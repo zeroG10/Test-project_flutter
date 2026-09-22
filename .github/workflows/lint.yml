@@ -1,0 +1,98 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  python-mobile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: automation/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv python install 3.11
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+
+  python-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: automation/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv python install 3.11
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      # Offline self-test of the reporting/redaction helpers. `unittest`, not pytest:
+      # these need no target, and conftest.py refuses a pytest session without
+      # API_BASE_URL. A helper that leaks a token must fail here, not in a review.
+      - name: Helper self-test (offline, no target)
+        run: uv run python -m unittest discover -s unit_tests -v
+
+  python-tools:
+    # automation/tools is the Sheets sync + traceability closure — the code that decides
+    # Passed / Failed / Blocked. Its offline self-test gates every change to it.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: automation/tools
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv python install 3.11
+      - run: uv sync --frozen
+      - name: Tools self-test (offline, no target)
+        run: uv run pytest
+
+  typescript-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx tsc --noEmit
+      # Offline self-test of the reporting/redaction and cleanup helpers — no browser,
+      # no target. Same reason as the api job above.
+      - name: Helper self-test (offline, no target)
+        run: npm run test:helpers
+
+  verdict:
+    # The ONLY job branch protection should require (see .github/GATES.md).
+    # GitHub counts a SKIPPED job as a passing required check — this job runs always
+    # and converts "didn't run" / "cancelled" into red. Blocked is never green.
+    needs: [python-mobile, python-api, python-tools, typescript-web]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gate verdict
+        run: |
+          failed=0
+          check() {
+            echo "$1 result: $2"
+            if [ "$2" != "success" ]; then
+              echo "::error::Gate G-5 (lint) is red: $1 result is '$2'."
+              failed=1
+            fi
+          }
+          check "python-mobile"  "${{ needs.python-mobile.result }}"
+          check "python-api"     "${{ needs.python-api.result }}"
+          check "python-tools"   "${{ needs.python-tools.result }}"
+          check "typescript-web" "${{ needs.typescript-web.result }}"
+          exit $failed

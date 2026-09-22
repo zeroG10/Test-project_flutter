@@ -1,0 +1,56 @@
+node_modules/
+playwright-report/
+test-results/
+automation/web/playwright/playwright-report/
+automation/web/playwright/test-results/
+.DS_Store
+.env
+.env.*
+# ...but the per-stack templates MUST ship — every README's `cp .env.example .env`
+# and both mobile CI workflows depend on them being in the clone.
+!.env.example
+!**/.env.example
+
+# Personal Claude Code settings (not for team)
+.claude/settings.local.json
+
+# Playwright MCP session logs
+.playwright-mcp/
+
+# AI-generated output — commit only after review
+_bmad-output/
+
+# Leftover artifacts
+example.png
+
+# Python / Appium mobile automation
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+allure-results/
+allure-report/
+automation/mobile/builds/*
+!automation/mobile/builds/.gitkeep
+!automation/mobile/builds/README.md
+!automation/mobile/builds/android/
+!automation/mobile/builds/ios/
+!automation/mobile/builds/flutter/
+automation/mobile/builds/*/*
+!automation/mobile/builds/*/.gitkeep
+automation/mobile/.env
+automation/api/.env
+
+# qa-tools secrets
+automation/tools/.secrets/
+automation/tools/.env
+
+# Figma-downloaded design screenshots (regenerate from Figma via MCP)
+docs/designs/web/screens/
+docs/designs/mobile/**/screens/
+# Playwright storageState (auth by state) — regenerated per run
+automation/web/playwright/.auth/
+# Web recon output (npm run pw:recon) — raw drafts; curated results go to qa/web/<NN-module>/ and screens/
+automation/web/playwright/scripts/recon-out/

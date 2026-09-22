@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # Web stack (Playwright + TypeScript)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - web
+
+  # API stack (Python via uv)
+  - package-ecosystem: pip
+    directory: /automation/api
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - api
+
+  # Mobile stack (Python via uv)
+  - package-ecosystem: pip
+    directory: /automation/mobile
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - mobile
+
+  # GitHub Actions themselves
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    labels:
+      - dependencies
+      - ci

@@ -1,0 +1,130 @@
+# ============================================================================
+# PROJECT MANIFEST — single source of truth for project-specific values.
+#
+# When starting a new project from this template:
+#   1. Fill in every <PLACEHOLDER> below (or leave it — the /setup-project
+#      skill will ask you for missing values interactively).
+#   2. Run /setup-project. It propagates these values into every consumer
+#      file listed in setup/SETUP.md and verifies the integrations.
+#
+# AI agents: NEVER guess a value that is still a <PLACEHOLDER> — ask the user.
+# This file is committed (it contains no secrets). Secrets go into the
+# .env files and .secrets/ folders listed in setup/SETUP.md.
+# ============================================================================
+
+# Version of the TEMPLATE this clone was made from (setup/SETUP.md §6 — how to pull
+# template updates into a clone). Bump only when syncing with upstream.
+template_version: "1.1.1"
+
+project:
+  name: "<PROJECT_NAME>"
+  repo_name: "<repo-name>"
+  description: "<one line: what is automated, for which product, which stacks>"
+
+# ----------------------------------------------------------------------------
+# PROJECT PROFILE — answers of prompts/00-discovery.md (Step 0 of /setup-project).
+# These select the route through the template (see the routes table in that prompt).
+# `<unknown>` is allowed and blocks only the steps that depend on it. Never guessed.
+# ----------------------------------------------------------------------------
+context:
+  product_state: "<existing-reachable|existing-access-pending|greenfield>"
+  sources_of_truth:                  # available sources; default precedence is by layer, not list order
+    - "<design|srs-prd|user-stories-ac|api-spec|live-product-only>"
+  precedence_note: "<default by layer, or owner override: source + scope + reason + owner/date; link docs/notes/decisions.md>"
+  shared_backend: "<which platforms share one backend, or none>"
+  first_module: "<module slug — and why it is first: risk / release date / client ask>"
+  auth:
+    method: "<email-password|otp-magic-link|sso|social|mixed>"
+    roles: ["<role1>", "<role2>"]
+    test_accounts: "<per role: exist / owner / to be created>"
+  test_data:
+    policy: "<free|naming-rule|read-only-shared|unknown>"   # read-only-shared → no seeding fixtures, read-only tests
+    reset: "<seed script / scheduled reset / none>"
+  environments:
+    target: "<dev|staging>"           # automation target, never production
+    ci_reachable: "<yes|vpn-required|unknown>"
+  reporting: "<markdown-only|google-sheets|both>"
+  decision_owner: "<who answers open questions and typical turnaround>"
+
+# Bug tracker — read by prompts/08-file-bug.md. `none` = bugs stay in qa/*/bugs/ markdown.
+tracker:
+  system: "<jira|linear|gitlab|redmine|none>"
+  base_url: "<https://…>"
+  project_key: "<KEY>"
+  access: "<rest-api key outside the repo|browser session|paste text to the engineer>"
+  language: "en"
+  environment_names: "<the team's own names, e.g. DEV / stage / prod>"
+  etalon_ticket: "<link to one well-written existing ticket, or none>"
+  field_defaults: "<issue type, initial status, priority scale, component → assignee, sprint rule, watchers>"
+  filing_confirmed_by: "<who says go before anything is created — doctrine rule 5>"
+
+# Which test stacks this project actually uses. Every stack ships wired in the template
+# (web = Playwright, mobile = Appium for Android / iOS / Flutter, api = httpx+pytest);
+# set the unused ones to false — /setup-project then skips their configuration and CI
+# can be trimmed (setup/SETUP.md §2). Leave the folders in place.
+platforms:
+  web: <true|false>
+  mobile: <true|false>
+  api: <true|false>
+
+# Optional QA modules — toggle what this project needs. /setup-project skips
+# disabled modules entirely (no config, no verify) and offers to delete their
+# scaffold folders from the clone. See setup/SETUP.md §2b for what each enables.
+modules:
+  load_testing: false        # k6 smoke→load→stress in automation/load/ (needs platforms.api)
+  visual_regression: false   # Playwright screenshot baselines + BASELINES.md governance (needs platforms.web)
+  security: false            # headers/CORS + IDOR matrix in automation/api/tests/security/ + OWASP checklist (needs platforms.api)
+  exploratory: true          # SBTM chartered sessions in qa/<platform>/<NN-module>/exploratory/
+  compatibility: true        # tiered device/browser matrix in qa/shared/device-matrix/
+  localization: false        # i18n/RTL sweeps — no scaffold yet (planned)
+
+web:
+  base_url: "<https://app.example.com>"   # dev/staging target, never production
+  figma:
+    file_key: "<FIGMA_FILE_KEY>"         # https://www.figma.com/design/<FIGMA_FILE_KEY>/<slug>
+    file_name: "<Figma file name>"
+    main_page_node: "<0:1>"              # page with the screens; node-ids go to docs/designs/web/figma-sources.md
+
+mobile:
+  kind: "<native|flutter>"              # flutter → APP_KIND=flutter in automation/mobile/.env (native drivers + Semantics ids)
+  android:
+    app_package: "<com.example.app>"
+    app_activity: "<com.example.app.MainActivity>"
+  ios:
+    bundle_id: "<com.example.app>"
+  figma:
+    file_key: "<FIGMA_FILE_KEY>"
+    file_name: "<Figma file name>"
+    main_page_node: "<0:1>"
+
+api:
+  base_url: "<https://api.example.com>" # also used by UI suites for login-by-API / seeding when platforms.api is false
+  env_label: "<dev|staging>"            # used in reports
+
+# Google Sheets that the checklist sync publishes into.
+# IDs come from the sheet URL: docs.google.com/spreadsheets/d/<THIS_PART>/edit
+# Column letters depend on the sheet layout — see automation/tools/README.md.
+sheets:
+  web:
+    sheet_id: "<WEB_SHEET_ID>"
+    worksheet: "Check-list"
+    id_col: "O"
+    obsolete_col: "P"
+  mobile:
+    sheet_id: "<MOBILE_SHEET_ID>"
+    worksheet: "Check-list"
+    id_col: "N"
+    obsolete_col: "O"
+
+# Integration prerequisites — /setup-project checks these and reports status.
+# Values here are pointers/instructions, not secrets.
+integrations:
+  figma_mcp:
+    server: "figma"                     # project-local MCP server in .mcp.json
+    auth: "Set FIGMA_PERSONAL_ACCESS_TOKEN in your shell env (PAT from figma.com/settings)"
+  google_sheets:
+    auth: "Service-account JSON at automation/tools/.secrets/credentials.json (gitignored). Share each sheet with the service-account email as Editor."
+  playwright_mcp:
+    server: "playwright"                # project-local MCP server in .mcp.json, no auth needed
+  mobile_mcp:
+    server: "mobile"                    # project-local MCP server in .mcp.json; needs a booted simulator/emulator + Xcode / Android SDK

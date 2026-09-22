@@ -1,0 +1,129 @@
+Authentication,
+Access and Permissions,Check that the Set Password page is accessible only via a valid activation link sent by email.
+,Check that the Set Password page blocks access and shows an error if the activation token is invalid.
+,Check that the Set Password page blocks access and shows an error if the activation token is expired.
+,Check that the Set Password page blocks access and shows an error if the activation token was already used.
+,Check that the Login page is reachable without an authenticated session.
+,Check that the Login page redirects an already authenticated user away from the form.
+,Check that the Login page denies access when credentials belong to a non-activated account.
+,Check that the Login page denies access when credentials belong to a disabled account.
+,Check that after successful login as Root User the system grants access to the Admin Panel landing page.
+,Check that after successful login as Manager User the system grants access to the Admin Panel landing page.
+,Check that after successful login as Manager User the Managers list page is not accessible.
+,Check that the Forgot Password page is reachable from the Login page without authentication.
+,"Check that the Set Password, Login, and Forgot Password pages are not accessible while a valid session is already active unless explicitly allowed."
+Navigation,Check that the Login page exposes a Forgot Password link that navigates to the Forgot Password page.
+,Check that the Forgot Password page exposes a Back to Login link that navigates to the Login page.
+,"Check that after successful password creation on the Set Password page the user is redirected to the Login page (or auto-logged in, if configured)."
+,Check that after successful login the user is redirected to the Admin Panel landing page.
+,Check that the password reset email link navigates the user to the Set Password page.
+,Check that the Back to Login link on the Forgot Password page remains available after the success confirmation is shown.
+,Check that using the browser Back button after a successful Set Password submission does not return the user to a usable form state.
+,Check that using the browser Back button after a successful login does not return the user to the Login page in an authenticated state.
+UI Layout,Check that the Set Password page displays a centered card layout on a neutral background.
+,Check that the Login page displays a centered card layout on a neutral background.
+,Check that the Forgot Password page displays a centered card layout on a neutral background.
+,Check that the Acme Field Services logo is displayed above the form on the Set Password page.
+,Check that the Acme Field Services logo is displayed above the form on the Login page.
+,Check that the Acme Field Services logo is displayed above the form on the Forgot Password page.
+,Check that the Set Password page shows the title "Set password".
+,Check that the Login page shows the title "Log in using your credentials".
+,Check that the Forgot Password page shows the title "Forgot your password?".
+,Check that the Set Password page shows instructional text describing the password requirements.
+,Check that the Forgot Password page shows instructional text describing the reset process.
+,Check that each authentication page uses a single-column form optimized for desktop and tablet.
+Fields and Controls,Check that the Set Password page contains a New Password field with masked input by default.
+,Check that the Set Password page contains a Confirm Password field with masked input by default.
+,Check that the New Password field on the Set Password page provides a visibility toggle to show or hide the password.
+,Check that the Confirm Password field on the Set Password page provides a visibility toggle to show or hide the password.
+,Check that the Set Password page contains a primary "Set password" button disabled by default.
+,Check that the Login page contains an Email field with placeholder "Please enter".
+,Check that the Login page contains a Password field with masked input by default.
+,Check that the Password field on the Login page provides a visibility toggle to show or hide the password.
+,Check that the Login page contains a Remember Me checkbox.
+,Check that the Login page contains a Forgot Password link.
+,Check that the Login page contains a primary "Log in" button disabled when required fields are empty or invalid.
+,Check that the Forgot Password page contains an Email field with placeholder "Please enter".
+,Check that the Forgot Password page contains a primary "Request password reset" button disabled by default.
+,Check that the Forgot Password page contains a Back to Login link.
+Positive Flow,Check that opening a valid activation link loads the Set Password page without errors.
+,Check that entering a New Password that satisfies all rules and a matching Confirm Password enables the "Set password" button on the Set Password page.
+,Check that clicking "Set password" with valid matching passwords activates the account and persists the password securely.
+,Check that after successful password creation on the Set Password page the activation token is invalidated and cannot be reused.
+,Check that entering a valid email and a non-empty password on the Login page enables the "Log in" button.
+,Check that submitting valid credentials on the Login page creates an authenticated session and redirects to the landing page.
+,Check that selecting Remember Me on the Login page persists the session beyond the default expiration according to the security configuration.
+,Check that not selecting Remember Me on the Login page limits session persistence to the default expiration window.
+,Check that entering a valid email format on the Forgot Password page enables the "Request password reset" button.
+,Check that submitting a valid email on the Forgot Password page replaces the form with the success confirmation message.
+,Check that submitting a valid email associated with an existing account on the Forgot Password page triggers a password reset email containing a single-use reset link.
+,Check that opening the reset link from the password reset email loads the Set Password page with a valid token.
+Validation,Check that the Set Password page rejects a New Password shorter than 12 characters with an inline error.
+,Check that the Set Password page rejects a New Password without at least one digit with an inline error.
+,Check that the Set Password page rejects a New Password without at least one letter with an inline error.
+,Check that the Set Password page rejects a New Password without at least one special character or one uppercase letter with an inline error.
+,Check that the Set Password page shows inline validation errors in real time as the user types.
+,Check that the Set Password page rejects submission when Confirm Password does not exactly match New Password.
+,Check that the "Set password" button remains disabled while any password rule is unmet.
+,Check that the "Set password" button remains disabled while New Password and Confirm Password do not match.
+,Check that invalid inputs on the Set Password page are highlighted with an error style.
+,Check that the Login page rejects an invalid email format with an inline error and prevents submission.
+,Check that the "Log in" button stays disabled when the email field is empty.
+,Check that the "Log in" button stays disabled when the password field is empty.
+,Check that the "Log in" button stays disabled when the email field contains an invalid format.
+,Check that the Forgot Password page rejects an invalid email format with an inline error.
+,Check that the "Request password reset" button stays disabled when the email field is empty or invalid.
+Negative Flow,Check that opening an invalid activation link on the Set Password page shows an error state and blocks the form.
+,Check that opening an expired activation link on the Set Password page shows an error state and blocks the form.
+,Check that opening a previously used activation link on the Set Password page shows an error state and blocks the form.
+,Check that submitting incorrect credentials on the Login page displays a generic "Incorrect email or password" error.
+,Check that the Login error message does not reveal whether the email or the password was incorrect.
+,Check that submitting credentials for a disabled account on the Login page displays an authentication error without disclosing account state.
+,Check that submitting credentials for a non-activated account on the Login page displays an authentication error.
+,Check that submitting a non-existent email on the Forgot Password page still displays the same success confirmation message to prevent account enumeration.
+,Check that submitting the Login form with leading or trailing whitespace in the email is treated according to backend trimming rules.
+Status Behavior,Check that the account status changes to active only after a successful password creation on the Set Password page.
+,Check that the activation token is marked as used immediately after successful password submission.
+,Check that a previously issued password reset token becomes invalid after being used once.
+,Check that a Remember Me session ends at the configured expiration time even if the browser remains open.
+Notifications and Alerts,Check that a password reset email is sent when a valid email is submitted on the Forgot Password page and an account exists.
+,"Check that the password reset email contains a single-use, time-limited reset link."
+,"Check that the success confirmation message on the Forgot Password page reads ""Please check your email. If an account is associated with this address, we've sent a reset link."""
+,Check that no password reset email is sent when the submitted email does not match any account.
+,"Check that the activation email sent after Root User creates a new account contains a single-use, time-limited activation link."
+Data Saving and Persistence,Check that a password set on the Set Password page is persisted and usable to log in on the Login page.
+,Check that an authenticated session created at login persists across page reloads within its configured lifetime.
+,Check that Remember Me persists the session across browser restarts according to the configured expiration.
+,Check that without Remember Me the session does not persist beyond the default session expiration.
+,Check that input entered in the Set Password form is preserved when a server error occurs during submission.
+API and Backend Error Handling,Check that the Set Password page displays a generic error message and allows retry when the password submission fails due to a server error.
+,Check that the Login page displays a generic error message and allows retry when the authentication service is unavailable.
+,Check that the Forgot Password page displays a generic error message and allows retry when the password reset service is unavailable.
+,Check that backend errors on any authentication page do not expose stack traces or internal details to the user.
+,Check that submission buttons on all authentication pages do not allow duplicate submissions while a request is in flight.
+Loading States,Check that the Set Password page shows a loading state on the "Set password" button while the submission request is in flight.
+,Check that the Login page shows a loading state on the "Log in" button while the authentication request is in flight.
+,Check that the Forgot Password page shows a loading state on the "Request password reset" button while the request is in flight.
+,Check that the Set Password page shows a loading state while validating the activation token on page load.
+Cross-browser,"Check that the Set Password page renders and functions identically on the latest versions of Chrome, Firefox, and Edge."
+,"Check that the Login page renders and functions identically on the latest versions of Chrome, Firefox, and Edge."
+,"Check that the Forgot Password page renders and functions identically on the latest versions of Chrome, Firefox, and Edge."
+,"Check that the password visibility toggle works on the latest versions of Chrome, Firefox, and Edge."
+,Check that browser password autofill on the Login page does not break the enabled/disabled state of the "Log in" button.
+,Check that browser password manager prompts to save the new password after a successful Set Password submission.
+Security,Check that all authentication page requests are transmitted over HTTPS only.
+,Check that passwords are never sent or displayed in plaintext in network logs or browser dev tools.
+,Check that activation links on the Set Password page are single-use and become invalid after a successful submission.
+,Check that password reset tokens on the Forgot Password flow are single-use and expire after the configured time.
+,Check that the Forgot Password response is identical regardless of whether the email is registered to prevent account enumeration.
+,Check that session tokens are stored in a manner that protects against XSS access.
+,Check that authenticated requests include CSRF protection where applicable.
+,Check that pasting script payloads into the email or password fields does not execute as code.
+,Check that the password visibility toggle does not reveal the password value in the DOM in a way that persists after toggle-off.
+,Check that role-based access enforced after login restricts Manager Users from Root-only areas such as the Managers list.
+,Check that logout invalidates the session token on the server side and prevents reuse.
+,Check that an expired session redirects the user back to the Login page on the next protected action.
+Regression Checks,Check that after a password reset the previous password can no longer be used to log in on the Login page.
+,Check that after a successful login the role-based navigation menu reflects the user's role on the landing page.
+,Check that existing active sessions remain valid after a different user resets their password.
+,Check that the activation flow does not interfere with previously activated accounts attempting to log in.

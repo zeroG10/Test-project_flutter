@@ -1,0 +1,90 @@
+name: API Tests (pytest + httpx)
+
+on:
+  pull_request:
+    paths:
+      - 'automation/api/**'
+      - '.github/workflows/api-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'automation/api/**'
+  workflow_dispatch:
+    inputs:
+      api_env:
+        description: 'Environment to test against'
+        required: false
+        default: 'staging'
+        type: choice
+        options:
+          # Fail-closed allowlist: prod is deliberately NOT an option. CI runs only what
+          # is safe to run a hundred times — never production.
+          - dev
+          - staging
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: automation/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Environment allowlist (fail closed)
+        env:
+          API_ENV: ${{ inputs.api_env || 'staging' }}
+        run: |
+          case "$API_ENV" in
+            dev|staging) echo "env '$API_ENV' allowed" ;;
+            *) echo "::error::Refusing to run against '$API_ENV' — allowed: dev, staging. Never production."; exit 1 ;;
+          esac
+
+      - name: Run smoke tests
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          API_ENV: ${{ inputs.api_env || 'staging' }}
+        # pytest exits 5 when zero tests are collected — that red is deliberate:
+        # an empty run is not a passing run. Never add --suppress-no-tests or `|| true`.
+        # `not quarantine`: tests parked with a BUG id (GATES.md rule 3 + quarantine
+        # register) cannot vote in the gate. A skip inside the run turns the exit code
+        # red too (conftest.py, CI strict-skip: a skip is Blocked, never green).
+        run: uv run pytest -m "smoke and not quarantine" --tb=short
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-allure-results
+          path: automation/api/allure-results/
+          retention-days: 14
+
+  verdict:
+    # The ONLY job branch protection should require (see .github/GATES.md).
+    # GitHub counts a SKIPPED job as a passing required check — this job runs always
+    # and converts "didn't run" / "cancelled" into red. Blocked is never green.
+    needs: [test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gate verdict
+        run: |
+          result="${{ needs.test.result }}"
+          echo "test job result: $result"
+          if [ "$result" != "success" ]; then
+            echo "::error::Gate G-2 (api) is red: test job result is '$result'."
+            exit 1
+          fi

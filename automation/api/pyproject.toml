@@ -1,0 +1,54 @@
+[project]
+name = "api-automation"
+version = "0.1.0"
+description = "API tests (Python + pytest + httpx)"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27.0",
+    "pytest>=8.0.0",
+    "pytest-xdist>=3.5.0",
+    "pytest-rerunfailures>=14.0",
+    "pytest-timeout>=2.3.0",
+    "allure-pytest>=2.13.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "jsonschema>=4.20.0",
+    "tenacity>=8.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+    "respx>=0.21.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "-ra",
+    "--tb=short",
+    "--alluredir=allure-results",
+    "--clean-alluredir",
+]
+markers = [
+    "smoke: critical smoke tests",
+    "regression: full regression suite",
+    "contract: schema/contract validation tests",
+    "auth: tests requiring authentication",
+    "security: grey-box security checks (headers, CORS, IDOR/access-control)",
+    "slow: long-running tests",
+    "quarantine: parked flaky/blocked-by-defect test — MUST carry a BUG id in the reason; excluded from CI gates via -m \"... and not quarantine\" (GATES.md quarantine register)",
+    "chk(id): checklist item this test proves, e.g. CHK-AUTH-001",
+]

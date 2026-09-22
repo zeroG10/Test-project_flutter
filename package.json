@@ -1,0 +1,25 @@
+{
+  "name": "qa-automation-template",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reusable QA template: manual artifacts + Playwright (web), Appium (mobile), httpx (API). Set name/description via /setup-project.",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^20.19.43",
+    "dotenv": "^17.4.2",
+    "tsx": "^4.23.13",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "pw:test": "playwright test --config=automation/web/playwright.config.ts",
+    "pw:smoke": "playwright test --config=automation/web/playwright.config.ts --grep @smoke",
+    "pw:map-health": "playwright test --config=automation/web/playwright.config.ts --project=map-health",
+    "pw:ui": "playwright test --config=automation/web/playwright.config.ts --ui",
+    "pw:debug": "playwright test --config=automation/web/playwright.config.ts --debug",
+    "pw:codegen": "playwright codegen $BASE_URL",
+    "pw:report": "playwright show-report automation/web/playwright/playwright-report",
+    "pw:screenshot": "playwright screenshot",
+    "pw:recon": "tsx automation/web/playwright/scripts/recon.ts",
+    "test:helpers": "node --import tsx --test automation/web/unit-tests/*.test.ts"
+  }
+}
