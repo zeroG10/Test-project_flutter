@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import re
 import shutil
 import sys
 from dataclasses import dataclass, field
@@ -36,6 +37,7 @@ from pathlib import Path
 
 import trace_results as tr
 
+PAGE_TITLE = "Field Services Regression"
 DEFAULT_OUT = tr.REPO_ROOT / "automation" / "mobile" / "reports" / "summary"
 MARKER = ".generated-by-build_summary"  # only a folder carrying it is ever cleaned
 CHECKPOINT_PREFIX = "· "  # checkpoint attachments are named "NN · name" (helpers/evidence.py)
@@ -52,6 +54,7 @@ class TestRun:
     duration_s: float
     start_ms: int
     stop_ms: int
+    func: str = ""  # test function name (fullName after "#") — links a test to its bug file
     checkpoints: list[tuple[str, Path]] = field(default_factory=list)
     failure_shots: list[Path] = field(default_factory=list)
     videos: list[Path] = field(default_factory=list)
@@ -105,6 +108,7 @@ def load_test_runs(allure_dir: Path) -> list[TestRun]:
             duration_s=max(stop - start, 0) / 1000,
             start_ms=start,
             stop_ms=stop,
+            func=str(d.get("fullName") or "").partition("#")[2],
         )
         for att in _attachments(d) + from_fixtures.get(str(d.get("uuid")), []):
             source = allure_dir / str(att.get("source") or "")
@@ -133,6 +137,35 @@ def read_environment(allure_dir: Path) -> dict[str, str]:
     return env
 
 
+@dataclass(frozen=True)
+class Bug:
+    bug_id: str
+    title: str
+    severity: str
+    path: Path
+
+
+def load_bugs(pattern_root: Path = tr.REPO_ROOT / "qa" / "mobile") -> list[Bug]:
+    """``qa/mobile/<NN-module>/bugs/BUG-*.md`` — id, title and severity, as filed."""
+    bugs: list[Bug] = []
+    for f in sorted(pattern_root.glob("*/bugs/BUG-*.md")):
+        text = f.read_text(encoding="utf-8")
+        first = text.splitlines()[0] if text else ""
+        title = first.split("—", 1)[1].strip() if "—" in first else f.stem
+        m = re.search(r"\*\*Severity:\*\*\s*(S\d)", text)
+        bugs.append(Bug(f.stem, title, m.group(1) if m else "", f))
+    return bugs
+
+
+def bug_for(run: TestRun, bugs: list[Bug]) -> Bug | None:
+    """The bug whose report names this test function (the regression check it cites)."""
+    if not run.func:
+        return None
+    # "::test_name" not followed by "[": a bug citing ONE parametrised row never claims them all
+    cited = re.compile(rf"::{re.escape(run.func)}(?!\[)\b")
+    return next((b for b in bugs if cited.search(b.path.read_text(encoding="utf-8"))), None)
+
+
 def module_of_checklist(path: Path) -> str:
     """``qa/mobile/02-authentication/…`` -> ``02 · Authentication``."""
     number, _, slug = path.parent.name.partition("-")
@@ -145,36 +178,63 @@ def module_of_checklist(path: Path) -> str:
 # Rendering
 # --------------------------------------------------------------------------- #
 
-CSS = """
-:root{--bg:#f7f7f5;--surface:#fff;--text:#1d1d1b;--muted:#5f5e5a;--line:#e3e2dc;
---pass:#1f7a4d;--pass-bg:#e3f3ea;--fail:#b3261e;--fail-bg:#fbe7e5;--block:#8a5a00;
---block-bg:#fdf1d8;--none:#5f5e5a;--none-bg:#eeede8;--accent:#2b59c3}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;
---surface:#1f1f1d;--text:#ecebe6;--muted:#a3a29b;--line:#34332f;--pass:#6fd19c;
---pass-bg:#173526;--fail:#ff9b91;--fail-bg:#3d1c19;--block:#f3c262;--block-bg:#3a2d10;
---none:#a3a29b;--none-bg:#2a2a27;--accent:#8fb0ff}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);
-font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+# Palette: cool neutrals with the product's own maroon as the only accent; semantic status
+# colours are separate. Light tokens on :root; dark under the system query AND the explicit
+# data-theme stamp (artifact viewers have three theme states).
+_DARK = (
+    "--bg:#121417;--surface:#1b1e23;--text:#e8eaed;--muted:#9aa1ac;--line:#2c3037;"
+    "--accent:#e0868c;--pass:#6fd19c;--pass-bg:#16342a;--fail:#ff9b91;--fail-bg:#3b1d1b;"
+    "--block:#f0c060;--block-bg:#372c12;--none:#9aa1ac;--none-bg:#262a30;color-scheme:dark"
+)
+FONTS = (
+    "<link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500"
+    "&family=IBM+Plex+Sans:wght@400;500;600&display=swap'>"
+)
+CSS = (
+    """
+:root{--bg:#f6f7f9;--surface:#fff;--text:#16191f;--muted:#5b6270;--line:#e2e5ea;
+--accent:#7a2b30;--pass:#1d7048;--pass-bg:#e2f2e9;--fail:#b3261e;--fail-bg:#fbe7e5;
+--block:#835400;--block-bg:#fbefd6;--none:#5b6270;--none-bg:#eceef2;
+--sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+--mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){"""
+    + _DARK
+    + """}}
+:root[data-theme="dark"]{"""
+    + _DARK
+    + """}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 var(--sans)}
 main{max-width:1100px;margin:0 auto;padding:32px 16px 64px}
-h1{font-size:26px;margin:0 0 4px}h2{font-size:19px;margin:40px 0 12px}
-h3{font-size:15px;margin:20px 0 8px}.muted{color:var(--muted)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
-.tile b{display:block;font-size:26px;line-height:1.2;font-variant-numeric:tabular-nums}
-.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 16px}
+h1{font-size:28px;font-weight:600;margin:0 0 6px;text-wrap:balance}
+h2{font-size:18px;font-weight:600;margin:44px 0 12px;padding-top:12px;
+border-top:2px solid var(--accent);text-wrap:balance}
+h3{font-size:15px;font-weight:600;margin:22px 0 8px;text-wrap:balance}
+.muted{color:var(--muted)}.id{font-family:var(--mono);font-size:13px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.tile b{display:block;font:600 28px/1.2 var(--mono);font-variant-numeric:tabular-nums;margin-bottom:4px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 16px}
+.box ul{margin:12px 0;padding-left:18px}.box li{margin:6px 0}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:13px;color:var(--muted);font-weight:600}tr:last-child td{border-bottom:0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+tr:last-child td{border-bottom:0}
 .wrap{overflow-x:auto}.pill{display:inline-block;padding:1px 8px;border-radius:999px;
-font-size:13px;font-weight:600;white-space:nowrap}
+font-size:12px;font-weight:600;white-space:nowrap}
 .Passed{color:var(--pass);background:var(--pass-bg)}.Failed{color:var(--fail);background:var(--fail-bg)}
 .Blocked{color:var(--block);background:var(--block-bg)}.NotRun{color:var(--none);background:var(--none-bg)}
-.gallery{display:flex;flex-wrap:wrap;gap:12px}.gallery figure{margin:0;width:180px}
-.gallery img{width:100%;border:1px solid var(--line);border-radius:8px}
-figcaption{font-size:12px;color:var(--muted)}video{max-width:320px;border-radius:8px}
-dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:12px 0}dt{color:var(--muted)}
-dd{margin:0}code{font-size:13px}
+.bug{font-family:var(--mono);font-size:13px;color:var(--fail)}
+.gallery{display:flex;flex-wrap:wrap;gap:12px}.gallery figure{margin:0;width:170px;max-width:100%}
+.gallery img{width:100%;border:1px solid var(--line);border-radius:6px}
+figcaption{font:12px/1.4 var(--mono);color:var(--muted);margin-top:4px}
+video{max-width:100%;width:300px;border-radius:6px;border:1px solid var(--line)}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:12px 0}
+dt{color:var(--muted)}dd{margin:0;overflow-wrap:anywhere}code{font:13px var(--mono)}
+@media (max-width:520px){dl{grid-template-columns:1fr}dd{margin-bottom:6px}}
 """
+)
 
 
 def _e(text: object) -> str:
@@ -218,16 +278,19 @@ def render(
     manual_minutes: float | None,
     copy: AssetCopier,
     now: datetime,
-) -> str:
+    bugs: list[Bug] | None = None,
+) -> tuple[str, str]:
+    """(head, body): the head is <title> + fonts + <style>; the body is the page content.
+    A full document wraps both; an artifact publish takes them as a fragment."""
+    bugs = bugs or []
     counts = {s: sum(1 for r in runs if r.status == s) for s in ("Passed", "Failed", "Blocked")}
     wall = (max(r.stop_ms for r in runs) - min(r.start_ms for r in runs)) / 1000 if runs else 0
     verified = summary.passed + summary.failed  # an objective verdict either way
     out: list[str] = []
     w = out.append
-    w("<!doctype html><html lang='en'><head><meta charset='utf-8'>")
-    w("<meta name='viewport' content='width=device-width,initial-scale=1'>")
-    w(f"<title>Regression Run Summary</title><style>{CSS}</style></head><body><main>")
-    w("<h1>Regression run summary</h1>")
+    head = f"<title>{PAGE_TITLE}</title>{FONTS}<style>{CSS}</style>"
+    w("<main><p class='eyebrow'>Automated regression · run summary</p>")
+    w(f"<h1>{PAGE_TITLE}</h1>")
     w(
         f"<p class='muted'>{_e(env.get('App', 'App not recorded'))} · build "
         f"{_e(env.get('Build', 'not recorded'))} · {_e(env.get('Platform', ''))} "
@@ -253,8 +316,8 @@ def render(
         )
     else:
         w(
-            "<div class='tile'><b>—</b>manual-time comparison not recorded "
-            "(pass <code>--manual-minutes-per-check</code>)</div>"
+            "<div class='tile'><b>—</b>comparison with manual regression: waiting for the "
+            "team's estimate of minutes per check</div>"
         )
     w("</div>")
     failed = [r for r in runs if r.status == "Failed"]
@@ -263,7 +326,13 @@ def render(
     if not failed and not blocked:
         w("<li>Nothing failed and nothing was blocked in this run.</li>")
     for r in failed:
-        w(f"<li>{_pill('Failed')} {_e(r.title)} — <span class='muted'>{_e(r.detail)}</span></li>")
+        bug = bug_for(r, bugs)
+        why = (
+            f"<span class='bug'>{_e(bug.bug_id)}</span> ({_e(bug.severity)}) — {_e(bug.title)}"
+            if bug
+            else f"<span class='muted'>{_e(r.detail)}</span>"
+        )
+        w(f"<li>{_pill('Failed')} {_e(r.title)} — {why}</li>")
     for r in blocked:
         w(f"<li>{_pill('Blocked')} {_e(r.title)} — <span class='muted'>{_e(r.detail)}</span></li>")
     w("</ul></div>")
@@ -298,7 +367,10 @@ def render(
             _count(len(r.videos), "video"),
         ]
         evidence = ", ".join(part for part in parts if part) or "—"
+        bug = bug_for(r, bugs) if r.status == "Failed" else None
         detail = f"<br><span class='muted'>{_e(r.detail)}</span>" if r.detail else ""
+        if bug:
+            detail = f"<br><span class='bug'>{_e(bug.bug_id)}</span> <span class='muted'>{_e(bug.title)}</span>"
         w(
             f"<tr><td>{_e(r.title)}{detail}</td><td>{_e(r.module)}</td><td>{_pill(r.status)}</td>"
             f"<td>{_minutes(r.duration_s)}</td><td>{_e(evidence)}</td></tr>"
@@ -329,8 +401,8 @@ def render(
         "the traceability matrix (<code>trace_results.py</code>); step-by-step detail: the "
         "Allure report (<code>allure serve automation/mobile/allure-results</code>).</p>"
     )
-    w("</main></body></html>")
-    return "\n".join(out)
+    w("</main>")
+    return head, "\n".join(out)
 
 
 # --------------------------------------------------------------------------- #
@@ -372,7 +444,7 @@ def main(argv: list[str] | None = None) -> int:
     rows, _orphans = tr.build_rows(items, results)
     summary = tr.summarize(rows)
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    page = render(
+    head, body = render(
         runs=load_test_runs(args.allure_dir),
         rows=rows,
         summary=summary,
@@ -381,9 +453,17 @@ def main(argv: list[str] | None = None) -> int:
         manual_minutes=args.manual_minutes_per_check,
         copy=AssetCopier(args.out_dir),
         now=datetime.now(UTC),
+        bugs=load_bugs(),
     )
     out = args.out_dir / "index.html"
-    out.write_text(page, encoding="utf-8")
+    out.write_text(
+        "<!doctype html><html lang='en'><head><meta charset='utf-8'>"
+        "<meta name='viewport' content='width=device-width,initial-scale=1'>"
+        f"{head}</head><body>{body}</body></html>",
+        encoding="utf-8",
+    )
+    # Artifact publish: the host wraps the skeleton itself — a fragment, head first.
+    (args.out_dir / "page.html").write_text(f"{head}\n{body}\n", encoding="utf-8")
     tr.log("INFO", f"{summary.line()} -> {out}")
     return 0
 

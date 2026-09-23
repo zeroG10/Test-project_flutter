@@ -108,7 +108,19 @@ def harness_commit() -> str:
         )
     except (OSError, subprocess.SubprocessError):
         return NOT_RECORDED
-    return out.stdout.strip() or NOT_RECORDED
+    commit = out.stdout.strip()
+    if not commit:
+        return NOT_RECORDED
+    dirty = subprocess.run(
+        ["git", "status", "--porcelain", "--untracked-files=no"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=10,
+        check=False,
+    ).stdout.strip()
+    # A run on uncommitted code is not reproducible from the commit alone — say so.
+    return f"{commit} (uncommitted changes)" if dirty else commit
 
 
 def env_label(platform: str) -> str:

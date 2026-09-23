@@ -134,7 +134,7 @@ def test_attention_list_and_run_context(run_dir: Path) -> None:
     assert "Blocked: no signed-out Welcome" in page
     assert "<dd>abc1234</dd>" in page
     assert "<dd>pytest --platform=ios</dd>" in page
-    assert "manual-time comparison not recorded" in page
+    assert "waiting for the team's estimate of minutes per check" in page
 
 
 def test_manual_estimate_only_when_given(run_dir: Path) -> None:
@@ -196,3 +196,30 @@ def test_empty_run_is_blocked(tmp_path: Path) -> None:
         ["--allure-dir", str(tmp_path / "allure-results"), "--checklist", str(checklist)]
     )
     assert code == 2
+
+
+def test_artifact_fragment_has_no_document_skeleton(run_dir: Path) -> None:
+    _, _, out = _build(run_dir)
+    fragment = (out / "page.html").read_text(encoding="utf-8")
+    assert fragment.startswith("<title>Field Services Regression</title>")
+    for tag in ("<!doctype", "<html", "<head>", "<body"):
+        assert tag not in fragment.lower()
+    # the three theme states: system dark, explicit dark, explicit light
+    assert ':root:not([data-theme="light"])' in fragment
+    assert ':root[data-theme="dark"]' in fragment
+
+
+def test_failed_test_is_linked_to_the_bug_that_cites_it(
+    run_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    bugs = run_dir / "qa" / "mobile" / "02-authentication" / "bugs"
+    bugs.mkdir()
+    (bugs / "BUG-AUTH-009.md").write_text(
+        "# BUG-AUTH-009 — Login content is wrong\n\n- **Severity:** S3 (minor)\n\n"
+        "Regression check: `test_auth.py::t004`\n",
+        encoding="utf-8",
+    )
+    real = bs.load_bugs
+    monkeypatch.setattr(bs, "load_bugs", lambda: real(run_dir / "qa" / "mobile"))
+    _, page, _ = _build(run_dir)
+    assert "BUG-AUTH-009</span> (S3) — Login content is wrong" in page

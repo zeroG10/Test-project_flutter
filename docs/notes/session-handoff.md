@@ -170,8 +170,12 @@ happy flow → валідації); які пункти чеклісту кож�
     → http://127.0.0.1:5252 (Suites → iOS → «02 · Authentication»; Behaviors → модуль → TC).
   - Зведена сторінка для ліда: `automation/mobile/reports/summary/index.html` (генерує `automation/tools/build_summary.py`).
   - Матриця трасування: `qa/mobile/<NN-module>/<module>-traceability.md` (генерує `automation/tools/trace_results.py`).
-  - Посилання claude.ai (доступне з будь-якого пристрою) — **лише за командою власника**: сторінка містить скріншоти
-    інтерфейсу замовника.
+  - **Опубліковано (власник, 2026-09-23): https://claude.ai/artifact/NvRzuhzr418nLAYMZfaf15** — приватна сторінка
+    (відкривається лише власнику, поки він сам не поділиться через Share). Оновлювати ТУ САМУ сторінку: у новій сесії —
+    Artifact publish з `url` цього посилання, файл `automation/mobile/reports/summary/page.html` (+ `assets/*` через
+    `files`, `root` = `automation/mobile/reports/summary`). Перед кожною публікацією: email тестового акаунта на
+    скріншотах замазати (кадри логіну та OTP) — у харнесі поки немає автоматичного маскування (зробити:
+    `evidence.checkpoint(..., hide=[елементи])`); кадри «jobs-list» робити після завантаження списку, не на спінері.
 
 ## 4. Ключові факти (деталі — у файлах за посиланнями)
 
