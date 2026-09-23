@@ -63,11 +63,26 @@ replace it when the id ships.
 from screens import resolve
 from screens.login_map import LOGIN
 
-el = resolve(driver, platform, LOGIN, "email")       # WebElement, explicit presence wait
-loc = LOGIN.locator("ios", "submit")                  # ("accessibility id", "login-submit")
+el = resolve(driver, platform, LOGIN, "identifier")  # WebElement, explicit presence wait
+loc = LOGIN.locator("ios", "continue")                # ("-ios predicate string", "type == … 'Continue'")
 ```
 
-Page objects (`pages/`) do this for you: `LoginPage(driver).tap("submit")`.
+Page objects (`pages/`) do this for you: `LoginPage(driver).tap("continue")`.
+
+## Parametrised locators
+
+A message known only at run time (the expected error text, the address an OTP went to) is
+one alias with a `{text}` placeholder — never a locator built inside a test or a page:
+
+```python
+"error": El(ios=(AppiumBy.IOS_PREDICATE, "type == 'XCUIElementTypeStaticText' AND name == {text}"),
+            note="parametrised by the expected message"),
+```
+
+`page.visible("error", text="Format is incorrect.")` fills it; for predicate / UiSelector
+strategies the value is inserted as a quoted literal (`screens.fill`). Only `{text}` is allowed,
+static values contain no braces (NSPredicate `IN {…}` → write `OR`), and a parametrised entry
+carries a `note=` — checked offline by `unit_tests/test_screen_maps.py`.
 
 ## Flutter note
 

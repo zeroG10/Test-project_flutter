@@ -555,22 +555,29 @@ are used so no real person receives a message.
 
 ## Aliases used
 
-All screens are resolvable from the recon dumps (`qa/shared/recon-dumps/ios-2026-09-23/`, incl. `registration_*`
-and `sms_terms_bottom`); they become `yes` once written into the screen maps. Unlabelled elements that need a
-relative locator with `note=` (decision 2026-09-23): `registration.channel-sms` / `.channel-email` (radios inside
-the `SMS\nEmail` container), `registration.sms-consent` (Switch next to its text), `welcome.back` / OTP back (system
-back used instead). Error texts under fields are their own text elements.
+Screen maps written in step 5 (2026-09-23): `automation/mobile/screens/{welcome,login,otp,registration,sms_terms,jobs_list}_map.py`,
+from the recon dumps `qa/shared/recon-dumps/ios-2026-09-23/`. Offline map-health
+(`automation/mobile/unit_tests/test_screen_maps.py`) checks that every alias below resolves; whether a locator
+finds its element is proven on the first device run. Android maps come with step 7.
+**UNCONFIRMED** = the OTP tree was not saved in recon and three messages were never displayed: the entry uses
+the checklist / test-case wording and is confirmed in recon 3d. Unnamed controls are testability defects
+TD-AUTH-001…007 (`docs/requirements/shared/testability-contract.md` §5).
 
 | Alias | Screen | android map | ios map |
 |---|---|---|---|
-| app | — (launch / relaunch) | n/a | n/a |
-| welcome.root, welcome.title, welcome.subtitle, welcome.sign-up, welcome.login, welcome.back | welcome | MISSING | MISSING (recon: resolvable) |
-| login.root, login.title, login.subtitle, login.helper, login.identifier, login.continue, login.error, login.privacy-link, login.terms-link, login.sign-up-link | login | MISSING | MISSING (recon: resolvable; `login.error` texts not yet seen) |
-| otp.root, otp.title, otp.instruction, otp.destination, otp.code, otp.verify, otp.error, otp.resend | otp | MISSING | MISSING (recon: resolvable) |
-| jobs-list.root | jobs-list | MISSING | MISSING (recon: resolvable) |
-| registration.root, .title, .subtitle, .first-name, .last-name, .phone, .phone-prefix, .email, .channel-section, .channel-options, .channel-sms, .channel-email, .sms-consent, .sms-consent-text, .continue, .privacy-link, .terms-link, .log-in-link, .error[{{field}}] | registration | MISSING | MISSING (recon 3c: resolvable) |
-| registration.form-error | registration | MISSING | MISSING (not yet observed — duplicate-phone error, TC-AUTH-014) |
-| sms-terms.root, sms-terms.accept | sms-terms | MISSING | MISSING (recon 3c: resolvable) |
+| app | — (launch / relaunch) | n/a | n/a (`helpers/app.py`) |
+| welcome.root, .title, .subtitle, .sign-up, .login, .back | welcome | step 7 | yes (`back` = any back control, used only for expect-hidden) |
+| login.root, .title, .subtitle, .helper, .identifier, .continue, .privacy-link, .terms-link, .sign-up-link | login | step 7 | yes |
+| login.error | login | step 7 | yes — parametrised by the expected text; where it is drawn **UNCONFIRMED** |
+| otp.root, .title, .code, .error | otp | step 7 | yes (`code` = the hidden field, TD-AUTH-002) |
+| otp.instruction, .verify, .resend | otp | step 7 | yes — **UNCONFIRMED** wording / name |
+| otp.destination | otp | step 7 | yes — parametrised by the address / last digits |
+| jobs-list.root | jobs-list | step 7 | yes |
+| registration.root, .title, .subtitle, .first-name, .last-name, .phone, .phone-prefix, .email, .channel-section, .channel-options, .sms-consent, .sms-consent-text, .continue, .privacy-link, .terms-link, .log-in-link | registration | step 7 | yes (`sms-consent` = the only switch, TD-AUTH-004) |
+| registration.channel-sms, .channel-email | registration | step 7 | page method `RegistrationPage.choose_channel` / `selected_channel` (radios by position, TD-AUTH-003) |
+| registration.error[{{field}}] | registration | step 7 | page method `RegistrationPage.field_errors` (texts inside the field's bounds, TD-AUTH-007) |
+| registration.form-error | registration | step 7 | yes — parametrised by the expected text; where it is drawn **UNCONFIRMED** |
+| sms-terms.root, sms-terms.accept | sms-terms | step 7 | yes |
 
 ## Fixtures used
 

@@ -82,3 +82,27 @@ Notes:
 - [ ] The alias → id table (§3) for the feature is filled and attached to the ticket.
 - [ ] Ids verified present in the build QA receives (web: DevTools; Android: `uiautomatorviewer` /
       Appium Inspector; iOS: Accessibility Inspector / Appium Inspector).
+
+## 5. Project log — Concert Technologies Field Services, mobile (Flutter)
+
+State of the build QA received (`[DEV] CT Mobile` 1.1.1 (178)), found while writing the screen maps
+(step 5, 2026-09-23). **Owner decision 2026-09-23:** the app is not changed for testing; with
+`Semantics(identifier:)` absent everywhere, the visible texts serve as locators (one language, stable
+copy), and every element without a text is a testability defect below. Checks that cannot be reached
+around a defect stay **Blocked**, never Passed.
+
+| ID | Where | What is missing | Workaround in the map (`note=`) | Checks affected |
+|---|---|---|---|---|
+| TD-ALL-001 | whole app | no `Semantics(identifier:)` on any element (audit: 0 identifiers) | visible text as locator; a copy change breaks one map entry | all — maintenance risk, not a blocker |
+| TD-AUTH-001 | Welcome, Login, Registration | logo image has no label | none — logo checks stay manual | CHK-AUTH-017, -104 (partial) |
+| TD-AUTH-002 | OTP | code input is a hidden 1×1 field without a label | the only text field on the screen | none (reachable) |
+| TD-AUTH-003 | Registration | SMS / Email radios have no names | position inside the labelled `SMS\nEmail` container; state from `value` | none (reachable) |
+| TD-AUTH-004 | Registration | SMS consent switch has no name | the only switch on the screen | none (reachable) |
+| TD-AUTH-005 | SMS Terms | close icon has no name | the only unnamed button on the screen | CHK-AUTH-057 (deferred) |
+| TD-AUTH-006 | OTP | back button has no name | system back (edge swipe on iOS) | CHK-AUTH-097 via system back |
+| TD-AUTH-007 | Login, Registration, OTP | validation / server messages have no ids | located by their exact text (parametrised alias) or as texts inside the field's bounds | none (reachable) |
+| TD-JOBS-001 | Jobs list | list ↔ calendar toggle has no name | the only unnamed button on the screen (module 03) | module 03 |
+| TD-PHOTO-001 | Photo editor | four toolbar buttons unnamed; palette and canvas absent from the tree | position only; markup checks `Blocked` | module 09 (9 checks) |
+
+Suggested ids for the dev team follow §1 (`<screen>-<element>`), e.g. `registration-channel-sms`,
+`registration-sms-consent`, `otp-code`, `otp-back`, `sms-terms-close`, `jobs-list-view-toggle`.

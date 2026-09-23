@@ -7,6 +7,7 @@ Format, alias rules and the Flutter note: screens/README.md.
 """
 
 import re
+import string
 from dataclasses import dataclass, field
 
 from appium.webdriver.common.appiumby import AppiumBy
@@ -17,7 +18,16 @@ from config.settings import normalize_platform, settings
 from helpers import waits
 from helpers.waits import Locator
 
-__all__ = ["ALLOWED_STRATEGIES", "El", "Locator", "Screen", "locator_for", "resolve"]
+__all__ = [
+    "ALLOWED_STRATEGIES",
+    "El",
+    "Locator",
+    "Screen",
+    "fill",
+    "locator_for",
+    "resolve",
+    "template_fields",
+]
 
 ALIAS = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
 
@@ -131,11 +141,51 @@ class Screen:
             raise LookupError(f"{self.qualified(alias)}: {exc}") from None
 
 
-def locator_for(screen: Screen, platform: str, alias: str) -> Locator:
+# Strategies whose value is a query language: a parameter goes in as a quoted literal.
+_QUOTED = frozenset(
+    {AppiumBy.IOS_PREDICATE, AppiumBy.IOS_CLASS_CHAIN, AppiumBy.ANDROID_UIAUTOMATOR}
+)
+
+
+def template_fields(locator: Locator) -> set[str]:
+    """Placeholders of a parametrised locator: ``name CONTAINS {text}`` -> ``{"text"}``."""
+    return {name for _, name, _, _ in string.Formatter().parse(locator[1]) if name}
+
+
+def fill(locator: Locator, params: dict[str, object]) -> Locator:
+    """Put runtime values into a parametrised locator (e.g. an expected message text).
+
+    A map may hold ``"error": El(ios=(IOS_PREDICATE, "name == {text}"))`` — the text is the
+    expectation a step asserts, known only at run time. Values are quoted for predicate /
+    UiSelector strategies, so a quote in the value cannot change the query.
+    """
+    strategy, value = locator
+    fields = template_fields(locator)
+    if fields != set(params):
+        raise LookupError(
+            f"locator {value!r} needs parameters {sorted(fields)}, got {sorted(params)}"
+        )
+    if not fields:
+        return locator
+
+    def quote(raw: object) -> str:
+        text = str(raw)
+        if strategy not in _QUOTED:
+            return text
+        return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+    return strategy, value.format(**{key: quote(val) for key, val in params.items()})
+
+
+def locator_for(screen: Screen, platform: str, alias: str, **params: object) -> Locator:
     """Locator for ``screen.alias`` on ``platform``, honouring FLUTTER_DRIVER from settings."""
-    return screen.locator(
+    locator = screen.locator(
         normalize_platform(platform), alias, flutter_integration=settings.uses_flutter_integration
     )
+    try:
+        return fill(locator, params)
+    except LookupError as exc:
+        raise LookupError(f"{screen.qualified(alias)}: {exc}") from None
 
 
 def resolve(
@@ -144,6 +194,7 @@ def resolve(
     screen: Screen,
     alias: str,
     timeout: float | None = None,
+    **params: object,
 ) -> WebElement:
     """WebElement for ``screen.alias`` on ``platform``, via an explicit presence wait."""
-    return waits.wait_present(driver, locator_for(screen, platform, alias), timeout)
+    return waits.wait_present(driver, locator_for(screen, platform, alias, **params), timeout)

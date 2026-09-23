@@ -27,12 +27,15 @@ automation/mobile/
 │   ├── settings.py        # pydantic-settings: .env → settings (PLATFORM, APP_KIND, FLUTTER_DRIVER, …)
 │   └── capabilities.py    # UiAutomator2Options / XCUITestOptions (+ FlutterIntegration when opted in)
 ├── screens/               # screen maps: alias → locator per platform — the ONLY place a locator lives
-│   ├── __init__.py        # El, Screen, resolve()
-│   ├── login_map.py       # example map (placeholder ids)
+│   ├── __init__.py        # El, Screen, resolve(), parametrised locators ({text})
+│   ├── welcome_map.py, login_map.py, otp_map.py, registration_map.py,
+│   │   sms_terms_map.py, jobs_list_map.py   # module 02 (iOS; Android in step 7)
 │   └── README.md          # format, alias rules, Flutter note
 ├── pages/                 # page objects: behaviour over a screen map, explicit waits only
-│   ├── base_page.py       # tap / type / visible / wait_gone / assert_open … by alias
-│   ├── login_page.py      # example page
+│   ├── base_page.py       # tap / type / visible / wait_gone / expect_text / scroll_to /
+│   │                      # positions / texts_within … by alias
+│   ├── welcome_page.py, login_page.py, otp_page.py, registration_page.py,
+│   │   sms_terms_page.py, jobs_list_page.py
 │   └── {android,ios,flutter}/   # only for flows that differ structurally per OS (rare)
 ├── helpers/
 │   ├── waits.py           # wait_visible / wait_gone / wait_clickable / wait_text on WebDriverWait
@@ -45,7 +48,7 @@ automation/mobile/
 ├── fixtures/
 │   ├── test_data.py       # {{tech.*}}, {{new_user.*}}, {{unregistered.*}} placeholders resolve here
 │   └── app_state.py       # fixtures: logged_out_app, ui_login, new_user, evidence, tech
-├── unit_tests/            # offline self-test of the harness (no device, no network)
+├── unit_tests/            # offline self-test of the harness + map-health (no device, no network)
 ├── tests/
 │   ├── shared/            # run on every --platform (parametrised by the platform fixture)
 │   ├── android/  ios/     # OS-specific (marker android / ios)
@@ -160,17 +163,18 @@ collected"), which CI treats as red — an empty run is not a passing run. Use p
 filters for narrower selections. A test that *is* collected and then skipped is Blocked:
 with `CI` set (or `QA_STRICT_SKIPS=1`) the run exits 1 and lists the skips (`conftest.py`).
 
-Each test carries its CHK ids twice — once for pytest, once for Allure — as in
-[`tests/shared/test_smoke_example.py`](tests/shared/test_smoke_example.py):
+Each test carries its CHK ids twice — once for pytest, once for Allure — and the id of the
+test case it implements:
 
 ```python
 @pytest.mark.smoke
 @pytest.mark.shared
-@pytest.mark.chk("CHK-AUTH-001")
-@allure.tag("CHK-AUTH-001")
-@allure.title("CHK-AUTH-001 App launches and shows the login screen")
-def test_app_launches_to_login(driver, platform):
-    LoginPage(driver, platform).assert_open()
+@pytest.mark.tc("TC-AUTH-001")
+@pytest.mark.chk("CHK-AUTH-001", "CHK-AUTH-003")
+@allure.tag("CHK-AUTH-001", "CHK-AUTH-003")
+@allure.title("TC-AUTH-001 Welcome screen shows the header, subtext and both actions")
+def test_welcome_screen(logged_out_app, driver, platform):
+    WelcomePage(driver, platform).assert_open()
 ```
 
 A malformed id (`CHK-auth-1`, a marker without an id) fails collection: an untraceable test
@@ -243,7 +247,7 @@ setup: `rm -rf ~/.npm/_npx` and re-verify (`setup/SETUP.md` §3).
 - `screens/<screen>_map.py` — alias → `(strategy, value)` per platform; rules in
   [`screens/README.md`](screens/README.md). Aliases match the web map for the same screen, so
   one test case in `qa/mobile/<NN-module>/<module>-test-cases.md` serves both stacks.
-- `pages/<screen>_page.py` — behaviour only (`LoginPage(driver).login(email, pw)`); every
+- `pages/<screen>_page.py` — behaviour only (`LoginPage(driver).request_code(email)`); every
   action is an alias call on `BasePage` (`tap`, `type`, `visible`, `wait_gone`,
   `expect_text`, `assert_open`).
 - `helpers/waits.py` — the only waits in the stack: `WebDriverWait` with
@@ -316,6 +320,11 @@ owner call. Usage: [`automation/tools/README.md`](../tools/README.md).
 ```bash
 uv run python -m unittest discover -s unit_tests    # no device, no Appium, no network
 ```
+
+It includes **map-health** (`unit_tests/test_screen_maps.py`): every alias used in the module's
+test cases resolves in a screen map, or is listed as resolved by a page method (unnamed controls,
+per-field messages — testability defects in `docs/requirements/shared/testability-contract.md` §5).
+Whether a locator finds its element is proven only on a device.
 
 ## Builds folder
 

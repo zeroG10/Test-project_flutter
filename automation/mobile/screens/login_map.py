@@ -1,52 +1,44 @@
-"""Login screen map — PLACEHOLDER ids. Replace with the ids from your testability contract.
+"""Login — email or phone, then an OTP (module 02-authentication).
 
-Native Android ids are ``<package>:id/<name>`` (package from .env). A Flutter app exposes
-``Semantics(identifier: "login-email")`` as resource-id ``login-email`` (no package prefix)
-on Android and as accessibilityIdentifier on iOS, so its map is simply::
-
-    "email": El(android=(AppiumBy.ID, "login-email"),
-                ios=(AppiumBy.ACCESSIBILITY_ID, "login-email"))
-
-Test-case steps address these as ``login.email``, ``login.submit`` ... (screens/README.md).
+Source: Appium tree qa/shared/recon-dumps/ios-2026-09-23/login.xml (recon 2026-09-23).
+Visible texts as locators (owner decision 2026-09-23). Android locators come with step 7.
 """
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from config.settings import settings
 from screens import El, Screen
 
-_PKG = settings.android_app_package
+_A = AppiumBy.ACCESSIBILITY_ID
+_P = AppiumBy.IOS_PREDICATE
 
 LOGIN = Screen(
     id="login",
-    anchor="title",
+    anchor="root",
     elements={
-        "title": El(
-            android=(AppiumBy.ID, f"{_PKG}:id/login_title"),
-            ios=(AppiumBy.ACCESSIBILITY_ID, "login-title"),
+        # The subtitle is unique to Login; "Log in" also appears on Registration (its link).
+        "root": El(ios=(_A, "Good to see you! Let's get you logged in.")),
+        "title": El(ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == 'Log in'")),
+        "subtitle": El(ios=(_A, "Good to see you! Let's get you logged in.")),
+        "helper": El(ios=(_A, "Enter the email or phone number you used during registration")),
+        "identifier": El(
+            ios=(_P, "type == 'XCUIElementTypeTextField' AND name == 'Phone number / Email'")
         ),
-        "email": El(
-            android=(AppiumBy.ID, f"{_PKG}:id/login_email"),
-            ios=(AppiumBy.ACCESSIBILITY_ID, "login-email"),
+        "format-hint": El(ios=(_A, "Format: +1234567890 or name@example.com")),
+        "continue": El(ios=(_P, "type == 'XCUIElementTypeButton' AND name == 'Continue'")),
+        "privacy-link": El(ios=(_P, "type == 'XCUIElementTypeLink' AND name == 'Privacy Policy'")),
+        "terms-link": El(
+            ios=(_P, "type == 'XCUIElementTypeLink' AND name == 'Terms & Conditions'")
         ),
-        "password": El(
-            android=(AppiumBy.ID, f"{_PKG}:id/login_password"),
-            ios=(AppiumBy.ACCESSIBILITY_ID, "login-password"),
+        "sign-up-link": El(ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == 'Sign up'")),
+        "text-fields": El(
+            ios=(_P, "type == 'XCUIElementTypeTextField'"),
+            note="all inputs — for 'the only input on the screen' (count)",
         ),
-        "submit": El(
-            android=(AppiumBy.ACCESSIBILITY_ID, "login-submit"),
-            ios=(AppiumBy.ACCESSIBILITY_ID, "login-submit"),
-        ),
+        # Validation and server messages: texts from the checklist (live-app wording, D-8).
+        # Where they are drawn (inside the field / a banner) — UNCONFIRMED until recon 3d.
         "error": El(
-            android=(AppiumBy.ID, f"{_PKG}:id/login_error"),
-            ios=(AppiumBy.ACCESSIBILITY_ID, "login-error"),
-        ),
-        # Text fallback: allowed, but only while the id is missing. Log it as a testability
-        # defect (docs/requirements/shared/testability-contract.md) and replace when fixed.
-        "forgot-password": El(
-            android=(AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Forgot password?")'),
-            ios=(AppiumBy.IOS_PREDICATE, "label == 'Forgot password?'"),
-            note="no id yet — text fallback, testability defect TD-LOGIN-001",
+            ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == {text}"),
+            note="parametrised by the expected message; position UNCONFIRMED (recon 3d)",
         ),
     },
 )
