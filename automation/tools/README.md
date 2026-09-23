@@ -8,8 +8,9 @@ chain described in [`automation/README.md`](../README.md):
 | `sync_checklist_to_sheets.py` | 0 → Sheet | checklist `.md` → Google Sheet | the team Sheet (**the only Sheets writer in this repo**) |
 | `import_checklist_from_sheets.py` | Sheet → 0 (one-time) | Google Sheet → per-feature checklist `.md` | markdown under `qa/web/<NN-slug>/` — **reads** Sheets, never writes them |
 | `trace_results.py` | 4 (closure) | run results → checklist IDs | one markdown report, by convention `qa/{web,mobile}/<NN-module>/<module>-traceability.md` — never Sheets |
+| `build_summary.py` | 4 (report) | one mobile run → summary page for the lead | local `automation/mobile/reports/summary/` (gitignored) — publishing is an owner call |
 
-All three honour the QA Doctrine in `CLAUDE.md`: no result is ever upgraded to
+All of them honour the QA Doctrine in `CLAUDE.md`: no result is ever upgraded to
 Passed by a tool, a skip is Blocked, an empty run is not a passing run.
 
 ## Setup
@@ -249,6 +250,33 @@ a successful import. Register the codes used by the map in
 `qa/shared/feature-codes.md` before the first sync.
 
 ---
+
+## build_summary.py — summary page for the lead (mobile)
+
+One local HTML page over **one clean run**: a PM half (checklist items verified, what failed,
+what was blocked and why, run time against an optional manual estimate) and an engineering
+half (coverage per module, results per test, key screens from the checkpoint screenshots,
+run context). CHK verdicts are computed by `trace_results.py` itself, so the page and the
+traceability matrix never disagree. Read-only over the results; writes only `--out-dir`.
+
+```bash
+uv run python build_summary.py \
+  --allure-dir ../mobile/allure-results \
+  --checklist ../../qa/mobile/02-authentication/authentication-checklist.md \
+  --run-label "pytest --platform=ios, Authentication" \
+  [--manual-minutes-per-check 3] [--out-dir ../mobile/reports/summary]
+```
+
+| Option | Meaning |
+|---|---|
+| `--allure-dir DIR` | allure `*-result.json` of **one clean run** (required); empty → exit 2, Blocked |
+| `--checklist MD` | repeat per module (required); the module name comes from its `qa/mobile/<NN-module>/` folder |
+| `--run-label TEXT` | what was run |
+| `--manual-minutes-per-check N` | owner's estimate; omitted → the manual comparison is shown as not recorded |
+| `--out-dir DIR` | default `automation/mobile/reports/summary/` (`index.html` + `assets/`, gitignored) |
+
+The page shows screenshots of the client's app — it stays local; publishing it is an owner
+call. `assets/` is rebuilt on every run (only a folder this script created is ever deleted).
 
 ## trace_results.py — layer 4, traceability closure
 

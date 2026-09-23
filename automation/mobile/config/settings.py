@@ -74,12 +74,24 @@ class Settings(BaseSettings):
     app_user_email: str = ""
     app_user_otp: str = ""
 
+    # Field Services API — лише підготовка/прибирання даних для UI-тестів
+    # (docs/api/dev-test-data.md). Порожній API_BASE_URL -> фікстури з API = Blocked.
+    api_base_url: str = ""
+    api_admin_email: str = ""
+    api_admin_password: str = ""
+    api_timeout: float = 30.0  # seconds per request
+
+    # Докази (README, "Evidence"): відео пишеться для кожного тесту, а зберігається:
+    # auto = лише для впалих або Blocked тестів і тестів з маркером e2e;
+    # all = для всіх; off = не писати.
+    evidence_video: Literal["auto", "all", "off"] = "auto"
+
     @field_validator("platform")
     @classmethod
     def _validate_platform(cls, value: str) -> str:
         return normalize_platform(value)
 
-    @field_validator("app_kind", "flutter_driver", mode="before")
+    @field_validator("app_kind", "flutter_driver", "evidence_video", mode="before")
     @classmethod
     def _lowercase(cls, value: object) -> object:
         return value.strip().lower() if isinstance(value, str) else value
@@ -120,6 +132,18 @@ class Settings(BaseSettings):
         )
         path = Path(raw).expanduser()
         return path if path.is_absolute() else MOBILE_ROOT / path
+
+    def app_id(self, platform: str) -> str:
+        """Bundle id (iOS) / package (Android) of the app under test."""
+        if normalize_platform(platform) == "android":
+            return self.android_app_package
+        return self.ios_bundle_id
+
+    def device_label(self, platform: str) -> str:
+        """``iPhone 17 · iOS 26.5`` — the device configuration a verdict is limited to."""
+        if normalize_platform(platform) == "android":
+            return f"{self.android_device_name} · Android {self.android_platform_version}"
+        return f"{self.ios_device_name} · iOS {self.ios_platform_version}"
 
 
 settings = Settings()

@@ -91,6 +91,25 @@ def wait_text(
     return driver.find_element(*locator)
 
 
+def wait_any(
+    driver: WebDriver, probes: dict[str, Callable[[], bool]], timeout: float | None = None
+) -> str:
+    """Name of the first probe that turns true — e.g. which screen a cold start landed on.
+
+    Probes must be instant (``page.is_open(0)``); the wait polls them together.
+    """
+
+    def first_true(_driver: WebDriver) -> str | bool:
+        return next((name for name, probe in probes.items() if probe()), False)
+
+    return wait_until(
+        driver,
+        first_true,
+        timeout,
+        f"none of {sorted(probes)} within {_seconds(timeout)}s",
+    )
+
+
 def is_visible(driver: WebDriver, locator: Locator, timeout: float | None = None) -> bool:
     """Non-raising probe for branching logic. For assertions use wait_visible / wait_gone."""
     try:

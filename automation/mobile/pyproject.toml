@@ -31,6 +31,10 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
+[tool.ruff.lint.isort]
+# The harness's own packages — also the ones that do not exist yet (pages of step 5).
+known-first-party = ["config", "fixtures", "helpers", "pages", "screens"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
@@ -50,4 +54,6 @@ markers = [
     "flutter: test specific to a Flutter build; runs only when APP_KIND=flutter (deselected otherwise)",
     "quarantine: parked flaky/blocked-by-defect test — MUST carry a BUG id in the reason; excluded from CI gates via -m \"... and not quarantine\" (GATES.md quarantine register)",
     "chk(id): checklist item this test proves, e.g. chk('CHK-AUTH-001'); several ids = several args; read by automation/tools/trace_results.py",
+    "tc(id): the one test case this test implements, e.g. tc('TC-AUTH-005') — qa/mobile/<NN-module>/<module>-test-cases.md",
+    "e2e: long end-to-end flow — its screen video is always kept (EVIDENCE_VIDEO=auto)",
 ]

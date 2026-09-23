@@ -61,11 +61,21 @@ and what the harness does about it (workers, timeouts). Retries stay 0 by policy
 
 ## Test data and seeding
 
-- Policy (`project.yaml → context.test_data.policy`): `<free | naming-rule | read-only-shared | unknown>`.
-  `read-only-shared` = no seeding fixtures, read-only tests only, and the report says so.
-- Endpoints usable for seeding/cleanup (from `docs/api/openapi.json`): `<list>`.
-- Data rules: `<unique marker convention; what may be created/deleted; cleanup at test end
-  (fixtures/test-fixtures.ts → seed); scheduled reset / seed script if any>`.
+- Policy (`project.yaml → context.test_data.policy`): **`free`** on DEV — tests may create and delete
+  their own data. Scheduled reset / seed script: none known.
+- Endpoints usable for seeding/cleanup (from `docs/api/openapi.json`, recipe verified live —
+  [docs/api/dev-test-data.md](api/dev-test-data.md)):
+  - admin token: `POST /auth/sign-in` (`AuthController_signInWithEmailAndPass`), `API_ADMIN_*` in `automation/mobile/.env`;
+  - jobs: `POST /job` with `userId` + `surveyId` → `DELETE /job/{id}` (`POST /job/assign/{phone}` is **not** used — it sends a CR-1 SMS link);
+  - self-registered test users: `GET /technician?search=<email>` → `DELETE /user/full-delete/{user.id}` (`UserController_fullDelete`).
+- Data rules (decisions 2026-09-22 / 2026-09-23 in [notes/decisions.md](notes/decisions.md)):
+  - tests create and delete **only** their own jobs and users; surveys and the test technician are **read-only**;
+  - unique markers: jobs `QA-AUTO-<stamp>`, users `qa-auto+<stamp>@example.com` + fictional phones
+    `+1 202 555 01xx` (reserved ranges — no real person gets a message); the cleanup code refuses any other email;
+  - cleanup at test end, pass or fail (`automation/mobile/fixtures/app_state.py`: fixture teardown), verified
+    by a read-back; a failed cleanup is a harness error that names the record id for manual removal;
+  - DEV-friendly: serial runs, one admin sign-in per run, one UI login per run where possible, at most one
+    wrong OTP per run (FR-OTP-13 lockout), no load or stress tests.
 
 ## Open questions (answers go to `qa/shared/questions/` or the module's `*-questions.md`)
 

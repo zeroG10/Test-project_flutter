@@ -32,6 +32,8 @@ __pycache__/
 .ruff_cache/
 allure-results/
 allure-report/
+# local summary page — shows the client's app, published only on the owner's command
+automation/mobile/reports/
 automation/mobile/builds/*
 !automation/mobile/builds/.gitkeep
 !automation/mobile/builds/README.md

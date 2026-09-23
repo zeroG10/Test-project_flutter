@@ -21,7 +21,8 @@ APP_KIND`): a Flutter app is tested through the Android / iOS drivers — see
 
 ```
 automation/mobile/
-├── conftest.py            # --platform, driver fixture, marker scoping, CHK-id validation
+├── conftest.py            # --platform, ONE driver per run, marker scoping, CHK/TC-id validation,
+│                          # Allure grouping, failure evidence, screen video
 ├── config/
 │   ├── settings.py        # pydantic-settings: .env → settings (PLATFORM, APP_KIND, FLUTTER_DRIVER, …)
 │   └── capabilities.py    # UiAutomator2Options / XCUITestOptions (+ FlutterIntegration when opted in)
@@ -36,8 +37,15 @@ automation/mobile/
 ├── helpers/
 │   ├── waits.py           # wait_visible / wait_gone / wait_clickable / wait_text on WebDriverWait
 │   ├── gestures.py        # swipe / long-press
-│   └── device.py          # adb, simctl, platform_of(driver)
-├── fixtures/              # static test data ({{user.email}} placeholders resolve here)
+│   ├── device.py          # adb, simctl, platform_of(driver)
+│   ├── app.py             # AppControl: launch / relaunch / clear data / reinstall
+│   ├── evidence.py        # checkpoint screenshots, screen recorder
+│   ├── reporting.py       # module labels, run context, Allure environment + categories
+│   └── field_services_api.py  # API client for test-data setup / cleanup only
+├── fixtures/
+│   ├── test_data.py       # {{tech.*}}, {{new_user.*}}, {{unregistered.*}} placeholders resolve here
+│   └── app_state.py       # fixtures: logged_out_app, ui_login, new_user, evidence, tech
+├── unit_tests/            # offline self-test of the harness (no device, no network)
 ├── tests/
 │   ├── shared/            # run on every --platform (parametrised by the platform fixture)
 │   ├── android/  ios/     # OS-specific (marker android / ios)
@@ -48,6 +56,7 @@ automation/mobile/
 │   ├── start_appium.sh    # Appium server
 │   └── reset_simulator.sh # erase + boot an iOS simulator
 ├── allure-results/        # run output (gitignored) — input for automation/tools/trace_results.py
+├── reports/               # local summary page (gitignored — shows the client's app)
 └── pyproject.toml         # deps + pytest markers
 ```
 
@@ -63,6 +72,7 @@ automation/mobile/
 | **Xcode** (full app, not just Command Line Tools) + one iOS simulator runtime | – | required | as per OS |
 | **Flutter SDK** (`flutter doctor` green) | – | – | only to *build* the app; not needed to run tests against a build |
 | Allure CLI (`brew install allure`) | optional | optional | optional |
+| **ffmpeg** (`brew install ffmpeg`) — screen video | – | required for video (else no video, test unaffected) | as per OS |
 
 ### `scripts/doctor.sh`
 
@@ -104,6 +114,9 @@ point `ANDROID_APP_PATH` / `IOS_APP_PATH` at it. A missing build makes every tes
 | `DEFAULT_TIMEOUT` | `15` (seconds) | explicit-wait default; there is no implicit wait |
 | `ANDROID_*` | device name, OS version, app path, package, activity | UiAutomator2 caps |
 | `IOS_*` | device name, OS version, app path, bundle id | XCUITest caps |
+| `EVIDENCE_VIDEO` | `auto` \| `all` \| `off` (default `auto`) | screen video per test; `auto` keeps it for failed / Blocked tests and tests marked `e2e` |
+| `APP_USER_EMAIL`, `APP_USER_PHONE`, `APP_USER_OTP` | — | the DEV test technician (`{{tech.*}}`); empty → dependent tests `Blocked` |
+| `API_BASE_URL`, `API_ADMIN_EMAIL`, `API_ADMIN_PASSWORD` | — | Field Services API for test-data setup / cleanup; empty → dependent tests `Blocked` |
 
 ## Run
 
@@ -138,6 +151,8 @@ two pytest processes; one process talks to one device.
 | `android`, `ios` | OS-specific test | **deselected** when `--platform` does not match |
 | `flutter` | test specific to a Flutter build | **deselected** unless `APP_KIND=flutter` |
 | `chk("CHK-AUTH-001", …)` | checklist item(s) this test proves | validated at collection against `CHK-[A-Z]{2,5}-\d{3,}`; exported to JUnit `<property name="chk">` |
+| `tc("TC-AUTH-005")` | the one test case this test implements | validated at collection (`TC-[A-Z]{2,5}-\d{3,}`, exactly one id); Allure feature + tag |
+| `e2e` | long end-to-end flow | its screen video is always kept |
 | `quarantine` | parked flaky / defect-blocked test | reason MUST carry a `BUG-<CODE>-NNN` id + a row in the quarantine register (`.github/GATES.md`); CI runs `-m "smoke and not quarantine"` |
 
 Deselection (not skip) is deliberate: a run where nothing remains exits 5 ("no tests
@@ -159,7 +174,9 @@ def test_app_launches_to_login(driver, platform):
 ```
 
 A malformed id (`CHK-auth-1`, a marker without an id) fails collection: an untraceable test
-would otherwise report "not run" forever without anyone noticing.
+would otherwise report "not run" forever without anyone noticing. As a safety net,
+`conftest.py` adds the Allure tag for any `chk` id a test forgot to repeat in `@allure.tag`
+(allure-pytest does not turn a marker with arguments into a tag).
 
 ## Flutter strategy
 
@@ -232,6 +249,73 @@ setup: `rm -rf ~/.npm/_npx` and re-verify (`setup/SETUP.md` §3).
 - `helpers/waits.py` — the only waits in the stack: `WebDriverWait` with
   `settings.default_timeout`. No `sleep`, no implicit wait (the driver fixture sets none, so
   explicit and implicit waits never stack).
+
+## Session model and app-state fixtures
+
+**One Appium session per run** (`driver` is session-scoped): runs are serial by decision
+(weak DEV server), the session start installs the build from `.env`, and every test gets the
+app into the state its test case asks for through a fixture — never through a new session.
+
+| Test-case precondition | Fixture | What it does |
+|---|---|---|
+| cold start; app data reset (logged out) | `logged_out_app` | `mobile: clearApp` → launch → Welcome must show; if it does not, one reinstall, then `Blocked` |
+| signed in as `{{tech.*}}` | `ui_login` | relaunch; reuses a live session, signs in through the UI (email + DEV OTP) only when Welcome shows |
+| `{{tech.*}}` | `tech` | the DEV test technician from `APP_USER_*` |
+| `{{new_user.*}}` + API delete | `new_user` | unique `qa-auto+<stamp>@example.com`, fictional `202-555-01xx`; teardown deletes what was registered (`GET /technician` → `DELETE /user/full-delete/{id}`, verified gone), then clears app data |
+| named screenshots | `evidence` | `evidence.checkpoint("otp-screen")` |
+
+Why clearing data signs out on iOS: the token lives in the keychain, which a data wipe does not
+touch, but the app deletes keychain tokens on a first-launch start (a flag in its preferences,
+which the wipe removes). The fixture still checks that Welcome shows and falls back to a
+reinstall — the report's steps say which path ran.
+
+A precondition that cannot be established is **Blocked** — `pytest.skip("Blocked: …")`, which
+`trace_results.py` reports as Blocked — never a product Failed. The destructive API call refuses
+any email that is not `qa-auto+…@example.com` and any record whose email is not an exact match.
+
+## Evidence
+
+Not everything is captured (owner decision 2026-09-23):
+
+- **On failure** (and on a Blocked setup): screenshot + page source — automatic.
+- **Checkpoints**: named screenshots only at the moments a test chooses (`evidence.checkpoint`),
+  numbered `01 · welcome`, `02 · otp-screen` … — the key screens of the summary page.
+- **Video**: recorded for every test (a failure is not known in advance), kept for failed or
+  Blocked tests and tests marked `e2e` (`EVIDENCE_VIDEO`). iOS records through ffmpeg (`brew install ffmpeg`)
+  as H.264 so it plays in the browser. A recorder that cannot start is logged as a step; evidence
+  never decides a verdict.
+
+## Allure report
+
+- **Suites:** Platform (iOS / Android) › Module (`02 · Authentication`, from the CHK feature code
+  and the `qa/mobile/<NN-module>/` folder) › tests titled `TC-… <title>`.
+- **Behaviors:** Module › TC id.
+- **Environment widget:** device, OS, build (from `builds/<platform>/BUILD_INFO.txt`), app
+  source commit, harness commit, Appium URL — `allure-results/environment.properties`.
+- **Categories:** Blocked (not a product verdict) · expected element not shown in time · assertion
+  failed · harness error — `allure-results/categories.json`.
+- Every result carries an `env` label (`iOS · iPhone 17 · iOS 26.5 · build 1.1.1 (178)`) that
+  `trace_results.py` prints in the run context.
+
+```bash
+allure serve allure-results                       # interactive
+allure generate allure-results -o allure-report --clean   # static folder
+```
+
+## Summary page for the lead
+
+`automation/tools/build_summary.py` turns ONE clean run into a local page: a PM half (checklist
+items verified, what failed, what was blocked and why, run time vs an optional manual estimate)
+and an engineering half (per-module coverage, per-test results, key screens, run context).
+CHK verdicts come from `trace_results.py` itself, so the page and the traceability matrix agree.
+Output goes to `reports/summary/` (gitignored: it shows the client's app); publishing it is an
+owner call. Usage: [`automation/tools/README.md`](../tools/README.md).
+
+## Offline self-test
+
+```bash
+uv run python -m unittest discover -s unit_tests    # no device, no Appium, no network
+```
 
 ## Builds folder
 
