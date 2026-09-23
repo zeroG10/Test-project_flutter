@@ -191,3 +191,55 @@ POST /job
 - фото всередині → `Photo Upload Test Survey`
 - навантаження / довгий список → `Repeatable MO12 ... Large / stress survey`
 
+---
+
+# Матриця опублікованих опитувань DEV (знято 2026-09-23, `GET /survey/{id}`)
+
+Модель: `items[]` → питання або секція (`section.questions[]`, `isRepeatable`). Логіка — на **варіантах відповіді**:
+`answers[].logic[] = {when:{op:'eq',value:true}, actions:[{type:'skipToField', targetFieldId}]}`; `targetFieldId='__end__'` —
+дострокове завершення опитування, порожній — «далі». Рушій логіки в апці: `lib/features/survey/domain/survey_logic_engine.dart`.
+`options.enabled` на питанні — імовірно «обов'язкове» (**не підтверджено**, питання в `qa/mobile/08-survey/`).
+
+| surveyId | Назва | Питань | Секцій | Повтор. | Правил логіки | `__end__` | Типи полів |
+|---|---|---|---|---|---|---|---|
+| `0c446a9a-7b94-4ee0-90bd-c97247924672` | Repeatable_Basic With Three sections_list_21 item_Repeatable | 63 | 21 | 21 | 0 | 0 | Date 20, Photo 1, Text 21, Time 20, Yes/No 1 |
+| `4e7bb594-7cfa-475e-95e9-6b9d03dddd36` |  Repeatable MO12 Survey title_Large / stress survey copy fro | 26 | 6 | 6 | 11 | 0 | Date 2, Photo 3, Multi 3, Single 5, Text 6, Time 2, Yes/No 5 |
+| `4044453f-6660-43c7-9c58-9499c63c2b45` | Repeatable_TWO_sections_with logic+questions_Repeatable | 49 | 3 | 3 | 17 | 2 | Date 4, Photo 7, Multi 4, Single 4, Text 8, Time 4, Yes/No 18 |
+| `cd20d2a6-a9e8-4269-991b-3a544655425e` | Fiber Site Survey | 14 | 3 | 3 | 2 | 1 | Date 2, Photo 1, Multi 2, Number 1, Single 4, Text 2, Yes/No 2 |
+| `b13b57ce-a255-4fe3-b179-768cb79889fd` | Repeatable_Basic With Three sections_Without logic_Repeatabl | 25 | 3 | 3 | 0 | 0 | Date 4, Photo 4, Multi 3, Single 3, Text 5, Time 4, Yes/No 2 |
+| `b0664624-f796-40e2-b493-abae4e85134f` | Repeatable_Basic With Three sections_first_last_midle positi | 20 | 3 | 3 | 0 | 0 | Date 4, Photo 2, Multi 1, Single 1, Text 6, Time 4, Yes/No 2 |
+| `89424e7d-e74e-422f-ba7b-5fc9c9d42a8a` | Repeatable_TWO_sections_with logic_Repeatable copy | 28 | 2 | 2 | 15 | 1 | Date 2, Photo 4, Multi 2, Single 2, Text 5, Time 2, Yes/No 11 |
+| `5478a9d2-8786-491d-bc09-bcc3a66d71e5` | End Survey | 15 | 1 | 1 | 12 | 3 | Date 1, Photo 2, Multi 1, Single 1, Text 3, Time 1, Yes/No 6 |
+| `9970fc29-20b1-4a34-9d66-05c75153784c` | Repeatable_Single section_with logic_Repeatable | 14 | 1 | 1 | 10 | 0 | Date 1, Photo 2, Multi 1, Single 1, Text 3, Time 1, Yes/No 5 |
+| `1f54be21-0c31-48c3-b4cf-9d8474d33f30` | Basic With Two sections_first position_Not  Repeatable | 17 | 2 | 1 | 0 | 0 | Date 3, Photo 2, Multi 1, Single 1, Text 5, Time 3, Yes/No 2 |
+| `b4e9b124-0048-4be0-9e22-4db8f446af41` | Photo Upload Test Survey | 5 | 1 | 1 | 0 | 0 | Photo 3, Text 2 |
+| `4c694562-dae5-494c-a8f9-c7e99b016d0f` | Repeatable_Single section_withOUT logic_Repeatable | 14 | 1 | 1 | 0 | 0 | Date 1, Photo 2, Multi 1, Single 1, Text 3, Time 1, Yes/No 5 |
+| `df302b7c-410c-4bf0-abfb-ae1f45e2d8ae` | Test Survey copy 2 | 22 | 1 | 0 | 14 | 0 | Date 3, Photo 3, Multi 3, Single 3, Text 4, Time 2, Yes/No 4 |
+| `512d21fa-776b-42af-965e-0e9c75bfdc1a` | MO12 Survey title_Large / stress survey copy from template | 26 | 6 | 0 | 11 | 0 | Date 2, Photo 3, Multi 3, Single 5, Text 6, Time 2, Yes/No 5 |
+| `d4a9bc87-ccdd-4191-86c2-a40ee2714aa9` | Test Survey copy 1 | 8 | 0 | 0 | 6 | 0 | Date 1, Photo 1, Multi 1, Single 1, Text 1, Time 1, Yes/No 2 |
+| `f71139c1-88ed-4810-a913-19e73f5e9452` | Test survey: fake response | 9 | 0 | 0 | 6 | 0 | Date 1, Photo 1, Multi 1, Single 1, Text 1, Time 2, Yes/No 2 |
+| `2efae6a3-0f0c-441e-88c8-d658fdfd1e14` | Survey title 1 | 7 | 0 | 0 | 5 | 1 | Date 1, Photo 1, Multi 1, Single 1, Text 1, Time 1, Yes/No 1 |
+| `16755932-7636-49fb-a932-31ff4e5e0771` | test_for_job_123 | 10 | 10 | 0 | 5 | 0 | Date 1, Photo 1, Multi 1, Single 2, Text 2, Time 1, Yes/No 2 |
+| `e4111c19-9709-4252-a459-1cda4dbb0733` | Fiber Installation Report | 8 | 1 | 0 | 4 | 1 | Date 1, Multi 1, Single 2, Text 1, Time 1, Yes/No 2 |
+| `2db0c23c-1f90-4ed9-bb13-fe18c13f9421` | Mo5 Radio Logic Mapping Survey_Radio with multiple logic pat | 5 | 1 | 0 | 4 | 0 | Date 1, Multi 1, Single 1, Text 2 |
+| `50b92523-f7ad-42d3-a187-07e2035bd2a4` | Shtock Survey part 2 | 12 | 3 | 0 | 4 | 0 | Date 1, Multi 1, Single 2, Text 4, Time 1, Yes/No 3 |
+| `62499a39-9a54-4f71-a0f3-7a770c850f84` | T11 Complex Template Validation Test_Complex template | 10 | 3 | 0 | 4 | 0 | Date 1, Photo 1, Multi 1, Single 1, Text 3, Time 1, Yes/No 2 |
+| `accc4039-cc3d-455f-b617-f89026760768` | Mo3 All Question Types Survey_Single section with all questi | 7 | 1 | 0 | 2 | 0 | Date 1, Photo 1, Multi 1, Single 1, Text 1, Time 1, Yes/No 1 |
+| `3fa5b8f2-7813-4055-97dd-a1a303d284c5` | T8 Branching Workflow Template_Multi-section branching templ | 6 | 4 | 0 | 2 | 0 | Photo 1, Single 2, Text 2, Yes/No 1 |
+| `fe491a35-8e0c-4fe6-8309-5aae9cf41308` | Basic With Two sections _Not  Repeatable | 17 | 2 | 0 | 0 | 0 | Date 3, Photo 2, Multi 1, Single 1, Text 5, Time 3, Yes/No 2 |
+| `f63a018a-eac0-4118-bb57-9ec5084ff982` | Basic With Two sections_first_last position_Not_Repeatable | 17 | 2 | 0 | 0 | 0 | Date 3, Photo 2, Multi 1, Single 1, Text 5, Time 3, Yes/No 2 |
+| `dc689f68-84c5-4ee7-b8bd-5cc185687954` | Basic Without sections Yes No Logic Survey_Basic Yes/No bran | 11 | 0 | 0 | 0 | 0 | Date 2, Photo 1, Multi 1, Single 1, Text 3, Time 2, Yes/No 1 |
+| `e7b730b0-b5e7-4aee-b069-23fe3c8e5f75` | Layout | 7 | 0 | 0 | 0 | 0 | Date 1, Photo 1, Multi 1, Single 1, Text 1, Time 1, Yes/No 1 |
+| `d544e28c-1357-449f-a2ff-197b700e1b98` | Layout Template Layout Survey title Template Layout Survey L | 15 | 1 | 0 | 0 | 0 | Date 1, Photo 1, Multi 2, Single 2, Text 4, Time 3, Yes/No 2 |
+| `d80f9fcd-94e2-4b9d-91f3-99f4ce29999c` | Layout dasfasfasf | 7 | 0 | 0 | 0 | 0 | Date 1, Photo 1, Multi 1, Single 1, Text 1, Time 1, Yes/No 1 |
+| `b6e5e83e-af9f-444e-ba33-683cf8665e84` | Layout for PDF - Lorem ipsum dolor sit amet, consectetur adi | 21 | 0 | 0 | 0 | 0 | Date 4, Photo 2, Multi 3, Single 2, Text 2, Time 2, Yes/No 6 |
+| `2964b433-b734-4505-a8c5-6fb42c30fc33` | Short Survey | 2 | 0 | 0 | 0 | 0 | Text 1, Yes/No 1 |
+| `336913f1-136e-48ef-8d4e-c03f89ab3d25` | Survey from opents21+1000@gmail | 4 | 1 | 0 | 0 | 0 | Date 1, Photo 1, Single 1, Yes/No 1 |
+| `2d28bda7-5435-4723-aad3-ee5388ef3ce2` | Test Survey without logic | 29 | 5 | 0 | 0 | 0 | Date 3, Photo 3, Multi 4, Single 4, Text 4, Time 3, Yes/No 8 |
+| `630c8f8a-843f-4517-ac50-6c2a2c6d2eb9` | Test template synchronization | 3 | 1 | 0 | 0 | 0 | Date 1, Photo 1, Yes/No 1 |
+| `553411d6-9a98-4e97-bd58-1b2b0a6d6e2c` | stringsdf | 0 | 0 | 0 | 0 | 0 | — |
+| `b4d21a1e-6917-4fb0-a739-cb88bc97e173` | test_for_job_124 | 0 | 0 | 0 | 0 | 0 | — |
+| `30c011be-b009-445e-9c61-0b1da61b0dd6` | test_for_job_126 | 0 | 0 | 0 | 0 | 0 | — |
+| `a7e07819-377c-4c96-9542-0b3a5c8e37bb` | test_for_job_127 | 0 | 0 | 0 | 0 | 0 | — |
+| `226ad599-2e03-4ed1-9bc7-0b80c7e55239` | test_for_job_128 | 0 | 0 | 0 | 0 | 0 | — |
+| `8effee17-8d64-4392-b2c3-1aa745f64622` | test_for_job_129 | 0 | 0 | 0 | 0 | 0 | — |

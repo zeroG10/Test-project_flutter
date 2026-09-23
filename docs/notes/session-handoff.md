@@ -1,6 +1,13 @@
 # Передача стану проекту — з цього файлу стартує будь-яка нова сесія
 
-**Оновлено:** 2026-09-23 · **Поточний етап:** крок 3b завершено → **наступний крок 4: обговорення тест-кейсів**
+**Оновлено:** 2026-09-23 · **Поточний етап:** крок 4 (обговорення) завершено; **пілот Authentication** — чекліст
+імпортовано (CHK-AUTH-001…126), план автоматизації і 14 тест-кейсів написано → кейси провалідовані власником (2026-09-23),
+recon Registration/SMS Terms зроблено (recon 3c; Q-A1…A4 закриті; прибирання — `DELETE /user/full-delete/{user.id}`);
+власник прийняв D-1…D-11 як правильну поведінку апки. **Далі (погоджено «виконуй»):** доробки харнесу (Allure-групування, відео, скріншоти, зведена сторінка), карти
+екранів, тести. Файли: `qa/mobile/02-authentication/authentication-{checklist,automation-plan,test-cases,questions}.md`.
+Погоджено на кроці 4: тест-кейси англійською; 3 рівні звітності (Allure по модулях + матриця трасування + зведена
+сторінка для ліда); опитування — найглибший модуль (8 репрезентативних опитувань + 1 порожнє, CR-2 з PRD);
+статуси джоб — блок переходів станів у модулях 03–07; щадний режим DEV (без навантаження, послідовно).
 
 > Новій сесії Claude: прочитай цей файл повністю, потім `docs/notes/decisions.md`,
 > `qa/shared/app-code-audit.md`, `qa/shared/recon-2026-09-23-ios.md`. Не починай наступний крок без
@@ -37,8 +44,10 @@
 | 2 | Збірка iOS | ✅ `automation/mobile/builds/ios/Runner.app` (gitignored), `BUILD_INFO.txt` |
 | 3 | Жива сесія Welcome/Login | ✅ `qa/shared/recon-2026-09-23-ios.md` |
 | 3b | Прохід після логіну (іконки, check-in, фоторедактор) | ✅ там само |
-| **4** | **Обговорення тест-кейсів з власником** | ⏭ **наступний** |
-| 5 | Карти екранів (`automation/mobile/screens/`) | — |
+| 4 | Обговорення тест-кейсів з власником | ✅ підхід, 3 рівні звітності, англійська, пілот |
+| 4a | Пілот Auth: імпорт чеклісту, план автоматизації (126 оцінено, 82 обрано), 14 тест-кейсів, recon 3c | ✅ `qa/mobile/02-authentication/` |
+| **4b** | **Доробки харнесу:** Allure-групування по модулях, відео, іменовані скріншоти, фікстури `logged_out_app` / `ui_login` / `new_user`+API-прибирання, зведена сторінка | ⏭ **наступний** |
+| 5 | Карти екранів (`automation/mobile/screens/`) — з дампів `qa/shared/recon-dumps/ios-2026-09-23/` | — |
 | 6 | Тести + доведений червоний | — |
 | 7 | Android | — |
 | 8 | Регресійний прогін + звіт (Allure + матриця трасування) | — |
@@ -64,11 +73,11 @@ happy flow → валідації); які пункти чеклісту кож�
 | Локатори | ~90% — текст (`ACCESSIBILITY_ID`); слабке місце — фоторедактор (кнопки без імен, палітри нема в дереві) | recon, «Підсумок» |
 | Захист локації | check-in блокується на симуляторі; фікстура вмикає `flutter.mock_location_override_enabled` + ставить локацію пристрою в координати джоби | decisions.md, recon |
 | Пастки | OTP: `Incorrect code.` завжди в дереві (перевіряти лише видимість); OTP підтверджується сам після 4-ї цифри; картка джоби й таймер — склеєний текст | recon |
-| Відкриті питання | усі продуктові закриті; розбіжності D-1…D-5 | `qa/shared/questions/open-questions.md`, `qa/mobile/02-authentication/authentication-questions.md` |
+| Відкриті питання | продуктові закриті; Auth: D-1…D-11 прийняті власником (тести стверджують апку) | `qa/shared/questions/open-questions.md`, `qa/mobile/02-authentication/authentication-questions.md` |
 
 ## 5. Стан машини (може не пережити перезавантаження)
 
-- Симулятор iPhone 17 піднятий, апка встановлена й залогінена тестовим акаунтом; локація симулятора
+- Симулятор iPhone 17 піднятий, апка **щойно перевстановлена — чистий стан, не залогінена**; локація симулятора
   40.748440,-73.985664; у бібліотеці фото — тестове фото; перемикач mock-локації = NO.
 - Appium 3.4.2 працює у фоні на `127.0.0.1:4723` (після перезавантаження: `bash automation/mobile/scripts/start_appium.sh`).
 - На DEV немає жодної тестової джоби `QA-AUTO-*`.
@@ -76,7 +85,7 @@ happy flow → валідації); які пункти чеклісту кож�
 
 ## 6. Карта файлів, створених у цьому проекті
 
-- `docs/notes/decisions.md` — журнал усіх рішень (13 рядків) — **головне джерело «чому»**
+- `docs/notes/decisions.md` — журнал усіх рішень (16 рядків) — **головне джерело «чому»**
 - `qa/shared/app-code-audit.md` — аудит коду, рецепт збірки
 - `qa/shared/recon-2026-09-23-ios.md` — жива розвідка, стратегія локаторів по екранах
 - `qa/shared/recon-dumps/ios-2026-09-23/*.xml` — дерева Appium 8 екранів (сировина для карт екранів)
@@ -87,7 +96,9 @@ happy flow → валідації); які пункти чеклісту кож�
 - `automation/mobile/config/settings.py`, `.env.example` — змінні тестового акаунта й API
 - `qa/mobile/NN-*/` — 12 папок модулів; `qa/shared/feature-codes.md` — коди фіч
 - `docs/00-intake/checklist-concert-technologies-flutter.csv` — експорт чеклісту
-- `docs/api/` — OpenAPI, Postman, каталог опитувань DEV і рецепт даних
+- `docs/api/` — OpenAPI, Postman, каталог опитувань DEV (+ матриця 41 опитування) і рецепт даних
+- `automation/tools/import_checklist_from_csv.py` — імпорт модуля чеклісту з CSV (адаптер до штатного імпортера); карта модулів — у кінці цього файлу
+- `qa/mobile/02-authentication/` — checklist, automation-plan, test-cases, questions (пілот)
 
 Git: закомічено 2026-09-23 у локальну гілку `qa/concert-technologies-setup` (не запушено).
 Нові коміти/пуш — лише за командою власника.
@@ -184,3 +195,21 @@ cd ~/Projects/Test-project_flutter/automation/mobile && nohup bash scripts/start
 bash scripts/doctor.sh ios          # має бути RESULT: OK і build: ios OK
 # якщо білда немає — рецепт у qa/shared/app-code-audit.md, «Рецепт збірки»
 ```
+
+## 9. Імпорт наступних модулів чеклісту
+
+```bash
+cd automation/tools && uv run python import_checklist_from_csv.py \
+  --csv ../../docs/00-intake/checklist-concert-technologies-flutter.csv --out-root ../../qa/mobile \
+  --module-map "Splash screen=01-splash:SPL" --module-map "Authentication=02-authentication:AUTH" \
+  --module-map "Order list screen=03-order-list:ORDL" --module-map "Order details screen=04-order-details:ORDD" \
+  --module-map "Check-In / Check-Out Flow=05-check-in-out:CHIO" \
+  --module-map "Order details_In progress state_screen=06-order-progress:ORDP" \
+  --module-map "Submit Deliverables=07-submit-deliverables:DLV" --module-map "Survey screen=08-survey:SRV" \
+  --module-map "Photo report screen=09-photo-report:PHR" --module-map "Notes screen=10-notes:NOTE" \
+  --module-map "Notifications screen=11-notifications:NOTIF" --module-map "Profile screen=12-profile:PRF" \
+  --feature "<Feature name>" [--dry-run]
+```
+
+Імпорт одноразовий на модуль (ID стають контрактом). Dry-run по всіх модулях дає рівно 625 перевірок.
+

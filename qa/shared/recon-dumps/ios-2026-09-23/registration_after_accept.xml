@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="55000" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="118" index="1" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" name="Already have an account?" label="Already have an account?" enabled="true" visible="true" accessible="true" x="0" y="118" width="402" height="756" index="0" traits=""/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                      <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="true" accessible="true" x="0" y="118" width="402" height="670" index="0" traits=""/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="16" y="118" width="370" height="670" index="0" traits=""/>
+                        <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="false" accessible="false" x="0" y="0" width="0" height="0" index="1" traits="Image"/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Registration" name="Registration" label="Registration" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="2" traits="StaticText"/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Good to see you! Let's get you registered." name="Good to see you! Let's get you registered." label="Good to see you! Let's get you registered." enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="3" traits="StaticText"/>
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="First name" label="First name" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="4" traits=""/>
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="Last name" label="Last name" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="5" traits=""/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="United States + 1&#10;+ 1" label="United States + 1&#10;+ 1" enabled="true" visible="true" accessible="true" x="16" y="146" width="62" height="48" index="6" traits="Button"/>
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="Phone number" label="Phone number" enabled="true" visible="true" accessible="true" x="16" y="142" width="370" height="56" index="7" traits=""/>
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="Email" label="Email" enabled="true" visible="true" accessible="true" x="16" y="234" width="370" height="56" index="8" traits=""/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Preferred channel for job notifications" name="Preferred channel for job notifications" label="Preferred channel for job notifications" enabled="true" visible="true" accessible="true" x="16" y="314" width="370" height="20" index="9" traits="StaticText"/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="10" traits="">
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" name="SMS&#10;Email" label="SMS&#10;Email" enabled="true" visible="true" accessible="true" x="16" y="342" width="370" height="48" index="0" traits=""/>
+                          <XCUIElementTypeButton type="XCUIElementTypeButton" value="1" enabled="true" visible="true" accessible="true" x="16" y="342" width="48" height="48" index="1" traits="Selected, Button"/>
+                          <XCUIElementTypeButton type="XCUIElementTypeButton" enabled="true" visible="true" accessible="true" x="201" y="342" width="48" height="48" index="2" traits="Button"/>
+                        </XCUIElementTypeOther>
+                        <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="0" enabled="true" visible="true" accessible="true" x="16" y="422" width="48" height="48" index="11" traits="ToggleButton, Button"/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="I agree to receive automated SMS messages from Concert Technologies Group, Inc., including one-time passwords (OTPs), job notifications, and account alerts." name="I agree to receive automated SMS messages from Concert Technologies Group, Inc., including one-time passwords (OTPs), job notifications, and account alerts." label="I agree to receive automated SMS messages from Concert Technologies Group, Inc., including one-time passwords (OTPs), job notifications, and account alerts." enabled="true" visible="true" accessible="true" x="64" y="406" width="322" height="80" index="12" traits="StaticText"/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Checking this box you agree to receive SMS messages from Concert Technologies Group, Inc., including one-time password (OTP)&#10;Message frequency may vary.&#10;Message and data rates may apply.&#10;Reply Stop to unsubscribe. Reply Help for help." name="Checking this box you agree to receive SMS messages from Concert Technologies Group, Inc., including one-time password (OTP)&#10;Message frequency may vary.&#10;Message and data rates may apply.&#10;Reply Stop to unsubscribe. Reply Help for help." label="Checking this box you agree to receive SMS messages from Concert Technologies Group, Inc., including one-time password (OTP)&#10;Message frequency may vary.&#10;Message and data rates may apply.&#10;Reply Stop to unsubscribe. Reply Help for help." enabled="true" visible="true" accessible="true" x="16" y="496" width="370" height="96" index="13" traits="StaticText"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Continue" label="Continue" enabled="false" visible="true" accessible="true" x="16" y="616" width="370" height="48" index="14" traits="NotEnabled, Button"/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="15" traits="">
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="16" y="688" width="370" height="60" index="0" traits=""/>
+                          <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="By continuing, you accept the Concert Technologies Group, Inc.&#10;" name="By continuing, you accept the Concert Technologies Group, Inc.&#10;" label="By continuing, you accept the Concert Technologies Group, Inc.&#10;" enabled="true" visible="true" accessible="true" x="20" y="685" width="366" height="46" index="1" traits="StaticText"/>
+                          <XCUIElementTypeLink type="XCUIElementTypeLink" name="Privacy Policy" label="Privacy Policy" enabled="true" visible="true" accessible="true" x="64" y="725" width="106" height="26" index="2" traits="Link"/>
+                          <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value=" and " name=" and " label=" and " enabled="true" visible="true" accessible="true" x="161" y="725" width="42" height="26" index="3" traits="StaticText"/>
+                          <XCUIElementTypeLink type="XCUIElementTypeLink" name="Terms &amp; Conditions" label="Terms &amp; Conditions" enabled="true" visible="true" accessible="true" x="194" y="725" width="144" height="26" index="4" traits="Link"/>
+                        </XCUIElementTypeOther>
+                      </XCUIElementTypeOther>
+                    </XCUIElementTypeOther>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Log in" name="Log in" label="Log in" enabled="true" visible="true" accessible="true" x="269" y="804" width="42" height="20" index="2" traits="StaticText"/>
+                  </XCUIElementTypeOther>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>
