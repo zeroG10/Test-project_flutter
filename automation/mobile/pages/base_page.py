@@ -38,6 +38,7 @@ from screens import Screen, locator_for
 CENTRE_TOLERANCE = 0.02
 BOTTOM_AREA = 1 / 3
 SCROLL_ATTEMPTS = 6
+VIEW_MARGIN = 50  # points kept clear at the top (status bar) and bottom (home indicator)
 
 
 def normalized(text: str | None) -> str:
@@ -95,14 +96,18 @@ class BasePage:
                 self.scroll_to(alias)
                 element = waits.wait_visible(self.driver, self.locator(alias), timeout)
             element.click()  # focus it, as a user does: keys typed into a moving view go nowhere
+            # Focusing rebuilds the Flutter widget: the old reference goes stale (prove-red run,
+            # TC-AUTH-003 setup) — find the field again before touching it.
+            element = waits.wait_present(self.driver, self.locator(alias), timeout)
             element.clear()
             self._send(element, text, per_char)
+            element = waits.wait_present(self.driver, self.locator(alias), timeout)
             if text and not element.get_attribute("value"):
                 # Not one character landed (the view was still settling after a scroll,
                 # recon 3d). Input plumbing, not a verdict — logged, then typed once more.
                 with allure.step("no input landed → tap the field and type again"):
-                    element = waits.wait_visible(self.driver, self.locator(alias), timeout)
-                    element.click()
+                    waits.wait_visible(self.driver, self.locator(alias), timeout).click()
+                    element = waits.wait_present(self.driver, self.locator(alias), timeout)
                     self._send(element, text, per_char)
 
     @staticmethod
@@ -128,12 +133,29 @@ class BasePage:
             for start, end in ((0.55, 0.35), (0.3, 0.5)):
                 for _ in range(attempts):
                     if self.is_visible(alias, 0.5, **params):
+                        self._settle_in_view(alias, height, **params)
                         return
                     self._drag(int(height * start), int(height * end))
             if not self.is_visible(alias, 1, **params):
                 raise TimeoutException(
                     f"{self._name(alias, params)} not visible after scrolling both ways"
                 )
+            self._settle_in_view(alias, height, **params)
+
+    def _settle_in_view(self, alias: str, height: int, **params: object) -> None:
+        """A partly visible element is 'visible' too, and a tap on its centre can miss (run 1:
+        the SMS Terms Accept button cut by the screen edge). Nudge it fully into view."""
+        for _ in range(3):
+            rect = waits.wait_visible(self.driver, self.locator(alias, **params), 2).rect
+            top, bottom = rect["y"], rect["y"] + rect["height"]
+            if bottom > height - VIEW_MARGIN:
+                shift = -(bottom - (height - VIEW_MARGIN) + 20)
+            elif top < VIEW_MARGIN:
+                shift = VIEW_MARGIN - top + 20
+            else:
+                return
+            middle = height // 2
+            self._drag(middle, middle + int(shift))
 
     def _drag(self, from_y: int, to_y: int) -> None:
         """A vertical drag without a fling (move, hold, release), so the view stops where the

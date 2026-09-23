@@ -95,13 +95,16 @@ filled / outlined styling in CHK-AUTH-007/-008 stays manual (partial).
 | 2 | expect-visible | welcome.root | — | visible |
 | 3 | click | welcome.sign-up | — | — |
 | 4 | expect-visible | registration.root | — | visible |
-| 5 | back | — | — | Welcome (system back / swipe-back) |
+| 5 | open | app | terminate, then cold start | Welcome (signed out) |
 | 6 | expect-visible | welcome.root | — | visible |
 | 7 | click | welcome.login | — | — |
 | 8 | expect-visible | login.root | — | visible |
 
 **Postconditions / cleanup:** nothing to clean.
-**Notes:** Registration has no on-screen back control (recon 3c) — system back / swipe-back is the way back.
+**Notes:** Registration has no on-screen back control (recon 3c), and **no back stack either**: Welcome opens it with
+`context.go(Routes.signUp)` — a route replace (app code, `welcome_page.dart`). The first run (2026-09-23) failed on the
+old step 5 "system back → Welcome": a test-design assumption no CHK asks for, not an app defect. Step 5 is now a cold
+start; the CHK coverage is unchanged.
 
 ---
 
@@ -278,6 +281,8 @@ stays disabled. **D-12 accepted as is (owner, 2026-09-23):** steps 3 and 6 asser
 Skipped with reason D-12.
 The server messages are a red banner at the bottom for ~4 s (element `Other` named by its text); the email wording is
 confirmed verbatim, the phone wording is still the checklist's. `a b@c.com` enables Continue — D-13, no test (owner: spaces are trimmed).
+**Run 1 (2026-09-23):** the unregistered **phone** got "An unexpected error occurred. Please try logging in again." (D-15, open).
+The TC is automated as two tests so the email CHKs are not failed by the phone question: `test_login_rejects_invalid_and_unregistered_email` (steps 1–9 + retry with a second email — CHK-114/121/123/125) and `test_login_rejects_unregistered_phone` (steps 10–12 — CHK-122).
 
 ---
 
@@ -419,21 +424,21 @@ wording captured in recon 3c; errors appear while typing (no blur needed).
 
 | field | {{value}} | class | {{expected}} |
 |---|---|---|---|
-| first-name | *(typed, then cleared)* | required | required error visible (wording captured on first run) |
+| first-name | *(typed, then cleared)* | required | Field is required. |
 | first-name | `A` | below min (1) | 2 characters minimum. |
 | first-name | `Al` | min (2) | no error |
-| first-name | 100 × `a` | max (100) | no error |
-| first-name | 101 × `a` | above max (101) | error visible, or input capped at 100 |
+| first-name | 50 × `a` | max (50, D-14) | no error |
+| first-name | 51 × `a` | above max (51) | input capped at 50, no error (D-14) |
 | first-name | `Ann3` | digit | Has invalid characters. |
 | first-name | `An@n` | special character | Has invalid characters. |
-| last-name | *(typed, then cleared)* | required | required error visible |
+| last-name | *(typed, then cleared)* | required | Field is required. |
 | last-name | `B` | below min | 2 characters minimum. |
 | last-name | `Bo` | min | no error |
 | last-name | `B3` | digit | Has invalid characters. |
-| phone | *(typed, then cleared)* | required | required error visible |
+| phone | *(typed, then cleared)* | required | Phone number is required |
 | phone | `123` | malformed | Enter a valid phone number |
 | phone | `2025550123` | valid (US) | no error — shown as `(202) 555-0123` |
-| email | *(typed, then cleared)* | required (D-6) | required error visible |
+| email | *(typed, then cleared)* | required (D-6) | Field is required. |
 | email | `abc@` | malformed | Email format is incorrect. |
 | email | `qa-auto@example.com` | valid | no error |
 
@@ -447,8 +452,9 @@ wording captured in recon 3c; errors appear while typing (no blur needed).
 | 6 | expect-hidden | registration.error[{{field}}] | — | hidden (error cleared dynamically) |
 
 **Postconditions / cleanup:** nothing submitted, nothing to clean.
-**Notes:** error texts captured in recon 3c (Q-A3 resolved) and asserted verbatim; the required-field wording and
-the 101-character behaviour are not yet observed — asserted as "error visible" and recorded on the first run.
+**Notes:** error texts captured in recon 3c (Q-A3 resolved) and asserted verbatim. Probe 2026-09-23 (step 6): required
+wording `Field is required.` (names, email) / `Phone number is required` (phone); names are **capped at 50 characters**
+without a message — SRS says 100 (D-14), the rows assert the app.
 Step 3 is kept as a harmless focus change: validation already fires while typing.
 
 ---

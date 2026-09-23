@@ -161,6 +161,24 @@ def test_evidence_is_copied_and_old_output_replaced(run_dir: Path) -> None:
     assert "<video controls" in page
 
 
+def test_video_attached_in_a_fixture_teardown_is_found(run_dir: Path) -> None:
+    results = run_dir / "allure-results"
+    (results / "v-1-attachment.mp4").write_bytes(b"x")
+    container = {
+        "children": ["t010"],
+        "afters": [{"name": "_screen_video::0", "attachments": [
+            {"name": "video · test_registration", "source": "v-1-attachment.mp4", "type": "video/mp4"}
+        ], "steps": []}],
+    }
+    (results / "c1-container.json").write_text(json.dumps(container), encoding="utf-8")
+    data = json.loads((results / "t010-result.json").read_text(encoding="utf-8"))
+    data["uuid"] = "t010"
+    (results / "t010-result.json").write_text(json.dumps(data), encoding="utf-8")
+    _, page, out = _build(run_dir)
+    assert (out / "assets" / "v-1-attachment.mp4").exists()
+    assert "1 video" in page
+
+
 def test_foreign_assets_folder_is_never_deleted(tmp_path: Path) -> None:
     assets = tmp_path / "assets"
     assets.mkdir()

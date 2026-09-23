@@ -9,13 +9,14 @@ field's errors are the texts found inside that field (``BasePage.texts_within``)
 """
 
 import allure
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 
 from helpers import waits
 from pages.base_page import BasePage, normalized
 from screens.registration_map import REGISTRATION
 
 FIELDS = ("first-name", "last-name", "phone", "email")
+NO_ERROR_HOLD = 1.0  # seconds a "no error" expectation watches for a late message
 CHANNELS = ("sms", "email")
 
 
@@ -127,7 +128,14 @@ class RegistrationPage(BasePage):
             )
             return shown[0]
 
-    def expect_no_field_error(self, field: str, timeout: float | None = None) -> None:
+    def expect_no_field_error(
+        self, field: str, timeout: float | None = None, hold: float = NO_ERROR_HOLD
+    ) -> None:
+        """No error under ``field`` — and none appears within ``hold`` seconds.
+
+        A negative expectation needs a window: checked only once, it could pass before the
+        validator has rendered its message.
+        """
         with allure.step(f"expect no error under {field}"):
             waits.wait_until(
                 self.driver,
@@ -135,6 +143,11 @@ class RegistrationPage(BasePage):
                 timeout,
                 f"{field}: still shows {self._errors_or_empty(field)}",
             )
+            try:
+                waits.wait_until(self.driver, lambda _d: bool(self._errors_or_empty(field)), hold)
+            except TimeoutException:
+                return
+            raise AssertionError(f"{field}: an error appeared: {self._errors_or_empty(field)}")
 
     def _errors_or_empty(self, field: str) -> list[str]:
         try:

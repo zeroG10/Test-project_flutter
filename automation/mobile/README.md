@@ -315,6 +315,21 @@ CHK verdicts come from `trace_results.py` itself, so the page and the traceabili
 Output goes to `reports/summary/` (gitignored: it shows the client's app); publishing it is an
 owner call. Usage: [`automation/tools/README.md`](../tools/README.md).
 
+## Prove red (GATES rule 6)
+
+Every generated test must fail at least once against a broken expectation before it is
+trusted. Tests route their expected texts through the `expected` fixture; `--prove-red` makes
+every one of them wrong on purpose:
+
+```bash
+uv run pytest --platform=ios tests/shared/test_authentication.py --prove-red \
+    --alluredir=allure-results-prove-red          # never trace this run
+```
+
+The run must be all red; the summary lists any test that stayed green as **NOT PROVEN**.
+A test fails at its first text expectation, which is placed before any server call where
+possible, so a prove-red run costs the DEV server little.
+
 ## Offline self-test
 
 ```bash

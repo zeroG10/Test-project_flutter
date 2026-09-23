@@ -52,6 +52,16 @@ def pytest_addoption(parser):
         default=None,
         help="android | ios (Flutter is APP_KIND in .env)",
     )
+    parser.addoption(
+        "--prove-red",
+        action="store_true",
+        default=False,
+        help="break every expected text a test routes through the `expected` fixture: each test "
+        "must go red (GATES rule 6). Use a separate --alluredir; never trace this run.",
+    )
+
+
+PROVE_RED_SUFFIX = " «prove-red: deliberately wrong»"
 
 
 def pytest_configure(config):
@@ -64,10 +74,13 @@ def pytest_configure(config):
 
 def pytest_report_header(config):
     flutter_driver = settings.flutter_driver if settings.is_flutter else "-"
-    return (
+    header = (
         f"mobile: platform={config.stash[PLATFORM_KEY]} app_kind={settings.app_kind} "
         f"flutter_driver={flutter_driver} appium={settings.appium_url}"
     )
+    if config.getoption("--prove-red"):
+        header += "\nPROVE-RED RUN: every test must FAIL; a passing test is not proven"
+    return header
 
 
 def pytest_collection_modifyitems(config, items):
@@ -122,6 +135,18 @@ def platform(request) -> str:
 
 
 @pytest.fixture(scope="session")
+def expected(request):
+    """Route a test's expected texts through this: ``expected("Log in")``.
+
+    Normal run: the text unchanged. ``--prove-red``: the text made wrong on purpose, so the
+    test must fail at its first text expectation — the proof that it can go red.
+    """
+    if not request.config.getoption("--prove-red"):
+        return lambda text: text
+    return lambda text: f"{text}{PROVE_RED_SUFFIX}"
+
+
+@pytest.fixture(scope="session")
 def driver(platform):
     """ONE Appium session for the whole run. The session start installs the build from
     .env (a clean app at the start of every run); per-test app state comes from the
@@ -169,6 +194,8 @@ def _allure_context(request, platform):
         if chk_id not in declared:
             allure.dynamic.tag(chk_id)
     allure.dynamic.label("env", env_label(platform))
+    if request.config.getoption("--prove-red"):
+        allure.dynamic.label("run_mode", "prove-red")
 
 
 @pytest.fixture(autouse=True)
@@ -251,6 +278,16 @@ def pytest_runtest_logreport(report):
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    if config.getoption("--prove-red"):
+        green = [r.nodeid for r in terminalreporter.stats.get("passed", [])]
+        red = len(terminalreporter.stats.get("failed", []))
+        terminalreporter.write_sep(
+            "=", f"PROVE-RED: {red} test(s) went red, {len(green)} stayed green"
+        )
+        for nodeid in green:
+            terminalreporter.write_line(
+                f"  NOT PROVEN (passed with a broken expectation): {nodeid}"
+            )
     if not _SKIPPED_IN_RUN:
         return
     if _strict_skips_enabled():

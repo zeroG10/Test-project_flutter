@@ -70,8 +70,25 @@ def _attachments(node: dict) -> list[dict]:
     return found
 
 
+def _fixture_attachments(allure_dir: Path) -> dict[str, list[dict]]:
+    """Attachments made in fixtures (setup / teardown), by test uuid.
+
+    allure-pytest files them under ``*-container.json`` (befores / afters), not under the
+    test result — the per-test screen video is attached in a teardown (conftest.py).
+    """
+    by_test: dict[str, list[dict]] = {}
+    for f in sorted(allure_dir.glob("*-container.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        parts = (d.get("befores") or []) + (d.get("afters") or [])
+        found = [att for part in parts for att in _attachments(part)]
+        for uuid in d.get("children") or []:
+            by_test.setdefault(str(uuid), []).extend(found)
+    return by_test
+
+
 def load_test_runs(allure_dir: Path) -> list[TestRun]:
     runs: list[TestRun] = []
+    from_fixtures = _fixture_attachments(allure_dir)
     for f in sorted(allure_dir.glob("*-result.json")):
         d = json.loads(f.read_text(encoding="utf-8"))  # tr.load_allure_results already vetted
         labels: dict[str, str] = {}
@@ -89,7 +106,7 @@ def load_test_runs(allure_dir: Path) -> list[TestRun]:
             start_ms=start,
             stop_ms=stop,
         )
-        for att in _attachments(d):
+        for att in _attachments(d) + from_fixtures.get(str(d.get("uuid")), []):
             source = allure_dir / str(att.get("source") or "")
             name = str(att.get("name") or "")
             if not source.is_file():
@@ -167,6 +184,10 @@ def _e(text: object) -> str:
 def _pill(status: str) -> str:
     label = status or "Not run"
     return f'<span class="pill {label.replace(" ", "")}">{_e(label)}</span>'
+
+
+def _count(n: int, noun: str) -> str:
+    return "" if n == 0 else f"{n} {noun}{'' if n == 1 else 's'}"
 
 
 def _minutes(seconds: float) -> str:
@@ -271,7 +292,12 @@ def render(
     w("<h2>Tests</h2><div class='box wrap'><table><tr><th>Test</th><th>Module</th>")
     w("<th>Result</th><th>Time</th><th>Evidence</th></tr>")
     for r in runs:
-        evidence = f"{len(r.checkpoints)} screens" + (f", {len(r.videos)} video" if r.videos else "")
+        parts = [
+            _count(len(r.checkpoints), "key screen"),
+            _count(len(r.failure_shots), "failure screenshot"),
+            _count(len(r.videos), "video"),
+        ]
+        evidence = ", ".join(part for part in parts if part) or "—"
         detail = f"<br><span class='muted'>{_e(r.detail)}</span>" if r.detail else ""
         w(
             f"<tr><td>{_e(r.title)}{detail}</td><td>{_e(r.module)}</td><td>{_pill(r.status)}</td>"

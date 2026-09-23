@@ -5,6 +5,7 @@ the app submits by itself after the 4th digit (D-5). ``Incorrect code.`` sits in
 while hidden — only its visibility means anything (recon 3b).
 """
 
+import contextlib
 import re
 
 import allure
@@ -14,6 +15,7 @@ from pages.base_page import BasePage, normalized
 from screens.otp_map import OTP
 
 _MM_SS = re.compile(r"(\d{1,2}):(\d{2})")
+OTP_SCREEN_TIMEOUT = 20.0  # the code request goes to the (weak) DEV server
 
 
 class OtpPage(BasePage):
@@ -21,7 +23,12 @@ class OtpPage(BasePage):
 
     def enter_code(self, code: str) -> None:
         with allure.step(f"OTP: enter {len(code)} digits"):
+            # The code locator is "the only input on the screen" — valid ONLY once this screen
+            # is open. Typing earlier put the code into the Login field (prove-red run, TC-003).
+            self.assert_open(OTP_SCREEN_TIMEOUT)
             field = self.find("code")
+            with contextlib.suppress(WebDriverException):
+                field.clear()  # after a wrong code the field may still hold the old digits
             try:
                 field.send_keys(code)
             except WebDriverException:
