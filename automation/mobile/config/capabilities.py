@@ -69,6 +69,10 @@ def ios_caps() -> XCUITestOptions:
     opts.device_name = settings.ios_device_name
     opts.app = str(settings.app_path("ios"))
     opts.bundle_id = settings.ios_bundle_id
+    # iOS counterpart of Android's auto_grant_permissions: accept native system alerts
+    # (notifications, location, camera, photos). Flutter in-app dialogs are not native
+    # alerts and are unaffected. A test that checks a denied permission overrides this.
+    opts.auto_accept_alerts = True
     opts.new_command_timeout = settings.new_command_timeout
     return opts
 

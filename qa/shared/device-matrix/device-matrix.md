@@ -15,11 +15,16 @@ What we **actually test on**, with priorities. Derived from [docs/platform-specs
 
 ---
 
+> **Concert Technologies, демо (рішення 2026-09-23):** автоматизація ганяється на двох
+> конфігураціях — **iPhone 17 / iOS 26.5** (симулятор) і **Pixel 7 / API 35** (емулятор).
+> Решта рядків нижче — шаблонні орієнтири, у демо не проганяються. Планшети поза скоупом.
+
 ## iOS
 
 | Device | OS | Screen | Form factor | Priority | Where tested | Notes |
 |---|---|---|---|---|---|---|
-| iPhone 15 | 17.4 | 6.1" | Standard | P0 | Simulator + 1 real | Primary target |
+| **iPhone 17** | **26.5** | 6.3" | Standard | **P0** | Simulator | **Ціль автоматизації (демо)** |
+| iPhone 15 | 17.4 | 6.1" | Standard | P1 | Simulator + 1 real | Шаблонний орієнтир |
 | iPhone SE (3rd gen) | 17.4 | 4.7" | Small | P1 | Simulator | Smallest supported screen |
 | iPhone 15 Pro Max | 17.4 | 6.7" | Large | P1 | Simulator | Dynamic Island, large layouts |
 | iPhone 13 | 16.7 | 6.1" | Standard | P1 | Simulator | Latest-1 OS |
@@ -29,7 +34,7 @@ What we **actually test on**, with priorities. Derived from [docs/platform-specs
 
 | Device | OS | API | Screen | Form factor | Priority | Where tested | Notes |
 |---|---|---|---|---|---|---|---|
-| Pixel 7 | 14 | 34 | 6.3" | Standard | P0 | Emulator + 1 real | Reference device |
+| **Pixel 7** | **15** | **35** | 6.3" | Standard | **P0** | Emulator | **Ціль автоматизації (демо)** |
 | Samsung Galaxy S23 | 14 | 34 | 6.1" | Standard | P0 | Real device | OneUI quirks |
 | Pixel 6a | 13 | 33 | 6.1" | Mid-range | P1 | Emulator | Mid-range perf |
 | Pixel 4a | 13 | 33 | 5.8" | Small + older | P1 | Emulator | Lowest supported screen + OS |

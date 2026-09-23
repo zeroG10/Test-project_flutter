@@ -21,4 +21,15 @@ Rule (read before adding a row):
 
 | slug | code | platform | notes |
 |---|---|---|---|
-| `<authentication>` | `<AUTH>` | `<web \| mobile \| api \| shared>` | `<SRS section — one line>` — replace this row with the first real feature |
+| `splash` | `SPL` | mobile | Splash screen — 15 перевірок у чеклісті |
+| `authentication` | `AUTH` | mobile | Welcome + Registration + Phone/email verification + Login — 126 перевірок у чеклісті |
+| `order-list` | `ORDL` | mobile | Order list screen / List view — 68 перевірок у чеклісті |
+| `order-details` | `ORDD` | mobile | Order details screen — 89 перевірок у чеклісті |
+| `check-in-out` | `CHIO` | mobile | Check-In / Check-Out Flow + confirmation logic — 40 перевірок у чеклісті |
+| `order-progress` | `ORDP` | mobile | Order details — In progress state — 42 перевірок у чеклісті |
+| `submit-deliverables` | `DLV` | mobile | Submit Deliverables — 33 перевірок у чеклісті |
+| `survey` | `SRV` | mobile | Survey screen — 40 перевірок у чеклісті |
+| `photo-report` | `PHR` | mobile | Photo report screen — 54 перевірок у чеклісті |
+| `notes` | `NOTE` | mobile | Notes screen — 52 перевірок у чеклісті |
+| `notifications` | `NOTIF` | mobile | Notifications screen — 31 перевірок у чеклісті |
+| `profile` | `PRF` | mobile | Profile screen — 35 перевірок у чеклісті |

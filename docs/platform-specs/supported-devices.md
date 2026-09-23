@@ -1,5 +1,21 @@
 # Supported Devices & Platforms
 
+> **ЗАФІКСОВАНО З SRS (2026-09-22)** — `SRS … (IEEE830)` §2.4 Operating Environment
+> та §2.5 Design and Implementation Constraints:
+>
+> | Параметр | Значення з SRS |
+> |---|---|
+> | **iOS** | **16.0 і новіші** |
+> | **Android** | **12.1 і новіші** |
+> | Ширина екрана | мін. **320px**, макс. **1440px** (звідси колонка `Tablet` у чеклісті) |
+> | Технологія | Flutter, кросплатформна збірка |
+> | Бекенд | REST API на .NET + PostgreSQL; Survey Manager API на Node.js |
+>
+> Матриця нижче — шаблонна, її треба привести до цих значень (питання Q-003
+> у `qa/shared/questions/open-questions.md`).
+
+
+
 **Source of truth** for what the product officially supports. QA device coverage in [qa/shared/device-matrix/](../../qa/shared/device-matrix/) must align with this list.
 
 > Update this file when product changes its support policy (e.g., drops an OS version, adds a new device tier).

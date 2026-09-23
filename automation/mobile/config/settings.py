@@ -68,6 +68,12 @@ class Settings(BaseSettings):
     ios_app_path: str = "./builds/ios/App.app"
     ios_bundle_id: str = "com.example.app"
 
+    # Тестовий акаунт Field Technician. Вхід = телефон|email -> 4-значний OTP,
+    # пароля в апці немає (SRS FR-LOG-05). На DEV код захардкоджений.
+    app_user_phone: str = ""
+    app_user_email: str = ""
+    app_user_otp: str = ""
+
     @field_validator("platform")
     @classmethod
     def _validate_platform(cls, value: str) -> str:

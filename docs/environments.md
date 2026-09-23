@@ -1,4 +1,4 @@
-# Environments and access — `<PROJECT_NAME>` (pointers only, NO secrets)
+# Environments and access — Concert Technologies Field Services (pointers only, NO secrets)
 
 Filled by `/setup-project` from `setup/project.yaml` (`web.*`, `api.*`, `mobile.*` and the
 Discovery profile `context.*` — prompts/00-discovery.md) and by hand after the kickoff.
@@ -7,8 +7,12 @@ Credentials live ONLY in the gitignored `.env` files (`automation/web/.env`,
 
 ## Product
 
-`<One paragraph: what the product is, which stacks exist (web SPA / mobile app / API), which
-share a backend, who the user roles are.>`
+Мобільний застосунок на Flutter для **Field Technicians (FT)** — польових технічних
+спеціалістів, що виконують монтаж і обслуговування обладнання на об'єктах замовника.
+Замінює GoCanvas і CompanyCam. Бекенд: Order Management REST API (.NET + PostgreSQL)
+та Survey Manager API (Node.js). Веб-панель використовує **Project Facilitator (PF)** —
+**поза скоупом мобільної автоматизації**. У самій мобільній апці роль одна — FT
+(SRS §2.3), тож матриці прав немає.
 
 ## Environments
 
@@ -24,20 +28,31 @@ Reachability note: `<is the target reachable from GitHub-hosted runners without 
 
 | Role | Env vars | Can | Cannot |
 |---|---|---|---|
-| `<primary / admin role>` | `APP_USER_EMAIL` / `APP_USER_PASSWORD` (web) · `APP_USER_*` (mobile) | | |
-| `<second, lower-privilege role>` | `APP_MANAGER_EMAIL` / `APP_MANAGER_PASSWORD` — optional; both or neither | | |
+| **Field Technician (FT)** — єдина роль у мобільній апці | `APP_USER_PHONE`, `APP_USER_EMAIL`, `APP_USER_OTP` в `automation/mobile/.env` | переглядати призначені замовлення, check-in / check-out, заповнювати опитування, додавати фото й нотатки, здавати результати | керувати замовленнями, призначати роботи — це робить PF через веб |
+| Project Facilitator (PF) | — | керує замовленнями у веб-панелі | **поза скоупом** мобільної автоматизації |
 
 > Record here any place where the UI names a role differently from the API — that is a
 > product decision to test against, not a defect, once the team confirms it.
 
-Login mechanics: `<email + password / OTP / SSO — which endpoint or screen, verified YYYY-MM-DD>`.
-Account activation / password recovery: `<via email link? see docs/notes/email-automation-setup.md>`.
+Login mechanics: **пароля в апці немає.** Вхід = номер телефону **або** email → 4-значний OTP
+(SRS FR-LOG-05, FR-OTP-01). Канал OTP залежить від прапорця згоди на SMS (FR-012):
+`TRUE` → SMS, `FALSE` → Email. **На DEV код захардкоджений** — змінна `APP_USER_OTP`,
+тож читати пошту чи SMS не потрібно (підтверджено власником 2026-09-22).
+
+Пастки, закладені в архітектуру тестів:
+- `FR-OTP-13` — перевищення кількості спроб блокує акаунт на 2 хвилини;
+- `FR-OTP-08/09` — новий код не запросити, доки не спливе відлік таймера.
+
+Через це логін виконується **один раз на прогін**, далі тести працюють у відкритій сесії.
+Account activation / password recovery: **не застосовується** — пароля немає, відновлювати
+нічого. Реєстрація нового FT — окремий флоу (SRS §3.1.1.2) з верифікацією через OTP.
+Поштовий ящик для автоматизації **не потрібен**, доки OTP на DEV захардкоджений.
 
 ## Browsers, devices, viewport
 
-- Web: `<browsers and versions from the SRS>`; gate projects in `automation/web/playwright.config.ts`.
+- Web: поза скоупом (`platforms.web: false` у `setup/project.yaml`).
 - Mobile: `docs/platform-specs/supported-devices.md` (product policy) → `qa/shared/device-matrix/device-matrix.md` (what we test on).
-- Viewport / responsive rules: `<min–max width, tablet, mobile web?>`.
+- Ширина екрана за SRS §2.5: мін. **320px**, макс. **1440px**. Планшети — поза скоупом демо (рішення 2026-09-22).
 
 ## Known environment constraints (observed by automation)
 

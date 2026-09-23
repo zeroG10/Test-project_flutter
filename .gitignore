@@ -54,3 +54,8 @@ docs/designs/mobile/**/screens/
 automation/web/playwright/.auth/
 # Web recon output (npm run pw:recon) — raw drafts; curated results go to qa/web/<NN-module>/ and screens/
 automation/web/playwright/scripts/recon-out/
+
+# Застосунок під тестом — симлінк на ~/Projects/concert-app.
+# Код клієнта живе ЗОВНІ цього репозиторію: читаємо, збираємо, НЕ змінюємо
+# (QA-доктрина, правило 4 — app under test is read-only).
+/app

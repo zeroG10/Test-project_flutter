@@ -7,9 +7,21 @@ checklists of the same feature share the code (they sync to separate Sheets).
 
 Stage legend: intake → analysed → checklist → candidates → test cases → automated → traced.
 
-| # | Module | Code | SRS | Figma node | Platforms | Stage | Notes |
+| # | Module | Code | Checks | Figma node | Platforms | Stage | Notes |
 |---|---|---|---|---|---|---|---|
-| 01 | `<module>` | `<CODE>` | `docs/srs/mobile/<N. Module>/<file>.md` | `<node-id>` | android · ios | intake | |
+| 01 | `splash` | `SPL` | 15 | `<node-id>` | android · ios · tablet | intake | Splash screen |
+| 02 | `authentication` | `AUTH` | 126 | `<node-id>` | android · ios · tablet | intake | Welcome + Registration + Phone/email verification + Login |
+| 03 | `order-list` | `ORDL` | 68 | `<node-id>` | android · ios · tablet | intake | Order list screen / List view |
+| 04 | `order-details` | `ORDD` | 89 | `<node-id>` | android · ios · tablet | intake | Order details screen |
+| 05 | `check-in-out` | `CHIO` | 40 | `<node-id>` | android · ios · tablet | intake | Check-In / Check-Out Flow + confirmation logic |
+| 06 | `order-progress` | `ORDP` | 42 | `<node-id>` | android · ios · tablet | intake | Order details — In progress state |
+| 07 | `submit-deliverables` | `DLV` | 33 | `<node-id>` | android · ios · tablet | intake | Submit Deliverables |
+| 08 | `survey` | `SRV` | 40 **+нові** | `4009:12410` | android · ios · tablet | intake | Survey screen. ⚠️ **CR-2 Repeatable Sections у проді, але в чеклісті 0 перевірок** — пишемо заново з PRD (stories 3–6, §9.2) |
+| 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | intake | Photo report screen |
+| 10 | `notes` | `NOTE` | 52 | `<node-id>` | android · ios · tablet | intake | Notes screen |
+| 11 | `notifications` | `NOTIF` | 31 | `<node-id>` | android · ios · tablet | intake | Notifications screen |
+| 12 | `profile` | `PRF` | 35 | `<node-id>` | android · ios · tablet | intake | Profile screen |
+| | **разом** | | **625** | | | | Google Sheet: `Working_Regression Check-list_Concert Technologies– Flutter App` |
 
 Platform column: which OS the module is verified on (`android`, `ios`, or both). A Flutter app
 is still `android · ios` — Flutter is an app kind (`APP_KIND=flutter`), not a platform.

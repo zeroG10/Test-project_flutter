@@ -17,7 +17,7 @@
 template_version: "1.1.1"
 
 project:
-  name: "<PROJECT_NAME>"
+  name: "Concert Technologies — Flutter App"
   repo_name: "<repo-name>"
   description: "<one line: what is automated, for which product, which stacks>"
 
@@ -27,23 +27,25 @@ project:
 # `<unknown>` is allowed and blocks only the steps that depend on it. Never guessed.
 # ----------------------------------------------------------------------------
 context:
-  product_state: "<existing-reachable|existing-access-pending|greenfield>"
+  product_state: "existing-reachable"          # апка в проді, клієнт користується, DEV доступний
   sources_of_truth:                  # available sources; default precedence is by layer, not list order
-    - "<design|srs-prd|user-stories-ac|api-spec|live-product-only>"
+    - "srs-prd"
+    - "design"                       # Figma
+    - "live-product-only"            # жива апка — тільки для discovery, не як доказ коректності
   precedence_note: "<default by layer, or owner override: source + scope + reason + owner/date; link docs/notes/decisions.md>"
   shared_backend: "<which platforms share one backend, or none>"
   first_module: "<module slug — and why it is first: risk / release date / client ask>"
   auth:
-    method: "<email-password|otp-magic-link|sso|social|mixed>"
+    method: "mixed"                 # email+пароль, далі OTP (email або SMS); на DEV код захардкоджений
     roles: ["<role1>", "<role2>"]
-    test_accounts: "<per role: exist / owner / to be created>"
+    test_accounts: "exist — надані власником проекту"
   test_data:
-    policy: "<free|naming-rule|read-only-shared|unknown>"   # read-only-shared → no seeding fixtures, read-only tests
+    policy: "free"                   # DEV: будь-які тести, створення й видалення даних дозволені
     reset: "<seed script / scheduled reset / none>"
   environments:
-    target: "<dev|staging>"           # automation target, never production
+    target: "dev"                     # automation target, never production
     ci_reachable: "<yes|vpn-required|unknown>"
-  reporting: "<markdown-only|google-sheets|both>"
+  reporting: "both"                 # markdown = джерело правди, Google Sheets = таблиця команди
   decision_owner: "<who answers open questions and typical turnaround>"
 
 # Bug tracker — read by prompts/08-file-bug.md. `none` = bugs stay in qa/*/bugs/ markdown.
@@ -63,9 +65,10 @@ tracker:
 # set the unused ones to false — /setup-project then skips their configuration and CI
 # can be trimmed (setup/SETUP.md §2). Leave the folders in place.
 platforms:
-  web: <true|false>
-  mobile: <true|false>
-  api: <true|false>
+  web: false
+  mobile: true
+  api: false                 # окремого набору API-тестів НЕ робимо; API — лише підготовка даних,
+                             # логін в обхід OTP і звірка результатів усередині UI-сценаріїв
 
 # Optional QA modules — toggle what this project needs. /setup-project skips
 # disabled modules entirely (no config, no verify) and offers to delete their
@@ -86,20 +89,20 @@ web:
     main_page_node: "<0:1>"              # page with the screens; node-ids go to docs/designs/web/figma-sources.md
 
 mobile:
-  kind: "<native|flutter>"              # flutter → APP_KIND=flutter in automation/mobile/.env (native drivers + Semantics ids)
+  kind: "flutter"                       # APP_KIND=flutter в automation/mobile/.env
   android:
-    app_package: "<com.example.app>"
-    app_activity: "<com.example.app.MainActivity>"
+    app_package: "com.concerttechnologies.app.dev"        # flavor development; prod = com.ctfieldservices.app
+    app_activity: "com.concerttechnologies.app.MainActivity"
   ios:
-    bundle_id: "<com.example.app>"
+    bundle_id: "com.concerttechnologies.app.dev"           # flavor development; prod = com.ctfieldservices.app
   figma:
-    file_key: "<FIGMA_FILE_KEY>"
-    file_name: "<Figma file name>"
-    main_page_node: "<0:1>"
+    file_key: "eAb4RANWzBFgqiyiA5hUZ0"
+    file_name: "Concert Technologies: Mobile app (For review)"
+    main_page_node: "2451:73252"        # canvas "Design Mobile app"; Light=2451:82536, Dark=2451:83876
 
 api:
-  base_url: "<https://api.example.com>" # also used by UI suites for login-by-API / seeding when platforms.api is false
-  env_label: "<dev|staging>"            # used in reports
+  base_url: "https://copsfieldservices.devapi.concerttech.com"  # COPS Field Services (NestJS); спека в docs/api/openapi.json
+  env_label: "dev"                      # used in reports
 
 # Google Sheets that the checklist sync publishes into.
 # IDs come from the sheet URL: docs.google.com/spreadsheets/d/<THIS_PART>/edit
@@ -111,7 +114,7 @@ sheets:
     id_col: "O"
     obsolete_col: "P"
   mobile:
-    sheet_id: "<MOBILE_SHEET_ID>"
+    sheet_id: "1HX1obTdusEYgDQjR6NCwdxjNVkj-8eZKsHOiSRxbvsg"
     worksheet: "Check-list"
     id_col: "N"
     obsolete_col: "O"
