@@ -55,6 +55,10 @@ class TestRun:
     start_ms: int
     stop_ms: int
     func: str = ""  # test function name (fullName after "#") — links a test to its bug file
+    message: str = ""  # full status message (the detail is its first line)
+    steps: list[dict] = field(default_factory=list)
+    fixtures: list[tuple[str, dict]] = field(default_factory=list)  # ("setup"|"teardown", part)
+    attachments: list[dict] = field(default_factory=list)  # attached to the test body itself
     checkpoints: list[tuple[str, Path]] = field(default_factory=list)
     failure_shots: list[Path] = field(default_factory=list)
     videos: list[Path] = field(default_factory=list)
@@ -73,25 +77,25 @@ def _attachments(node: dict) -> list[dict]:
     return found
 
 
-def _fixture_attachments(allure_dir: Path) -> dict[str, list[dict]]:
-    """Attachments made in fixtures (setup / teardown), by test uuid.
+def _fixture_parts(allure_dir: Path) -> dict[str, list[tuple[str, dict]]]:
+    """Fixture setup / teardown parts by test uuid (allure-pytest ``*-container.json``).
 
-    allure-pytest files them under ``*-container.json`` (befores / afters), not under the
-    test result — the per-test screen video is attached in a teardown (conftest.py).
+    Preconditions (app reset, UI login, test data) and cleanup live here, not in the test
+    result — as does the per-test screen video, attached in a teardown (conftest.py).
     """
-    by_test: dict[str, list[dict]] = {}
+    by_test: dict[str, list[tuple[str, dict]]] = {}
     for f in sorted(allure_dir.glob("*-container.json")):
         d = json.loads(f.read_text(encoding="utf-8"))
-        parts = (d.get("befores") or []) + (d.get("afters") or [])
-        found = [att for part in parts for att in _attachments(part)]
+        parts = [("setup", b) for b in d.get("befores") or []]
+        parts += [("teardown", a) for a in d.get("afters") or []]
         for uuid in d.get("children") or []:
-            by_test.setdefault(str(uuid), []).extend(found)
+            by_test.setdefault(str(uuid), []).extend(parts)
     return by_test
 
 
 def load_test_runs(allure_dir: Path) -> list[TestRun]:
     runs: list[TestRun] = []
-    from_fixtures = _fixture_attachments(allure_dir)
+    from_fixtures = _fixture_parts(allure_dir)
     for f in sorted(allure_dir.glob("*-result.json")):
         d = json.loads(f.read_text(encoding="utf-8"))  # tr.load_allure_results already vetted
         labels: dict[str, str] = {}
@@ -109,8 +113,13 @@ def load_test_runs(allure_dir: Path) -> list[TestRun]:
             start_ms=start,
             stop_ms=stop,
             func=str(d.get("fullName") or "").partition("#")[2],
+            message=str((d.get("statusDetails") or {}).get("message") or ""),
+            steps=list(d.get("steps") or []),
+            fixtures=from_fixtures.get(str(d.get("uuid")), []),
+            attachments=list(d.get("attachments") or []),
         )
-        for att in _attachments(d) + from_fixtures.get(str(d.get("uuid")), []):
+        fixture_atts = [a for _, part in run.fixtures for a in _attachments(part)]
+        for att in _attachments(d) + fixture_atts:
             source = allure_dir / str(att.get("source") or "")
             name = str(att.get("name") or "")
             if not source.is_file():
@@ -135,6 +144,59 @@ def read_environment(allure_dir: Path) -> dict[str, str]:
             if sep:
                 env[key.replace(".", " ")] = value
     return env
+
+
+class Redactor:
+    """Hides the test account's identifiers on a page that leaves this machine.
+
+    Text: every known form of APP_USER_EMAIL / APP_USER_PHONE (from automation/mobile/.env,
+    never printed) becomes ``‹test account›``. Images: boxes listed in a redactions file
+    (attachment source → [[x0, y0, x1, y1] in points]) are pixelated on the page's copy;
+    the original results stay untouched.
+    """
+
+    MASK = "‹test account›"
+
+    def __init__(self, env_file: Path | None, boxes_file: Path | None):
+        self.values: list[str] = []
+        if env_file and env_file.exists():
+            from dotenv import dotenv_values
+
+            env = dotenv_values(env_file)
+            email = (env.get("APP_USER_EMAIL") or "").strip()
+            phone = (env.get("APP_USER_PHONE") or "").strip()
+            digits = re.sub(r"\D", "", phone)[-10:]
+            forms = [email, email.lower(), phone]
+            if len(digits) == 10:
+                forms += [f"+1{digits}", f"({digits[:3]}) {digits[3:6]}-{digits[6:]}", digits]
+            self.values = sorted({v for v in forms if v}, key=len, reverse=True)
+        self.boxes: dict[str, list[list[float]]] = {}
+        self.points_width = 402.0
+        if boxes_file and boxes_file.exists():
+            data = json.loads(boxes_file.read_text(encoding="utf-8"))
+            self.points_width = float(data.get("points_width", 402))
+            self.boxes = data.get("boxes", {})
+
+    def text(self, value: object) -> str:
+        out = str(value)
+        for secret in self.values:
+            out = out.replace(secret, self.MASK)
+        return out
+
+    def image(self, path: Path) -> None:
+        boxes = self.boxes.get(path.name)
+        if not boxes:
+            return
+        from PIL import Image
+
+        img = Image.open(path).convert("RGB")
+        scale = img.width / self.points_width
+        for x0, y0, x1, y1 in boxes:
+            box = tuple(round(v * scale) for v in (x0, y0, x1, y1))
+            region = img.crop(box)
+            small = region.resize((max(1, region.width // 28), max(1, region.height // 28)))
+            img.paste(small.resize(region.size, Image.NEAREST), box)
+        img.save(path)
 
 
 @dataclass(frozen=True)
@@ -232,6 +294,23 @@ figcaption{font:12px/1.4 var(--mono);color:var(--muted);margin-top:4px}
 video{max-width:100%;width:300px;border-radius:6px;border:1px solid var(--line)}
 dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:12px 0}
 dt{color:var(--muted)}dd{margin:0;overflow-wrap:anywhere}code{font:13px var(--mono)}
+details.test{background:var(--surface);border:1px solid var(--line);border-radius:8px;margin:8px 0}
+details.test>summary{cursor:pointer;padding:10px 14px;list-style-position:inside}
+details.test>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tbody{padding:0 14px 12px;border-top:1px solid var(--line)}
+.dur{font:12px var(--mono);color:var(--muted);margin-left:8px}
+.phase{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:14px 0 4px}
+ol.steps{list-style:none;margin:0;padding-left:16px;border-left:1px solid var(--line)}
+ol.steps>li{margin:3px 0;font-size:14px}.mark{display:inline-block;width:18px;font-weight:600}
+.st-passed>.mark{color:var(--pass)}.st-failed>.mark,.st-broken>.mark{color:var(--fail)}
+.st-skipped>.mark{color:var(--block)}.sname{overflow-wrap:anywhere}
+.atts{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 6px 18px}
+figure.att{margin:0;width:150px;max-width:100%}figure.att img,figure.att video{width:100%;
+border:1px solid var(--line);border-radius:6px}
+details.att-text{width:100%}details.att-text>summary{cursor:pointer;font:12px var(--mono);color:var(--muted)}
+pre{font:12px/1.5 var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;
+padding:8px 10px;overflow:auto;max-height:280px;white-space:pre-wrap;overflow-wrap:anywhere}
+pre.err{color:var(--fail);margin:12px 0}
 @media (max-width:520px){dl{grid-template-columns:1fr}dd{margin-bottom:6px}}
 """
 )
@@ -257,7 +336,11 @@ def _minutes(seconds: float) -> str:
 class AssetCopier:
     """Copies the attachments the page shows next to it; names stay unique and stable."""
 
-    def __init__(self, out_dir: Path):
+    def __init__(
+        self, out_dir: Path, redactor: Redactor | None = None, source_root: Path = Path(".")
+    ):
+        self.redactor = redactor
+        self.source_root = source_root
         self.dir = out_dir / "assets"
         if self.dir.exists() and (self.dir / MARKER).exists():
             shutil.rmtree(self.dir)  # our own previous output only
@@ -265,8 +348,92 @@ class AssetCopier:
         (self.dir / MARKER).write_text("generated by automation/tools/build_summary.py\n")
 
     def __call__(self, source: Path) -> str:
-        shutil.copy2(source, self.dir / source.name)
+        target = self.dir / source.name
+        if not target.exists():
+            shutil.copy2(source, target)
+            if self.redactor:
+                self.redactor.image(target)
         return f"assets/{source.name}"
+
+
+MARK = {"passed": "✓", "failed": "✗", "broken": "✗", "skipped": "–"}
+TEXT_LIMIT = 3000
+
+
+def _duration(node: dict) -> str:
+    start, stop = node.get("start"), node.get("stop")
+    if not start or not stop:
+        return ""
+    return _minutes(max(int(stop) - int(start), 0) / 1000)
+
+
+def attachments_html(node: dict, t, copy: AssetCopier, root: Path) -> str:
+    out: list[str] = []
+    for att in node.get("attachments") or []:
+        source = root / str(att.get("source") or "")
+        name = str(att.get("name") or "")
+        if not source.is_file():
+            continue
+        suffix = source.suffix.lower()
+        if suffix in (".png", ".jpg", ".jpeg"):
+            out.append(
+                f"<figure class='att'><img loading='lazy' src='{t(copy(source))}' alt='{t(name)}'>"
+                f"<figcaption>{t(name)}</figcaption></figure>"
+            )
+        elif suffix == ".mp4":
+            out.append(
+                f"<figure class='att'><video controls preload='none' src='{t(copy(source))}'>"
+                f"</video><figcaption>{t(name)}</figcaption></figure>"
+            )
+        else:
+            text = source.read_text(encoding="utf-8", errors="replace")
+            cut = " …(truncated)" if len(text) > TEXT_LIMIT else ""
+            out.append(
+                f"<details class='att-text'><summary>{t(name)}</summary>"
+                f"<pre>{t(text[:TEXT_LIMIT])}{cut}</pre></details>"
+            )
+    return f"<div class='atts'>{''.join(out)}</div>" if out else ""
+
+
+def steps_html(steps: list[dict], t, copy: AssetCopier, root: Path) -> str:
+    if not steps:
+        return ""
+    items = []
+    for st in steps:
+        status = str(st.get("status") or "unknown")
+        items.append(
+            f"<li class='st-{t(status)}'><span class='mark'>{MARK.get(status, '·')}</span>"
+            f"<span class='sname'>{t(st.get('name') or '')}</span>"
+            f"<span class='dur'>{t(_duration(st))}</span>"
+            f"{attachments_html(st, t, copy, root)}{steps_html(st.get('steps') or [], t, copy, root)}</li>"
+        )
+    return f"<ol class='steps'>{''.join(items)}</ol>"
+
+
+def details_html(r: TestRun, t, copy: AssetCopier) -> str:
+    root = copy.source_root
+    out = [f"<details class='test'><summary>{_pill(r.status)} {t(r.title)} "]
+    out.append(f"<span class='dur'>{_minutes(r.duration_s)}</span></summary><div class='tbody'>")
+    if r.message:
+        cut = " …" if len(r.message) > 1200 else ""
+        out.append(f"<pre class='err'>{t(r.message[:1200])}{cut}</pre>")
+    for kind, part in r.fixtures:
+        if kind == "setup" and (part.get("steps") or part.get("attachments")):
+            name = str(part.get("name") or "").split("::")[0]
+            out.append(f"<p class='phase'>setup · {t(name)}</p>")
+            out.append(steps_html(part.get("steps") or [], t, copy, root))
+            out.append(attachments_html(part, t, copy, root))
+    out.append("<p class='phase'>test</p>")
+    out.append(steps_html(r.steps, t, copy, root))
+    out.append(attachments_html({"attachments": r.attachments}, t, copy, root))
+    for kind, part in r.fixtures:
+        if kind == "teardown" and (part.get("steps") or part.get("attachments")):
+            name = str(part.get("name") or "").split("::")[0]
+            out.append(f"<p class='phase'>teardown · {t(name)}</p>")
+            out.append(steps_html(part.get("steps") or [], t, copy, root))
+            out.append(attachments_html(part, t, copy, root))
+    out.append("</div></details>")
+    return "".join(out)
 
 
 def render(
@@ -279,10 +446,16 @@ def render(
     copy: AssetCopier,
     now: datetime,
     bugs: list[Bug] | None = None,
+    redactor: Redactor | None = None,
 ) -> tuple[str, str]:
     """(head, body): the head is <title> + fonts + <style>; the body is the page content.
     A full document wraps both; an artifact publish takes them as a fragment."""
     bugs = bugs or []
+    red = redactor or Redactor(None, None)
+
+    def t(value: object) -> str:
+        return _e(red.text(value))
+
     counts = {s: sum(1 for r in runs if r.status == s) for s in ("Passed", "Failed", "Blocked")}
     wall = (max(r.stop_ms for r in runs) - min(r.start_ms for r in runs)) / 1000 if runs else 0
     verified = summary.passed + summary.failed  # an objective verdict either way
@@ -292,9 +465,9 @@ def render(
     w("<main><p class='eyebrow'>Automated regression · run summary</p>")
     w(f"<h1>{PAGE_TITLE}</h1>")
     w(
-        f"<p class='muted'>{_e(env.get('App', 'App not recorded'))} · build "
-        f"{_e(env.get('Build', 'not recorded'))} · {_e(env.get('Platform', ''))} "
-        f"{_e(env.get('Device', ''))} · generated {now:%Y-%m-%d %H:%M} UTC</p>"
+        f"<p class='muted'>{t(env.get('App', 'App not recorded'))} · build "
+        f"{t(env.get('Build', 'not recorded'))} · {t(env.get('Platform', ''))} "
+        f"{t(env.get('Device', ''))} · generated {now:%Y-%m-%d %H:%M} UTC</p>"
     )
 
     # --- for the PM ---------------------------------------------------------------------
@@ -328,13 +501,13 @@ def render(
     for r in failed:
         bug = bug_for(r, bugs)
         why = (
-            f"<span class='bug'>{_e(bug.bug_id)}</span> ({_e(bug.severity)}) — {_e(bug.title)}"
+            f"<span class='bug'>{t(bug.bug_id)}</span> ({t(bug.severity)}) — {t(bug.title)}"
             if bug
-            else f"<span class='muted'>{_e(r.detail)}</span>"
+            else f"<span class='muted'>{t(r.detail)}</span>"
         )
-        w(f"<li>{_pill('Failed')} {_e(r.title)} — {why}</li>")
+        w(f"<li>{_pill('Failed')} {t(r.title)} — {why}</li>")
     for r in blocked:
-        w(f"<li>{_pill('Blocked')} {_e(r.title)} — <span class='muted'>{_e(r.detail)}</span></li>")
+        w(f"<li>{_pill('Blocked')} {t(r.title)} — <span class='muted'>{t(r.detail)}</span></li>")
     w("</ul></div>")
     w(
         "<p class='muted'>A failed test is checked against its expectation first; only then "
@@ -353,7 +526,7 @@ def render(
     for module, module_rows in sorted(by_module.items()):
         s = tr.summarize(module_rows)
         w(
-            f"<tr><td>{_e(module)}</td><td>{s.total}</td><td>{s.automated}</td>"
+            f"<tr><td>{t(module)}</td><td>{s.total}</td><td>{s.automated}</td>"
             f"<td>{s.passed}</td><td>{s.failed}</td><td>{s.blocked}</td><td>{s.not_run}</td></tr>"
         )
     w("</table></div>")
@@ -368,12 +541,12 @@ def render(
         ]
         evidence = ", ".join(part for part in parts if part) or "—"
         bug = bug_for(r, bugs) if r.status == "Failed" else None
-        detail = f"<br><span class='muted'>{_e(r.detail)}</span>" if r.detail else ""
+        detail = f"<br><span class='muted'>{t(r.detail)}</span>" if r.detail else ""
         if bug:
-            detail = f"<br><span class='bug'>{_e(bug.bug_id)}</span> <span class='muted'>{_e(bug.title)}</span>"
+            detail = f"<br><span class='bug'>{t(bug.bug_id)}</span> <span class='muted'>{t(bug.title)}</span>"
         w(
-            f"<tr><td>{_e(r.title)}{detail}</td><td>{_e(r.module)}</td><td>{_pill(r.status)}</td>"
-            f"<td>{_minutes(r.duration_s)}</td><td>{_e(evidence)}</td></tr>"
+            f"<tr><td>{t(r.title)}{detail}</td><td>{t(r.module)}</td><td>{_pill(r.status)}</td>"
+            f"<td>{_minutes(r.duration_s)}</td><td>{t(evidence)}</td></tr>"
         )
     w("</table></div>")
 
@@ -381,21 +554,34 @@ def render(
     if shown:
         w("<h2>Key screens</h2>")
     for r in shown:
-        w(f"<h3>{_e(r.title)} {_pill(r.status)}</h3><div class='gallery'>")
+        w(f"<h3>{t(r.title)} {_pill(r.status)}</h3><div class='gallery'>")
         pictures = r.checkpoints + [("on failure", shot) for shot in r.failure_shots]
         for name, source in pictures:
             w(
-                f"<figure><img loading='lazy' src='{_e(copy(source))}' alt='{_e(name)}'>"
-                f"<figcaption>{_e(name)}</figcaption></figure>"
+                f"<figure><img loading='lazy' src='{t(copy(source))}' alt='{t(name)}'>"
+                f"<figcaption>{t(name)}</figcaption></figure>"
             )
         for video in r.videos:
-            w(f"<video controls preload='none' src='{_e(copy(video))}'></video>")
+            w(f"<video controls preload='none' src='{t(copy(video))}'></video>")
         w("</div>")
 
+    w("<h2 id='details'>Test details</h2>")
+    w(
+        "<p class='muted'>Every step of every test, as the harness recorded it: <b>setup</b> = "
+        "preconditions (app reset, sign-in, test data), then the test's own steps, then "
+        "<b>teardown</b> = cleanup and evidence. ✓ passed · ✗ failed · – skipped.</p>"
+    )
+    by_mod: dict[str, list[TestRun]] = {}
+    for r in runs:
+        by_mod.setdefault(r.module, []).append(r)
+    for module, module_runs in sorted(by_mod.items()):
+        w(f"<h3>{t(module)}</h3>")
+        for r in module_runs:
+            w(details_html(r, t, copy))
     w("<h2>Run context</h2><div class='box'><dl>")
     for key, value in env.items():
-        w(f"<dt>{_e(key)}</dt><dd>{_e(value)}</dd>")
-    w(f"<dt>Run label</dt><dd>{_e(run_label or tr.NOT_RECORDED.strip('*'))}</dd></dl></div>")
+        w(f"<dt>{t(key)}</dt><dd>{t(value)}</dd>")
+    w(f"<dt>Run label</dt><dd>{t(run_label or tr.NOT_RECORDED.strip('*'))}</dd></dl></div>")
     w(
         "<p class='muted'>Every verdict is limited to this configuration. Per-item verdicts: "
         "the traceability matrix (<code>trace_results.py</code>); step-by-step detail: the "
@@ -424,6 +610,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="owner's estimate for the manual comparison; omitted = not shown",
     )
     p.add_argument("--out-dir", type=Path, default=DEFAULT_OUT)
+    p.add_argument(
+        "--redact-env",
+        type=Path,
+        default=tr.REPO_ROOT / "automation" / "mobile" / ".env",
+        help="dotenv whose APP_USER_EMAIL / APP_USER_PHONE are hidden on the page (values never printed)",
+    )
+    p.add_argument(
+        "--redact-boxes",
+        type=Path,
+        default=None,
+        help="JSON {points_width, boxes: {attachment source: [[x0,y0,x1,y1], ...]}} pixelated on the page copies",
+    )
     return p
 
 
@@ -444,6 +642,7 @@ def main(argv: list[str] | None = None) -> int:
     rows, _orphans = tr.build_rows(items, results)
     summary = tr.summarize(rows)
     args.out_dir.mkdir(parents=True, exist_ok=True)
+    redactor = Redactor(args.redact_env, args.redact_boxes)
     head, body = render(
         runs=load_test_runs(args.allure_dir),
         rows=rows,
@@ -451,9 +650,10 @@ def main(argv: list[str] | None = None) -> int:
         env=read_environment(args.allure_dir),
         run_label=args.run_label,
         manual_minutes=args.manual_minutes_per_check,
-        copy=AssetCopier(args.out_dir),
+        copy=AssetCopier(args.out_dir, redactor, args.allure_dir),
         now=datetime.now(UTC),
         bugs=load_bugs(),
+        redactor=redactor,
     )
     out = args.out_dir / "index.html"
     out.write_text(

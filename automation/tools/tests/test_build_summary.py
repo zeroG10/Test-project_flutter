@@ -223,3 +223,36 @@ def test_failed_test_is_linked_to_the_bug_that_cites_it(
     monkeypatch.setattr(bs, "load_bugs", lambda: real(run_dir / "qa" / "mobile"))
     _, page, _ = _build(run_dir)
     assert "BUG-AUTH-009</span> (S3) — Login content is wrong" in page
+
+
+def test_test_account_is_hidden_in_text(run_dir: Path) -> None:
+    env = run_dir / "test.env"
+    env.write_text("APP_USER_EMAIL=secret.tech@example.org\nAPP_USER_PHONE=+12025550111\n")
+    red = bs.Redactor(env, None)
+    assert red.text("UI login as secret.tech@example.org") == "UI login as ‹test account›"
+    assert red.text("phone (202) 555-0111 or +12025550111") == (
+        "phone ‹test account› or ‹test account›"
+    )
+
+
+def test_redaction_box_pixelates_only_the_page_copy(tmp_path: Path) -> None:
+    from PIL import Image, ImageDraw
+
+    src = tmp_path / "shot-attachment.png"
+    img = Image.new("RGB", (402, 100), (255, 255, 255))
+    ImageDraw.Draw(img).text((20, 40), "secret.tech@example.org", fill=(0, 0, 0))
+    img.save(src)
+    boxes = tmp_path / "boxes.json"
+    boxes.write_text(json.dumps({"points_width": 402, "boxes": {src.name: [[0, 30, 402, 60]]}}))
+    copier = bs.AssetCopier(tmp_path / "out", bs.Redactor(None, boxes), tmp_path)
+    copier(src)
+    before = Image.open(src).crop((0, 30, 402, 60)).tobytes()
+    after = Image.open(tmp_path / "out" / "assets" / src.name).crop((0, 30, 402, 60)).tobytes()
+    assert before != after  # the copy is pixelated
+    assert Image.open(src).crop((0, 30, 402, 60)).tobytes() == before  # the original untouched
+
+
+def test_every_test_has_expandable_details(run_dir: Path) -> None:
+    _, page, _ = _build(run_dir)
+    assert page.count("<details class='test'>") == 3
+    assert "<p class='phase'>test</p>" in page

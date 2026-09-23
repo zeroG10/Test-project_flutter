@@ -173,7 +173,12 @@ happy flow → валідації); які пункти чеклісту кож�
   - **Опубліковано (власник, 2026-09-23): https://claude.ai/artifact/NvRzuhzr418nLAYMZfaf15** — приватна сторінка
     (відкривається лише власнику, поки він сам не поділиться через Share). Оновлювати ТУ САМУ сторінку: у новій сесії —
     Artifact publish з `url` цього посилання, файл `automation/mobile/reports/summary/page.html` (+ `assets/*` через
-    `files`, `root` = `automation/mobile/reports/summary`). Перед кожною публікацією: email тестового акаунта на
+    `files`, `root` = `automation/mobile/reports/summary`). Сторінка має два рівні: зверху для ПМ, нижче **Test details** —
+    кожен тест розгортається до кроків (setup / test / teardown), скріншотів, відео, відповідей API (замість «сирого» Allure:
+    його мініфікований переглядач не публікуємо — не можемо переглянути). Генерація:
+    `cd automation/tools && uv run python build_summary.py --allure-dir ../mobile/allure-results --checklist <усі чеклісти>
+    --run-label "…" --redact-boxes ../mobile/reports/redactions-<run>.json` — email/телефон акаунта в тексті ховаються
+    автоматично (з `.env`), на скріншотах — за файлом зон. Перед кожною публікацією: email тестового акаунта на
     скріншотах замазати (кадри логіну та OTP) — у харнесі поки немає автоматичного маскування (зробити:
     `evidence.checkpoint(..., hide=[елементи])`); кадри «jobs-list» робити після завантаження списку, не на спінері.
 
