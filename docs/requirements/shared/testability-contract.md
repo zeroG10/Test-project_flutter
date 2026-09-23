@@ -99,8 +99,9 @@ around a defect stay **Blocked**, never Passed.
 | TD-AUTH-003 | Registration | SMS / Email radios have no names | position inside the labelled `SMS\nEmail` container; state from `value` | none (reachable) |
 | TD-AUTH-004 | Registration | SMS consent switch has no name | the only switch on the screen | none (reachable) |
 | TD-AUTH-005 | SMS Terms | close icon has no name | the only unnamed button on the screen | CHK-AUTH-057 (deferred) |
-| TD-AUTH-006 | OTP | back button has no name | system back (edge swipe on iOS) | CHK-AUTH-097 via system back |
+| ~~TD-AUTH-006~~ | OTP | ~~back button has no name~~ — **resolved:** it is labelled `Back` (recon 3d) | — | — |
 | TD-AUTH-007 | Login, Registration, OTP | validation / server messages have no ids | located by their exact text (parametrised alias) or as texts inside the field's bounds | none (reachable) |
+| TD-AUTH-008 | OTP | `Incorrect code.` is reported `visible=true` by the accessibility tree while it is NOT drawn (recon 3d) | pixel oracle: ink inside the element's bounds (`helpers/pixels.py`) | CHK-AUTH-090 — decided by pixels, not by the tree |
 | TD-JOBS-001 | Jobs list | list ↔ calendar toggle has no name | the only unnamed button on the screen (module 03) | module 03 |
 | TD-PHOTO-001 | Photo editor | four toolbar buttons unnamed; palette and canvas absent from the tree | position only; markup checks `Blocked` | module 09 (9 checks) |
 

@@ -233,6 +233,36 @@ class WaitAny(unittest.TestCase):
             wait_any(object(), {"welcome": lambda: False}, 0.3)
 
 
+class PixelOracle(unittest.TestCase):
+    """helpers/pixels.py — the oracle for elements the tree reports visible but does not draw."""
+
+    @staticmethod
+    def _png(draw_text: bool) -> bytes:
+        import io
+
+        from PIL import Image, ImageDraw
+
+        image = Image.new("RGB", (300, 120), (247, 247, 249))  # the app's light background
+        if draw_text:
+            ImageDraw.Draw(image).text((20, 50), "Incorrect code.", fill=(200, 30, 30))
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG")
+        return buffer.getvalue()
+
+    def test_blank_box_has_no_ink(self):
+        from helpers import pixels
+
+        box = {"x": 5, "y": 15, "width": 40, "height": 8}  # points, scale 3 → 120×24 px
+        self.assertEqual(pixels.ink_ratio(self._png(False), box, 3), 0.0)
+
+    def test_drawn_text_is_ink(self):
+        from helpers import pixels
+
+        box = {"x": 5, "y": 15, "width": 40, "height": 8}
+        ratio = pixels.ink_ratio(self._png(True), box, 3)
+        self.assertGreater(ratio, pixels.MIN_INK_RATIO)
+
+
 class Markers(unittest.TestCase):
     def test_tc_and_chk_patterns_match_the_contract(self):
         import conftest  # noqa: PLC0415 — only for its compiled patterns

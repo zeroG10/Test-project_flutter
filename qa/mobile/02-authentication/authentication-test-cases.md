@@ -244,7 +244,7 @@ filled / outlined styling in CHK-AUTH-007/-008 stays manual (partial).
 |---|---|
 | ID | TC-AUTH-007 |
 | Title | Login rejects an invalid format and an unregistered email or phone |
-| Source CHK IDs | CHK-AUTH-112, CHK-AUTH-114, CHK-AUTH-121, CHK-AUTH-122, CHK-AUTH-123, CHK-AUTH-125 |
+| Source CHK IDs | CHK-AUTH-114, CHK-AUTH-121, CHK-AUTH-122, CHK-AUTH-123, CHK-AUTH-125 (CHK-AUTH-112 — Skipped, D-12) |
 | Platforms | ios, android |
 | Priority | P1 |
 | Automation | candidate |
@@ -253,16 +253,16 @@ filled / outlined styling in CHK-AUTH-007/-008 stays manual (partial).
 | Permissions | notifications: granted |
 | Network | online Wi-Fi |
 | Preconditions | `{{unregistered.email}}` and `{{unregistered.phone}}` are generated per run and not registered |
-| Oracle | spec — checklist CHK-AUTH-112/122/123 (live-app wording) over SRS FR-LOG-03/08 — D-8 |
+| Oracle | spec — checklist CHK-AUTH-122/123 (live-app wording) over SRS FR-LOG-03/08 — D-8; accepted baseline for invalid formats — D-12 (owner, 2026-09-23) |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
 | 1 | open | login | — | Welcome → Login |
 | 2 | fill | login.identifier | {{invalid.identifier}} | e.g. `abc@`, `12ab` |
-| 3 | expect-text | login.error | — | Format is incorrect. |
+| 3 | expect-visible | login.format-hint | — | visible — the only guidance shown; no error message (D-12) |
 | 4 | expect-disabled | login.continue | — | disabled |
 | 5 | fill | login.identifier | {{unregistered.email}} | replaces the value |
-| 6 | expect-hidden | login.error | — | hidden (error cleared after correction) |
+| 6 | expect-enabled | login.continue | — | enabled — the invalid state is cleared after correction (CHK-AUTH-114) |
 | 7 | click | login.continue | — | request sent |
 | 8 | expect-text | login.error | — | This email is not registered yet. Create an account to get started. |
 | 9 | expect-text | login.identifier | — | {{unregistered.email}} (value preserved) |
@@ -273,6 +273,11 @@ filled / outlined styling in CHK-AUTH-007/-008 stays manual (partial).
 **Postconditions / cleanup:** nothing created, nothing to clean.
 **Notes:** the moment validation fires (while typing / on focus loss) is confirmed during mapping; validation styling
 (CHK-AUTH-113) stays manual.
+**Recon 3d (2026-09-23):** the Login screen shows **no** format message for any invalid value tried — only Continue
+stays disabled. **D-12 accepted as is (owner, 2026-09-23):** steps 3 and 6 assert that; CHK-AUTH-112 is reported
+Skipped with reason D-12.
+The server messages are a red banner at the bottom for ~4 s (element `Other` named by its text); the email wording is
+confirmed verbatim, the phone wording is still the checklist's. `a b@c.com` enables Continue — D-13, no test (owner: spaces are trimmed).
 
 ---
 
@@ -308,6 +313,10 @@ filled / outlined styling in CHK-AUTH-007/-008 stays manual (partial).
 
 **Postconditions / cleanup:** reset app data (sign out).
 **Notes:** exactly one wrong attempt — FR-OTP-13 locks the account for 2 minutes after the limit.
+**Recon 3d (2026-09-23):** `Incorrect code.` is in the tree AND reported visible before any input while nothing is drawn
+(TD-AUTH-008). Steps 5 and 7 are therefore decided by **pixels** — ink inside the element's bounds on the screenshot
+(`OtpPage.expect_error_shown`, `helpers/pixels.py`: 0.000 when not drawn, 0.10–0.15 for drawn text, threshold 0.03).
+The "drawn" side of the threshold is proven on the first run (the only wrong OTP of the run).
 
 ---
 
@@ -344,6 +353,9 @@ filled / outlined styling in CHK-AUTH-007/-008 stays manual (partial).
 
 **Postconditions / cleanup:** reset app data.
 **Notes:** the enabled "Request a new code" state after expiry (CHK-AUTH-079) needs a ~60 s wait and is deferred.
+**Recon 3d (2026-09-23):** Verify is disabled with 3 digits; resend text `Didn't receive the code? You can request a new
+code in 0:59` counts down (58 s → 55 s); the OTP back button is labelled `Back` and the iOS edge swipe also returns to
+Login — step 8 uses the system back as written.
 
 ---
 
@@ -550,6 +562,9 @@ are used so no real person receives a message.
 **Postconditions / cleanup:** no second submit — nothing created, nothing to clean.
 **Notes:** where the error is shown (inline under the phone field or a banner) is confirmed in recon; the alias
 `registration.form-error` is resolved in the map accordingly.
+**Recon 3d (2026-09-23):** confirmed — a red banner (element `Other`) with the checklist wording verbatim (D-7); the form
+stays with its values; nothing is created (API read-back). The phone field shows its value formatted
+(`(202) 555-0450`), so step 8 compares **digits**.
 
 ---
 
@@ -559,24 +574,24 @@ Screen maps written in step 5 (2026-09-23): `automation/mobile/screens/{welcome,
 from the recon dumps `qa/shared/recon-dumps/ios-2026-09-23/`. Offline map-health
 (`automation/mobile/unit_tests/test_screen_maps.py`) checks that every alias below resolves; whether a locator
 finds its element is proven on the first device run. Android maps come with step 7.
-**UNCONFIRMED** = the OTP tree was not saved in recon and three messages were never displayed: the entry uses
-the checklist / test-case wording and is confirmed in recon 3d. Unnamed controls are testability defects
-TD-AUTH-001…007 (`docs/requirements/shared/testability-contract.md` §5).
+Recon 3d (2026-09-23) confirmed the OTP entries and the two server messages it could observe; the unregistered-phone
+wording is still the checklist's (not requested). Unnamed controls and misreported elements are testability defects
+TD-AUTH-001…008 (`docs/requirements/shared/testability-contract.md` §5).
 
 | Alias | Screen | android map | ios map |
 |---|---|---|---|
 | app | — (launch / relaunch) | n/a | n/a (`helpers/app.py`) |
 | welcome.root, .title, .subtitle, .sign-up, .login, .back | welcome | step 7 | yes (`back` = any back control, used only for expect-hidden) |
 | login.root, .title, .subtitle, .helper, .identifier, .continue, .privacy-link, .terms-link, .sign-up-link | login | step 7 | yes |
-| login.error | login | step 7 | yes — parametrised by the expected text; where it is drawn **UNCONFIRMED** |
-| otp.root, .title, .code, .error | otp | step 7 | yes (`code` = the hidden field, TD-AUTH-002) |
-| otp.instruction, .verify, .resend | otp | step 7 | yes — **UNCONFIRMED** wording / name |
+| login.error | login | step 7 | yes — parametrised by the expected text; a transient banner (`Other`), recon 3d; no format message exists (D-12) |
+| otp.root, .title, .code, .instruction, .verify, .resend | otp | step 7 | yes — recon 3d (`code` = the hidden field, TD-AUTH-002) |
+| otp.error | otp | step 7 | yes — shown / hidden decided by **pixels** (TD-AUTH-008) |
 | otp.destination | otp | step 7 | yes — parametrised by the address / last digits |
 | jobs-list.root | jobs-list | step 7 | yes |
 | registration.root, .title, .subtitle, .first-name, .last-name, .phone, .phone-prefix, .email, .channel-section, .channel-options, .sms-consent, .sms-consent-text, .continue, .privacy-link, .terms-link, .log-in-link | registration | step 7 | yes (`sms-consent` = the only switch, TD-AUTH-004) |
 | registration.channel-sms, .channel-email | registration | step 7 | page method `RegistrationPage.choose_channel` / `selected_channel` (radios by position, TD-AUTH-003) |
 | registration.error[{{field}}] | registration | step 7 | page method `RegistrationPage.field_errors` (texts inside the field's bounds, TD-AUTH-007) |
-| registration.form-error | registration | step 7 | yes — parametrised by the expected text; where it is drawn **UNCONFIRMED** |
+| registration.form-error | registration | step 7 | yes — parametrised by the expected text; a transient banner (`Other`), recon 3d |
 | sms-terms.root, sms-terms.accept | sms-terms | step 7 | yes |
 
 ## Fixtures used
@@ -603,7 +618,8 @@ TD-AUTH-001…007 (`docs/requirements/shared/testability-contract.md` §5).
 | CHK-AUTH-105, -106, -107, -108, -109 | TC-AUTH-004 | |
 | CHK-AUTH-073, -074, -075, -088, -089, -110, -115, -117, -119 | TC-AUTH-005 | |
 | CHK-AUTH-072, -096, -111, -116, -118 | TC-AUTH-006 | -096 proven together with TC-AUTH-005 (both channels) |
-| CHK-AUTH-112, -114, -121, -122, -123, -125 | TC-AUTH-007 | |
+| CHK-AUTH-114, -121, -122, -123, -125 | TC-AUTH-007 | -114 = Continue re-enabled after correction (D-12) |
+| CHK-AUTH-112 | — | **Skipped** — the app shows no format message (D-12, owner 2026-09-23) |
 | CHK-AUTH-090, -091 | TC-AUTH-008 | |
 | CHK-AUTH-077, -078, -080, -097, -126 | TC-AUTH-009 | |
 | CHK-AUTH-017 | TC-AUTH-010 | **partial** — logo is an unlabelled image |
@@ -613,7 +629,7 @@ TD-AUTH-001…007 (`docs/requirements/shared/testability-contract.md` §5).
 | CHK-AUTH-050, -062, -063, -064, -066 | TC-AUTH-013 | cleanup via `DELETE /user/full-delete/{user.id}` (verified) |
 | CHK-AUTH-068, -069, -071 | TC-AUTH-014 | |
 
-**Total: 82 CHK IDs in 14 TCs** (4 of them partial). Not covered here, with reasons, in the automation plan:
+**Total: 81 CHK IDs in 14 TCs** (4 of them partial) + CHK-AUTH-112 Skipped (D-12). Not covered here, with reasons, in the automation plan:
 27 deferred (incl. CHK-AUTH-048), 5 manual, 11 not recommended.
 
 ## Open questions

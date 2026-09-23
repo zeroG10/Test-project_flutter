@@ -29,6 +29,10 @@ class OtpPage(BasePage):
                 with allure.step("code field refused direct input → typing into the focused field"):
                     self.driver.switch_to.active_element.send_keys(code)
 
+    def expect_error_shown(self, shown: bool = True, timeout: float | None = None) -> None:
+        """``Incorrect code.`` really drawn (or not) — by pixels; the tree always says visible."""
+        self.expect_drawn("error", drawn=shown, timeout=timeout)
+
     def expect_sent_to(self, destination: str) -> None:
         """The screen names where the code went (full email, or the phone's last digits)."""
         self.visible("destination", text=destination)

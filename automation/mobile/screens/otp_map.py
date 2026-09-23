@@ -1,10 +1,13 @@
 """OTP — "Email address verification" / "Phone number verification" (module 02-authentication).
 
-Source: recon 2026-09-23 (passes 3b, 3c) — the screen was driven through Appium, but its tree
-was NOT saved, so only these facts are confirmed: the title texts, the hidden 1×1 code field
-(the four cells are drawn), auto-submit after the 4th digit (D-5), ``Incorrect code.`` kept in
-the tree while hidden (assert VISIBILITY only), an unnamed back button, the ``1:00`` timer.
-Elements marked UNCONFIRMED use the checklist / test-case wording; recon 3d confirms them.
+Source: Appium trees qa/shared/recon-dumps/ios-2026-09-23/recon3d_otp*.xml (recon 3d,
+2026-09-23). Confirmed: title, instruction, destination (the full email), the hidden 1×1 code
+field (typed digits appear as texts "1", "2", "3" in the drawn cells), ``Verify`` disabled below
+4 digits, the resend text with an m:ss countdown, a back button labelled ``Back``.
+
+⚠️ ``Incorrect code.`` is in the tree AND reported ``visible=true`` before any input, while the
+screenshot shows nothing there (recon 3d) — neither presence nor Appium visibility may decide
+"the error is shown". See OtpPage.error_rendered(); TC-AUTH-008 needs that oracle.
 """
 
 from appium.webdriver.common.appiumby import AppiumBy
@@ -24,10 +27,7 @@ OTP = Screen(
     elements={
         "root": El(ios=(_P, _TITLE)),
         "title": El(ios=(_P, _TITLE)),
-        "instruction": El(
-            ios=(_P, "name BEGINSWITH 'Enter the 4-digit code'"),
-            note="UNCONFIRMED wording (TC-AUTH-005) — recon 3d",
-        ),
+        "instruction": El(ios=(_A, "Enter the 4-digit code sent to your email address")),
         "destination": El(
             ios=(_P, "type == 'XCUIElementTypeStaticText' AND name CONTAINS {text}"),
             note="parametrised by the address / last digits the code was sent to",
@@ -36,17 +36,14 @@ OTP = Screen(
             ios=(_P, "type == 'XCUIElementTypeTextField'"),
             note="hidden 1×1 field, no label — the only input; TD-AUTH-002",
         ),
-        "verify": El(
-            ios=(_P, "type == 'XCUIElementTypeButton' AND name == 'Verify'"),
-            note="UNCONFIRMED name — recon 3d",
-        ),
+        "verify": El(ios=(_P, "type == 'XCUIElementTypeButton' AND name == 'Verify'")),
+        "back": El(ios=(_P, "type == 'XCUIElementTypeButton' AND name == 'Back'")),
         "error": El(
             ios=(_A, "Incorrect code."),
-            note="present in the tree while hidden — expect-visible / expect-hidden only",
+            note="in the tree and 'visible' even when not drawn — "
+            "decide by OtpPage.error_rendered()",
         ),
-        "resend": El(
-            ios=(_P, "name CONTAINS 'request a new code'"),
-            note="UNCONFIRMED wording (TC-AUTH-009, countdown) — recon 3d",
-        ),
+        # "Didn't receive the code? You can request a new code in 0:59"
+        "resend": El(ios=(_P, "name CONTAINS 'You can request a new code in'")),
     },
 )

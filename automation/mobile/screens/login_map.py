@@ -34,11 +34,13 @@ LOGIN = Screen(
             ios=(_P, "type == 'XCUIElementTypeTextField'"),
             note="all inputs — for 'the only input on the screen' (count)",
         ),
-        # Validation and server messages: texts from the checklist (live-app wording, D-8).
-        # Where they are drawn (inside the field / a banner) — UNCONFIRMED until recon 3d.
+        # Server messages (not registered): a red banner at the bottom for ~4 s, exposed as an
+        # element of type Other named by its text (recon 3d) — hence no type in the predicate.
+        # The Login screen shows NO format message at all: an invalid value only keeps
+        # Continue disabled (recon 3d; question D-12).
         "error": El(
-            ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == {text}"),
-            note="parametrised by the expected message; position UNCONFIRMED (recon 3d)",
+            ios=(_P, "name == {text}"),
+            note="parametrised by the expected message; a transient banner (recon 3d)",
         ),
     },
 )

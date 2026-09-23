@@ -27,7 +27,8 @@ class RegistrationPage(BasePage):
     def fill(self, field: str, value: str) -> None:
         if field not in FIELDS:
             raise ValueError(f"unknown registration field {field!r}; one of {FIELDS}")
-        self.type(field, value)
+        # The phone input re-formats on every keystroke: "(202) 555-0199" (recon 3d).
+        self.type(field, value, per_char=field == "phone")
 
     def fill_form(self, first_name: str, last_name: str, phone_national: str, email: str) -> None:
         with allure.step("Registration: fill the form"):
@@ -69,9 +70,11 @@ class RegistrationPage(BasePage):
         if channel not in CHANNELS:
             raise ValueError(f"channel must be one of {CHANNELS}")
         with allure.step(f"Registration: choose the {channel.upper()} channel"):
+            self.scroll_to("channel-options")  # off-screen radios report empty bounds
             self._radios()[channel].click()
 
     def selected_channel(self) -> str | None:
+        self.scroll_to("channel-options")
         for channel, element in self._radios().items():
             if str(element.get_attribute("value") or "") == "1":
                 return channel

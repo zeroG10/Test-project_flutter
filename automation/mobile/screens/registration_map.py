@@ -21,7 +21,11 @@ REGISTRATION = Screen(
     id="registration",
     anchor="root",
     elements={
-        "root": El(ios=(_A, "Good to see you! Let's get you registered.")),
+        # The screen container (named by its trailing text): stays visible when the form scrolls,
+        # unlike the subtitle (recon 3d).
+        "root": El(
+            ios=(_P, "type == 'XCUIElementTypeOther' AND name == 'Already have an account?'")
+        ),
         "title": El(ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == 'Registration'")),
         "subtitle": El(ios=(_A, "Good to see you! Let's get you registered.")),
         "first-name": _field("First name"),
@@ -43,7 +47,7 @@ REGISTRATION = Screen(
             note="anchor for the unnamed radios: SMS = left half, Email = right half — TD-AUTH-003",
         ),
         "channel-radios": El(
-            ios=(_P, "type == 'XCUIElementTypeButton' AND name == ''"),
+            ios=(_P, "type == 'XCUIElementTypeButton' AND (name == nil OR name == '')"),
             note="both unnamed radios (value '1' = selected); the page tells them apart by "
             "position inside channel-options — TD-AUTH-003",
         ),
@@ -67,11 +71,12 @@ REGISTRATION = Screen(
             ios=(_P, "type == 'XCUIElementTypeImage'"),
             note="unlabelled image — TD-AUTH-001; logo checks stay manual (partial)",
         ),
-        # Server-side error after Continue (duplicate phone, TC-AUTH-014): text from the
-        # checklist (D-7); inline or banner — UNCONFIRMED until recon 3d.
+        # Server-side error after Continue (duplicate phone, TC-AUTH-014), wording from the
+        # checklist (D-7). Login shows its server errors as a banner of type Other (recon 3d),
+        # so the predicate names no type.
         "form-error": El(
-            ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == {text}"),
-            note="parametrised by the expected message; position UNCONFIRMED (recon 3d)",
+            ios=(_P, "name == {text}"),
+            note="parametrised by the expected message",
         ),
     },
 )

@@ -15,6 +15,7 @@ expect_below / expect_centred / expect_in_bottom_area, from element bounds.
 """
 
 import contextlib
+import io
 import xml.etree.ElementTree as ET
 
 import allure
@@ -27,7 +28,7 @@ from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
 
 from config.settings import normalize_platform
-from helpers import waits
+from helpers import pixels, waits
 from helpers.device import platform_of
 from helpers.waits import Locator
 from screens import Screen, locator_for
@@ -82,11 +83,32 @@ class BasePage:
         with allure.step(f"tap {self._name(alias, params)}"):
             waits.wait_clickable(self.driver, self.locator(alias, **params), timeout).click()
 
-    def type(self, alias: str, text: str, timeout: float | None = None) -> None:
+    def type(
+        self, alias: str, text: str, timeout: float | None = None, per_char: bool = False
+    ) -> None:
+        """The ``fill`` step. ``per_char`` for masked inputs: a formatter that rewrites the
+        value on every keystroke drops characters typed in one burst (phone, recon 3d)."""
         with allure.step(f"fill {self.screen.qualified(alias)}"):
-            element = waits.wait_visible(self.driver, self.locator(alias), timeout)
+            element = waits.wait_present(self.driver, self.locator(alias), timeout)
+            if not element.is_displayed():
+                # e.g. a lower field hidden by the keyboard the previous field opened (recon 3d)
+                self.scroll_to(alias)
+                element = waits.wait_visible(self.driver, self.locator(alias), timeout)
+            element.click()  # focus it, as a user does: keys typed into a moving view go nowhere
             element.clear()
-            element.send_keys(text)
+            self._send(element, text, per_char)
+            if text and not element.get_attribute("value"):
+                # Not one character landed (the view was still settling after a scroll,
+                # recon 3d). Input plumbing, not a verdict — logged, then typed once more.
+                with allure.step("no input landed → tap the field and type again"):
+                    element = waits.wait_visible(self.driver, self.locator(alias), timeout)
+                    element.click()
+                    self._send(element, text, per_char)
+
+    @staticmethod
+    def _send(element: WebElement, text: str, per_char: bool) -> None:
+        for chunk in text if per_char else (text,):
+            element.send_keys(chunk)
 
     def clear(self, alias: str, timeout: float | None = None) -> None:
         with allure.step(f"clear {self.screen.qualified(alias)}"):
@@ -98,19 +120,33 @@ class BasePage:
             self.driver.hide_keyboard()
 
     def scroll_to(self, alias: str, attempts: int = SCROLL_ATTEMPTS, **params: object) -> None:
-        """The ``scroll-to`` step: swipe up until the element is displayed."""
+        """The ``scroll-to`` step: short drags until the element is displayed — first towards
+        the end of the content, then back (an element above the view is found too)."""
         with allure.step(f"scroll to {self._name(alias, params)}"):
-            size = self.driver.get_window_size()
-            x = size["width"] // 2
-            for _ in range(attempts):
-                if self.is_visible(alias, 0.5, **params):
-                    return
-                # Upper part of the screen: an open keyboard covers the lower third.
-                self.driver.swipe(x, int(size["height"] * 0.55), x, int(size["height"] * 0.2), 500)
+            height = self.driver.get_window_size()["height"]
+            # Upper half only: an open keyboard covers the lower third of the screen.
+            for start, end in ((0.55, 0.35), (0.3, 0.5)):
+                for _ in range(attempts):
+                    if self.is_visible(alias, 0.5, **params):
+                        return
+                    self._drag(int(height * start), int(height * end))
             if not self.is_visible(alias, 1, **params):
                 raise TimeoutException(
-                    f"{self._name(alias, params)} not visible after {attempts} swipes"
+                    f"{self._name(alias, params)} not visible after scrolling both ways"
                 )
+
+    def _drag(self, from_y: int, to_y: int) -> None:
+        """A vertical drag without a fling (move, hold, release), so the view stops where the
+        finger stops. At the left margin: a drag that starts on an input does not scroll,
+        and a fling overshoots the target (recon 3d)."""
+        actions = ActionChains(self.driver)
+        actions.w3c_actions = ActionBuilder(
+            self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "finger"), duration=400
+        )
+        pointer = actions.w3c_actions.pointer_action
+        pointer.move_to_location(10, from_y).pointer_down()
+        pointer.move_to_location(10, to_y).pause(0.3).release()
+        actions.perform()
 
     def tap_at(self, alias: str, fx: float, fy: float, **params: object) -> None:
         """Tap a point inside ``alias`` given as fractions of its bounds.
@@ -240,6 +276,39 @@ class BasePage:
             assert rect["y"] >= height * (1 - fraction), (
                 f"{self.screen.qualified(alias)} (y={rect['y']}) is above the bottom "
                 f"{fraction:.0%} of the screen (height {height})"
+            )
+
+    # --- what is really drawn (for elements the tree misreports) ------------------------
+
+    def ink_ratio(self, alias: str, **params: object) -> float:
+        """Share of the element's box on the screenshot that is not background (helpers/pixels)."""
+        box = self.find(alias, **params).rect
+        png = self.driver.get_screenshot_as_png()
+        scale = pixels.Image.open(io.BytesIO(png)).width / self.driver.get_window_size()["width"]
+        return pixels.ink_ratio(png, box, scale)
+
+    def expect_drawn(
+        self, alias: str, drawn: bool = True, timeout: float | None = None, **params: object
+    ) -> None:
+        """``expect-visible`` / ``expect-hidden`` decided by pixels, not by the tree."""
+        state = "drawn" if drawn else "not drawn"
+        last: list[float] = []
+
+        def in_state(_driver: WebDriver) -> bool:
+            last.append(self.ink_ratio(alias, **params))
+            return (last[-1] >= pixels.MIN_INK_RATIO) == drawn
+
+        with allure.step(f"expect {self._name(alias, params)} {state} on screen (pixels)"):
+            waits.wait_until(
+                self.driver,
+                in_state,
+                timeout,
+                f"{self._name(alias, params)} not {state}: ink ratio {last[-1] if last else '-'}",
+            )
+            allure.attach(
+                self.driver.get_screenshot_as_png(),
+                name=f"{self.screen.qualified(alias)} {state} (ink {last[-1]:.3f})",
+                attachment_type=allure.attachment_type.PNG,
             )
 
     # --- texts inside an element (validation messages drawn inside a field) --------------

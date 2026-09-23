@@ -24,7 +24,7 @@ SMS_TERMS = Screen(
             )
         ),
         "close": El(
-            ios=(_P, "type == 'XCUIElementTypeButton' AND name == ''"),
+            ios=(_P, "type == 'XCUIElementTypeButton' AND (name == nil OR name == '')"),
             note="unnamed close icon, the only unnamed button here — TD-AUTH-005 "
             "(CHK-AUTH-057 deferred)",
         ),

@@ -27,7 +27,10 @@ WELCOME = Screen(
         # Asserted HIDDEN (CHK-AUTH-003): a Flutter back button is labelled "Back" on other
         # screens and unnamed on OTP / SMS Terms — neither may show here.
         "back": El(
-            ios=(_P, "type == 'XCUIElementTypeButton' AND (name == 'Back' OR name == '')"),
+            ios=(
+                _P,
+                "type == 'XCUIElementTypeButton' AND (name == 'Back' OR name == nil OR name == '')",
+            ),
             note="any back control; used only for expect-hidden",
         ),
         "logo": El(
