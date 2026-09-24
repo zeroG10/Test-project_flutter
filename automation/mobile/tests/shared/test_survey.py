@@ -28,6 +28,7 @@ from pages.jobs_list_page import JobsListPage
 from pages.survey_page import SurveyDeleteDialog, SurveyPage
 
 SERVER = 30.0
+LIST_REFRESHES = 3
 READ_ONLY_WATCH = 3.0
 MAX_SIDE = 1920  # the app's photo policy: longest side, JPEG 85 (recon 8: 4032×3024 → 1920×1440)
 FIBER = "Fiber installation report long title section name for tests"
@@ -46,7 +47,13 @@ def pages(driver, platform):
 
 
 def open_job(pages, job, expected) -> None:
-    pages.jobs.pull_to_refresh()
+    """Refresh until the new job is listed (DEV lists a job created a moment ago a little later —
+    run 2: "No jobs" after the first refresh), then open it."""
+    locator = pages.jobs.locator("card", text=job.job_id)
+    for _ in range(LIST_REFRESHES):
+        pages.jobs.pull_to_refresh()
+        if pages.jobs.driver.find_elements(*locator):
+            break
     pages.jobs.open_card(job.job_id)
     pages.details.expect_header(expected(job.title_line), SERVER)
 

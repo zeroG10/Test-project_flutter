@@ -207,6 +207,9 @@ def do(state: Path, dumps: Path, actions: list[str]) -> None:
                             if (num, title) not in seen:
                                 seen.append((num, title))
                     print("    " + " · ".join(f"{n}. {t}" for n, t in seen))
+                elif verb == "list":  # every match of a predicate, in the order find_elements gives
+                    for k, e in enumerate(drv.find_elements(P, arg)):
+                        print(f"    #{k} displayed={e.is_displayed()} rect={e.rect}")
                 elif verb == "rows":
                     print("\n".join("     " + r for r in rows_of(drv.page_source)), flush=True)
                 elif verb == "shot":  # a full path: screenshots stay out of the repo

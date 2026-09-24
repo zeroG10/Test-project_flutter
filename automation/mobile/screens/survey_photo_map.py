@@ -34,8 +34,9 @@ PHOTO_EDITOR = Screen(
     elements={
         "crop": El(ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == 'Crop'")),
         "done": El(
-            ios=(_P, _BUTTON + "(name == nil OR name == '') AND rect.x > 300 AND rect.y < 140"),
-            note="✓ — the right unnamed app-bar button (TD-PHOTO-001)",
+            ios=(_P, _BUTTON + "(name == nil OR name == '') AND rect.x > 330 AND rect.y < 140"),
+            note="✓ — the right-most unnamed app-bar button (TD-PHOTO-001); undo / redo (x 258, "
+            "306, unnamed, disabled) join the tree at times (module 08 run 2)",
         ),
     },
 )

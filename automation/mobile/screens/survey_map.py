@@ -125,3 +125,24 @@ SURVEY_DELETE_DIALOG = Screen(
         ),  # fmt: skip
     },
 )
+
+# Document-order twins of the aliases the page takes "n-th in form order" (module 08 run 1):
+# XCUITest's find_elements returns the off-screen matches FIRST (their rect is empty), so the n-th
+# match of a query is not the n-th on the form. The page reads the order from the page source; these
+# are the same conditions as the predicates above, per XCUIElementType.
+FORM_ORDER: dict[str, dict] = {
+    "yes": {"type": "Button", "name": "Yes"},
+    "no": {"type": "Button", "name": "No"},
+    "option": {"type": "Button", "name": "{text}"},
+    "checkbox": {"type": "Switch", "name": "{text}"},
+    "text": {
+        "type": "TextField",
+        "not_names": ("Select date", "Select time", "Hour", "Minute", "0"),
+    },
+    "date": {"type": "TextField", "name": "Select date"},
+    "time": {"type": "TextField", "name": "Select time"},
+    "upload-photo": {"type": "Button", "name": "Upload photo"},
+    "repeat": {"type": "Button", "name": "Repeat section"},
+    "delete-entry": {"type": "Button", "name": "Delete", "max_width": 60},
+    "entry-headers": {"type": "Image", "prefix": "{text}"},
+}

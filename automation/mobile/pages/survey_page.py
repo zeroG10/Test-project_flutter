@@ -16,11 +16,12 @@ import xml.etree.ElementTree as ET
 
 import allure
 from appium.webdriver.webelement import WebElement
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import TimeoutException
 
 from helpers import waits
 from pages.base_page import BasePage
 from screens.survey_map import (
+    FORM_ORDER,
     SURVEY,
     SURVEY_DATE_PICKER,
     SURVEY_DELETE_DIALOG,
@@ -32,6 +33,8 @@ TITLE = re.compile(r"(\d+)\. \n(.+?)(?=\n|$)")
 TOP, BOTTOM = 125, 770  # the form's visible band: below the app bar, above the Save button
 NTH_DRAGS = 30
 PICKER_WAIT = 10.0  # the system photo picker takes a few seconds to appear (recon 8)
+SNACKBAR = 10.0  # a snackbar stays ~4 s
+STILL_WAIT = 4.0  # the form's own scroll animation lasts 300 ms; a drag settles within a second
 LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only absorbs the redraw
 
 
@@ -103,49 +106,94 @@ class SurveyPage(BasePage):
 
     # --- the n-th element of a kind ---------------------------------------------------
 
-    def nth(self, alias: str, n: int, **params: object) -> WebElement:
-        """The ``n``-th (0-based) ``alias`` in form order, scrolled wholly into the visible band."""
+    def matches(self, alias: str, text: str | None = None, source: str | None = None) -> list[dict]:
+        """Every ``alias`` of the form in document order, as page-source attributes (FORM_ORDER)."""
+        spec = FORM_ORDER[alias]
+        found = []
+        for el in ET.fromstring(source or self.driver.page_source).iter():
+            if el.tag != f"XCUIElementType{spec['type']}":
+                continue
+            a = el.attrib
+            name = a.get("name") or ""
+            want = spec.get("name")
+            if want is not None and name != (text if want == "{text}" else want):
+                continue
+            if "prefix" in spec and not name.startswith(text or ""):
+                continue
+            if name in spec.get("not_names", ()):
+                continue
+            if "max_width" in spec and int(a.get("width") or 0) >= spec["max_width"]:
+                continue
+            found.append(dict(a))
+        return found
+
+    def nth(self, alias: str, n: int, text: str | None = None) -> dict:
+        """The ``n``-th (0-based) ``alias`` in form order, scrolled wholly into the visible band;
+        returns its page-source attributes (rect, value). Off-screen elements carry no position,
+        so the direction comes from the ones on screen; at an end of the form (nothing moved) it
+        turns round."""
         height = self.driver.get_window_size()["height"]
-        down = True
+        direction, previous = None, None
+        name = f"survey.{alias}[{text or ''}]"
         for _ in range(NTH_DRAGS):
-            found = self.driver.find_elements(*self.locator(alias, **params))
+            source = self._still_source()
+            found = self.matches(alias, text, source)
             if len(found) <= n:
-                raise AssertionError(
-                    f"{self._name(alias, params)}: {len(found)} on the form, wanted #{n}"
-                )
-            shown = []
-            for k, el in enumerate(found):
-                try:
-                    r = el.rect
-                    if el.is_displayed() and r["y"] >= TOP and r["y"] + r["height"] <= BOTTOM:
-                        shown.append(k)
-                except StaleElementReferenceException:
-                    continue
-            if n in shown:
-                return found[n]
-            if shown:
-                down = n > max(shown)
-            if down:
-                self._drag(int(height * 0.62), int(height * 0.34))
+                raise AssertionError(f"{name}: {len(found)} on the form, wanted #{n + 1}")
+            on_screen = {k for k, a in enumerate(found) if a.get("visible") == "true"}
+            target = found[n]
+            y, h = int(target.get("y") or 0), int(target.get("height") or 0)
+            if n in on_screen and y >= TOP and y + h <= BOTTOM:
+                return target
+            if n in on_screen:
+                direction = "up" if y < TOP else "down"
+            elif on_screen:
+                direction = "down" if n > max(on_screen) else "up"
+            elif direction is None:
+                direction = "up"  # the app scrolls to what an answer reveals: often past the target
+            if source == previous:  # nothing moved: an end of the form — turn round
+                direction = "down" if direction == "up" else "up"
+            previous = source
+            if direction == "down":
+                self._drag(int(height * 0.62), int(height * 0.36))
             else:
-                self._drag(int(height * 0.34), int(height * 0.62))
-        raise AssertionError(f"{self._name(alias, params)} #{n} not brought on screen")
+                self._drag(int(height * 0.36), int(height * 0.62))
+        raise AssertionError(f"{name} #{n + 1} not brought on screen")
 
-    def tap_nth(self, alias: str, n: int = 0, **params: object) -> None:
-        with allure.step(f"tap {self._name(alias, params)} #{n + 1}"):
-            self.nth(alias, n, **params).click()
-            time.sleep(0.3)  # the tap's own redraw; the next read waits on its condition
+    def _still_source(self, timeout: float = STILL_WAIT) -> str:
+        """The page source once two reads in a row agree: the form has stopped moving. A tap on a
+        form that is still moving (after a drag, or the app's own scroll to what an answer
+        revealed) lands where the element was, not where it is (module 08 run 2)."""
+        end = time.monotonic() + timeout
+        last = self.driver.page_source
+        while time.monotonic() < end:
+            time.sleep(0.3)
+            now = self.driver.page_source
+            if now == last:
+                return now
+            last = now
+        return last
 
-    def is_selected(self, alias: str, n: int = 0, **params: object) -> bool:
-        return (self.nth(alias, n, **params).get_attribute("value") or "") == "1"
+    def _tap_attrs(self, a: dict, y_offset: float | None = None) -> None:
+        x = int(a["x"]) + int(a["width"]) / 2
+        y = int(a["y"]) + (y_offset if y_offset is not None else int(a["height"]) / 2)
+        self.driver.execute_script("mobile: tap", {"x": x, "y": y})
+
+    def tap_nth(self, alias: str, n: int = 0, text: str | None = None) -> None:
+        with allure.step(f"tap survey.{alias}[{text or ''}] #{n + 1}"):
+            self._tap_attrs(self.nth(alias, n, text))
+            time.sleep(0.4)  # the tap's own redraw; the next read waits on its condition
+
+    def is_selected(self, alias: str, n: int = 0, text: str | None = None) -> bool:
+        return (self.nth(alias, n, text).get("value") or "") == "1"
 
     def expect_selected(
-        self, alias: str, n: int = 0, selected: bool = True, **params: object
+        self, alias: str, n: int = 0, selected: bool = True, text: str | None = None
     ) -> None:
         state = "selected" if selected else "not selected"
-        with allure.step(f"expect {self._name(alias, params)} #{n + 1} {state}"):
-            assert self.is_selected(alias, n, **params) == selected, (
-                f"{self._name(alias, params)} #{n + 1} is not {state}"
+        with allure.step(f"expect survey.{alias}[{text or ''}] #{n + 1} {state}"):
+            assert self.is_selected(alias, n, text) == selected, (
+                f"survey.{alias}[{text or ''}] #{n + 1} is not {state}"
             )
 
     # --- text, date, time -------------------------------------------------------------
@@ -156,10 +204,9 @@ class SurveyPage(BasePage):
         time.sleep(0.5)
 
     def _focus_text(self, n: int) -> WebElement:
-        el = self.nth("text", n)
-        r = el.rect
-        y = r["y"] + r["height"] - 70 if r["height"] > 200 else r["y"] + r["height"] // 2
-        self.driver.execute_script("mobile: tap", {"x": r["x"] + r["width"] // 2, "y": y})
+        a = self.nth("text", n)
+        h = int(a["height"])
+        self._tap_attrs(a, h - 70 if h > 200 else h / 2)  # a loose card's field: its input area
         time.sleep(0.8)  # the field re-renders on focus: type into the focused one (recon 8)
         return self.driver.switch_to.active_element
 
@@ -176,7 +223,7 @@ class SurveyPage(BasePage):
             self.hide_keyboard()
 
     def text_value(self, n: int) -> str:
-        return self.nth("text", n).get_attribute("value") or ""
+        return self.nth("text", n).get("value") or ""
 
     def set_date(self, day: int, n: int = 0) -> None:
         """The n-th EMPTY date field → day ``day`` of the month the picker opens on → OK."""
@@ -242,7 +289,7 @@ class SurveyPage(BasePage):
 
     def entry_headers(self, section: str) -> list[str]:
         """The headers of a repeatable section's entries, in order: '<section>', '<section> 2', …"""
-        return [name.split("\n")[0] for name in self.names("entry-headers", text=section)]
+        return [a.get("name", "").split("\n")[0] for a in self.matches("entry-headers", section)]
 
     def delete_entry(self, n: int, confirm: bool | None) -> None:
         """Tap the n-th entry's trash; ``confirm`` True / False answers the dialog, None = no
@@ -260,7 +307,11 @@ class SurveyPage(BasePage):
     # --- save -------------------------------------------------------------------------
 
     def save(self, timeout: float = 20.0) -> None:
-        """Tap Save; "Survey saved" appears (the app then shows the job's details)."""
-        with allure.step("tap survey.save → 'Survey saved'"):
+        """Tap Save; the survey closes and "Survey saved" appears. The snackbar of an earlier Save
+        lies over the Save button for a few seconds (module 08 run 1): it must be gone first."""
+        with allure.step("tap survey.save → the survey closes, 'Survey saved'"):
+            self.wait_gone("saved", SNACKBAR)
+            self.expect_enabled("save")
             self.tap("save")
+            self.wait_gone("header", timeout)
             self.visible("saved", timeout)
