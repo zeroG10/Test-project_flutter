@@ -9,9 +9,9 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 
 | # | Module | Code | Checks | Figma node | Platforms | Stage | Notes |
 |---|---|---|---|---|---|---|---|
-| 01 | `splash` | `SPL` | 15 | `<node-id>` | android · ios · tablet | intake | Splash screen |
-| 02 | `authentication` | `AUTH` | 126 | `<node-id>` | android · ios · tablet | intake | Welcome + Registration + Phone/email verification + Login |
-| 03 | `order-list` | `ORDL` | 68 | `<node-id>` | android · ios · tablet | intake | Order list screen / List view |
+| 01 | `splash` | `SPL` | 15 | `2451:82537` | android · ios · tablet | test cases (draft) | Splash screen — 3 TCs / 9 CHK на валідації власника; D-SPL-1…4 |
+| 02 | `authentication` | `AUTH` | 126 | `3191:12921`, `3608:11989` | android · ios · tablet | traced (iOS) | Welcome + Registration + Phone/email verification + Login — 31 тест, RTM + рев'ю покриття |
+| 03 | `order-list` | `ORDL` | 68 | `2451:82604` | android · ios · tablet | test cases (draft) | Jobs list + weekly calendar + job links — 12 TCs / 48 CHK на валідації власника; D-ORDL-1…9 |
 | 04 | `order-details` | `ORDD` | 89 | `<node-id>` | android · ios · tablet | intake | Order details screen |
 | 05 | `check-in-out` | `CHIO` | 40 | `<node-id>` | android · ios · tablet | intake | Check-In / Check-Out Flow + confirmation logic |
 | 06 | `order-progress` | `ORDP` | 42 | `<node-id>` | android · ios · tablet | intake | Order details — In progress state |
