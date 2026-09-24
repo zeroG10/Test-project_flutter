@@ -3,7 +3,7 @@
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/04-order-details/order-details-checklist.md`
 > (89 items, `CHK-ORDD-001…089`, imported 2026-09-24). Reviewed copy for the module; the **Selected CHK IDs** table is
 > the contract for `prompts/mobile/03` (test cases). Date: 2026-09-24. Owner: mykola.zhuchenko.
-> **Status: draft — waits for the owner (Q-ORDD-1…5 in [order-details-questions.md](order-details-questions.md)).**
+> **Status: draft — Q-ORDD-1…5 answered by the owner 2026-09-24; D-ORDD-1…9 and recon 5 pending ([order-details-questions.md](order-details-questions.md)).**
 
 | Field | Value |
 |---|---|
@@ -59,7 +59,7 @@ Status legend as in the Auth plan. **deferred → 05** = automated in module 05 
 | CHK-ORDD-014 | date and time with icons | E2E UI + API setup | H | H | M | Good Candidate | P1 | @regression | TC-ORDD-001 | texts asserted; the icons are visual |
 | CHK-ORDD-015 | date and time follow the backend | E2E UI + API | H | M | H | Good Candidate | P2 | @regression | TC-ORDD-002 | `PATCH /job/{id}` (`JobController_update`) + pull to refresh on the details |
 | CHK-ORDD-016 | PF name | E2E UI + API setup | M | H | L | Good Candidate | P1 | @regression | TC-ORDD-001 | `projectFacilitator` in `POST /job` — its `id` rule checked in recon 5 |
-| CHK-ORDD-017 | PF phone opens the dialer | E2E UI + API setup | M | M | L | Needs Device | P3 | @regression @android | TC-ORDD-004 | no Phone app on the iOS simulator → Blocked there; Android emulator has a dialer (Q-ORDD-3) |
+| CHK-ORDD-017 | PF phone opens the dialer | E2E UI + API setup | M | M | L | Needs Device | P3 | @regression @android | TC-ORDD-004 | iOS: Blocked — iOS simulator limitation (no Phone app); full run on the Android emulator (owner, Q-ORDD-3) |
 | CHK-ORDD-018 | Attachments section present | E2E UI + API setup | H | H | M | Good Candidate | P1 | @regression | TC-ORDD-001 | `Attachments (N)` with the real count |
 | CHK-ORDD-019 | Attachments opens its screen | E2E UI + API setup | H | H | M | Good Candidate | P1 | @regression | TC-ORDD-006 | — |
 | CHK-ORDD-020 | Check in shown for a New job | E2E UI + API setup | H | H | H | Good Candidate | P0 | @smoke | TC-ORDD-001 | — |
@@ -69,9 +69,9 @@ Status legend as in the Auth plan. **deferred → 05** = automated in module 05 
 | CHK-ORDD-030…035 | GPS capture, proximity, mismatch alert | E2E UI + API setup | H | L | H | Needs Environment Control | P1 | @regression | → 05 | **deferred → 05**; the simulator's fix is expected to be reported as mocked (iOS marks simulated locations) → GPS check-in blocked there by the app's design (D-ORDD-9) — recon 5 confirms |
 | CHK-ORDD-036…040 | manual check-in | E2E UI + API setup | H | M | H | Needs Environment Control | P1 | @regression | → 05 | **deferred → 05**; manual entry appears only when no GPS fix is obtained |
 | CHK-ORDD-041…047 | error notice, "GPS not confirmed" flag, check-in record (method, coordinates, accuracy, time) | E2E UI + API | H | M | H | Needs API Support | P1 | @regression | → 05 | **deferred → 05**; the record is read back through `GET /job/{id}` |
-| CHK-ORDD-048 | cached details offline | E2E UI | M | L | M | Not Recommended now | P3 | @offline | — | no network control on the iOS simulator (Q-ORDD-4) — Android phase |
-| CHK-ORDD-049 | check in offline, sync later | E2E UI | M | L | H | Not Recommended now | P3 | @offline | — | as -048; placeholder item; module 05 |
-| CHK-ORDD-050 | responsive during slow GPS / network | Manual | L | L | L | Not Recommended now | P3 | @performance | — | subjective; network control |
+| CHK-ORDD-048 | cached details offline | Manual | M | – | M | Manual Only | P3 | @manual @offline | — | **verified manually on iOS by the owner — works** (Q-ORDD-4, 2026-09-24); no network control on the iOS simulator |
+| CHK-ORDD-049 | check in offline, sync later | Manual | M | – | H | Manual Only | P3 | @manual @offline | — | as -048 (owner, Q-ORDD-4) |
+| CHK-ORDD-050 | responsive during slow GPS / network | Manual | L | – | L | Manual Only | P3 | @manual | — | as -048 (owner, Q-ORDD-4) |
 | CHK-ORDD-051 | Attachments screen opens | E2E UI + API setup | H | H | M | Good Candidate | P1 | @regression | TC-ORDD-006 | — |
 | CHK-ORDD-052 | back returns to the details | E2E UI + API setup | M | H | L | Good Candidate | P1 | @regression | TC-ORDD-006 | — |
 | CHK-ORDD-053 | title "Attachments" | E2E UI + API setup | M | H | L | Good Candidate | P1 | @regression | TC-ORDD-006 | — |
@@ -102,12 +102,12 @@ Status legend as in the Auth plan. **deferred → 05** = automated in module 05 
 | CHK-ORDD-078 | pan when zoomed | E2E UI + API setup | L | L | L | Deferred | P3 | @gesture | — | as -065 |
 | CHK-ORDD-079 | Close (X) in the photo viewer | E2E UI + API setup | L | H | L | Good Candidate | P3 | @regression | TC-ORDD-008 | the app has a back arrow (D-ORDD-7) — asserted if accepted |
 | CHK-ORDD-080 | closing returns to the Photos grid | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | TC-ORDD-008 | — |
-| CHK-ORDD-081…083 | attachments offline | E2E UI | M | L | M | Not Recommended now | P3 | @offline | — | network control (Q-ORDD-4) |
-| CHK-ORDD-084, -085 | network error message, retry | E2E UI | M | L | M | Not Recommended now | P3 | @offline | — | network control (Q-ORDD-4); the app's "Failed to load attachments" |
+| CHK-ORDD-081…083 | attachments offline | Manual | M | – | M | Manual Only | P3 | @manual @offline | — | as -048 (owner, Q-ORDD-4) |
+| CHK-ORDD-084, -085 | network error message, retry | Manual | M | – | M | Manual Only | P3 | @manual @offline | — | as -048 (owner, Q-ORDD-4); the app's "Failed to load attachments" |
 | CHK-ORDD-086 | no flicker when switching tabs | Manual | L | – | L | Manual Only | P3 | @manual | — | subjective |
 | CHK-ORDD-087 | the selected tab survives opening / closing | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | TC-ORDD-008 | Photos stays selected after the viewer closes |
 | CHK-ORDD-088 | responsive with many attachments | Performance | L | L | L | Not Recommended now | P3 | @performance | — | load excluded (DEV-gentle, decision 2026-09-23) |
-| CHK-ORDD-089 | attachments cached for offline | E2E UI | M | L | M | Not Recommended now | P3 | @offline | — | network control (Q-ORDD-4) |
+| CHK-ORDD-089 | attachments cached for offline | Manual | M | – | M | Manual Only | P3 | @manual @offline | — | as -048 (owner, Q-ORDD-4) |
 
 ## Step 5 — Best first candidates
 
@@ -121,15 +121,15 @@ Status legend as in the Auth plan. **deferred → 05** = automated in module 05 
 ## Step 5b — Selected CHK IDs (handoff to prompts/mobile/03)
 
 **44 of 89 → 9 test cases** (+ CHK-ORDD-001, -002 tagged on the existing TC-ORDL-008). **25 deferred → module 05**
-(-023…-047, Q-ORDD-1). The rest: manual 3, not recommended now 11, gestures deferred 4, skipped 1 (-070 if D-ORDD-6
-is accepted), needs decision 1 (-071) = 89. Final after the owner's answers and recon 5.
+(-023…-047, Q-ORDD-1). The rest: manual 12 (9 of them verified on iOS by the owner — offline / network), not
+recommended now 2 (-072, -088), gestures deferred 4, skipped 1 (-070 if D-ORDD-6 is accepted), needs decision 1 (-071) = 89. Final after the owner's answers and recon 5.
 
 | CHK ID | Automation Level | Priority | Automation Status | Blockers to clear before Prompt 07 | Note |
 |---|---|---|---|---|---|
 | CHK-ORDD-001…005, -008, -010, -011, -014, -016, -018, -020, -021 | E2E UI + API setup | P0–P1 | Good Candidate | job fixture with description and PF; recon 5 (PF, tree) | → TC-ORDD-001 (-001, -002 also on TC-ORDL-008) |
 | CHK-ORDD-015 | E2E UI + API | P2 | Good Candidate | `PATCH /job/{id}` helper | → TC-ORDD-002 |
 | CHK-ORDD-012, -013 | E2E UI + API setup | P2–P3 | Good / Medium | Maps app state (`query_app_state`), return to the app | → TC-ORDD-003 |
-| CHK-ORDD-017 | E2E UI + API setup | P3 | Needs Device | Android dialer; Blocked on the iOS simulator (Q-ORDD-3) | → TC-ORDD-004 |
+| CHK-ORDD-017 | E2E UI + API setup | P3 | Needs Device | Android dialer; iOS: Blocked — simulator limitation (Q-ORDD-3) | → TC-ORDD-004 |
 | CHK-ORDD-022 | E2E UI + API setup | P2 | Medium Candidate | recon 5: the first step on the simulator | → TC-ORDD-005 |
 | CHK-ORDD-019, -051…-061 | E2E UI + API setup | P1–P3 | Good Candidate | attachment files (Q-ORDD-2) | → TC-ORDD-006 |
 | CHK-ORDD-062, -063, -066…-068 | E2E UI + API setup | P1–P2 | Good / Medium | unlabelled close icon (testability defect) | → TC-ORDD-007 |
@@ -144,8 +144,9 @@ is accepted), needs decision 1 (-071) = 89. Final after the owner's answers and 
 | CHK-ORDD-086 | no flicker between tabs | subjective | no |
 | CHK-ORDD-069 | save a document through the share sheet | system UI outside the app (D-ORDD-6) | if the owner wants it automated |
 
-Deferred → 05: -023…-047 (Q-ORDD-1). Not recommended now: -048…-050, -072, -081…-085, -089 (network control, placeholder
-items — Android phase), -088 (load excluded). Deferred (gestures): -064, -065, -077, -078. Skipped if D-ORDD-6 is
+Deferred → 05: -023…-047 (Q-ORDD-1). **Manual, verified on iOS by the owner (Q-ORDD-4, 2026-09-24):** -048…-050,
+-081…-085, -089 (offline / network — no network control on the iOS simulator). Not recommended now: -072 (placeholder
+item), -088 (load excluded). Deferred (gestures): -064, -065, -077, -078. Skipped if D-ORDD-6 is
 accepted: -070. Needs decision: -071 (D-ORDD-5).
 
 ## Step 7 — API support
