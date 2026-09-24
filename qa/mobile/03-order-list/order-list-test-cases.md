@@ -204,7 +204,7 @@ not asserted — no checklist item asks for it (Q-ORDL-4).
 | Permissions | notifications: granted |
 | Network | online Wi-Fi |
 | Preconditions | signed in; seed job `{{job.unviewed}}` (status `new`, today, created with `isViewed=false`); no earlier test opened it |
-| Oracle | spec — SRS §3.1.2.1 FR-ORD-06 ("Updated" when applicable), §3.1.2.2 card flags; spec — figma:2451:82604 (card with "Updated"); app — the label follows the server's `isViewed`, opening the details marks the job viewed (code, *recon*) |
+| Oracle | spec — SRS §3.1.2.1 FR-ORD-06 ("Updated" when applicable), §3.1.2.2 card flags, §3.1.3.1 FR-ORD-D-04 ("Indicator disappears after a technician navigates outside a screen"); spec — figma:2451:82604 (card with "Updated"); app — the label follows the server's `isViewed`, opening the details marks the job viewed (code, *recon*) |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
@@ -218,10 +218,11 @@ not asserted — no checklist item asks for it (Q-ORDL-4).
 | 8 | back | — | — | calendar |
 | 9 | click | jobs-list.view-toggle | — | list |
 | 10 | swipe | jobs-list.root | down | pull to refresh |
-| 11 | expect-hidden | jobs-list.card[{{job.unviewed.jobId}}].updated | — | no "Updated" any more (confirmed in recon 4) |
+| 11 | expect-hidden | jobs-list.card[{{job.unviewed.jobId}}].updated | — | no "Updated" any more (SRS FR-ORD-D-04) |
 
 **Postconditions / cleanup:** the seed is removed after the module.
 **Notes:** "Unsubmitted" does not exist on the card (D-ORDL-5) — only "Updated" is asserted for CHK-ORDL-056.
+Red today: step 11 fails — "Updated" stays after the viewing (runs 1–2, 2026-09-24; drawn screen + server `isViewed=true`) → [BUG-ORDL-003](bugs/BUG-ORDL-003.md) (draft, owner decides). Recon 4 had read "gone" from the screen tree only; the tree after a back navigation is unreliable (TD-JOBS-003).
 
 ---
 

@@ -71,6 +71,17 @@ def cards_on_screen(page_source: str) -> list[tuple[Card, int]]:
     return sorted(found, key=lambda pair: pair[1])
 
 
+def cards_in_tree(page_source: str) -> list[Card]:
+    """Every card node of one page-source read, visible or not. After a back navigation the tree
+    reports drawn cards ``visible=false`` (run 2, 2026-09-24: TD-JOBS-003) — presence is what a
+    count can rely on; a short list (≤ ~8 cards) is built completely, so no scrolling is needed."""
+    return [
+        parse_card(node.attrib["name"])
+        for node in ET.fromstring(page_source).iter()
+        if node.tag in _CARD_TYPES and is_card(node.attrib.get("name"))
+    ]
+
+
 class JobsViewMixin:
     """What list and calendar mode share: cards, pull-to-refresh (mixed into a BasePage)."""
 
@@ -150,10 +161,11 @@ class JobsViewMixin:
             assert not shown, f"cards shown: {shown}"
 
     def wait_content(self, timeout: float | None = None) -> None:
-        """Cards or the empty state are on screen (the view has loaded / finished a transition)."""
+        """Cards or the empty state are in the tree (the view has loaded or finished a move)."""
 
         def shown(driver) -> bool:
-            return "No jobs" in driver.page_source or bool(self.visible_cards())
+            source = driver.page_source
+            return "No jobs" in source or bool(cards_in_tree(source))
 
         waits.wait_until(self.driver, shown, timeout, "neither job cards nor 'No jobs' on screen")
 
@@ -180,7 +192,10 @@ class JobsViewMixin:
         return seen
 
     def card_count(self, job_id: str) -> int:
-        return sum(1 for c in self.all_cards() if c.job_id == job_id)
+        """How many cards of ``job_id`` the view holds — one page-source read, visibility ignored
+        (see ``cards_in_tree``)."""
+        self.wait_content()
+        return sum(1 for c in cards_in_tree(self.driver.page_source) if c.job_id == job_id)
 
 
 class JobsListPage(JobsViewMixin, BasePage):

@@ -20,7 +20,7 @@ from config.settings import settings
 from fixtures import test_data
 from helpers import evidence, reporting
 from helpers.app import AppControl
-from helpers.field_services_api import ApiBlocked, FieldServicesApi
+from helpers.field_services_api import ApiBlocked, FieldServicesApi, safe_body
 from helpers.waits import wait_any
 
 
@@ -180,6 +180,18 @@ class Api(unittest.TestCase):
         api = self._api()
         with mock.patch.object(api._http, "request", return_value=self._resp(200, {"data": []})):
             self.assertEqual(api.full_delete_test_user("qa-auto+1a@example.com"), [])
+
+    def test_report_body_masks_personal_data_and_tokens(self):
+        body = json.dumps({
+            "user": {"id": "u-1", "email": "tech@example.com", "phone": "+12025550100",
+                     "firstName": "Ann", "lastName": "Lee"},
+            "access": {"token": "abc.def"}, "refreshToken": "r-1", "isViewed": True,
+        })  # fmt: skip
+        safe = safe_body(body)
+        for secret in ("tech@example.com", "+12025550100", "Ann", "Lee", "abc.def", "r-1"):
+            self.assertNotIn(secret, safe)
+        self.assertIn('"id": "u-1"', safe)
+        self.assertIn('"isViewed": true', safe)
 
 
 class AppAndEvidence(unittest.TestCase):

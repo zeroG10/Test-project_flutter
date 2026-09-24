@@ -6,6 +6,8 @@ the API out of date order, a late job for TC-ORDL-015, https job links) — all 
 
 Red today on purpose (regression checks, owner 2026-09-24): TC-ORDL-014 (BUG-ORDL-002, the list
 follows creation time) and TC-ORDL-015 (BUG-ORDL-001, the calendar does not follow a list refresh).
+TC-ORDL-005 is red by the app as well (runs 1–2: "Updated" stays on a viewed job) — BUG-ORDL-003,
+a draft until the owner decides.
 TC-ORDL-012 is two tests: the dialog itself, and Cancel / Log out — the latter is Blocked on the
 iOS simulator (the dialog closes by itself there; iOS simulator testing specific, Q-ORDL-8).
 
@@ -404,7 +406,10 @@ def test_calendar_selection_kept_and_card_opens(jobs_seed, ui_login, pages, expe
     "TC-ORDL-005 An unviewed job carries 'Updated' in the list and in the calendar until its "
     "details are opened"
 )
-def test_updated_label_until_viewed(jobs_seed, ui_login, field_services_api, pages, expected):
+def test_updated_label_until_viewed(
+    jobs_seed, ui_login, field_services_api, pages, expected, evidence
+):
+    # Red today: "Updated" stays on the viewed job after the list refresh — BUG-ORDL-003 (draft)
     job = jobs_seed["unviewed"]
     jobs = pages.jobs
     jobs.pull_to_refresh()
@@ -419,6 +424,7 @@ def test_updated_label_until_viewed(jobs_seed, ui_login, field_services_api, pag
     pages.details.go_back()
     jobs.to_list()
     jobs.pull_to_refresh()
+    evidence.checkpoint("list-after-viewing")  # the drawn card, not only the tree (TD-JOBS-003)
     server = field_services_api.job(job.id)  # evidence: what the server says after the viewing
     allure.attach(
         f"isViewed={server.get('isViewed')} updatedAt={server.get('updatedAt')}",

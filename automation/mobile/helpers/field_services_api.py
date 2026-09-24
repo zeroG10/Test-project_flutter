@@ -10,6 +10,7 @@ exactly that email; ``DELETE /job/{id}`` only for a job whose ``jobId`` starts w
 ``QA-AUTO-``. Shared data is never touched.
 """
 
+import re
 import urllib.parse
 from datetime import UTC, datetime
 
@@ -18,6 +19,16 @@ import requests
 
 from config.settings import settings
 from fixtures.test_data import TEST_EMAIL_RE
+
+# Response bodies go to the report: the account's personal data and any token are masked there.
+_PRIVATE = re.compile(
+    r'("(?:email|phone|firstName|lastName|[A-Za-z]*[Tt]oken|password)"\s*:\s*)"[^"]*"'
+)
+
+
+def safe_body(text: str) -> str:
+    """A response body fit for the report: personal fields and tokens replaced by [REDACTED]."""
+    return _PRIVATE.sub(r'\1"[REDACTED]"', text)
 
 
 class ApiBlocked(RuntimeError):
@@ -68,7 +79,7 @@ class FieldServicesApi:
                 method, f"{self.base_url}{path}", timeout=settings.api_timeout, **kwargs
             )
             allure.attach(
-                f"HTTP {resp.status_code}\n{resp.text[:1000]}",
+                f"HTTP {resp.status_code}\n{safe_body(resp.text)[:1000]}",
                 name=f"{method} {path} → {resp.status_code}",
                 attachment_type=allure.attachment_type.TEXT,
             )
