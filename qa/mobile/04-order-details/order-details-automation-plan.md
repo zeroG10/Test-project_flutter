@@ -120,6 +120,8 @@ Status legend as in the Auth plan. **deferred → 05** = automated in module 05 
 
 ## Step 5b — Selected CHK IDs (handoff to prompts/mobile/03)
 
+> **After recon 5 / 5b (2026-09-24): 42 of 89 in 9 TCs** — CHK-ORDD-006 → manual (the banner lives ~0.3 s), CHK-ORDD-013 → not automated on the simulator (in-app browser shows the host only, blank page); TC-ORDD-007 / -008 depend on Q-ORDD-6 (attachments did not load). Details in [order-details-test-cases.md](order-details-test-cases.md).
+
 **44 of 89 → 9 test cases** (+ CHK-ORDD-001, -002 tagged on the existing TC-ORDL-008). **25 deferred → module 05**
 (-023…-047, Q-ORDD-1). The rest: manual 12 (9 of them verified on iOS by the owner — offline / network), not
 recommended now 2 (-072, -088), gestures deferred 4, skipped 1 (-070 if D-ORDD-6 is accepted), needs decision 1 (-071) = 89. Final after the owner's answers and recon 5.

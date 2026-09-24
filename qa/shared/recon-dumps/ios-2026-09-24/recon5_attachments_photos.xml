@@ -17,8 +17,8 @@
                     <XCUIElementTypeOther type="XCUIElementTypeOther" name="Attachments" label="Attachments" enabled="true" visible="true" accessible="true" x="72" y="76" width="132" height="28" index="2" traits="Header"/>
                     <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="3" traits="">
                       <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="118" width="402" height="48" index="0" traits=""/>
-                      <XCUIElementTypeOther type="XCUIElementTypeOther" name="Documents&#10;Tab 1 of 2" label="Documents&#10;Tab 1 of 2" enabled="true" visible="true" accessible="true" x="0" y="118" width="201" height="48" index="1" traits="Selected"/>
-                      <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Photos&#10;Tab 2 of 2" name="Photos&#10;Tab 2 of 2" label="Photos&#10;Tab 2 of 2" enabled="true" visible="true" accessible="true" x="201" y="118" width="201" height="48" index="2" traits="StaticText"/>
+                      <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Documents&#10;Tab 1 of 2" name="Documents&#10;Tab 1 of 2" label="Documents&#10;Tab 1 of 2" enabled="true" visible="true" accessible="true" x="0" y="118" width="201" height="48" index="1" traits="StaticText"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" name="Photos&#10;Tab 2 of 2" label="Photos&#10;Tab 2 of 2" enabled="true" visible="true" accessible="true" x="201" y="118" width="201" height="48" index="2" traits="Selected"/>
                     </XCUIElementTypeOther>
                   </XCUIElementTypeOther>
                   <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
@@ -31,8 +31,8 @@
                           <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="166" width="402" height="708" index="0" traits=""/>
                           <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
                             <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="false" accessible="false" x="0" y="166" width="402" height="708" index="0" traits=""/>
-                            <XCUIElementTypeButton type="XCUIElementTypeButton" name="QA-AUTO safety.pdf" label="QA-AUTO safety.pdf" enabled="true" visible="true" accessible="true" x="0" y="178" width="402" height="48" index="1" traits="Button"/>
-                            <XCUIElementTypeButton type="XCUIElementTypeButton" name="QA-AUTO power.pdf" label="QA-AUTO power.pdf" enabled="true" visible="true" accessible="true" x="0" y="226" width="402" height="48" index="2" traits="Button"/>
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="true" x="16" y="182" width="177" height="236" index="1" traits=""/>
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="true" x="209" y="182" width="177" height="236" index="2" traits=""/>
                           </XCUIElementTypeOther>
                         </XCUIElementTypeOther>
                       </XCUIElementTypeOther>

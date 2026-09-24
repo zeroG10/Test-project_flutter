@@ -105,6 +105,8 @@ around a defect stay **Blocked**, never Passed.
 | TD-JOBS-001 | Jobs list | list ↔ calendar toggle has no name | the only unnamed button on the screen (module 03) | module 03 |
 | TD-JOBS-002 | Jobs list (empty state) | the empty-state picture is reported `visible=false` by the tree in list mode while it is drawn (run 1, 2026-09-24) | pixel oracle: ink inside its bounds (`BasePage.expect_drawn`) | CHK-ORDL-027 — decided by pixels |
 | TD-JOBS-003 | Jobs list after a back navigation | after returning from job details the tree reports drawn cards `visible=false` and keeps some stale positions (run 2, 2026-09-24; the screenshot shows the cards); in recon 4 a tree read after the details reported no "Updated" where runs 1–2 show it drawn | counts use card nodes present in one tree read, not their visibility; a card scan that finds cards in the tree but none visible fails instead of passing a "no such card" check; "Updated" is decided by the tree **and** the drawn banner fill | CHK-ORDL-036, CHK-ORDL-022, CHK-ORDL-056 |
+| TD-ORDD-001 | PDF viewer (attachments) | the close (X) icon has no label — the only unnamed button at the right of the viewer's app bar; the download icon (after the PDF loads) is unnamed too (app code audit §3) | located by its place in the app bar | CHK-ORDD-067, -068 |
+| TD-ORDD-002 | Attachments → Photos | photo thumbnails are not in the tree at all (no element per cell) | grid cells by position + pixels | CHK-ORDD-073…-075 |
 | TD-PHOTO-001 | Photo editor | four toolbar buttons unnamed; palette and canvas absent from the tree | position only; markup checks `Blocked` | module 09 (9 checks) |
 
 Suggested ids for the dev team follow §1 (`<screen>-<element>`), e.g. `registration-channel-sms`,
