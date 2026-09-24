@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-24 10:48 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-09-24 12:09 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/04-order-details/order-details-checklist.md` — 89 items
-- Results (allure): `automation/mobile/allure-results-04` — 10 tests (9 passed, 0 failed, 1 skipped)
+- Results (allure): `automation/mobile/allure-results-04-05` — 20 tests (19 passed, 0 failed, 1 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `iOS simulator iPhone 17 · iOS 26.5 · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true`
-- Harness commit (this repo): `04c80ec`
+- Harness commit (this repo): `b829fd7`
 - Environment label (pytest): `iOS · iPhone 17 · iOS 26.5 · build 1.1.1 (178)`
-- Run label (suite / filter): `pytest --platform=ios tests/shared/test_order_details.py tests/shared/test_order_list.py::test_calendar_selection_kept_and_card_opens (run 2, 2026-09-24)`
+- Run label (suite / filter): `MERGED: module 04 run 2 (harness 04c80ec: test_order_details.py + TC-ORDL-008) + module 05 run 2 (harness b829fd7: test_check_in_out.py + TC-ORDD-005), 2026-09-24`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -40,20 +40,20 @@ Generated: 2026-09-24 10:48 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDD-019 | Check that tapping the Attachments section navigates the user to the Order Atta… | 1 — `tests.shared.test_order_details#test_attachments_screen (TC-ORDD-006 Attachments opens with Documents selected and lists the job's documents; Photos switches the tab)` | Passed | allure: passed |
 | CHK-ORDD-020 | Check that the Check In button is displayed at the bottom of the screen when th… | 1 — `tests.shared.test_order_details#test_new_job_details (TC-ORDD-001 A New job shows every part of its details and the Check in button; back returns to the list)` | Passed | allure: passed |
 | CHK-ORDD-021 | Check that the Check In button is always visible and accessible without scrolli… | 1 — `tests.shared.test_order_details#test_new_job_details (TC-ORDD-001 A New job shows every part of its details and the Check in button; back returns to the list)` | Passed | allure: passed |
-| CHK-ORDD-022 | Check that tapping the Check In button initiates the check-in workflow. | 1 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Passed | allure: passed |
+| CHK-ORDD-022 | Check that tapping the Check In button initiates the check-in workflow. | 2 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Passed | allure: passed<br>allure: passed |
 | CHK-ORDD-023 | Check that the Enable Location Services prompt is displayed before requesting O… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-024 | Check that the prompt clearly explains why location access is required. | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-ORDD-024 | Check that the prompt clearly explains why location access is required. | 1 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Passed | allure: passed |
 | CHK-ORDD-025 | Check that tapping Enable triggers the operating system location permission dia… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-026 | Check that tapping Cancel dismisses the prompt and continues the check-in flow… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-027 | Check that the Location Disabled prompt is displayed when device-level location… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-028 | Check that tapping Go to settings opens the device location settings screen. | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-ORDD-027 | Check that the Location Disabled prompt is displayed when device-level location… | 1 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Passed | allure: passed |
+| CHK-ORDD-028 | Check that tapping Go to settings opens the device location settings screen. | 1 — `tests.shared.test_check_in_out#test_go_to_settings (TC-CHIO-009 After refusing location, 'Go to settings' opens the device settings)` | Passed | allure: passed |
 | CHK-ORDD-029 | Check that tapping Cancel returns the user to the check-in flow without GPS val… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-030 | Check that the system captures the user’s GPS location when GPS is enabled duri… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-031 | Check that the system compares the captured GPS location with the registered jo… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-032 | Check that a Check-in Location Mismatch alert is displayed when the distance ex… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-033 | Check that the Check-in Location Mismatch alert explains that the user is not a… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-034 | Check that tapping Got it closes the alert and returns the user to the previous… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-035 | Check that tapping Cancel dismisses the alert without completing check-in. | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-ORDD-030 | Check that the system captures the user’s GPS location when GPS is enabled duri… | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | Passed | allure: passed |
+| CHK-ORDD-031 | Check that the system compares the captured GPS location with the registered jo… | 1 — `tests.shared.test_check_in_out#test_check_in_away (TC-CHIO-003 Away from the site, check-in is stopped with 'You are not at the job site'; Got it and Cancel leave the job New)` | Passed | allure: passed |
+| CHK-ORDD-032 | Check that a Check-in Location Mismatch alert is displayed when the distance ex… | 1 — `tests.shared.test_check_in_out#test_check_in_away (TC-CHIO-003 Away from the site, check-in is stopped with 'You are not at the job site'; Got it and Cancel leave the job New)` | Passed | allure: passed |
+| CHK-ORDD-033 | Check that the Check-in Location Mismatch alert explains that the user is not a… | 1 — `tests.shared.test_check_in_out#test_check_in_away (TC-CHIO-003 Away from the site, check-in is stopped with 'You are not at the job site'; Got it and Cancel leave the job New)` | Passed | allure: passed |
+| CHK-ORDD-034 | Check that tapping Got it closes the alert and returns the user to the previous… | 1 — `tests.shared.test_check_in_out#test_check_in_away (TC-CHIO-003 Away from the site, check-in is stopped with 'You are not at the job site'; Got it and Cancel leave the job New)` | Passed | allure: passed |
+| CHK-ORDD-035 | Check that tapping Cancel dismisses the alert without completing check-in. | 1 — `tests.shared.test_check_in_out#test_check_in_away (TC-CHIO-003 Away from the site, check-in is stopped with 'You are not at the job site'; Got it and Cancel leave the job New)` | Passed | allure: passed |
 | CHK-ORDD-036 | Check that a manual location entry prompt is displayed when GPS coordinates can… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-037 | Check that the manual location input field allows the user to enter a textual l… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-038 | Check that tapping Confirm saves the manually entered location to the order. | 0 |  | no tagged test — not run (manual / exploratory), never green |
@@ -62,10 +62,10 @@ Generated: 2026-09-24 10:48 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDD-041 | Check that a notification is displayed when location data cannot be retrieved d… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-042 | Check that the order is marked with a flag indicating GPS was not confirmed whe… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-043 | Check that location permission failures do not prevent the user from continuing… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-044 | Check that the check-in records include the method used (GPS or Manual). | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-045 | Check that the check-in records include captured coordinates when GPS is availa… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-046 | Check that the check-in records include horizontal accuracy values when GPS is… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-047 | Check that the check-in records include an accurate timestamp of the action. | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-ORDD-044 | Check that the check-in records include the method used (GPS or Manual). | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | Passed | allure: passed |
+| CHK-ORDD-045 | Check that the check-in records include captured coordinates when GPS is availa… | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | Passed | allure: passed |
+| CHK-ORDD-046 | Check that the check-in records include horizontal accuracy values when GPS is… | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | Passed | allure: passed |
+| CHK-ORDD-047 | Check that the check-in records include an accurate timestamp of the action. | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | Passed | allure: passed |
 | CHK-ORDD-048 | Check that cached order details are displayed when the device is offline. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-049 | Check that the Check In flow can be initiated offline and synchronized later wh… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-050 | Check that the Order Details screen remains responsive during slow GPS or netwo… | 0 |  | no tagged test — not run (manual / exploratory), never green |
@@ -109,7 +109,7 @@ Generated: 2026-09-24 10:48 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDD-088 | Check that the Attachments screen remains responsive when a large number of doc… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-089 | Check that attachment content is cached for subsequent access according to offl… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 
-**Summary:** total 89 · automated 43 · Passed 42 · Failed 0 · Blocked 1 · Not run 46 (= total − Passed − Failed − Blocked)
+**Summary:** total 89 · automated 56 · Passed 55 · Failed 0 · Blocked 1 · Not run 33 (= total − Passed − Failed − Blocked)
 
 ## Tagged tests with no checklist item
 
@@ -117,5 +117,30 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 
 | CHK ID | Tests | Statuses |
 |---|---|---|
+| CHK-CHIO-001 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-002 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
+| CHK-CHIO-003 | 1 — `tests.shared.test_check_in_out#test_check_in_cancelled (TC-CHIO-002 X and Cancel on the check-in confirmation leave the job New)` | passed |
+| CHK-CHIO-004 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-005 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-006 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-007 | 1 — `tests.shared.test_check_in_out#test_check_in_cancelled (TC-CHIO-002 X and Cancel on the check-in confirmation leave the job New)` | passed |
+| CHK-CHIO-008 | 1 — `tests.shared.test_check_in_out#test_check_out_cancelled (TC-CHIO-005 Cancel on the check-out confirmation keeps the job Submitted)` | passed |
+| CHK-CHIO-009 | 1 — `tests.shared.test_check_in_out#test_check_in_cancelled (TC-CHIO-002 X and Cancel on the check-in confirmation leave the job New)` | passed |
+| CHK-CHIO-010 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-011 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-012 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-014 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-016 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
+| CHK-CHIO-017 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
+| CHK-CHIO-018 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
+| CHK-CHIO-020 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
+| CHK-CHIO-022 | 2 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | passed, passed |
+| CHK-CHIO-023 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
+| CHK-CHIO-035 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-036 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-037 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
+| CHK-CHIO-039 | 1 — `tests.shared.test_check_in_out#test_confirm_double_tap (TC-CHIO-007 Two quick taps on Confirm start the job once)` | passed |
+| CHK-CHIO-040 | 1 — `tests.shared.test_check_in_out#test_actions_per_status (TC-CHIO-006 Each status offers only its own action: New → Check in, In progress → none, Submitted → Check out)` | passed |
+| CHK-CHIO-041 | 1 — `tests.shared.test_check_in_out#test_mock_location_refused (TC-CHIO-008 Without the switch, a simulated location is refused with 'Location could not be trusted' and the job stays New)` | passed |
 | CHK-ORDL-058 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
 | CHK-ORDL-068 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |

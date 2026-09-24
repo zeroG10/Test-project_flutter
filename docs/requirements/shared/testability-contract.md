@@ -107,6 +107,7 @@ around a defect stay **Blocked**, never Passed.
 | TD-JOBS-003 | Jobs list after a back navigation | after returning from job details the tree reports drawn cards `visible=false` and keeps some stale positions (run 2, 2026-09-24; the screenshot shows the cards); in recon 4 a tree read after the details reported no "Updated" where runs 1–2 show it drawn | counts use card nodes present in one tree read, not their visibility; a card scan that finds cards in the tree but none visible fails instead of passing a "no such card" check; "Updated" is decided by the tree **and** the drawn banner fill | CHK-ORDL-036, CHK-ORDL-022, CHK-ORDL-056 |
 | TD-ORDD-001 | PDF viewer (attachments) | the close (X) icon has no label; once the PDF loads, the download icon is a second unnamed button left of it (run 1 tapped download instead of X) (app code audit §3) | X = the right-most unnamed app-bar button | CHK-ORDD-067, -068 |
 | TD-ORDD-002 | Attachments → Photos | photo thumbnails are not in the tree at all (no element per cell) | grid cells by position + pixels | CHK-ORDD-073…-075 |
+| TD-CHIO-001 | Check-in / check-out confirmation | the X (close) has no label — the only unnamed app-bar button (recon 6c) | located by that rule | CHK-CHIO-003, -009 |
 | TD-PHOTO-001 | Photo editor | four toolbar buttons unnamed; palette and canvas absent from the tree | position only; markup checks `Blocked` | module 09 (9 checks) |
 
 Suggested ids for the dev team follow §1 (`<screen>-<element>`), e.g. `registration-channel-sms`,

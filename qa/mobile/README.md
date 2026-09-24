@@ -12,8 +12,8 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 | 01 | `splash` | `SPL` | 15 | `2451:82537` | android · ios · tablet | traced (iOS) | Splash screen — 3 тести (3 TC); 8 Passed, 1 Failed (BUG-SPL-001); D-SPL-1…4 |
 | 02 | `authentication` | `AUTH` | 126 | `3191:12921`, `3608:11989` | android · ios · tablet | traced (iOS) | Welcome + Registration + Phone/email verification + Login — 31 тест, RTM + рев'ю покриття |
 | 03 | `order-list` | `ORDL` | 70 | `2451:82604` | android · ios · tablet | traced (iOS) | Jobs list + weekly calendar + job links — 16 тестів (15 TC); 46 Passed, 4 Failed (BUG-ORDL-001…003), 2 Blocked (iOS-симулятор); D-ORDL-1…12 |
-| 04 | `order-details` | `ORDD` | 89 | `2451:82657` | android · ios · tablet | traced (iOS) | Order details + Attachments — 9 тестів (9 TC); 42 Passed, 1 Blocked (телефон PF — обмеження симулятора); 25 перевірок check-in → модуль 05 |
-| 05 | `check-in-out` | `CHIO` | 40 (+25 ORDD) | `2451:83073` | android · ios · tablet | candidates (draft) | Check-In / Check-Out + геолокація з модуля 04 — план чернеткою; D-CHIO-1…6, Q-CHIO-1…4 чекають власника |
+| 04 | `order-details` | `ORDD` | 89 | `2451:82657` | android · ios · tablet | traced (iOS) | Order details + Attachments — 9 тестів; разом з перевірками check-in у модулі 05: 55 Passed, 1 Blocked (телефон PF — обмеження симулятора) |
+| 05 | `check-in-out` | `CHIO` | 41 (+25 ORDD) | `2451:83073` | android · ios · tablet | traced (iOS) | Check-In / Check-Out — 9 тестів; 25 CHIO Passed (+ CHK-ORDD 024…047 частково); перемикач підробленої локації для потоків, захист — окремий тест (Q-CHIO-5) |
 | 06 | `order-progress` | `ORDP` | 42 | `<node-id>` | android · ios · tablet | intake | Order details — In progress state |
 | 07 | `submit-deliverables` | `DLV` | 33 | `<node-id>` | android · ios · tablet | intake | Submit Deliverables |
 | 08 | `survey` | `SRV` | 40 **+нові** | `4009:12410` | android · ios · tablet | intake | Survey screen. ⚠️ **CR-2 Repeatable Sections у проді, але в чеклісті 0 перевірок** — пишемо заново з PRD (stories 3–6, §9.2) |
