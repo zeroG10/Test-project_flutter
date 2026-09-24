@@ -15,7 +15,12 @@ Passes, in this order (one Appium session, one process):
   checkin  — Check in on `full` with the location permission reset: what appears first (OS
              prompt, app dialogs) — cancelled, the job must stay New
   cleanup  — ALWAYS (finally): jobs (verified 404), then whether the file URLs outlive the job,
-             then the files
+             then the files (files marked `keep` — the reused set — are left alone)
+
+Recon 5b (owner's go 2026-09-24, after recon 5 found that files outlive their job):
+  reuse    — take the files recon 5 left on DEV (RECON5_REUSE=<old state.json>), kept after the run
+  probe    — ONE small upload attached to a job, then DELETE /file/{id} BEFORE the job is deleted
+  RECON5_KINDS=full limits the seed to the named jobs
 
     cd automation/mobile
     PYTHONPATH=. uv run python scripts/recon/recon_5.py <dumps-dir> <evidence-dir> [pass ...]
@@ -26,6 +31,7 @@ Server writes (owner's go 2026-09-24): 3 × POST /file/upload + 3 × DELETE /fil
 """
 
 import json
+import os
 import subprocess
 import sys
 import time
@@ -51,6 +57,8 @@ from pages.welcome_page import WelcomePage
 
 DUMPS, EVIDENCE = Path(sys.argv[1]), Path(sys.argv[2])
 PASSES = sys.argv[3:] or ["files", "seed", "details", "attach", "updated", "schedule", "checkin"]
+KINDS = [k for k in os.environ.get("RECON5_KINDS", "full,unviewed,reschedule").split(",") if k]
+REUSE = os.environ.get("RECON5_REUSE", "")
 DUMPS.mkdir(parents=True, exist_ok=True)
 EVIDENCE.mkdir(parents=True, exist_ok=True)
 STATE_FILE = EVIDENCE / "state.json"
@@ -160,6 +168,43 @@ def main() -> None:
                     note(f"uploaded {key} reachable", f"HEAD {head.status_code} "
                          f"{head.headers.get('content-type')}", head.status_code == 200)
 
+        # ------------------------------------------------------------------ reuse / probe (5b)
+        def reuse_pass() -> None:
+            old = json.loads(Path(REUSE).read_text())
+            for key, f in old["files"].items():
+                head = requests.head(f["url"], timeout=30).status_code
+                state["files"][key] = {**f, "keep": True}
+                note(f"reuse {key}", f"HEAD {head}", head == 200)
+            save_state(state)
+
+        def probe_pass() -> None:
+            data = (MEDIA / "site_photo_2.jpg").read_bytes()
+            up = api._call("POST", "/file/upload",
+                           files={"file": (f"QA-AUTO-{RUN}-probe.jpg", data, "image/jpeg")})
+            body = up.json()
+            note("probe upload", f"HTTP {up.status_code} id={body.get('id')}", up.status_code in (200, 201))
+            user_id = api.technician_user_id(tech.email)
+            when = datetime.now().replace(hour=14, minute=0, second=0, microsecond=0)
+            job_body = {"title": "QA-AUTO recon5 probe", "jobId": f"QA-AUTO-R5-{RUN}-PROBE",
+                        "userId": user_id, "surveyId": SHORT_SURVEY, "statusType": "new",
+                        "startAt": iso(when), "scheduleDate": iso(when),
+                        "location": {"address": ADDRESS, "coordinates": COORDS},
+                        "attachments": {"documents": [], "photos": [
+                            {"url": body["location"], "name": "QA-AUTO probe.jpg", "description": "probe"}]}}
+            job = api._call("POST", "/job", json=job_body).json()
+            state["jobs"]["probe"] = {"id": job["id"], "jobId": job_body["jobId"]}
+            save_state(state)
+            deleted = api._call("DELETE", f"/file/{body['id']}")
+            after = requests.head(body["location"], timeout=30).status_code
+            note("probe: DELETE /file while the job still points to it / HEAD after",
+                 (deleted.status_code, deleted.text[:120], after), deleted.status_code == 200 and after != 200)
+            back = api._call("GET", f"/job/{job['id']}").json()
+            photos = (back.get("attachments") or {}).get("photos") or []
+            note("probe: the job's photos after the file delete", [p.get("name") for p in photos], None)
+            if deleted.status_code != 200:
+                state["files"]["probe"] = {"id": body["id"], "url": body["location"], "name": "probe"}
+                save_state(state)
+
         # ------------------------------------------------------------------ seed
         def seed_pass() -> None:
             user_id = api.technician_user_id(tech.email)
@@ -187,6 +232,8 @@ def main() -> None:
                                    description=LONG_DESCRIPTION),
             }
             for kind, p in plans.items():
+                if kind not in KINDS:
+                    continue
                 when = p.pop("when")
                 body = {"title": f"QA-AUTO recon5 {kind}", "jobId": f"QA-AUTO-R5-{RUN}-{kind.upper()}",
                         "userId": user_id, "surveyId": SHORT_SURVEY, "statusType": "new",
@@ -207,7 +254,8 @@ def main() -> None:
                                          "photos": len(att.get("photos") or []),
                                          "isViewed": back.get("isViewed")}, None)
 
-        for name, fn in (("files", files_pass), ("seed", seed_pass)):
+        for name, fn in (("reuse", reuse_pass), ("probe", probe_pass), ("files", files_pass),
+                         ("seed", seed_pass)):
             if name in PASSES:
                 step(name, fn)
 
@@ -309,10 +357,10 @@ def main() -> None:
             el("name BEGINSWITH 'Attachments'").click()
             time.sleep(3)
             dump(drv, "recon5_attachments_documents")
-            el("name == 'Photos'").click()
+            el("name BEGINSWITH 'Photos'").click()
             time.sleep(3)
             dump(drv, "recon5_attachments_photos")
-            el("name == 'Documents'").click()
+            el("name BEGINSWITH 'Documents'").click()
             time.sleep(2)
             el("name CONTAINS 'QA-AUTO safety'").click()
             time.sleep(5)
@@ -333,7 +381,7 @@ def main() -> None:
                 max(unnamed, key=lambda b: b.rect["x"]).click()  # the right-most: close (X)
                 time.sleep(2)
             dump(drv, "recon5_after_pdf_close")
-            el("name == 'Photos'").click()
+            el("name BEGINSWITH 'Photos'").click()
             time.sleep(2)
             imgs = [e for e in drv.find_elements("-ios predicate string", "type == 'XCUIElementTypeImage'")
                     if e.rect["y"] > 150]
@@ -401,50 +449,39 @@ def main() -> None:
                          f"{COORDS['latitude']},{COORDS['longitude']}"]):
                 out = subprocess.run(cmd, capture_output=True, text=True)
                 note(" ".join(cmd[2:5]), f"rc={out.returncode} {out.stderr.strip()[:120]}", out.returncode == 0)
-            drv.update_settings({"defaultAlertAction": ""})
+            drv.update_settings({"defaultAlertAction": "", "respectSystemAlerts": True})
             try:
                 signed_in_jobs()
                 open_job("full")
                 el("type == 'XCUIElementTypeButton' AND name == 'Check in'").click()
                 t0 = time.monotonic()
-                seen = []
-                while time.monotonic() - t0 < 20:
-                    try:
-                        text = drv.execute_script("mobile: alert", {"action": "getText"})
-                        buttons = drv.execute_script("mobile: alert", {"action": "getButtons"})
-                        seen.append((round(time.monotonic() - t0, 1), "OS alert", text, buttons))
-                        (EVIDENCE / "recon5_checkin_os_alert.png").write_bytes(drv.get_screenshot_as_png())
-                        allow = next((b for b in buttons if "While Using" in b), buttons[-1])
-                        drv.execute_script("mobile: alert", {"action": "accept", "buttonLabel": allow})
-                        time.sleep(1)
-                        continue
-                    except Exception:
-                        pass
+                prompt = None
+                while time.monotonic() - t0 < 15 and prompt is None:
                     src = drv.page_source
-                    texts = [r for r in rows_of(src) if r.startswith(("StaticText", "Button"))
-                             and any(k in r for k in ("ocation", "GPS", "site", "trusted", "Precise",
-                                                      "manually", "Checking", "Got it", "Enable"))]
-                    if texts:
-                        seen.append((round(time.monotonic() - t0, 1), "app", texts))
-                        if any("Got it" in r or "Cancel" in r for r in texts):
-                            dump(drv, f"recon5_checkin_dialog_{len(seen)}")
+                    if "to use your location" in src:
+                        prompt = round(time.monotonic() - t0, 1)
+                        dump(drv, "recon5b_checkin_os_prompt")
+                    else:
+                        time.sleep(0.5)
+                note("OS location prompt after Check in (s)", prompt, prompt is not None)
+                if prompt is not None:
+                    el("type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Don'").click()
+                    time.sleep(3)
+                    dump(drv, "recon5b_checkin_after_dont_allow")
+                    for label in ("Cancel", "Got it"):
+                        try:
+                            el(f"type == 'XCUIElementTypeButton' AND name == '{label}'").click()
+                            note(f"tapped {label}", "", None)
                             break
-                    time.sleep(0.7)
-                note("after Check in (s, what)", seen, None)
-                for label in ("Cancel", "Got it"):
-                    try:
-                        el(f"type == 'XCUIElementTypeButton' AND name == '{label}'").click()
-                        note(f"tapped {label}", "", None)
-                        break
-                    except Exception:
-                        pass
-                time.sleep(2)
-                dump(drv, "recon5_after_checkin_cancel")
+                        except Exception:
+                            pass
+                    time.sleep(2)
+                    dump(drv, "recon5b_checkin_after_cancel")
                 server = api._call("GET", f"/job/{state['jobs']['full']['id']}").json()
                 note("job status after the cancelled flow", server.get("statusType"),
                      server.get("statusType") == "new")
             finally:
-                drv.update_settings({"defaultAlertAction": "accept"})
+                drv.update_settings({"defaultAlertAction": "accept", "respectSystemAlerts": False})
 
         for name, fn in (("details", details_pass), ("attach", attach_pass), ("updated", updated_pass),
                          ("schedule", schedule_pass), ("checkin", checkin_pass)):
@@ -462,6 +499,9 @@ def main() -> None:
                 note(f"delete job {kind}", f"{type(exc).__name__}: {exc}", False)
             save_state(state)
         for key, f in list(state["files"].items()):
+            if f.get("keep"):
+                note(f"file {key} kept (reused set)", requests.head(f["url"], timeout=30).status_code, None)
+                continue
             try:
                 alive = requests.head(f["url"], timeout=30).status_code
                 resp = api._call("DELETE", f"/file/{f['id']}")
