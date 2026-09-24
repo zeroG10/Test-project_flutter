@@ -3,7 +3,7 @@
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/06-order-progress/order-progress-checklist.md`
 > (42 items, `CHK-ORDP-001…042`, imported 2026-09-24). Date: 2026-09-24. Owner: mykola.zhuchenko.
 > **Status: accepted by the owner 2026-09-24 (Q-ORDP-1…3 closed, D-ORDP-1…5 accepted); updated after recon 7 —
-> Q-ORDP-4 open ([order-progress-questions.md](order-progress-questions.md)).**
+> Q-ORDP-4 accepted as is ([order-progress-questions.md](order-progress-questions.md)).**
 
 | Field | Value |
 |---|---|
@@ -57,4 +57,4 @@ the first test), `done` (Submitted) — `POST /job`, deleted in `finally`. Nothi
 
 ## Step 16 — Recommendation
 
-Done: owner's word on Q-ORDP-1…3 → recon 7 → test cases → maps / tests. Open: Q-ORDP-4 (bug or accepted).
+Done: owner's word on Q-ORDP-1…3 → recon 7 → test cases → maps / tests. Q-ORDP-4 accepted as is by the owner (2026-09-24).
