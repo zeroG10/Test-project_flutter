@@ -73,7 +73,8 @@ jobs:
       - name: Run iOS tests
         run: |
           cp .env.example .env
-          uv run pytest --platform=ios -m "smoke and not quarantine" --tb=short
+          # unattended run: keep the video of a failed test (README "Evidence")
+          EVIDENCE_VIDEO=auto uv run pytest --platform=ios -m "smoke and not quarantine" --tb=short
 
       - name: Upload Allure results
         if: always()

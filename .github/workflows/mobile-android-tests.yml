@@ -82,7 +82,7 @@ jobs:
           working-directory: automation/mobile
           script: |
             cp .env.example .env
-            uv run pytest --platform=android -m "smoke and not quarantine" --tb=short
+            EVIDENCE_VIDEO=auto uv run pytest --platform=android -m "smoke and not quarantine" --tb=short
 
       - name: Upload Allure results
         if: always()

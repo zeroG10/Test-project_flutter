@@ -117,7 +117,7 @@ point `ANDROID_APP_PATH` / `IOS_APP_PATH` at it. A missing build makes every tes
 | `DEFAULT_TIMEOUT` | `15` (seconds) | explicit-wait default; there is no implicit wait |
 | `ANDROID_*` | device name, OS version, app path, package, activity | UiAutomator2 caps |
 | `IOS_*` | device name, OS version, app path, bundle id | XCUITest caps |
-| `EVIDENCE_VIDEO` | `auto` \| `all` \| `off` (default `auto`) | screen video per test; `auto` keeps it for failed / Blocked tests and tests marked `e2e` |
+| `EVIDENCE_VIDEO` | `off` \| `auto` \| `all` (default `off`) | screen video per test; `off` for working runs (~5 s per test saved); `auto` — for report / demo runs and CI — keeps it for failed / Blocked tests and tests marked `e2e` |
 | `APP_USER_EMAIL`, `APP_USER_PHONE`, `APP_USER_OTP` | — | the DEV test technician (`{{tech.*}}`); empty → dependent tests `Blocked` |
 | `API_BASE_URL`, `API_ADMIN_EMAIL`, `API_ADMIN_PASSWORD` | — | Field Services API for test-data setup / cleanup; empty → dependent tests `Blocked` |
 
@@ -284,10 +284,13 @@ Not everything is captured (owner decision 2026-09-23):
 - **On failure** (and on a Blocked setup): screenshot + page source — automatic.
 - **Checkpoints**: named screenshots only at the moments a test chooses (`evidence.checkpoint`),
   numbered `01 · welcome`, `02 · otp-screen` … — the key screens of the summary page.
-- **Video**: recorded for every test (a failure is not known in advance), kept for failed or
-  Blocked tests and tests marked `e2e` (`EVIDENCE_VIDEO`). iOS records through ffmpeg (`brew install ffmpeg`)
-  as H.264 so it plays in the browser. A recorder that cannot start is logged as a step; evidence
-  never decides a verdict.
+- **Video**: **off in working runs** (recording and saving cost ~5 s per test — owner decision
+  2026-09-24). Report / demo runs and CI switch it on for the run:
+  `EVIDENCE_VIDEO=auto uv run pytest --platform=ios …` — every test is recorded (a failure is not
+  known in advance) and the video is kept for failed or Blocked tests and tests marked `e2e`
+  (`all` keeps every video). iOS records through ffmpeg (`brew install ffmpeg`) as H.264 so it
+  plays in the browser. A recorder that cannot start is logged as a step; evidence never decides
+  a verdict. Screenshot + page source on a failure are captured either way.
 
 ## Allure report
 

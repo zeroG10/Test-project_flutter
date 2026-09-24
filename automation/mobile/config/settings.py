@@ -81,10 +81,11 @@ class Settings(BaseSettings):
     api_admin_password: str = ""
     api_timeout: float = 30.0  # seconds per request
 
-    # Докази (README, "Evidence"): відео пишеться для кожного тесту, а зберігається:
-    # auto = лише для впалих або Blocked тестів і тестів з маркером e2e;
-    # all = для всіх; off = не писати.
-    evidence_video: Literal["auto", "all", "off"] = "auto"
+    # Докази (README, "Evidence"): off = не писати (за замовчуванням — робочі прогони, запис
+    # коштує ~5 с на тест); auto = писати кожен тест, зберігати лише для впалих або Blocked і
+    # тестів з маркером e2e; all = зберігати всі. Звітний прогін: EVIDENCE_VIDEO=auto (рішення
+    # власника 2026-09-24).
+    evidence_video: Literal["auto", "all", "off"] = "off"
 
     @field_validator("platform")
     @classmethod

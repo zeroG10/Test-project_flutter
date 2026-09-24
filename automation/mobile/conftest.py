@@ -18,8 +18,9 @@ Harness additions for this project (README "Session model", "Evidence", "Allure 
   from fixtures/app_state.py (``logged_out_app``, ``ui_login``, ``new_user`` …).
 * Allure grouping Platform › Module (from the CHK code) and a run-context ``env`` label on
   every result; environment.properties + categories.json written at the end of the run.
-* Screenshot + page source on a failure or a Blocked setup; screen video kept for failed
-  or Blocked tests and tests marked ``e2e``.
+* Screenshot + page source on a failure or a Blocked setup; screen video only when
+  ``EVIDENCE_VIDEO`` asks for it (default off; ``auto`` keeps it for failed or Blocked tests
+  and tests marked ``e2e``).
 """
 
 import contextlib
@@ -200,7 +201,8 @@ def _allure_context(request, platform):
 
 @pytest.fixture(autouse=True)
 def _screen_video(request, driver, platform):
-    """Record every test; keep the video for failed or Blocked tests and tests marked e2e."""
+    """``EVIDENCE_VIDEO=auto|all``: record every test; keep the video for failed or Blocked tests
+    and tests marked e2e (``all``: every test). Default ``off``: nothing is recorded."""
     if settings.evidence_video == "off":
         yield
         return
