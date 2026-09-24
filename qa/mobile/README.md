@@ -12,7 +12,7 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 | 01 | `splash` | `SPL` | 15 | `2451:82537` | android · ios · tablet | traced (iOS) | Splash screen — 3 тести (3 TC); 8 Passed, 1 Failed (BUG-SPL-001); D-SPL-1…4 |
 | 02 | `authentication` | `AUTH` | 126 | `3191:12921`, `3608:11989` | android · ios · tablet | traced (iOS) | Welcome + Registration + Phone/email verification + Login — 31 тест, RTM + рев'ю покриття |
 | 03 | `order-list` | `ORDL` | 70 | `2451:82604` | android · ios · tablet | traced (iOS) | Jobs list + weekly calendar + job links — 16 тестів (15 TC); 46 Passed, 4 Failed (BUG-ORDL-001…003), 2 Blocked (iOS-симулятор); D-ORDL-1…12 |
-| 04 | `order-details` | `ORDD` | 89 | `<node-id>` | android · ios · tablet | intake | Order details screen |
+| 04 | `order-details` | `ORDD` | 89 | `2451:82657` | android · ios · tablet | candidates (draft) | Order details + Attachments — план: 44 CHK → 9 TC, 25 → модуль 05; D-ORDD-1…9, Q-ORDD-1…5 чекають власника |
 | 05 | `check-in-out` | `CHIO` | 40 | `<node-id>` | android · ios · tablet | intake | Check-In / Check-Out Flow + confirmation logic |
 | 06 | `order-progress` | `ORDP` | 42 | `<node-id>` | android · ios · tablet | intake | Order details — In progress state |
 | 07 | `submit-deliverables` | `DLV` | 33 | `<node-id>` | android · ios · tablet | intake | Submit Deliverables |
