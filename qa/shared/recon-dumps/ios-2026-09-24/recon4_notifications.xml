@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="22091" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="118" index="0" traits=""/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" name="Notification list" label="Notification list" enabled="true" visible="true" accessible="true" x="16" y="76" width="157" height="28" index="1" traits="Header"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="118" width="402" height="756" index="0" traits=""/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                          <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="false" accessible="true" x="0" y="118" width="402" height="756" index="0" traits=""/>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" name="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 otherday QA-AUTO-R4-0924-0909-OTHERDAY was assigned to you" label="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 otherday QA-AUTO-R4-0924-0909-OTHERDAY was assigned to you" enabled="true" visible="true" accessible="true" x="0" y="118" width="402" height="104" index="0" traits=""/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="true" accessible="false" x="28" y="158" width="24" height="24" index="1" traits="Image"/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="true" accessible="false" x="366" y="160" width="20" height="20" index="2" traits="Image"/>
+                          </XCUIElementTypeOther>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" name="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 unviewed QA-AUTO-R4-0924-0909-UNVIEWED was assigned to you" label="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 unviewed QA-AUTO-R4-0924-0909-UNVIEWED was assigned to you" enabled="true" visible="true" accessible="true" x="0" y="223" width="402" height="104" index="0" traits=""/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="true" accessible="false" x="28" y="263" width="24" height="24" index="1" traits="Image"/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="true" accessible="false" x="366" y="265" width="20" height="20" index="2" traits="Image"/>
+                          </XCUIElementTypeOther>
+                          <XCUIElementTypeImage type="XCUIElementTypeImage" name="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 expired QA-AUTO-R4-0924-0909-EXPIRED was assigned to you" label="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 expired QA-AUTO-R4-0924-0909-EXPIRED was assigned to you" enabled="true" visible="true" accessible="true" x="0" y="328" width="402" height="104" index="3" traits="Image"/>
+                          <XCUIElementTypeImage type="XCUIElementTypeImage" name="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 canceled QA-AUTO-R4-0924-0909-CANCELED was assigned to you" label="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 canceled QA-AUTO-R4-0924-0909-CANCELED was assigned to you" enabled="true" visible="true" accessible="true" x="0" y="433" width="402" height="104" index="4" traits="Image"/>
+                          <XCUIElementTypeImage type="XCUIElementTypeImage" name="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 completed QA-AUTO-R4-0924-0909-COMPLETED was assigned to you" label="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 completed QA-AUTO-R4-0924-0909-COMPLETED was assigned to you" enabled="true" visible="true" accessible="true" x="0" y="538" width="402" height="104" index="5" traits="Image"/>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="6" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" name="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 submitted QA-AUTO-R4-0924-0909-SUBMITTED was assigned to you" label="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 submitted QA-AUTO-R4-0924-0909-SUBMITTED was assigned to you" enabled="true" visible="true" accessible="true" x="0" y="643" width="402" height="104" index="0" traits=""/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="true" accessible="false" x="28" y="683" width="24" height="24" index="1" traits="Image"/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="true" accessible="false" x="366" y="685" width="20" height="20" index="2" traits="Image"/>
+                          </XCUIElementTypeOther>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="7" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" name="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 inprog QA-AUTO-R4-0924-0909-INPROG was assigned to you" label="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 inprog QA-AUTO-R4-0924-0909-INPROG was assigned to you" enabled="true" visible="true" accessible="true" x="0" y="748" width="402" height="104" index="0" traits=""/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="false" accessible="false" x="28" y="788" width="24" height="24" index="1" traits="Image"/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="false" accessible="false" x="366" y="790" width="20" height="20" index="2" traits="Image"/>
+                          </XCUIElementTypeOther>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="8" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" name="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 new QA-AUTO-R4-0924-0909-NEW was assigned to you" label="9/24/2026&#10;9:10 AM&#10;QA-AUTO recon4 new QA-AUTO-R4-0924-0909-NEW was assigned to you" enabled="true" visible="true" accessible="true" x="0" y="853" width="402" height="21" index="0" traits=""/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="false" accessible="false" x="0" y="0" width="0" height="0" index="1" traits="Image"/>
+                            <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="false" accessible="false" x="0" y="0" width="0" height="0" index="2" traits="Image"/>
+                          </XCUIElementTypeOther>
+                        </XCUIElementTypeOther>
+                      </XCUIElementTypeOther>
+                    </XCUIElementTypeOther>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="16" y="750" width="370" height="74" index="0" traits=""/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="Jobs&#10;Tab 1 of 3" label="Jobs&#10;Tab 1 of 3" enabled="true" visible="true" accessible="true" x="16" y="750" width="124" height="74" index="1" traits="Image"/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="8&#10;Notifications&#10;Tab 2 of 3" label="8&#10;Notifications&#10;Tab 2 of 3" enabled="true" visible="true" accessible="true" x="139" y="750" width="124" height="74" index="2" traits="Selected, Image"/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="Profile&#10;Tab 3 of 3" label="Profile&#10;Tab 3 of 3" enabled="true" visible="true" accessible="true" x="262" y="750" width="124" height="74" index="3" traits="Image"/>
+                  </XCUIElementTypeOther>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

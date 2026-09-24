@@ -10,8 +10,8 @@
 |---|---|
 | Feature | Order list — Jobs list, weekly calendar, job links |
 | Platform | cross-platform (Flutter app driven by native drivers) — iOS first, then Android |
-| Source checklist | `qa/mobile/03-order-list/order-list-checklist.md` (CHK-ORDL-001…068) |
-| Selection | `qa/mobile/03-order-list/order-list-automation-plan.md` → Selected CHK IDs (48) |
+| Source checklist | `qa/mobile/03-order-list/order-list-checklist.md` (CHK-ORDL-001…070) |
+| Selection | `qa/mobile/03-order-list/order-list-automation-plan.md` → Selected CHK IDs (50) |
 | Min OS | iOS 16.0 / Android 12.1 (SRS §2.4) — not run by decision; see [supported-devices.md](../../../docs/platform-specs/supported-devices.md) |
 | Devices | iPhone 17 · iOS 26.5 (simulator); Pixel 7 · Android 15 / API 35 (emulator) — [device matrix](../../shared/device-matrix/device-matrix.md) |
 | Build | `[DEV] CT Mobile` 1.1.1 (178), flavor `development`, `CLIENT_BUILD=true` |
@@ -26,16 +26,22 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 - **Priority:** P0 = smoke, every run · P1 = release regression · P2 = full suite · P3 = edge / scheduled.
 - **Oracle model:** accepted production baseline (`docs/notes/decisions.md`, 2026-09-23). Where the SRS / checklist and
   the app + Figma disagree, the TC asserts the app — D-ORDL-1…9 accepted by the owner on 2026-09-23
-  ([order-list-questions.md](order-list-questions.md)). Expectations marked *(recon)* come from the app code and are
-  confirmed on the simulator before the test is written.
-- **A card is one text element**: `<date>\n<time>\n<status>\n<jobId> - <title>\n<address>` (recon 3b), with
-  `Updated` on top when the job is unviewed. `…card[{{jobId}}].<field>` is the parsed field — never a substring of the
+  ([order-list-questions.md](order-list-questions.md)). All expectations were confirmed on the simulator in recon 4
+  (2026-09-24, [qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)).
+- **A card is one text element**: `<date>\n<time>\n<status>\n<jobId> - <title>\n<address>`, with `Updated\n` on top
+  when the job is unviewed — then the element type changes (Image), so a card is found by its `jobId`, never by type. `…card[{{jobId}}].<field>` is the parsed field — never a substring of the
   whole card (the address "New York" contains "New").
 - **Dates and times** are the job's `scheduleDate` in the **device** time zone: date `d MMM y`, time `HH:mm`
   (card), day title `EEEE, d MMMM` (calendar).
 - **Signed in** = the session-scoped `ui_login` fixture (UI login once per run, `{{tech}}`), Jobs list open.
 - **Jobs** = the module seed `jobs_seed` (plan, Step 9): created through `POST /job` (`JobController_create`), removed
-  through `DELETE /job/{id}` (`JobController_remove`) in `finally`.
+  through `DELETE /job/{id}` (`JobController_remove`) in `finally`. The seed is created after the Jobs screen loaded, so
+  the list is pulled to refresh first — and **the calendar separately** (BUG-ORDL-001: a list refresh does not reach the
+  calendar); the calendar TCs refresh it on purpose so their own checks are not hidden by that bug.
+- **Job links** are the https links `https://copsfieldservices.dev.concerttech.com/redirect/<key>` returned by
+  `POST /job/assign/{phone}` (`JobController_jobAssign`, field `message`), opened as a universal link — iOS simulator:
+  `xcrun simctl openurl booted <url>`; Android: `adb shell am start -a android.intent.action.VIEW -d <url>`. The app's
+  own scheme `ctflutter://jobs/<key>` does not carry the key (recon 4). Alert auto-accept is switched off for these steps.
 
 ---
 
@@ -64,7 +70,7 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 | 4 | expect-visible | tabbar.jobs | — | visible; bottom area |
 | 5 | expect-visible | tabbar.notifications | — | visible |
 | 6 | expect-visible | tabbar.profile | — | visible |
-| 7 | expect-visible | tabbar.jobs-selected | — | the Jobs tab is the selected one *(recon: tree state or pixels)* |
+| 7 | expect-visible | tabbar.jobs-selected | — | the Jobs tab is the selected one (tree: `traits` contains `Selected`) |
 | 8 | expect-text | jobs-list.empty-state | — | No jobs |
 | 9 | expect-text | jobs-list.empty-message | — | Your list of jobs is currently empty. New jobs from your Project Facilitator will appear here. |
 | 10 | expect-visible | jobs-list.empty-image | — | an image above the title |
@@ -174,7 +180,7 @@ created without `isViewed`).
 | 6 | expect-text | jobs-list.card[{{job.submitted.jobId}}].status | — | Submitted (D-ORDL-8, accepted) |
 | 7 | expect-hidden | jobs-list.card[{{job.completed.jobId}}] | — | not listed (whole list scrolled) |
 | 8 | expect-hidden | jobs-list.card[{{job.canceled.jobId}}] | — | not listed |
-| 9 | expect-hidden | jobs-list.card[{{job.expired.jobId}}] | — | not listed *(recon 3b: the technician's 8 expired jobs were not listed)* |
+| 9 | expect-hidden | jobs-list.card[{{job.expired.jobId}}] | — | not listed (recon 4) |
 
 **Postconditions / cleanup:** the seed is removed after the module.
 **Notes:** "visually distinct" (CHK-ORDL-020) = a different label per status here; the badge colours stay manual
@@ -205,13 +211,14 @@ not asserted — no checklist item asks for it (Q-ORDL-4).
 | 1 | swipe | jobs-list.root | down | pull to refresh |
 | 2 | expect-visible | jobs-list.card[{{job.unviewed.jobId}}].updated | — | "Updated" on the card |
 | 3 | click | jobs-list.view-toggle | — | calendar, today selected |
-| 4 | expect-visible | jobs-calendar.card[{{job.unviewed.jobId}}].updated | — | "Updated" on the calendar card |
-| 5 | click | jobs-calendar.card[{{job.unviewed.jobId}}] | — | — |
-| 6 | expect-text | job-details.header | — | {{job.unviewed.jobId}} - {{job.unviewed.title}} |
-| 7 | back | — | — | calendar |
-| 8 | click | jobs-list.view-toggle | — | list |
-| 9 | swipe | jobs-list.root | down | pull to refresh |
-| 10 | expect-hidden | jobs-list.card[{{job.unviewed.jobId}}].updated | — | no "Updated" any more |
+| 4 | swipe | jobs-calendar.root | down | pull to refresh the calendar (BUG-ORDL-001) |
+| 5 | expect-visible | jobs-calendar.card[{{job.unviewed.jobId}}].updated | — | "Updated" on the calendar card |
+| 6 | click | jobs-calendar.card[{{job.unviewed.jobId}}] | — | — |
+| 7 | expect-text | job-details.header | — | {{job.unviewed.jobId}} - {{job.unviewed.title}} |
+| 8 | back | — | — | calendar |
+| 9 | click | jobs-list.view-toggle | — | list |
+| 10 | swipe | jobs-list.root | down | pull to refresh |
+| 11 | expect-hidden | jobs-list.card[{{job.unviewed.jobId}}].updated | — | no "Updated" any more (confirmed in recon 4) |
 
 **Postconditions / cleanup:** the seed is removed after the module.
 **Notes:** "Unsubmitted" does not exist on the card (D-ORDL-5) — only "Updated" is asserted for CHK-ORDL-056.
@@ -241,7 +248,7 @@ not asserted — no checklist item asks for it (Q-ORDL-4).
 | 2 | expect-visible | jobs-calendar.root | — | the weekly view |
 | 3 | expect-text | jobs-calendar.week-days | — | the 7 days of the current week, Sunday → Saturday, left to right |
 | 4 | expect-text | jobs-calendar.selected-day-title | — | {{today}} as `EEEE, d MMMM` — today is selected |
-| 5 | expect-visible | tabbar.jobs-selected | — | bottom navigation still shown, Jobs selected |
+| 5 | expect-visible | tabbar.jobs-selected | — | bottom navigation still shown, Jobs selected (`traits` contains `Selected`) |
 | 6 | click | jobs-list.view-toggle | — | — |
 | 7 | expect-visible | jobs-list.root | — | list mode |
 | 8 | expect-hidden | jobs-calendar.root | — | no day cells |
@@ -272,16 +279,17 @@ the app or in Figma (D-ORDL-6).
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
 | 1 | click | jobs-list.view-toggle | — | calendar, today selected |
-| 2 | expect-text | jobs-calendar.card[{{job.new.jobId}}] | — | the same fields as its list card: {{job.new.date}} · {{job.new.time}} · New · {{job.new.jobId}} - {{job.new.title}} · {{job.new.address}} |
-| 3 | expect-hidden | jobs-calendar.card[{{job.other_day.jobId}}] | — | not shown for today |
-| 4 | click | jobs-calendar.day[{{day.with_job}}] | — | — |
-| 5 | expect-text | jobs-calendar.selected-day-title | — | {{day.with_job}} as `EEEE, d MMMM` |
-| 6 | expect-visible | jobs-calendar.card[{{job.other_day.jobId}}] | — | shown at once |
-| 7 | expect-hidden | jobs-calendar.card[{{job.new.jobId}}] | — | hidden |
-| 8 | click | jobs-calendar.day[{{day.empty}}] | — | — |
-| 9 | expect-text | jobs-calendar.empty-state | — | No jobs |
-| 10 | expect-text | jobs-calendar.empty-message | — | Your list of jobs is currently empty. New jobs from your Project Facilitator will appear here. |
-| 11 | expect-hidden | jobs-calendar.any-card | — | no card — the empty state replaces the list |
+| 2 | swipe | jobs-calendar.root | down | pull to refresh the calendar (BUG-ORDL-001) |
+| 3 | expect-text | jobs-calendar.card[{{job.new.jobId}}] | — | the same fields as its list card: {{job.new.date}} · {{job.new.time}} · New · {{job.new.jobId}} - {{job.new.title}} · {{job.new.address}} |
+| 4 | expect-hidden | jobs-calendar.card[{{job.other_day.jobId}}] | — | not shown for today |
+| 5 | click | jobs-calendar.day[{{day.with_job}}] | — | — |
+| 6 | expect-text | jobs-calendar.selected-day-title | — | {{day.with_job}} as `EEEE, d MMMM` |
+| 7 | expect-visible | jobs-calendar.card[{{job.other_day.jobId}}] | — | shown at once |
+| 8 | expect-hidden | jobs-calendar.card[{{job.new.jobId}}] | — | hidden |
+| 9 | click | jobs-calendar.day[{{day.empty}}] | — | — |
+| 10 | expect-text | jobs-calendar.empty-state | — | No jobs |
+| 11 | expect-text | jobs-calendar.empty-message | — | Your list of jobs is currently empty. New jobs from your Project Facilitator will appear here. |
+| 12 | expect-hidden | jobs-calendar.any-card | — | no card — the empty state replaces the list |
 
 **Postconditions / cleanup:** the seed is removed after the module.
 **Notes:** the empty text is the general one, not "no jobs for the selected date" (D-ORDL-2). Card fields are compared
@@ -309,15 +317,16 @@ field by field with the list card format (CHK-ORDL-051…055).
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
 | 1 | click | jobs-list.view-toggle | — | calendar |
-| 2 | click | jobs-calendar.day[{{day.with_job}}] | — | — |
-| 3 | click | jobs-list.view-toggle | — | list |
-| 4 | expect-visible | jobs-list.root | — | list mode |
-| 5 | click | jobs-list.view-toggle | — | calendar again |
-| 6 | expect-text | jobs-calendar.selected-day-title | — | {{day.with_job}} as `EEEE, d MMMM` — the selection is kept |
-| 7 | click | jobs-calendar.card[{{job.other_day.jobId}}] | — | — |
-| 8 | expect-text | job-details.header | — | {{job.other_day.jobId}} - {{job.other_day.title}} |
-| 9 | back | — | — | — |
-| 10 | expect-text | jobs-calendar.selected-day-title | — | {{day.with_job}} — back on the same calendar day |
+| 2 | swipe | jobs-calendar.root | down | pull to refresh the calendar (BUG-ORDL-001) |
+| 3 | click | jobs-calendar.day[{{day.with_job}}] | — | — |
+| 4 | click | jobs-list.view-toggle | — | list |
+| 5 | expect-visible | jobs-list.root | — | list mode |
+| 6 | click | jobs-list.view-toggle | — | calendar again |
+| 7 | expect-text | jobs-calendar.selected-day-title | — | {{day.with_job}} as `EEEE, d MMMM` — the selection is kept |
+| 8 | click | jobs-calendar.card[{{job.other_day.jobId}}] | — | — |
+| 9 | expect-text | job-details.header | — | {{job.other_day.jobId}} - {{job.other_day.title}} |
+| 10 | back | — | — | — |
+| 11 | expect-text | jobs-calendar.selected-day-title | — | {{day.with_job}} — back on the same calendar day |
 
 **Postconditions / cleanup:** the seed is removed after the module.
 
@@ -338,14 +347,14 @@ field by field with the list card format (CHK-ORDL-051…055).
 | Permissions | notifications: granted |
 | Network | online Wi-Fi |
 | Preconditions | signed in; Jobs list open in list mode |
-| Oracle | spec — SRS §3.1.2.2 FR-CAL-W-02, FR-CAL-W-03; spec — figma:2451:82613 (no arrows); accepted baseline D-ORDL-7 (swipe instead of arrows) — owner, 2026-09-23 |
+| Oracle | spec — SRS §3.1.2.2 FR-CAL-W-02, FR-CAL-W-03; spec — figma:2451:82613 (no arrows); accepted baseline D-ORDL-7 (swipe instead of arrows), D-ORDL-12 (the same weekday stays selected) — owner, 2026-09-23 / 2026-09-24 |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
 | 1 | click | jobs-list.view-toggle | — | calendar, current week |
 | 2 | swipe | jobs-calendar.week | left | — |
 | 3 | expect-text | jobs-calendar.week-days | — | the 7 days of the next week, Sunday → Saturday |
-| 4 | expect-text | jobs-calendar.selected-day-title | — | {{next_week.sunday}} — the first day of the week *(recon; D-ORDL-7)* |
+| 4 | expect-text | jobs-calendar.selected-day-title | — | the same weekday as before the swipe, one week later (e.g. Thursday → next Thursday) — D-ORDL-12 |
 | 5 | swipe | jobs-calendar.week | right | — |
 | 6 | expect-text | jobs-calendar.week-days | — | the current week again |
 | 7 | swipe | jobs-calendar.week | right | — |
@@ -377,23 +386,24 @@ one week back and forward is always inside that range.
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
 | 1 | click | jobs-list.view-toggle | — | calendar, today selected |
-| 2 | expect-visible | jobs-calendar.card[{{job.new.jobId}}] | — | shown |
-| 3 | expect-visible | jobs-calendar.card[{{job.in_progress.jobId}}] | — | shown |
-| 4 | expect-visible | jobs-calendar.card[{{job.submitted.jobId}}] | — | shown (D-ORDL-8, accepted) |
-| 5 | expect-hidden | jobs-calendar.card[{{job.completed.jobId}}] | — | not shown |
-| 6 | expect-hidden | jobs-calendar.card[{{job.canceled.jobId}}] | — | not shown |
-| 7 | expect-hidden | jobs-calendar.card[{{job.expired.jobId}}] | — | not shown |
+| 2 | swipe | jobs-calendar.root | down | pull to refresh the calendar (BUG-ORDL-001) |
+| 3 | expect-visible | jobs-calendar.card[{{job.new.jobId}}] | — | shown |
+| 4 | expect-visible | jobs-calendar.card[{{job.in_progress.jobId}}] | — | shown |
+| 5 | expect-visible | jobs-calendar.card[{{job.submitted.jobId}}] | — | shown (D-ORDL-8, accepted) |
+| 6 | expect-hidden | jobs-calendar.card[{{job.completed.jobId}}] | — | not shown |
+| 7 | expect-hidden | jobs-calendar.card[{{job.canceled.jobId}}] | — | not shown |
+| 8 | expect-hidden | jobs-calendar.card[{{job.expired.jobId}}] | — | not shown (confirmed in recon 4) |
 
 **Postconditions / cleanup:** the seed is removed after the module.
 
 ---
 
-## TC-ORDL-011 — Signed out, a job link does not open the Jobs list
+## TC-ORDL-011 — Signed out, a job link does not open the Jobs list: an unknown key shows "Link expired", a valid key leads to registration
 
 | Field | Value |
 |---|---|
 | ID | TC-ORDL-011 |
-| Title | Signed out, a job link does not open the Jobs list |
+| Title | Signed out, a job link does not open the Jobs list: an unknown key shows "Link expired", a valid key leads to registration |
 | Source CHK IDs | CHK-ORDL-003, CHK-ORDL-038 |
 | Platforms | ios, android |
 | Priority | P1 |
@@ -402,22 +412,25 @@ one week back and forward is always inside that range.
 | App state | cold start; app data reset (logged out) |
 | Permissions | notifications: granted |
 | Network | online Wi-Fi |
-| Preconditions | no session; `{{link.invalid}}` = `ctflutter://jobs/QA-AUTO-INVALID-<ts>` (a key that was never issued) |
-| Oracle | spec — SRS §3.1.2.0 (job link: validity, "Link expired" error), FR-ORD-01 (list for the authenticated user); spec — checklist CHK-ORDL-003; accepted baseline D-ORDL-9 (dialog wording) — owner, 2026-09-23 |
+| Preconditions | no session; `{{link.invalid}}` = `https://copsfieldservices.dev.concerttech.com/redirect/QA-AUTO-INVALID-<ts>` (a key never issued); `{{link.other_phone}}` — the https link from `POST /job/assign/{phone}` for `{{other.phone}}` (reserved `+1 202 555 01xx`, no account) |
+| Oracle | spec — SRS §3.1.2.0 (job link: registered → job list, not registered → registration; invalid → error), FR-ORD-01; spec — checklist CHK-ORDL-003; accepted baseline D-ORDL-9 (dialog wording) — owner, 2026-09-23; observed in recon 4 (2026-09-24) |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
 | 1 | open | app | cold start | Welcome |
-| 2 | open | app | deep link {{link.invalid}} | — |
-| 3 | expect-text | link-expired.title | — | Link expired *(recon)* |
-| 4 | expect-text | link-expired.message | — | This link is no longer valid. *(recon)* |
+| 2 | open | app | job link {{link.invalid}} | — |
+| 3 | expect-text | link-expired.title | — | Link expired |
+| 4 | expect-text | link-expired.message | — | This link is no longer valid. |
 | 5 | click | link-expired.ok | — | — |
 | 6 | expect-visible | welcome.root | — | still signed out |
-| 7 | expect-hidden | jobs-list.root | — | the Jobs list (and its calendar) never opens |
+| 7 | open | app | job link {{link.other_phone}} | — |
+| 8 | expect-visible | registration.root | — | the registration form opens — the number has no account |
+| 9 | expect-hidden | jobs-list.root | — | the Jobs list (and its calendar) never opens |
 
-**Postconditions / cleanup:** nothing created (the app only asks the server to validate the key).
+**Postconditions / cleanup:** nothing created; reset app data.
 **Notes:** SRS §3.1.2.0 wording is longer ("…(72 hours passed). Please contact your Project Facilitator.") — D-ORDL-9.
-Closes MISS-06 of the Auth coverage review.
+Step 8 follows the app code and recon 4: the key validates to a phone without an account → Registration (for a
+registered phone the app would open Login). Closes MISS-06 of the Auth coverage review.
 
 ---
 
@@ -435,77 +448,147 @@ Closes MISS-06 of the Auth coverage review.
 | App state | warm start, signed in |
 | Permissions | notifications: granted |
 | Network | online Wi-Fi |
-| Preconditions | signed in as `{{tech}}`; `{{link.other_phone}}` — the key taken from the **response** of `POST /job/assign/{phone}` (`JobController_jobAssign`: `message` = `https://…/redirect/<key>`) for `{{other.phone}}` (reserved `+1 202 555 01xx`, not the technician's); no SMS or email is read — **method waits for the owner (Q-ORDL-2)** |
-| Oracle | spec — SRS §3.1.2.1 FR-ORD-01-1; spec — figma:2451:82555 (`Basic dialog/True`: title, text, Log out); spec — checklist CHK-ORDL-004…008; accepted baseline D-ORDL-9 (title in sentence case) — owner, 2026-09-23 |
+| Preconditions | signed in as `{{tech}}`; `{{link.other_phone}}` — the https link from `POST /job/assign/{phone}` for `{{other.phone}}` (reserved `+1 202 555 01xx`, not the technician's) — owner go 2026-09-24 |
+| Oracle | spec — SRS §3.1.2.1 FR-ORD-01-1; spec — figma:2451:82555 (`Basic dialog/True`: title, text, Cancel, Log out); spec — checklist CHK-ORDL-004…008; human — owner, 2026-09-24: on a device the dialog stays until a button is tapped; accepted baseline D-ORDL-9 (title in sentence case) |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
-| 1 | open | app | deep link `ctflutter://jobs/{{link.other_phone}}` | — |
+| 1 | open | app | job link {{link.other_phone}} | — |
 | 2 | expect-text | phone-mismatch.title | — | Assigned to a different phone number |
 | 3 | expect-text | phone-mismatch.message | — | The jobs you are trying to access are assigned to a different phone number. To continue, please log out and sign in with the phone number linked to this job. |
 | 4 | expect-visible | phone-mismatch.cancel | — | Cancel |
 | 5 | expect-visible | phone-mismatch.log-out | — | Log out |
 | 6 | click | phone-mismatch.cancel | — | — |
 | 7 | expect-visible | jobs-list.root | — | dialog closed, still signed in |
-| 8 | open | app | deep link `ctflutter://jobs/{{link.other_phone}}` | the dialog again |
+| 8 | open | app | job link {{link.other_phone}} | the dialog again |
 | 9 | click | phone-mismatch.log-out | — | — |
 | 10 | expect-visible | welcome.root | — | signed out |
 | 11 | open | app | terminate, then cold start | — |
 | 12 | expect-visible | welcome.root | — | the session really ended |
 
-**Notes:** the link is opened the way the app receives it from a message — the app handles `ctflutter://jobs/<key>` and
-`https://…/redirect/<key>` alike (the key is the last path segment); the recon tries the https link first. SMS / email
-delivery of the link is out of scope (backend + Twilio; checked manually on production by the owner).
 **Postconditions / cleanup:** the session is gone — this TC runs **last** in the module; the next module signs in again
 (one more OTP). The link expires by itself (72 h); nothing to delete.
+**Platform-specific — iOS simulator testing specific, not an app defect:** on the iOS simulator the dialog appears
+(steps 2–5 observed in recon 4) but closes by itself after ~0.6 s — 4 of 4 attempts, with and without alert
+auto-accept; on a device it stays until a button is tapped (owner, 2026-09-24). So on the iOS simulator steps 4–12 are
+**Blocked** with the reason "iOS simulator specific: the dialog closes by itself; on a device it stays (Q-ORDL-8)". On Android the link opens the app directly (App Links) — run
+in full. A further idea for iOS: open the link from Notes / Messages on the simulator instead of `simctl openurl`.
+
+---
+
+## TC-ORDL-013 — A job link for the technician's own phone opens the Jobs list
+
+| Field | Value |
+|---|---|
+| ID | TC-ORDL-013 |
+| Title | A job link for the technician's own phone opens the Jobs list |
+| Source CHK IDs | CHK-ORDL-002 |
+| Platforms | ios, android |
+| Priority | P2 |
+| Automation | candidate |
+| Device / OS | P0 devices from the matrix |
+| App state | warm start, signed in |
+| Permissions | notifications: granted |
+| Network | online Wi-Fi |
+| Preconditions | signed in as `{{tech}}`; `{{link.own_phone}}` — the https link from `POST /job/assign/{phone}` for `{{tech.phone}}` (the test account's phone is not real — no SMS is delivered; owner, 2026-09-24) |
+| Oracle | spec — SRS §3.1.2.0 ("If the user is registered, the link will open the job list screen within the mobile application"); spec — checklist CHK-ORDL-002; observed in recon 4 |
+
+| # | Action | Target (alias) | Data | Expected |
+|---|---|---|---|---|
+| 1 | click | tabbar.profile | — | leave the list, so the link must bring it back |
+| 2 | expect-visible | profile.root | — | Profile |
+| 3 | open | app | job link {{link.own_phone}} | — |
+| 4 | expect-visible | jobs-list.root | — | the Jobs list opens |
+| 5 | expect-hidden | phone-mismatch.title | — | no mismatch dialog — the phones match |
+| 6 | expect-hidden | link-expired.title | — | no error |
+
+**Postconditions / cleanup:** nothing to clean (the link expires by itself).
+**Notes:** CHK-ORDL-030 ("jobs assigned via the link appear after synchronization") is **not** automated: on DEV,
+without COPS, `synchronize` attaches nothing whatever the delivery channel (recon 4); the owner verified the SMS and the
+email link flows manually on production (2026-09-24) — reported as a manual check, not as an automated verdict.
+
+---
+
+## TC-ORDL-015 — Jobs that the refreshed list shows are shown in the calendar on their dates
+
+| Field | Value |
+|---|---|
+| ID | TC-ORDL-015 |
+| Title | Jobs that the refreshed list shows are shown in the calendar on their dates |
+| Source CHK IDs | CHK-ORDL-070 |
+| Platforms | ios, android |
+| Priority | P2 |
+| Automation | candidate |
+| Device / OS | P0 devices from the matrix |
+| App state | warm start, signed in |
+| Permissions | notifications: granted |
+| Network | online Wi-Fi |
+| Preconditions | signed in; the Jobs screen opened **before** the seed was created; seed jobs `{{job.new}}` (today) and `{{job.other_day}}` (`{{day.with_job}}`); no calendar refresh since the seed (runs right after TC-ORDL-004) |
+| Oracle | spec — SRS §3.1.2.2 ("This screen complements the Orders List view"; FR-CAL-W-01 orders grouped by the selected date); spec — checklist CHK-ORDL-070 (owner, 2026-09-24) |
+
+| # | Action | Target (alias) | Data | Expected |
+|---|---|---|---|---|
+| 1 | swipe | jobs-list.root | down | pull to refresh the list |
+| 2 | expect-visible | jobs-list.card[{{job.new.jobId}}] | — | the list shows the job |
+| 3 | click | jobs-list.view-toggle | — | calendar, today selected |
+| 4 | expect-visible | jobs-calendar.card[{{job.new.jobId}}] | — | the calendar shows it on today — no separate calendar refresh |
+| 5 | click | jobs-calendar.day[{{day.with_job}}] | — | — |
+| 6 | expect-visible | jobs-calendar.card[{{job.other_day.jobId}}] | — | shown on its day |
+
+**Postconditions / cleanup:** the seed is removed after the module.
+**Known issue:** [BUG-ORDL-001](bugs/BUG-ORDL-001.md) — today the calendar shows "No jobs" at step 4 (recon 4, 2 of 2).
+The TC keeps the expectation and **stays red** as the regression check for that bug (owner, 2026-09-24).
 
 ---
 
 ## Aliases used
 
-Screen maps come in step 5 of the module; `MISSING` = to be added from the module recon.
+Screen maps come in step 5 of the module; `MISSING` = not in a map yet — every entry below was **seen in recon 4**
+(`qa/shared/recon-dumps/ios-2026-09-24/`), so the ios column is a work order, not an unknown.
 
 | Alias | Screen | android map | ios map |
 |---|---|---|---|
-| app | — (launch / relaunch / deep link) | n/a | n/a (`helpers/app.py`; deep link helper **MISSING**) |
+| app | — (launch / relaunch / job link) | n/a | n/a (`helpers/app.py`; job-link helper **MISSING** — `simctl openurl`) |
 | jobs-list.root, .empty-state | jobs-list | step 7 | yes |
-| jobs-list.view-toggle | jobs-list | step 7 | **MISSING** — the only unnamed button in the app bar (TD-JOBS-001) |
-| jobs-list.empty-message, .empty-image, .any-card | jobs-list | step 7 | **MISSING** |
-| jobs-list.card[{{jobId}}] (+ `.title`, `.date`, `.status`, `.address`, `.updated`) | jobs-list | step 7 | **MISSING** — `name CONTAINS jobId`; fields by the page parser |
+| jobs-list.view-toggle | jobs-list | step 7 | **MISSING** — the only unnamed button in the app bar, y ≈ 66 (TD-JOBS-001) |
+| jobs-list.empty-message, .empty-image, .any-card | jobs-list | step 7 | **MISSING** — texts as recon 4; image unlabelled |
+| jobs-list.card[{{jobId}}] (+ `.title`, `.date`, `.status`, `.address`, `.updated`) | jobs-list | step 7 | **MISSING** — `name CONTAINS jobId`, any type (StaticText, or Image with "Updated"); fields by the page parser |
 | jobs-list.card-count[{{jobId}}] | jobs-list | step 7 | **MISSING** — page method |
-| jobs-calendar.root, .week, .week-days, .day[{{date}}], .selected-day-title | jobs-calendar | step 7 | **MISSING** — day cells are named by the full date (recon 3b) |
-| jobs-calendar.card[{{jobId}}] (+ fields, `.updated`), .any-card, .empty-state, .empty-message | jobs-calendar | step 7 | **MISSING** |
+| jobs-calendar.root, .week, .week-days, .day[{{date}}], .selected-day-title | jobs-calendar | step 7 | **MISSING** — day cells `'Thursday, September 24, 2026'`, title `'Thursday, 24 September'` |
+| jobs-calendar.card[{{jobId}}] (+ fields, `.updated`), .any-card, .empty-state, .empty-message | jobs-calendar | step 7 | **MISSING** — same card format as the list |
 | tabbar.jobs, .notifications, .profile | tab bar (shared) | step 7 | **MISSING** as `tabbar.*` — today `jobs-list.tab-*` (move) |
-| tabbar.jobs-selected | tab bar | step 7 | **MISSING** — state from the tree or pixels (recon) |
-| notifications.root, profile.root | notifications, profile | step 7 | **MISSING** |
-| job-details.header | job-details | step 7 | **MISSING** — the app-bar text `<jobId> - <title>` (dump `job_details_new.xml`) |
-| link-expired.title, .message, .ok | dialog | step 7 | **MISSING** |
-| phone-mismatch.title, .message, .cancel, .log-out | dialog | step 7 | **MISSING** |
-| welcome.root | welcome | step 7 | yes |
+| tabbar.jobs-selected | tab bar | step 7 | **MISSING** — `name ENDSWITH 'Tab 1 of 3' AND traits CONTAINS 'Selected'` |
+| notifications.root, profile.root | notifications, profile | step 7 | **MISSING** — `Other 'Notification list'`, `Other 'Profile'` |
+| job-details.header | job-details | step 7 | **MISSING** — `Other '<jobId> - <title>'` |
+| link-expired.title, .message, .ok | dialog | step 7 | **MISSING** — `Link expired`, `This link is no longer valid.`, `OK` |
+| phone-mismatch.title, .message, .cancel, .log-out | dialog | step 7 | **MISSING** — texts as Figma 2451:82555; `Cancel`, `Log out` |
+| welcome.root, registration.root | welcome, registration | step 7 | yes |
 
 ## Fixtures used
 
 | Placeholder | Source | Notes |
 |---|---|---|
-| {{tech}}, {{tech.email}} | `automation/mobile/.env` | existing test technician, read-only |
+| {{tech}}, {{tech.email}}, {{tech.phone}} | `automation/mobile/.env` | existing test technician, read-only; the phone is not real |
 | {{tech.user_id}} | `GET /technician` (`search={{tech.email}}`) → `user.id` | what `POST /job` needs as `userId` |
-| {{job.new}}, {{job.in_progress}}, {{job.submitted}}, {{job.completed}}, {{job.canceled}}, {{job.expired}} | `jobs_seed`, `POST /job` with `statusType`, today 12:00 local | `jobId` `QA-AUTO-<run>-<kind>`, `surveyId` = Short Survey, address and coordinates of recon 3b |
+| {{job.new}}, {{job.in_progress}}, {{job.submitted}}, {{job.completed}}, {{job.canceled}}, {{job.expired}} | `jobs_seed`, `POST /job` with `statusType`, today | `jobId` `QA-AUTO-<run>-<kind>`, `surveyId` = Short Survey, address and coordinates of recon 3b; distinct times (09:00…14:00) |
 | {{job.other_day}} | `jobs_seed` | status `new` on `{{day.with_job}}` |
 | {{job.unviewed}} | `jobs_seed` | status `new`, today, `isViewed=false` |
 | {{job.*.date}}, {{job.*.time}} | derived from `scheduleDate` in the device time zone | `d MMM y`, `HH:mm` |
-| {{today}}, {{day.with_job}}, {{day.empty}}, {{next_week.sunday}} | computed from the device date | "other day" and "empty day" are chosen inside the current Sunday–Saturday week |
-| {{link.invalid}} | generated | never issued, nothing created |
-| {{link.other_phone}}, {{other.phone}} | `POST /job/assign/{phone}` → last segment of the returned URL | owner go (Q-ORDL-2) |
+| {{today}}, {{day.with_job}}, {{day.empty}} | computed from the device date | "other day" and "empty day" are chosen inside the current Sunday–Saturday week |
+| {{link.invalid}} | generated | `https://copsfieldservices.dev.concerttech.com/redirect/QA-AUTO-INVALID-<ts>`; nothing created |
+| {{link.other_phone}}, {{other.phone}} | `POST /job/assign/{phone}` → `message` (https link) | reserved `+1 202 555 01xx`; owner go 2026-09-24 |
+| {{link.own_phone}} | `POST /job/assign/{phone}` for `{{tech.phone}}` → `message` | owner go 2026-09-24 (phone not real) |
 
 ## Coverage
 
 | CHK ID | TC | Note |
 |---|---|---|
-| CHK-ORDL-001 | TC-AUTH-005 | tag added to the existing test — owner OK (Q-ORDL-5) |
+| CHK-ORDL-001 | TC-AUTH-005 | tag on the existing test (owner, 2026-09-24) |
+| CHK-ORDL-002 | TC-ORDL-013 | |
 | CHK-ORDL-003, -038 | TC-ORDL-011 | |
-| CHK-ORDL-004…008 | TC-ORDL-012 | owner go for the link (Q-ORDL-2) |
+| CHK-ORDL-004…008 | TC-ORDL-012 | steps after the dialog appears: Blocked on the iOS simulator (Q-ORDL-8) |
 | CHK-ORDL-009, -011, -026, -029 | TC-ORDL-001 | |
-| CHK-ORDL-012 | TC-ORDL-001 | "Jobs" tab (D-ORDL-3); state readable after recon |
+| CHK-ORDL-012 | TC-ORDL-001 | "Jobs" tab (D-ORDL-3) |
 | CHK-ORDL-027 | TC-ORDL-001 | **partial** — picture presence only |
 | CHK-ORDL-028 | TC-ORDL-001 | "No jobs" (D-ORDL-2) |
 | CHK-ORDL-013 | TC-ORDL-002 | |
@@ -520,16 +603,17 @@ Screen maps come in step 5 of the module; `MISSING` = to be added from the modul
 | CHK-ORDL-049…055, -060, -063 | TC-ORDL-007 | |
 | CHK-ORDL-061, -062 | TC-ORDL-007 | app texts (D-ORDL-2) |
 | CHK-ORDL-058, -068 | TC-ORDL-008 | |
-| CHK-ORDL-043, -047, -048 | TC-ORDL-009 | swipe instead of arrows (D-ORDL-7) |
+| CHK-ORDL-043, -047, -048 | TC-ORDL-009 | swipe instead of arrows (D-ORDL-7); same weekday selected (D-ORDL-12) |
 | CHK-ORDL-057 | TC-ORDL-010 | Submitted shown too — correct per the owner (D-ORDL-8) |
+| CHK-ORDL-070 | TC-ORDL-015 | red today — BUG-ORDL-001 (regression check) |
+| CHK-ORDL-030 | — | **manual — verified by the owner on production** (2026-09-24); not automatable on DEV without COPS |
+| CHK-ORDL-069 | — | TC-ORDL-014 after D-ORDL-10 is settled |
 
-**Total: 48 CHK IDs in 12 TCs** (+ CHK-ORDL-001 via TC-AUTH-005; 3 partial). Not covered here, with reasons, in the
-plan: -002, -030 (own-phone link), -014, -021, -041 (control / label does not exist), -023, -066 (manual), -025,
--045, -046, -059 (deferred), -031…-035, -064, -065 (network — Android phase), -067 (load).
+**Total: 50 CHK IDs in 14 TCs** (+ CHK-ORDL-001 via TC-AUTH-005; 3 partial). Not covered here, with reasons, in the
+plan: -030 (manual, owner), -069 (pending D-ORDL-10), -014, -021, -041 (control / label does not exist), -023, -066
+(manual), -025, -045, -046, -059 (deferred), -031…-035, -064, -065 (network — Android phase), -067 (load).
 
 ## Open questions
 
-- D-ORDL-1…9 — accepted (owner, 2026-09-23). Q-ORDL-1…7 still open — [order-list-questions.md](order-list-questions.md).
-- **Added 2026-09-24 (owner):** CHK-ORDL-069 (ascending sort, SRS FR-ORD-02) and CHK-ORDL-002 / -030 (job link for the
-  technician's own phone — the phone is not real, no SMS arrives). Their TCs (TC-ORDL-014, TC-ORDL-013) are written after
-  the recon shows the server order and what `synchronize` does.
+- D-ORDL-1…9, -12 — accepted; D-ORDL-11 — bug BUG-ORDL-001; D-ORDL-10 (sort order) — being clarified.
+  All in [order-list-questions.md](order-list-questions.md).

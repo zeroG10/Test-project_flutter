@@ -65,9 +65,10 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 | 10 | expect-hidden | login.root | — | hidden |
 
 **Postconditions / cleanup:** nothing to clean.
-**Notes:** the splash lasts ~2.8 s without a session (app code: 2.0 s animation + 0.8 s transition). If step 2 or
-step 7 cannot be observed in time, the TC is **Blocked (timing)** — the recon decides between a screenshot right after
-launch and the first frames of the recorded video. The long press on the logo is **not** used: in the `development`
+**Notes:** recon 4 (2026-09-24, debug build): the first screenshot comes 2.2–3.4 s after launch and is already 99.8 %
+brand colour; the logo appears at ~8 s (centre within 0.5 %); Welcome after ~9 s; the tree holds no text / button /
+field during the splash. The debug build starts far slower than the code's 2.0 s + 0.8 s — step 3 waits for the logo.
+If a step cannot be observed inside the splash, the TC is **Blocked (timing)**, never Passed. The long press on the logo is **not** used: in the `development`
 flavour it opens the debug screen by design (D-SPL-4). The logo animates while it grows (fade, scale, a half turn);
 its centre does not move, so step 3 holds at any moment of the animation.
 
@@ -132,10 +133,9 @@ splash's own look is proven by TC-SPL-001. Overlaps TC-AUTH-003 by design (plan,
 
 **Postconditions / cleanup:** the account is already deleted; teardown re-checks it is gone (`GET /technician` → 0) and
 deletes it if a failure left it behind; reset app data.
-**Notes:** app code (discovery, not proof): the app first shows the Jobs list of the cached user, then the server
-answers 401 and the app signs out locally — the TC asserts the final state only; the short glimpse of the list is
-Q-SPL-3. Job data is not taken from the cache on a 401 (by design in the repository code). Also closes MISS-10 of the
-Auth coverage review.
+**Known issue:** [BUG-SPL-001](bugs/BUG-SPL-001.md) — recon 4 (2 of 2): the deleted account stays signed in (Jobs list
+"No jobs", Profile of the deleted account, the next launch the same). The TC keeps the SRS expectation and **stays red**
+as the regression check for that bug (owner, 2026-09-24). Also closes MISS-10 of the Auth coverage review.
 
 ---
 
@@ -168,14 +168,15 @@ Screen maps come in step 5 of the module; `MISSING` = to be added from the recon
 | CHK-SPL-002 | TC-SPL-001 | brand colour instead of white — D-SPL-2 (accepted) |
 | CHK-SPL-011 | TC-SPL-001 | Welcome instead of Login — D-SPL-3 (accepted) |
 | CHK-SPL-008, -012 | TC-SPL-002 | -008 proven by the outcome (session honoured) |
-| CHK-SPL-009 | TC-SPL-003 | proven by the outcome (revoked token not honoured) |
+| CHK-SPL-009 | TC-SPL-003 | proven by the outcome — currently red: BUG-SPL-001 |
 | CHK-SPL-004 | — | **Skipped** — the logo is animated by design (D-SPL-1, owner 2026-09-23) |
 | CHK-SPL-006, -013 | — | manual (plan, Step 6) |
 | CHK-SPL-010, -015 | — | not recommended (plan) |
-| CHK-SPL-014 | — | needs an owner time budget (Q-SPL-1) |
+| CHK-SPL-014 | — | manual (owner, 2026-09-24); the measured duration is reported as information |
 
 **Total: 9 CHK IDs in 3 TCs.**
 
 ## Open questions
 
-- D-SPL-1…4 — accepted (owner, 2026-09-23). Q-SPL-1…3 still open — [splash-questions.md](splash-questions.md).
+- D-SPL-1…4 — accepted (owner, 2026-09-23). Q-SPL-1 — CHK-SPL-014 stays manual; Q-SPL-2 — one user per run OK;
+  Q-SPL-3 — bug BUG-SPL-001 (owner, 2026-09-24). [splash-questions.md](splash-questions.md).

@@ -47,7 +47,7 @@ elements in the tree — both need a short recon to confirm the timing: without 
 | CHK-SPL-011 | no session → Login screen | E2E UI | H | H | H | Good Candidate | P0 | @smoke | TC-SPL-001 | the app opens **Welcome** (D-SPL-3, accepted; SRS FR-WEL-03 says the same) |
 | CHK-SPL-012 | valid session → Jobs list / Calendar | E2E UI | H | H | H | Good Candidate | P1 | @regression @critical | TC-SPL-002 | text locators; overlaps TC-AUTH-003 (see Step 11) |
 | CHK-SPL-013 | transition without visible delays or artifacts | Manual only | L | L | L | Manual Only | — | @manual-only | — | subjective |
-| CHK-SPL-014 | splash shown only as long as initialization needs | E2E UI | M | M | L | Medium Candidate | P3 | @regression | — | **needs an owner time budget** (Q-SPL-1); the run can report the measured duration as information, never as a verdict |
+| CHK-SPL-014 | splash shown only as long as initialization needs | E2E UI | M | M | L | Medium Candidate | P3 | @regression | — | **manual** (owner, 2026-09-24); the debug build starts in ~9 s (recon 4) — the measured duration is reported as information only |
 | CHK-SPL-015 | slow initialization handled without glitches | Not applicable yet | L | L | L | Not Recommended Now | — | — | — | no network throttling on the iOS simulator; revisit on Android |
 
 ## Step 5 — Best first candidates
@@ -69,7 +69,7 @@ elements in the tree — both need a short recon to confirm the timing: without 
 | CHK-SPL-005 | E2E UI | P1 | Medium Candidate | recon: tree during the splash | → TC-SPL-001 |
 | CHK-SPL-007 | E2E UI | P2 | Medium Candidate | recon: actions land inside the splash window | → TC-SPL-001 |
 | CHK-SPL-008 | E2E UI | P1 | Good Candidate | — | → TC-SPL-002 |
-| CHK-SPL-009 | E2E UI + API setup | P1 | Needs API Support | owner go: one user created and deleted per run | → TC-SPL-003 |
+| CHK-SPL-009 | E2E UI + API setup | P1 | Needs API Support | — (owner go 2026-09-24); red today: BUG-SPL-001 | → TC-SPL-003 |
 | CHK-SPL-011 | E2E UI | P0 | Good Candidate | — (D-SPL-3 accepted) | → TC-SPL-001 |
 | CHK-SPL-012 | E2E UI | P1 | Good Candidate | — | → TC-SPL-002 |
 
@@ -81,7 +81,7 @@ elements in the tree — both need a short recon to confirm the timing: without 
 | CHK-SPL-013 | transition without delays / artifacts | subjective | no |
 
 Skipped: CHK-SPL-004 (the logo is animated by design, D-SPL-1). Not recommended now: CHK-SPL-010 (not observable), CHK-SPL-015 (no network
-throttling on iOS). Needs a number first: CHK-SPL-014 (Q-SPL-1).
+throttling on iOS). Manual by the owner's decision: CHK-SPL-014 (debug-build timing is not representative).
 
 ## Step 7 — API support
 

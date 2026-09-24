@@ -1,7 +1,7 @@
 # Automation plan — Order list (mobile)
 
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/03-order-list/order-list-checklist.md`
-> (69 items: `CHK-ORDL-001…068` imported + `CHK-ORDL-069` added 2026-09-24 on the owner's decision). Reviewed copy for the module; the **Selected CHK IDs** table is the contract for
+> (70 items: `CHK-ORDL-001…068` imported + `CHK-ORDL-069`, `-070` added 2026-09-24 on the owner's decisions). Reviewed copy for the module; the **Selected CHK IDs** table is the contract for
 > `prompts/mobile/03` (test cases). Date: 2026-09-23. Owner: mykola.zhuchenko. **Status: draft — waits for the owner.**
 
 | Field | Value |
@@ -44,8 +44,8 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 
 | CHK ID | Scenario (short) | Automation Level | ROI | Stability | Risk | Automation Status | Priority | Tags | TC | Reason / blocker |
 |---|---|---|---|---|---|---|---|---|---|---|
-| CHK-ORDL-001 | Jobs list is the landing screen after login | E2E UI | H | H | H | Good Candidate | P0 | @smoke | TC-AUTH-005 | already proven by TC-AUTH-005 — add this CHK tag to that test, no new test (owner OK) |
-| CHK-ORDL-002 | registered user opens a valid job link → Jobs list | E2E UI + API setup | M | L | M | Needs Test Data Setup | P3 | @regression | — | **selected 2026-09-24** (Q-ORDL-1 closed: the account's phone is not real) — link from `POST /job/assign/{tech phone}`; what `synchronize` adds is learnt in recon → TC-ORDL-013 after recon |
+| CHK-ORDL-001 | Jobs list is the landing screen after login | E2E UI | H | H | H | Good Candidate | P0 | @smoke | TC-AUTH-005 | proven by TC-AUTH-005 — the tag is on that test (owner, 2026-09-24), no new test |
+| CHK-ORDL-002 | registered user opens a valid job link → Jobs list | E2E UI + API setup | M | L | M | Needs Test Data Setup | P3 | @regression | — | selected 2026-09-24 (the account's phone is not real) — https link from `POST /job/assign/{tech phone}` opens the Jobs list (recon 4) → TC-ORDL-013 |
 | CHK-ORDL-003 | not shown to unauthenticated users; auth flow instead | E2E UI | H | M | H | Good Candidate | P1 | @regression @critical | TC-ORDL-011 | signed-out job link → "Link expired" dialog → Welcome; the list never opens |
 | CHK-ORDL-004 | mismatch modal title | E2E UI + API setup | M | M | M | Needs API Support | P2 | @regression | TC-ORDL-012 | key from `POST /job/assign/{phone}` for a reserved number — owner go (Q-ORDL-2) |
 | CHK-ORDL-005 | mismatch modal text | E2E UI + API setup | M | M | M | Needs API Support | P2 | @regression | TC-ORDL-012 | as -004 |
@@ -73,7 +73,7 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 | CHK-ORDL-027 | placeholder illustration | E2E UI | L | M | L | Medium Candidate | P2 | @regression | TC-ORDL-001 | image unlabelled — presence only (partial) |
 | CHK-ORDL-028 | empty-state title "No orders" | E2E UI | M | H | L | Good Candidate | P1 | @regression | TC-ORDL-001 | app and Figma: "No jobs" (D-ORDL-2) |
 | CHK-ORDL-029 | empty-state message | E2E UI | M | H | L | Good Candidate | P1 | @regression | TC-ORDL-001 | text as app and Figma |
-| CHK-ORDL-030 | jobs from a valid link appear after sync | E2E UI + API | M | L | M | Needs Test Data Setup | P3 | @regression | — | **selected 2026-09-24** with -002 → TC-ORDL-013 after recon |
+| CHK-ORDL-030 | jobs from a valid link appear after sync | E2E UI + API | M | L | M | Needs Test Data Setup | P3 | @regression | — | **manual — verified by the owner on production** (SMS and email links, 2026-09-24); on DEV without COPS `synchronize` attaches nothing (recon 4) — not automatable here |
 | CHK-ORDL-031 | cached jobs offline | Not applicable yet | L | L | M | Not Recommended Now | — | — | — | no network control on the iOS simulator — Android phase |
 | CHK-ORDL-032 | offline without cache (UX placeholder) | Not applicable yet | L | L | L | Not Recommended Now | — | — | — | as -031; expected state undefined in the checklist itself |
 | CHK-ORDL-033 | error message on a network error | Not applicable yet | L | L | M | Not Recommended Now | — | — | — | as -031 |
@@ -86,7 +86,7 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 | CHK-ORDL-040 | switch back to the list | E2E UI | H | H | M | Good Candidate | P1 | @regression | TC-ORDL-006 | same toggle |
 | CHK-ORDL-041 | month and year in the date selector | Not applicable yet | L | L | L | Not Recommended Now | — | — | — | no month / year in the app or in Figma (D-ORDL-6, accepted) — **Skipped** |
 | CHK-ORDL-042 | today selected by default | E2E UI | M | H | M | Good Candidate | P1 | @regression | TC-ORDL-006 | day title = today |
-| CHK-ORDL-043 | first day selected when today is not in the week | E2E UI | M | M | L | Medium Candidate | P3 | @regression | TC-ORDL-009 | after a week swipe; the day the app picks is to confirm (D-ORDL-7) |
+| CHK-ORDL-043 | first day selected when today is not in the week | E2E UI | M | M | L | Medium Candidate | P3 | @regression | TC-ORDL-009 | after a week swipe the same weekday stays selected (D-ORDL-12, accepted) |
 | CHK-ORDL-044 | days Sunday … Saturday | E2E UI | M | H | L | Good Candidate | P1 | @regression | TC-ORDL-006 | full day names in the tree |
 | CHK-ORDL-045 | selected day highlighted | E2E UI | L | L | L | Medium Candidate | P3 | @regression | — | **deferred** — colour only; a pixel oracle is possible |
 | CHK-ORDL-046 | days with jobs marked | E2E UI | M | L | L | Medium Candidate | P3 | @regression | — | **deferred** — 8-px dot; a pixel oracle is possible |
@@ -113,6 +113,7 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 | CHK-ORDL-067 | many jobs without slowdown | Not applicable yet | L | L | M | Not Recommended Now | — | — | — | load on DEV is excluded (decision 2026-09-23) |
 | CHK-ORDL-068 | selected date kept across list ↔ calendar | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | TC-ORDL-008 | — |
 | CHK-ORDL-069 | cards sorted by scheduled date and time, ascending (added 2026-09-24) | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | — | SRS FR-ORD-02; the app does not sort on the device — the server order is observed in recon → TC-ORDL-014 after recon |
+| CHK-ORDL-070 | jobs in the refreshed list are also in the calendar (added 2026-09-24) | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | TC-ORDL-015 | regression check for BUG-ORDL-001 — red until it is fixed |
 
 ## Step 5 — Best first candidates
 
@@ -124,14 +125,15 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 
 ## Step 5b — Selected CHK IDs (handoff to prompts/mobile/03)
 
-**48 of 68 → 12 test cases**, plus CHK-ORDL-001 through the existing TC-AUTH-005 (owner OK) = 49.
+**50 of 70 → 14 test cases** (updated after recon 4), plus CHK-ORDL-001 through the existing TC-AUTH-005 (owner, 2026-09-24) = 51. CHK-ORDL-069 waits for D-ORDL-10.
 
 | CHK ID | Automation Level | Priority | Automation Status | Blockers to clear before Prompt 07 | Note |
 |---|---|---|---|---|---|
-| CHK-ORDL-003 | E2E UI | P1 | Good Candidate | recon: link-expired dialog tree | → TC-ORDL-011 |
-| CHK-ORDL-004…008 | E2E UI + API setup | P2 | Needs API Support | owner go for `POST /job/assign/{phone}` (Q-ORDL-2); recon of the dialog | → TC-ORDL-012 |
+| CHK-ORDL-002 | E2E UI + API setup | P2 | Needs API Support | job-link helper (`simctl openurl`) | → TC-ORDL-013 |
+| CHK-ORDL-003 | E2E UI | P1 | Good Candidate | job-link helper | → TC-ORDL-011 |
+| CHK-ORDL-004…008 | E2E UI + API setup | P2 | Needs API Support | the dialog closes by itself on the iOS simulator → steps after it Blocked there (Q-ORDL-8); full run on Android | → TC-ORDL-012 |
 | CHK-ORDL-009, -011 | E2E UI | P1 | Good Candidate | map: toggle, tab bar | → TC-ORDL-001 |
-| CHK-ORDL-012 | E2E UI | P2 | Medium Candidate | recon: tab selected state | → TC-ORDL-001 |
+| CHK-ORDL-012 | E2E UI | P2 | Good Candidate | — (`traits` contains `Selected`, recon 4) | → TC-ORDL-001 |
 | CHK-ORDL-026…029 | E2E UI | P1–P2 | Good / Medium | API check: no active job for the technician | → TC-ORDL-001 |
 | CHK-ORDL-013 | E2E UI | P2 | Good Candidate | maps: Notifications / Profile anchors | → TC-ORDL-002 |
 | CHK-ORDL-015 | E2E UI + API setup | P0 | Good Candidate | job fixture | → TC-ORDL-003, TC-ORDL-004 |
@@ -141,7 +143,8 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 | CHK-ORDL-010, -037, -039, -040, -042, -044 | E2E UI | P1–P2 | Good / Medium | map: calendar | → TC-ORDL-006 |
 | CHK-ORDL-049…055, -060…063 | E2E UI + API setup | P1–P2 | Good Candidate | jobs on two days of the week | → TC-ORDL-007 |
 | CHK-ORDL-058, -068 | E2E UI + API setup | P1–P2 | Good Candidate | as -049 | → TC-ORDL-008 |
-| CHK-ORDL-043, -047, -048 | E2E UI | P3 | Medium Candidate | recon: day selected after a swipe | → TC-ORDL-009 |
+| CHK-ORDL-070 | E2E UI + API setup | P2 | Good Candidate | must run before any calendar refresh in the module | → TC-ORDL-015 |
+| CHK-ORDL-043, -047, -048 | E2E UI | P3 | Medium Candidate | — (D-ORDL-7, -12 accepted) | → TC-ORDL-009 |
 | CHK-ORDL-057 | E2E UI + API setup | P1 | Good Candidate | — (D-ORDL-8 accepted) | → TC-ORDL-010 |
 | CHK-ORDL-038 | E2E UI | P1 | Good Candidate | as -003 | → TC-ORDL-011 |
 
@@ -153,7 +156,7 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 | CHK-ORDL-066 | no flicker between weeks | subjective | no |
 
 Skipped: -014, -021, -041 (the control / label does not exist — D-ORDL-1, -5, -6, accepted). Not recommended now: -031…-035, -064,
--065 (network control — Android phase), -067 (load excluded). Deferred: -002, -030 (link to the own phone), -025,
+-065 (network control — Android phase), -067 (load excluded). Manual (owner-verified on production): -030. Deferred: -025,
 -059 (rapid taps), -045, -046 (colour-only markers).
 
 ## Step 7 — API support
@@ -163,7 +166,7 @@ Skipped: -014, -021, -041 (the control / label does not exist — D-ORDL-1, -5, 
 | TC-ORDL-003…010 | jobs in given statuses / days | create before, delete in `finally` | `POST /job` (`JobController_create`) → `DELETE /job/{id}` (`JobController_remove`) — **verified 2026-09-22** | P0 | `userId` = the technician's `user.id`; `surveyId` = Short Survey (read-only); `jobId` `QA-AUTO-<run>-<kind>` |
 | TC-ORDL-001 | "no active jobs" precondition | read | `GET /job` (`JobController_findAll`, `userId`, `statusType`) | P1 | leftover `QA-AUTO-*` jobs of the technician are deleted first |
 | TC-ORDL-005 | "Updated" label | create with `isViewed=false` | `POST /job` | P2 | field present in `CreateJobDto` |
-| TC-ORDL-012 | job link for another phone | generate the link | `POST /job/assign/{phone}` (`JobController_jobAssign`) → `message` = `https://…/redirect/<key>` | P2 | the link is read from the **response** and opened in the app — no SMS / email; reserved 555-01xx number; not yet tried on a number without an account; method waits for the owner (Q-ORDL-2) |
+| TC-ORDL-011, -012, -013 | job links (another phone, own phone) | generate the link | `POST /job/assign/{phone}` (`JobController_jobAssign`) → `message` = `https://…/redirect/<key>` — **verified in recon 4** for a reserved number and the test account (201) | P2 | owner go 2026-09-24; opened as a universal link; no SMS / email is read |
 
 ## Step 8 — Stable selectors
 
@@ -216,15 +219,17 @@ Order-sensitive facts, written into the plan so nobody "fixes" them: TC-ORDL-005
 - Fixtures / helpers: `helpers/field_services_api.py` gets `create_job` / `delete_job` / `find_active_jobs`;
   fixture `jobs_seed` (module scope, `finally` cleanup, refuses to delete anything not `QA-AUTO-*`); helper
   `open_deep_link(url)` (`mobile: deepLink` on iOS, `am start` on Android).
-- Order: 011 → 001 → 002 → 006 → 009 → (seed) 003 → 004 → 010 → 007 → 008 → 005 → 012.
+- Order: 011 → 001 → 002 → 006 → 009 → 013 → (seed) 003 → 004 → **015** (before any calendar refresh) → 010 → 007 → 008 → 005 → 012.
+- Job-link helper: `xcrun simctl openurl booted <https link>` (iOS), `adb shell am start -a android.intent.action.VIEW -d <link>` (Android); `defaultAlertAction` off for these steps (recon 4).
 - Estimate: 12 TCs × ~1.5–2.5 h ≈ **20–28 h** incl. maps, the job fixture and stabilisation. Maintenance risk:
   **Medium** — the parsed card format and the unnamed toggle.
 
 ## Step 13 — Runtime notes
 
 As the Auth plan. Specific here: the card list scrolls (a card is ~150 px) — `scroll-to` before assertions on lower
-cards; jobs created after the list loaded appear only after pull-to-refresh; dates and times are compared in the
-device time zone.
+cards; jobs created after the list loaded appear only after pull-to-refresh — **in the list and, separately, in the
+calendar** (BUG-ORDL-001); the toggle is ignored while the list is still loading (wait for the list first); dates and
+times are compared in the device time zone.
 
 ## Step 14 — CI readiness
 

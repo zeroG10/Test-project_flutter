@@ -95,3 +95,7 @@
 30. [CHK-ORDL-066] Check that switching between weeks does not cause UI flickering or layout shifts.
 31. [CHK-ORDL-067] Check that the Calendar (Weekly) view handles a large number of orders without performance degradation.
 32. [CHK-ORDL-068] Check that the selected date and order list state are preserved when switching between Calendar and List views.
+33. [CHK-ORDL-070] Check that jobs shown in the Orders List after a refresh are also shown in the Calendar (Weekly) view on their scheduled dates.
+
+> CHK-ORDL-070 added 2026-09-24 on the owner's decision — the regression check for BUG-ORDL-001; not in the team Sheet
+> yet (only through `qa-sheets-sync`, dry-run first, owner confirms).

@@ -178,7 +178,7 @@ start; the CHK coverage is unchanged.
 |---|---|
 | ID | TC-AUTH-005 |
 | Title | Login with email and the OTP opens the Jobs list |
-| Source CHK IDs | CHK-AUTH-110, CHK-AUTH-115, CHK-AUTH-117, CHK-AUTH-119, CHK-AUTH-073, CHK-AUTH-074, CHK-AUTH-075, CHK-AUTH-088, CHK-AUTH-089 |
+| Source CHK IDs | CHK-AUTH-110, CHK-AUTH-115, CHK-AUTH-117, CHK-AUTH-119, CHK-AUTH-073, CHK-AUTH-074, CHK-AUTH-075, CHK-AUTH-088, CHK-AUTH-089; also CHK-ORDL-001 of module 03 (landing screen after login — owner, 2026-09-24) |
 | Platforms | ios, android |
 | Priority | P0 |
 | Automation | candidate |
