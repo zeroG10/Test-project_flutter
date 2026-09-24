@@ -30,10 +30,12 @@ def wait_until(
     condition: Callable[[WebDriver], T],
     timeout: float | None = None,
     message: str = "",
+    poll: float = 0.5,
 ) -> T:
-    """Generic explicit wait: polls ``condition`` until it returns a truthy value."""
+    """Generic explicit wait: polls ``condition`` every ``poll`` s until it returns a truthy
+    value."""
     secs = _seconds(timeout)
-    return WebDriverWait(driver, secs).until(
+    return WebDriverWait(driver, secs, poll_frequency=poll).until(
         condition, message=message or f"condition not met within {secs}s"
     )
 

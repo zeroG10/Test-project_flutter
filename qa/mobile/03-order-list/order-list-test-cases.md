@@ -222,7 +222,7 @@ not asserted — no checklist item asks for it (Q-ORDL-4).
 
 **Postconditions / cleanup:** the seed is removed after the module.
 **Notes:** "Unsubmitted" does not exist on the card (D-ORDL-5) — only "Updated" is asserted for CHK-ORDL-056.
-Red today: step 11 fails — "Updated" stays after the viewing (runs 1–2, 2026-09-24; drawn screen + server `isViewed=true`) → [BUG-ORDL-003](bugs/BUG-ORDL-003.md) (draft, owner decides). Recon 4 had read "gone" from the screen tree only; the tree after a back navigation is unreliable (TD-JOBS-003).
+Red today: step 11 fails — "Updated" stays after the viewing (runs 1–2, 2026-09-24; drawn screen + server `isViewed=true`) → [BUG-ORDL-003](bugs/BUG-ORDL-003.md) (filed on the owner's go, 2026-09-24). Recon 4 had read "gone" from the screen tree only; the tree after a back navigation is unreliable (TD-JOBS-003). Steps 2, 5 and 11 are therefore decided by the tree **and** the drawn banner together (its fill `#B80B22` on the screen with the card in view — pixels); both must agree.
 
 ---
 

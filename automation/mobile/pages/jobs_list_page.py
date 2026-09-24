@@ -19,7 +19,7 @@ from selenium.webdriver.common.actions import interaction
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
 
-from helpers import waits
+from helpers import pixels, waits
 from pages.base_page import BasePage
 from screens import locator_for
 from screens.jobs_calendar_map import JOBS_CALENDAR
@@ -29,6 +29,8 @@ _CARD_START = re.compile(r"^(Updated\n)?\d{1,2} [A-Z][a-z]{2} \d{4}\n\d{2}:\d{2}
 _CARD_TYPES = ("XCUIElementTypeStaticText", "XCUIElementTypeImage")
 REFRESH_SETTLE = 8.0  # a pull-to-refresh against the weak DEV server
 SCAN_LIMIT = 8  # drags while collecting every card of the list
+UPDATED_RGB = (0xB8, 0x0B, 0x22)  # the "Updated" banner fill: app theme `tertiary`
+UPDATED_SHARE = 0.005  # calibrated 2026-09-24: 0.016–0.027 with a banner in view, 0.000 without
 
 
 @dataclass(frozen=True)
@@ -146,6 +148,26 @@ class JobsViewMixin:
             actual = getattr(self.card(job_id), field)
             assert actual == value, f"card {job_id}: {field} is {actual!r}, expected {value!r}"
 
+    def expect_updated(self, job_id: str, shown: bool) -> None:
+        """``card[...].updated`` decided by the tree AND the drawn screen: after a back navigation
+        the tree has contradicted the screen (recon 4 vs runs 1–2, TD-JOBS-003). The pixels look
+        for the banner fill anywhere on the screen with the card in view — in the seed only the
+        card under test can carry it. Tree and screen must both agree with ``shown``."""
+        state = "shows" if shown else "does not show"
+        with allure.step(
+            f"expect {self.screen.id}.card[{job_id}] {state} 'Updated' (tree + pixels)"
+        ):
+            in_tree = self.card(job_id).updated
+            png = self.driver.get_screenshot_as_png()
+            share = pixels.colour_share(png, UPDATED_RGB)
+            drawn = share >= UPDATED_SHARE
+            allure.attach(png, name=f"{job_id}: tree updated={in_tree}, banner fill {share:.4f}",
+                          attachment_type=allure.attachment_type.PNG)  # fmt: skip
+            assert in_tree == shown and drawn == shown, (
+                f"card {job_id}: 'Updated' in the tree {in_tree}, drawn {drawn} "
+                f"(banner fill {share:.4f}); expected {shown}"
+            )
+
     def expect_no_card(self, job_id: str) -> None:
         """``expect-hidden card[...]``: not found anywhere in the (scrolled) list."""
         with allure.step(f"expect no card {job_id} in {self.screen.id}"):
@@ -189,6 +211,10 @@ class JobsViewMixin:
                 break
             seen += fresh
             self._drag_at(10, up, down)
+        # a "no such card" built on a tree that hides every card would pass vacuously
+        assert seen or not cards_in_tree(self.driver.page_source), (
+            "the tree holds job cards but reports none visible (TD-JOBS-003) — cannot decide"
+        )
         return seen
 
     def card_count(self, job_id: str) -> int:

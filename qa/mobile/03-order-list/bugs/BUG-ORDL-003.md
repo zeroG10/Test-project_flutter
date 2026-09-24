@@ -1,7 +1,8 @@
 # BUG-ORDL-003 — "Updated" stays on a job after its details were opened, until the calendar is refreshed
 
-> Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md). **DRAFT, 2026-09-24 — not accepted until the
-> owner's go.** Found by the automated run of TC-ORDL-005 (runs 1 and 2). Tracker: not configured, nothing sent anywhere.
+> Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md). Filed locally 2026-09-24 on the owner's go
+> (mykola.zhuchenko: «заводь хай буде»). Found by the automated runs of TC-ORDL-005. Tracker: not configured, nothing sent
+> anywhere.
 
 ## Summary
 
@@ -74,8 +75,9 @@ longer "Updated": the card in the list (and in the calendar) shows no banner.
 
 ## Frequency
 
-- [x] Always — **2 of 2 attempts** (automated runs 1 and 2 of TC-ORDL-005, 2026-09-24, two separate seeds). Run 2 is
-  confirmed by the drawn screen (evidence 1) and by the server state (evidence 2); run 1 by the screen tree only.
+- [x] Always — **3 of 3 attempts** (automated runs 1–3 of TC-ORDL-005, 2026-09-24, three separate seeds). Runs 2 and 3
+  are confirmed by the drawn screen (banner fill 2.7 % of the screen, evidence 1) and by the server state
+  (`isViewed=True`); run 1 by the screen tree only.
 
 ## Crash? ANR?
 

@@ -2,7 +2,9 @@
 
 The mismatch dialog closes by itself ~0.6 s after it appears on the iOS simulator (recon 4, 4 of
 4 — iOS simulator testing specific; on a device it stays, owner 2026-09-24). Its texts are
-therefore read from ONE page-source snapshot taken the moment it appears (``snapshot``).
+therefore read over its whole short life (``snapshot``): a read taken while it builds up can hold
+the title alone (run 3), so every read that contains it adds to one picture of the dialog. If it
+closes before that picture is complete, ``DialogMissed`` is raised — Blocked, never Passed.
 """
 
 import time
@@ -34,24 +36,36 @@ class LinkExpiredDialog(BasePage):
     screen = LINK_EXPIRED
 
 
+class DialogMissed(RuntimeError):
+    """The dialog closed before a complete read of it was possible."""
+
+
 class PhoneMismatchDialog(BasePage):
     screen = PHONE_MISMATCH
 
     def snapshot(self, timeout: float = 15) -> dict[str, list[str]]:
-        """Texts and buttons of the dialog from the first page source that contains it."""
+        """Texts and buttons of the dialog, gathered from every page-source read that contains
+        it until it holds a title, a message and two buttons (the dialog's structure — the
+        texts themselves are the test's to check)."""
         title = DIALOG_TITLES[1]
-        found: dict[str, list[str]] = {}
+        found: dict[str, list[str]] = {"texts": [], "buttons": []}
+        seen = [False]
 
-        def appeared(driver) -> bool:
+        def complete(driver) -> bool:
             source = driver.page_source
             if title not in source:
+                if seen[0]:
+                    raise DialogMissed(f"the dialog closed after a partial read: {found}")
                 return False
-            texts, buttons = _visible_texts(source)
-            found.update(texts=texts, buttons=buttons)
-            return True
+            seen[0] = True
+            for key, values in zip(("texts", "buttons"), _visible_texts(source), strict=True):
+                found[key] += [v for v in values if v not in found[key]]
+            return len(found["texts"]) >= 2 and len(found["buttons"]) >= 2
 
-        with allure.step("capture the mismatch dialog (one page-source read)"):
-            waits.wait_until(self.driver, appeared, timeout, "the mismatch dialog did not appear")
+        with allure.step("capture the mismatch dialog (every read while it is up)"):
+            waits.wait_until(  # a fast poll: the dialog lives ~0.6 s on the simulator
+                self.driver, complete, timeout, "the mismatch dialog did not appear", poll=0.1
+            )
         return found
 
 

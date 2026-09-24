@@ -6,13 +6,22 @@ cd automation/mobile && uv run python -m unittest discover -s unit_tests -v
 import io
 import unittest
 from datetime import date
+from unittest import mock
 
 from PIL import Image
 
 from fixtures.jobs import plan_days, week_of
 from helpers import pixels
 from pages.jobs_calendar_page import day_cell_name, day_title
-from pages.jobs_list_page import cards_on_screen, is_card, parse_card
+from pages.jobs_list_page import (
+    UPDATED_RGB,
+    UPDATED_SHARE,
+    JobsViewMixin,
+    cards_on_screen,
+    is_card,
+    parse_card,
+)
+from pages.link_dialogs_page import DialogMissed, PhoneMismatchDialog
 
 CARD = (
     "24 Sep 2026\n09:00\nNew\nQA-AUTO-R4-0924-0909-NEW - QA-AUTO recon4 new\n"
@@ -61,6 +70,23 @@ class Cards(unittest.TestCase):
         found = cards_on_screen(source)
         self.assertEqual([c.updated for c, _ in found], [False, True])  # sorted by y
 
+    def test_hidden_cards_never_make_an_empty_scan(self):
+        # TD-JOBS-003: every card in the tree but reported visible=false
+        hidden = (
+            "<AppiumAUT>"
+            f'<XCUIElementTypeStaticText name="{CARD.replace(chr(10), "&#10;")}" '
+            'visible="false" y="118"/>'
+            "</AppiumAUT>"
+        )
+
+        class Frozen(JobsViewMixin):
+            driver = mock.Mock(page_source=hidden, get_window_size=lambda: {"height": 874})
+            wait_content = _drag_at = lambda *_a, **_k: None
+
+        self.assertEqual(cards_on_screen(hidden), [])
+        with self.assertRaisesRegex(AssertionError, "cannot decide"):
+            Frozen().all_cards()
+
 
 class Pixels(unittest.TestCase):
     BRAND = pixels.hex_to_rgb("#782A2A")
@@ -87,6 +113,17 @@ class Pixels(unittest.TestCase):
         welcome = png((402, 874), (248, 248, 250))
         self.assertLess(pixels.colour_share(welcome, self.BRAND), 0.1)
 
+    def test_updated_banner_fill(self):
+        # a list with one banner (370 x 27 pt, ~2.8 % of the screen) vs the brand-coloured tab
+        # indicator and the red notification dot, which must not count as a banner
+        white = (248, 248, 250)
+        banner = png((402, 874), white, box=(16, 126, 370, 27), box_fill=UPDATED_RGB)
+        self.assertGreater(pixels.colour_share(banner, UPDATED_RGB), UPDATED_SHARE)
+        tab = png((402, 874), white, box=(40, 750, 60, 4), box_fill=self.BRAND)
+        dot = png((402, 874), white, box=(200, 760, 10, 10), box_fill=(0xEB, 0x01, 0x01))
+        for frame in (tab, dot):
+            self.assertLess(pixels.colour_share(frame, UPDATED_RGB), UPDATED_SHARE)
+
 
 class SeedDays(unittest.TestCase):
     def test_week_is_sunday_to_saturday(self):
@@ -107,6 +144,38 @@ class SeedDays(unittest.TestCase):
     def test_calendar_names(self):
         self.assertEqual(day_cell_name(date(2026, 9, 24)), "Thursday, September 24, 2026")
         self.assertEqual(day_title(date(2026, 9, 24)), "Thursday, 24 September")
+
+
+class MismatchDialogRead(unittest.TestCase):
+    TITLE = (
+        '<XCUIElementTypeStaticText name="Assigned to a different phone number" visible="true"/>'
+    )
+    REST = (
+        '<XCUIElementTypeStaticText name="The jobs you are trying to access…" visible="true"/>'
+        '<XCUIElementTypeButton name="Cancel" visible="true"/>'
+        '<XCUIElementTypeButton name="Log out" visible="true"/>'
+    )
+
+    def _dialog(self, *sources: str) -> PhoneMismatchDialog:
+        driver = mock.Mock()
+        type(driver).page_source = mock.PropertyMock(side_effect=list(sources))
+        return PhoneMismatchDialog(driver, "ios")
+
+    def test_reads_add_up_while_the_dialog_builds(self):
+        # run 3: the first read that held the dialog had its title only
+        dialog = self._dialog(
+            "<AppiumAUT/>",
+            f"<AppiumAUT>{self.TITLE}</AppiumAUT>",
+            f"<AppiumAUT>{self.TITLE}{self.REST}</AppiumAUT>",
+        )
+        seen = dialog.snapshot(timeout=5)
+        self.assertEqual(seen["buttons"], ["Cancel", "Log out"])
+        self.assertEqual(len(seen["texts"]), 2)
+
+    def test_closed_after_a_partial_read_is_missed_not_passed(self):
+        dialog = self._dialog(f"<AppiumAUT>{self.TITLE}</AppiumAUT>", "<AppiumAUT/>")
+        with self.assertRaises(DialogMissed):
+            dialog.snapshot(timeout=5)
 
 
 if __name__ == "__main__":
