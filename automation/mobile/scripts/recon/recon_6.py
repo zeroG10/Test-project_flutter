@@ -280,10 +280,17 @@ def main() -> None:
             note("far: server status", server("new_far")["statusType"], None)
 
         # ------------------------------------------------------------------ manual
+        def through_prompt(label: str, seconds: float) -> list:
+            seen = watch(label, seconds)
+            if seen and seen[-1][1] == "OS prompt":
+                answer_prompt("Allow While Using App")
+                seen += watch(f"{label}_allowed", seconds)
+            return seen
+
         def manual_to_confirm(label: str) -> bool:
             tap("Check in")
             t0 = time.monotonic()
-            seen = watch(f"{label}_start", 35)
+            seen = through_prompt(f"{label}_start", 35)
             note(f"{label}: after Check in with no location ({time.monotonic() - t0:.0f}s)", seen, None)
             if not has("name == 'Enter location manually'"):
                 return False
@@ -335,7 +342,7 @@ def main() -> None:
             note("submitted: buttons", [r for r in rows if r.startswith("Button")], None)
             for attempt, final in (("co1", "Cancel"), ("co2", "Confirm")):
                 tap("Check out")
-                seen = watch(f"{attempt}_start", 35)
+                seen = through_prompt(f"{attempt}_start", 35)
                 note(f"{attempt}: after Check out", seen, None)
                 if has("name == 'Enter location manually'"):
                     tap("Confirm")
