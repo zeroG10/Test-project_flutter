@@ -267,6 +267,13 @@ class FieldServicesApi:
             raise ApiBlocked(f"Blocked: GET /job/<id> returned HTTP {resp.status_code}")
         return resp.json()
 
+    def survey(self, survey_id: str) -> dict:
+        """SurveyController_findOne — read-only: the template a job's survey is built from."""
+        resp = self._call("GET", f"/survey/{survey_id}")
+        if resp.status_code != 200:
+            raise ApiBlocked(f"Blocked: GET /survey/<id> returned HTTP {resp.status_code}")
+        return resp.json()
+
     def sweep_test_jobs(self, user_id: str) -> list[str]:
         """Delete every ``QA-AUTO-*`` job left on the technician by an interrupted run."""
         left = [

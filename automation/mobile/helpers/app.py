@@ -16,6 +16,7 @@ Clearing data = signing out, on both OSes:
 import contextlib
 import subprocess
 from collections.abc import Iterator
+from pathlib import Path
 
 import allure
 from appium.webdriver.webdriver import WebDriver
@@ -132,6 +133,14 @@ class AppControl:
             read = self._simctl("spawn", "{udid}", "defaults", "read", plist, self.MOCK_SWITCH)
             if read.stdout.strip() != ("1" if allowed else "0"):
                 raise RuntimeError(f"mock-location switch not written: {read.stdout!r}")
+
+    def add_media(self, *paths: Path) -> None:
+        """Put photos into the device gallery; the last one becomes the newest (iOS simulator:
+        ``simctl addmedia``). Android: the Android stage adds its own (adb push + media scan)."""
+        if self.platform != "ios":
+            raise NotImplementedError("add_media: iOS simulator only for now")
+        with allure.step(f"device gallery: add {', '.join(p.name for p in paths)}"):
+            self._simctl("addmedia", "{udid}", *(str(p) for p in paths))
 
     def in_foreground(self, bundle_or_package: str) -> bool:
         """Whether another app (e.g. Settings) is in the foreground now (state 4)."""

@@ -43,6 +43,7 @@ pytest_plugins = [
     "fixtures.details",
     "fixtures.check",
     "fixtures.progress",
+    "fixtures.survey",
 ]
 
 CHK_ID = re.compile(r"^CHK-[A-Z]{2,5}-\d{3,}$")

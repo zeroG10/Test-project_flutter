@@ -3,8 +3,8 @@
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/08-survey/survey-checklist.md`
 > (40 items, `CHK-SRV-001…040`, imported 2026-09-24) **plus 17 proposed items `CHK-SRV-041…057`** (logic, CR-2, empty
 > survey, Number, "Other" — the checklist has none; owner's plan §7.5, Q-SRV-5). Date: 2026-09-24. Owner: mykola.zhuchenko.
-> **Status: draft — waits for the owner (Q-SRV-1…5 in [survey-questions.md](survey-questions.md), logic tables in
-> [survey-logic-tables.md](survey-logic-tables.md)).**
+> **Status: accepted — owner's decisions 2026-09-24 (Q-SRV-1…6 closed, every D-SRV accepted, logic tables approved);
+> [survey-questions.md](survey-questions.md), [survey-logic-tables.md](survey-logic-tables.md).**
 
 | Field | Value |
 |---|---|
@@ -111,9 +111,9 @@ day earlier in UTC). Harness facts from recon 8:
 | TC-SRV-007 | T8 Branching | table T8-1…3 (a whole section disappears / returns) |
 | TC-SRV-008 | End Survey | END-1, END-3, END-8; Save with only Q1; hidden not saved |
 | TC-SRV-009 | Fiber Site Survey | realistic end-to-end: 2 rooms, Number, FIB-2 / FIB-3; server structure |
-| TC-SRV-010 | Repeatable Single without logic | CR-2: first entry, Repeat → 2, 3; edit without duplicate; restart; server |
-| TC-SRV-011 | Repeatable Single without logic | CR-2: delete — empty (no dialog), with data (Cancel / Delete), renumbering, first not deletable; server |
-| TC-SRV-012 | Repeatable Single without logic | CR-2: an incomplete entry blocks Save |
+| TC-SRV-010 | Repeatable Single without logic | CR-2: first entry, Repeat → 2, 3; each entry its own answers; restart (the no-duplicate edit on the server — TC-SRV-009) |
+| TC-SRV-011 | Fiber Site Survey | CR-2: delete — empty (no dialog), with data (Cancel / Delete), renumbering, first not deletable; server (entries are 4 questions — Save is reachable) |
+| TC-SRV-012 | Fiber Site Survey | CR-2: an incomplete entry blocks Save |
 | TC-SRV-013 | Repeatable TWO with logic | TWO-1 / TWO-8 per entry; TWO-12 lands in S2; TWO-9 end |
 | TC-SRV-014 | Photo Upload Test Survey | photos: several, thumbnails, stay after leaving; per-room photos in entry 2 → server under entry 2; compression ≤ 1920 px |
 | TC-SRV-015 | stringsdf (0 questions) | opens, Save works |
