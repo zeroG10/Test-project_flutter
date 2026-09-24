@@ -1,4 +1,4 @@
-"""Recon 6 (2026-09-24): module 05 Check-in / Check-out — what the app REALLY does.
+"""Recon 6 / 6b (2026-09-24): module 05 Check-in / Check-out — what the app REALLY does.
 
 Not a test — discovery before the test cases of module 05 (owner's go 2026-09-24, Q-CHIO-1).
 One Appium session, one process; every check-in / check-out happens through the UI on OUR jobs:
@@ -14,6 +14,9 @@ One Appium session, one process; every check-in / check-out happens through the 
              status and record on the server
   cleanup  — ALWAYS: jobs deleted (404 verified); the simulator's location back at the job site
 
+6b: RECON6_KINDS=new_manual,submitted RECON6_STALE_WAIT=75 … manual checkout — recon 6 showed the
+last simulated fix still delivered right after `location clear` (the app keeps fixes ≤ 60 s old).
+
     cd automation/mobile
     PYTHONPATH=. uv run python scripts/recon/recon_6.py <dumps-dir> <evidence-dir> [pass ...]
 
@@ -21,6 +24,7 @@ Server writes: 5 × POST /job, the app's own check-in / check-out on those jobs,
 """
 
 import json
+import os
 import subprocess
 import sys
 import time
@@ -43,6 +47,8 @@ from pages.welcome_page import WelcomePage
 
 DUMPS, EVIDENCE = Path(sys.argv[1]), Path(sys.argv[2])
 PASSES = sys.argv[3:] or ["seed", "gps", "far", "manual", "statuses", "checkout"]
+KINDS = os.environ.get("RECON6_KINDS", "new_gps,new_far,new_manual,in_progress,submitted").split(",")
+STALE_WAIT = int(os.environ.get("RECON6_STALE_WAIT", "0"))  # 6b: seconds after `location clear`
 DUMPS.mkdir(parents=True, exist_ok=True)
 EVIDENCE.mkdir(parents=True, exist_ok=True)
 STATE_FILE = EVIDENCE / "state.json"
@@ -116,6 +122,13 @@ def set_location(dev: str, where: tuple[float, float] | None) -> None:
     cmd = ["xcrun", "simctl", "location", dev] + (["clear"] if where is None else ["set", f"{where[0]},{where[1]}"])
     out = subprocess.run(cmd, capture_output=True, text=True)
     note(f"simctl location {'clear' if where is None else where}", f"rc={out.returncode}", out.returncode == 0)
+    if where is None and STALE_WAIT and not set_location.waited:
+        note("waiting for the last simulated fix to go stale", f"{STALE_WAIT}s", None)
+        time.sleep(STALE_WAIT)
+        set_location.waited = True
+
+
+set_location.waited = False
 
 
 def main() -> None:
@@ -130,6 +143,8 @@ def main() -> None:
             today = datetime.now().replace(second=0, microsecond=0)
             for kind, status, hour in (("new_gps", "new", 9), ("new_far", "new", 10), ("new_manual", "new", 11),
                                        ("in_progress", "in_progress", 12), ("submitted", "submitted", 13)):  # fmt: skip
+                if kind not in KINDS:
+                    continue
                 when = today.replace(hour=hour, minute=0)
                 iso = when.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
                 body = {"title": f"QA-AUTO recon6 {kind}", "jobId": f"QA-AUTO-R6-{RUN}-{kind.upper()}",
