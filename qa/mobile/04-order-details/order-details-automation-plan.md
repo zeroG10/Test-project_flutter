@@ -3,7 +3,7 @@
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/04-order-details/order-details-checklist.md`
 > (89 items, `CHK-ORDD-001…089`, imported 2026-09-24). Reviewed copy for the module; the **Selected CHK IDs** table is
 > the contract for `prompts/mobile/03` (test cases). Date: 2026-09-24. Owner: mykola.zhuchenko.
-> **Status: draft — Q-ORDD-1…5 answered by the owner 2026-09-24; D-ORDD-1…9 and recon 5 pending ([order-details-questions.md](order-details-questions.md)).**
+> **Status: validated — Q-ORDD-1…5 and D-ORDD-1…9 decided by the owner 2026-09-24; recon 5 / 5b done ([order-details-questions.md](order-details-questions.md)).**
 
 | Field | Value |
 |---|---|
@@ -91,8 +91,8 @@ Status legend as in the Auth plan. **deferred → 05** = automated in module 05 
 | CHK-ORDD-067 | Close (X) shown | E2E UI + API setup | M | M | L | Medium Candidate | P2 | @regression | TC-ORDD-007 | unlabelled icon (app code audit §3) — located by its place in the app bar → testability defect |
 | CHK-ORDD-068 | Close returns to the Documents list | E2E UI + API setup | M | M | M | Medium Candidate | P2 | @regression | TC-ORDD-007 | as -067 |
 | CHK-ORDD-069 | save a document locally | Manual | L | L | L | Not Recommended now | P3 | @manual | — | the system share sheet (D-ORDD-6), outside the app |
-| CHK-ORDD-070 | success toast after saving | — | – | – | – | Skipped if D-ORDD-6 accepted | – | – | — | the app shows no toast (D-ORDD-6) |
-| CHK-ORDD-071 | PDF, DOC and XLS supported | E2E UI + API setup | M | L | M | Needs Decision | P3 | @regression | — | only PDF opens in the app (D-ORDD-5); tagging it on the PDF test would over-claim — decided after D-ORDD-5 |
+| CHK-ORDD-070 | success toast after saving | — | – | – | – | Skipped | – | – | — | the app shows no toast — the system share sheet saves (D-ORDD-6, accepted 2026-09-24) |
+| CHK-ORDD-071 | PDF, DOC and XLS supported | Manual | M | – | M | Manual Only | P3 | @manual | — | PDF in the app (TC-ORDD-007); DOC / XLS are handed to another app (D-ORDD-5, accepted) — the simulator has no app for them; tagging the PDF test would over-claim |
 | CHK-ORDD-072 | unsupported format → message | E2E UI + API setup | L | L | L | Not Recommended now | P3 | @regression | — | placeholder item; the app's "Could not open document" |
 | CHK-ORDD-073 | Photos tab is a grid of thumbnails | E2E UI + API setup | M | M | L | Good Candidate | P2 | @regression | TC-ORDD-008 | thumbnails side by side (tree positions) |
 | CHK-ORDD-074 | thumbnails same size and spacing | E2E UI + API setup | L | M | L | Medium Candidate | P3 | @regression | TC-ORDD-008 | equal rects from the tree |

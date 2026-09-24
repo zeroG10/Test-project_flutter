@@ -25,8 +25,9 @@ TEST_CASES = {
     "01-splash": REPO / "qa/mobile/01-splash/splash-test-cases.md",
     "02-authentication": REPO / "qa/mobile/02-authentication/authentication-test-cases.md",
     "03-order-list": REPO / "qa/mobile/03-order-list/order-list-test-cases.md",
+    "04-order-details": REPO / "qa/mobile/04-order-details/order-details-test-cases.md",
 }
-MIN_ALIASES = {"01-splash": 5, "02-authentication": 40, "03-order-list": 30}
+MIN_ALIASES = {"01-splash": 5, "02-authentication": 40, "03-order-list": 30, "04-order-details": 35}
 STEP_ROW = re.compile(r"^\| \d+ \| ([a-z-]+) \| ([^|]+?) \|")
 # Test-case targets that are not elements: lifecycle and navigation shortcuts ("open | login").
 NOT_ELEMENTS = {"app", "—", "login", "registration"}
@@ -47,6 +48,12 @@ PAGE_RESOLVED = {
     "jobs-calendar.any-card": "JobsCalendarPage.expect_no_cards",
     "jobs-calendar.week-days": "JobsCalendarPage.week_days (day cells left → right)",
     "tabbar.jobs-selected": "TabBarPage.selected (page-source traits contain 'Selected')",
+    # module 04 — what the tree does not hold (recon 5 / 5b): pixels, or another platform's app
+    "job-details.updated-banner": "JobDetailsPage.expect_no_updated_banner (banner fill pixels)",
+    "attachments.thumbnail": "AttachmentsPage.expect_thumbnails_drawn / tap_cell (TD-ORDD-002)",
+    "pdf-viewer.page": "PdfViewerPage.expect_page_drawn (the test PDF's colour block)",
+    "photo-viewer.image": "PhotoViewerPage.expect_photo_fills_width (pixels)",
+    "dialer.number": "Android dialer (TC-ORDD-004); iOS Blocked — no Phone app on the simulator",
 }
 # Fields of a parsed job card (``screen.card[{{jobId}}].<field>``, pages/jobs_list_page.parse_card)
 CARD_FIELDS = {"title", "date", "status", "address", "updated"}
@@ -72,7 +79,7 @@ def test_case_aliases(path: Path) -> set[str]:
         if not m:
             continue
         action, target = m.group(1), m.group(2).strip()
-        if action == "open" or target in NOT_ELEMENTS:
+        if action in ("open", "api") or target in NOT_ELEMENTS:
             continue
         if target == "registration.{{field}}":
             aliases.update(f"registration.{f}" for f in REGISTRATION_FIELDS)

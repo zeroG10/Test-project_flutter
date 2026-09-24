@@ -7,12 +7,14 @@ only the calls a fixture needs, no retries.
 Safety: the destructive calls are guarded — ``DELETE /user/full-delete/{id}`` only for a
 test-owned address (``qa-auto+…@example.com``, fixtures/test_data.py) whose record carries
 exactly that email; ``DELETE /job/{id}`` only for a job whose ``jobId`` starts with
-``QA-AUTO-``. Shared data is never touched.
+``QA-AUTO-``; ``DELETE /file/{id}`` only for a file this run uploaded under a ``QA-AUTO-`` name.
+Shared data is never touched.
 """
 
 import re
 import urllib.parse
 from datetime import UTC, datetime
+from pathlib import Path
 
 import allure
 import requests
@@ -172,8 +174,14 @@ class FieldServicesApi:
         address: str,
         coordinates: dict[str, str],
         is_viewed: bool | None = None,
+        description: str = "Created by an automated QA test and deleted by it.",
+        project_facilitator: dict[str, str] | None = None,
+        attachments: dict[str, list[dict[str, str]]] | None = None,
     ) -> dict:
-        """JobController_create — a job already assigned to ``user_id``; returns the new job."""
+        """JobController_create — a job already assigned to ``user_id``; returns the new job.
+
+        ``attachments``: ``{"documents": [...], "photos": [...]}`` of ``{url, name, description}``
+        (CreateJobAttachmentDto) — urls of files uploaded with ``upload_file``."""
         if not job_id.startswith(self.TEST_JOB_PREFIX):
             raise ValueError(f"test jobs must start with {self.TEST_JOB_PREFIX!r}: {job_id!r}")
         iso = when.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")  # naive = device-local
@@ -185,11 +193,15 @@ class FieldServicesApi:
             "statusType": status,
             "startAt": iso,
             "scheduleDate": iso,
-            "description": "Created by an automated QA test and deleted by it.",
+            "description": description,
             "location": {"address": address, "coordinates": coordinates},
         }
         if is_viewed is not None:
             body["isViewed"] = is_viewed
+        if project_facilitator is not None:
+            body["projectFacilitator"] = project_facilitator
+        if attachments is not None:
+            body["attachments"] = attachments
         resp = self._call("POST", "/job", json=body)
         if resp.status_code not in (200, 201):
             raise ApiBlocked(f"Blocked: POST /job ({job_id}) returned HTTP {resp.status_code}")
@@ -207,6 +219,45 @@ class FieldServicesApi:
                 raise ApiBlocked(
                     f"cleanup failed: DELETE /job/{job['id']} ({job_id}) → HTTP "
                     f"{resp.status_code}, still found: {not gone} — remove it manually"
+                )
+
+    def update_job(self, job_uuid: str, job_id: str, changes: dict) -> None:
+        """JobController_update on a test job (e.g. ``scheduleDate``); expects ``success``."""
+        if not job_id.startswith(self.TEST_JOB_PREFIX):
+            raise ValueError(f"refusing to change a non-test job: {job_id!r}")
+        resp = self._call("PATCH", f"/job/{job_uuid}", json=changes)
+        if resp.status_code != 200 or not (resp.json() or {}).get("success"):
+            raise ApiBlocked(f"Blocked: PATCH /job ({job_id}) returned HTTP {resp.status_code}")
+
+    # --- files (attachments of test jobs) ----------------------------------------------------
+
+    TEST_FILE_PREFIX = "QA-AUTO-"
+
+    def upload_file(self, path: Path, name: str, mime: str) -> dict:
+        """FileController_uploadFile — returns ``{id, location, …}`` (location = public URL).
+
+        Cleanup order matters (recon 5b): ``delete_file`` BEFORE the job that points to the file
+        is deleted — deleting the job first drops the file record and leaves the file in storage."""
+        if not name.startswith(self.TEST_FILE_PREFIX):
+            raise ValueError(f"test files must start with {self.TEST_FILE_PREFIX!r}: {name!r}")
+        resp = self._call("POST", "/file/upload", files={"file": (name, path.read_bytes(), mime)})
+        if resp.status_code not in (200, 201):
+            raise ApiBlocked(
+                f"Blocked: POST /file/upload ({name}) returned HTTP {resp.status_code}"
+            )
+        return resp.json()
+
+    def delete_file(self, file: dict) -> None:
+        """FileController_deleteFile for a file this run uploaded; verifies the URL is gone."""
+        if not str(file.get("originalName", "")).startswith(self.TEST_FILE_PREFIX):
+            raise ValueError(f"refusing to delete a non-test file: {file.get('originalName')!r}")
+        with allure.step(f"cleanup: delete file {file.get('originalName', file['id'])}"):
+            resp = self._call("DELETE", f"/file/{file['id']}")
+            gone = requests.head(file["location"], timeout=settings.api_timeout).status_code != 200
+            if resp.status_code != 200 or not gone:
+                raise ApiBlocked(
+                    f"cleanup failed: DELETE /file/{file['id']} → HTTP {resp.status_code}, "
+                    f"still reachable: {not gone} — {file['location']}"
                 )
 
     def job(self, job_uuid: str) -> dict:

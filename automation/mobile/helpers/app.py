@@ -62,6 +62,28 @@ class AppControl:
             self.driver.remove_app(self.app_id)
             self.driver.install_app(str(path))
 
+    def reset_location_permission(self) -> None:
+        """Location permission back to "not determined", so the next check-in asks again
+        (module 04, TC-ORDD-005; recon 5b). The app is terminated first — relaunch it after.
+
+        iOS simulator: ``xcrun simctl privacy <udid> reset location <bundle>``. Android:
+        ``mobile: changePermissions`` revoke (a revoked runtime permission is asked again)."""
+        with allure.step("app: reset the location permission (not determined)"):
+            self.terminate()
+            if self.platform == "android":
+                self.driver.execute_script("mobile: changePermissions", {
+                    "permissions": ["android.permission.ACCESS_FINE_LOCATION",
+                                    "android.permission.ACCESS_COARSE_LOCATION"],
+                    "appPackage": self.app_id, "action": "revoke"})  # fmt: skip
+                return
+            udid = self.driver.capabilities.get("udid") or "booted"
+            subprocess.run(
+                ["xcrun", "simctl", "privacy", udid, "reset", "location", self.app_id],
+                check=True,
+                capture_output=True,
+                timeout=30,
+            )
+
     # --- job links (module 03; recon 4, 2026-09-24) -----------------------------------------
 
     def open_link(self, url: str) -> None:

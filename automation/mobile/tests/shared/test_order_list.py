@@ -379,8 +379,9 @@ def test_calendar_date_selection(jobs_seed, ui_login, pages, expected, evidence)
 @pytest.mark.regression
 @pytest.mark.shared
 @pytest.mark.tc("TC-ORDL-008")
-@pytest.mark.chk("CHK-ORDL-058", "CHK-ORDL-068")
-@allure.tag("CHK-ORDL-058", "CHK-ORDL-068")
+# + CHK-ORDD-001 / -002: the calendar path into the details and back (module 04, plan Step 5b)
+@pytest.mark.chk("CHK-ORDL-058", "CHK-ORDL-068", "CHK-ORDD-001", "CHK-ORDD-002")
+@allure.tag("CHK-ORDL-058", "CHK-ORDL-068", "CHK-ORDD-001", "CHK-ORDD-002")
 @allure.title(
     "TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar "
     "card opens its job"

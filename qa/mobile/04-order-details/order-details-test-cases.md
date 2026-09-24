@@ -4,7 +4,7 @@
 > [order-details-automation-plan.md](order-details-automation-plan.md). Format:
 > [qa/_templates/test-case-format.md](../../_templates/test-case-format.md) ·
 > [qa/_templates/test-cases-mobile.md](../../_templates/test-cases-mobile.md) · prompt `prompts/mobile/03`.
-> **Status: draft for the owner's validation — not automated yet.** Written after recon 5 / 5b
+> **Status: validated by the owner 2026-09-24; automated in `automation/mobile/tests/shared/test_order_details.py`.** Written after recon 5 / 5b
 > ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md), section "Recon 5 і 5b").
 
 | Field | Value |
@@ -26,8 +26,8 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 
 - **Priority:** P0 = smoke, every run · P1 = release regression · P2 = full suite · P3 = edge / scheduled.
 - **Oracle model:** accepted production baseline (`docs/notes/decisions.md`). Where the SRS / checklist and the app +
-  Figma disagree, the TC asserts the app **once the owner accepts the discrepancy** (D-ORDD-1…9 in
-  [order-details-questions.md](order-details-questions.md) — open at the time of writing).
+  Figma disagree, the TC asserts the app — D-ORDD-1…9 accepted by the owner on 2026-09-24
+  ([order-details-questions.md](order-details-questions.md)).
 - **Signed in** = the `ui_login` fixture; the Jobs list is open.
 - **Jobs** = the module seed `details_seed`: created through `POST /job` (`JobController_create`), removed through
   `DELETE /job/{id}` (`JobController_remove`) in `finally`. The attachment files are our own: `POST /file/upload`
@@ -56,7 +56,7 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 | Permissions | notifications: granted |
 | Network | online Wi-Fi |
 | Preconditions | signed in; `{{job.full}}` in the seed (New, today 12:00 local, 3-line description, PF name + phone, 2 documents + 2 photos) |
-| Oracle | spec — SRS §3.1.3.1 UI Description, FR-ORD-D-01, -02, -03, -08; spec — figma:2451:82657 (`Jobs details_New`); accepted baseline D-ORDD-1 (one line `<jobId> - <title>`) — pending the owner; data — the values sent in `POST /job` |
+| Oracle | spec — SRS §3.1.3.1 UI Description, FR-ORD-D-01, -02, -03, -08; spec — figma:2451:82657 (`Jobs details_New`); accepted baseline D-ORDD-1 (one line `<jobId> - <title>`) — accepted 2026-09-24; data — the values sent in `POST /job` |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
@@ -134,7 +134,7 @@ is taller than the screen (recon 5) — asserted in TC-ORDD-001 step 15 on the s
 | Permissions | notifications: granted |
 | Network | online Wi-Fi |
 | Preconditions | signed in; `{{job.full}}`; Google Maps **not** installed (simulator) |
-| Oracle | spec — SRS FR-ORD-D-05 ("an in-app map view, or the device's default map application"); app — recon 5: `maps.apple.com` in an in-app browser (D-ORDD-4, pending the owner) |
+| Oracle | spec — SRS FR-ORD-D-05 ("an in-app map view, or the device's default map application"); app — recon 5: `maps.apple.com` in an in-app browser (D-ORDD-4, accepted 2026-09-24) |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
@@ -315,14 +315,14 @@ sheet without a toast (D-ORDD-6) — manual / skipped.
 | Permissions | notifications: granted |
 | Network | online Wi-Fi |
 | Preconditions | signed in; `{{job.full}}` with `{{photo.1}}`, `{{photo.2}}` |
-| Oracle | spec — SRS §3.1.3.2.2, FR-ATT-10; spec — figma:2451:83346 (`Job details_Atachments_Photos`); app — D-ORDD-7 (back arrow instead of X) pending the owner |
+| Oracle | spec — SRS §3.1.3.2.2, FR-ATT-10; spec — figma:2451:83346 (`Job details_Atachments_Photos`); app — D-ORDD-7 (back arrow instead of X) accepted 2026-09-24 |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
 | 1 | click | jobs-list.card[{{job.full.jobId}}] | — | the details open |
 | 2 | click | job-details.attachments | — | — |
 | 3 | click | attachments.tab[Photos] | — | Photos selected |
-| 4 | expect-drawn | attachments.thumbnail[1], attachments.thumbnail[2] | — | two thumbnails side by side, same size (pixels; the thumbnails have no name in the tree) — no error icon |
+| 4 | expect-drawn | attachments.thumbnail[1..2] | — | two thumbnails side by side, same size (pixels; the thumbnails have no name in the tree) — no error icon |
 | 5 | click | attachments.thumbnail[1] | — | — |
 | 6 | expect-drawn | photo-viewer.image | — | the photo fills the screen width (pixels) |
 | 7 | expect-hidden | attachments.tab[Photos] | — | no tabs — full screen |
@@ -428,11 +428,10 @@ so the ios column is a work order, not an unknown.
 **Total: 42 CHK IDs in 9 TCs** (2 partial). Changed from the plan after recon 5: **CHK-ORDD-006 → manual** (the banner
 lives ~0.3 s), **CHK-ORDD-013 → not automated on the simulator** (blank page, host only). Not covered here, with
 reasons, in the plan: -023…-047 (module 05), -009, -086, -069 (manual), -048…-050, -081…-085, -089 (manual, verified
-by the owner on iOS), -064, -065, -077, -078 (gestures deferred), -070 (skipped if D-ORDD-6 accepted), -071 (needs
-decision), -072, -088 (not recommended now).
+by the owner on iOS), -064, -065, -077, -078 (gestures deferred), -070 (skipped — D-ORDD-6), -071 (manual — D-ORDD-5), -072, -088 (not recommended now).
 
 ## Open questions
 
-- D-ORDD-1…9 — waiting for the owner ([order-details-questions.md](order-details-questions.md)).
+- D-ORDD-1…9 — accepted by the owner 2026-09-24 ([order-details-questions.md](order-details-questions.md)).
 - **Q-ORDD-6** — photos and PDFs of the attachments did not load in the app on the simulator (recon 5b); TC-ORDD-007
   and -008 depend on it.
