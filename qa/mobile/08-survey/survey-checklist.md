@@ -68,3 +68,27 @@
 3. [CHK-SRV-038] Check that attached photo references are included in the survey data payload.
 4. [CHK-SRV-039] Check that the survey last modified timestamp is updated after each change.
 5. [CHK-SRV-040] Check that the survey completion status is correctly stored after Save.
+
+## Survey screen / Logic & Repeatable Sections (added 2026-09-24)
+
+> Added by the owner's decision Q-SRV-5 (2026-09-24): the imported checklist had no check for skip logic or CR-2
+> Repeatable Sections (PRD). Sources: PRD stories 2–6, §9.2, §9.3, §14.2; the survey templates' logic rules;
+> the owner's plan (session handoff §7.5). Not yet in the team Sheet — sync on the owner's command, dry-run first.
+
+1. [CHK-SRV-041] Check that each answer shows exactly the questions its logic rule leaves visible (survey-logic-tables.md).
+2. [CHK-SRV-042] Check that changing an answer after a branch shows the questions of the new branch and hides those of the old one.
+3. [CHK-SRV-043] Check that a logic rule that leads to another section hides the sections in between.
+4. [CHK-SRV-044] Check that an "end survey" answer hides every later question and lets the survey be saved.
+5. [CHK-SRV-045] Check that questions hidden by logic are not included in the saved survey.
+6. [CHK-SRV-046] Check that a repeatable section shows its first entry, named after the section, and a "Repeat section" control.
+7. [CHK-SRV-047] Check that "Repeat section" adds an entry with the same questions, named "<section> 2", "<section> 3"…, and the technician cannot rename entries.
+8. [CHK-SRV-048] Check that each entry of a repeatable section keeps its own answers, and editing an entry creates no duplicate.
+9. [CHK-SRV-049] Check that deleting an entry that has data asks for confirmation; Cancel keeps it, Delete removes it and renumbers the rest; the first entry cannot be deleted.
+10. [CHK-SRV-050] Check that a deleted entry is not included in the saved survey.
+11. [CHK-SRV-051] Check that an incomplete entry of a repeatable section keeps Save disabled, and its card shows that it is not complete.
+12. [CHK-SRV-052] Check that logic inside an entry applies to that entry only, and a rule that leads out of the section continues the survey at its target.
+13. [CHK-SRV-053] Check that photos added inside an entry stay linked to that entry in the saved survey.
+14. [CHK-SRV-054] Check that the saved survey keeps every entry of a repeatable section, in order, with its name and answers.
+15. [CHK-SRV-055] Check that entries of a repeatable section (added, edited, deleted) survive leaving the survey and an app restart.
+16. [CHK-SRV-056] Check that a survey with no questions opens and can be saved.
+17. [CHK-SRV-057] Check that an "Other" option asks for its own text, and that text is required.
