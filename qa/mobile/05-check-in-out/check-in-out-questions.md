@@ -1,0 +1,37 @@
+# Check-in / Check-out — питання
+
+Розбіжності між документами і застосунком. За моделлю оракула (`docs/notes/decisions.md`, 2026-09-23) тести
+стверджують **поведінку застосунку**; тут фіксуємо, щоб розбіжність не загубилась. Власник може перевести будь-який
+рядок у баг.
+
+Статус: `відкрите` · `прийнято як є` · `баг`
+
+Джерела поведінки апки: код `lib/features/jobs/presentation/pages/{job_details,confirm_check_in,confirm_check_out}_page.dart`,
+`bloc/location_flow/location_flow_cubit.dart`, `widgets/check_in_location_dialogs.dart`, `lib/core/location/location_service.dart`,
+`lib/features/jobs/data/{dto/job_dtos,api/job_api_service}.dart` (лише читання, 2026-09-24); recon 5 / 5b (модуль 04: старт
+check-in, системний запит, «Location disabled»); Figma `Jobs details_New_Check in active` 2451:83418, `Job details_Confirm check in`
+2451:83073, `…_Confirm check out` 2451:83083, `Job details_In progress_Check out` 2451:82844; API `POST /job/{id}/check-in`,
+`POST /job/{id}/check-out` (`CreateUserJobLocationDto`: address, horizontalAccuracyM, coordinates, method), у `GET /job/{id}` —
+`userLocation`, `checkOutLocation`, `checkInDate`, `checkOutDate`.
+
+До модуля 05 перенесено з модуля 04 **CHK-ORDD-023…047** (дозволи, GPS, ручний check-in, запис даних — рішення власника Q-ORDD-1).
+
+## Розбіжності (D)
+
+| # | Що | Документ каже | Застосунок (і Figma) | Джерело | Статус |
+|---|---|---|---|---|---|
+| D-CHIO-1 | Звідки Check out | з замовлення **In Progress** (CHK-CHIO-002) | кнопка **Check out** — лише для статусу **Submitted** (після здачі робіт); SRS FR-CIO-04 так само: «when the user has submitted deliverables successfully» | код `canCheckOut`, SRS | відкрите |
+| D-CHIO-2 | Порядок кроків | «Confirm» → записати час, **зняти GPS** (FR-CIO-02, -05) | спершу **локація** (GPS або ручна адреса, перевірка радіуса), **потім** екран підтвердження; «Confirm» передає вже зняту локацію | код `_handleCheckIn` / `_handleCheckOut` | відкрите |
+| D-CHIO-3 | Тексти екрана підтвердження | «title», «primary message», «supporting text» (без формулювань) | «Confirm check in» / «Check in and start» / «Confirm you are on site to begin the job.»; «Confirm check out» / «Check out and finish» / «Confirm you are ready to finish the job.» — як у Figma | код, Figma | відкрите (довідково) |
+| D-CHIO-4 | Статус після check-out | Completed **або наступний за правилами** (FR-CIO-05, CHK-CHIO-020) | невідомо з коду клієнта (рішення сервера) — **з'ясуємо в recon 6** | — | відкрите |
+| D-CHIO-5 | Ручний check-in | дозволено, коли GPS **заборонено або недоступно** (FR-CIO-08, CHK-CHIO-024) | ручне введення адреси — **лише коли GPS-позицію не вдалось отримати** (15 с без точки); якщо дозвіл **заборонено** — вікно «Location disabled … You can still check in manually if you prefer» з кнопками Cancel / Go to settings, а **ручного введення немає** (Cancel скасовує check-in, recon 5b) | код, recon 5b | відкрите |
+| D-CHIO-6 | Решта логіки геолокації | з модуля 04 — D-ORDD-9 | підроблена локація блокується («Location could not be trusted»), потрібна точна локація, радіус 100 м, «You are not at the job site», «Weak GPS signal» | код | **прийнято** (власник, 2026-09-24, D-ORDD-9) — деталі перевіряємо тут |
+
+## Питання (Q)
+
+| # | Питання | Навіщо | Статус |
+|---|---|---|---|
+| Q-CHIO-1 | **Recon 6 на симуляторі.** Приблизно 5 тестових джоб (3–4 New для різних шляхів check-in, 1–2 Submitted для check-out), check-in / check-out робимо **на наших тестових джобах** через UI, локацію симулятора задаємо (`xcrun simctl location`: на адресі джоби / за 5 км / без локації), дозволи скидаємо; усе видаляється після. Дивимось: чи вважає апка локацію симулятора **підробленою** (тоді GPS-шлях на симуляторі неможливий), «You are not at the job site», ручне введення після 15 с без GPS, екрани підтвердження, Cancel / X, що записується на сервері (`userLocation`, `checkOutLocation`, час), статус після check-out. | без цього план GPS-частини — здогадки | відкрите |
+| Q-CHIO-2 | **Лист PF після check-in / check-out** (CHK-CHIO-015, -021; SRS: «FT … checked-in to Order ID …»). У тестових джоб PF вигаданий (`qa-auto+pf@example.com`). Перевіряти вручну на справжній скриньці PF (твоїй?) чи вважати ручними / пропустити? | з апки цього не видно — це сервер | відкрите |
+| Q-CHIO-3 | **Помилки мережі й повільна мережа** (CHK-CHIO-027…032, -038): мережу iOS-симулятора з тесту не вимкнути. Як у модулі 04 — ти перевіряв вручну на iOS? Тоді позначаю ручними з коментарем. | як Q-ORDD-4 | відкрите |
+| Q-CHIO-4 | **Якщо recon 6 покаже, що апка блокує локацію симулятора як підроблену**: GPS-перевірки (CHK-CHIO-011, -012, -017, -018, -037; CHK-ORDD-030…035, -045, -046) на iOS-симуляторі — **Blocked (обмеження симулятора)**, повністю — на Android / реальному пристрої. Альтернатива — налагоджувальний перемикач апки «дозволити підроблену локацію» (налаштування апки, не код), але тоді тестується не та поведінка, що в клієнта. Що обираєш? | від цього залежить половина модуля | відкрите |
