@@ -198,6 +198,13 @@ class FieldServicesApi:
                     f"{resp.status_code}, still found: {not gone} — remove it manually"
                 )
 
+    def job(self, job_uuid: str) -> dict:
+        """JobController_findOne — read-only; evidence of what the server holds for a job."""
+        resp = self._call("GET", f"/job/{job_uuid}")
+        if resp.status_code != 200:
+            raise ApiBlocked(f"Blocked: GET /job/<id> returned HTTP {resp.status_code}")
+        return resp.json()
+
     def sweep_test_jobs(self, user_id: str) -> list[str]:
         """Delete every ``QA-AUTO-*`` job left on the technician by an interrupted run."""
         left = [

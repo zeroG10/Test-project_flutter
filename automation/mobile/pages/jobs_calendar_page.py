@@ -65,7 +65,7 @@ class JobsCalendarPage(JobsViewMixin, BasePage):
         width = self.driver.get_window_size()["width"]
         start, end = (0.85, 0.15) if direction == "left" else (0.15, 0.85)
         with allure.step(f"swipe the week strip {direction}"):
-            self._drag_at(int(width * start), y, int(width * end))
+            self._drag_at(int(width * start), 0, int(width * end), horizontal_y=y)
             waits.wait_until(
                 self.driver,
                 lambda _d: self.week_days() != before,

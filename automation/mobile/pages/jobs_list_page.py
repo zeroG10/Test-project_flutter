@@ -74,14 +74,36 @@ def cards_on_screen(page_source: str) -> list[tuple[Card, int]]:
 class JobsViewMixin:
     """What list and calendar mode share: cards, pull-to-refresh (mixed into a BasePage)."""
 
-    def _drag_at(self, x: int, from_y: int, to_y: int, hold: float = 0.3) -> None:
+    def _drag_at(
+        self, x: int, from_y: int, to_x_or_y: int, *, horizontal_y: int | None = None
+    ) -> None:
+        """A drag from (x, from_y) to (x, to_y) — or, with ``horizontal_y``, from (x, y) to
+        (to_x, y). iOS: the native press-then-drag (``mobile: dragFromToForDuration``), which the
+        Flutter lists and the calendar's page view follow (recon 4); a W3C drag with a hold before
+        the release did not turn the week (run 1). Android: a W3C drag."""
+        if horizontal_y is None:
+            start, end = (x, from_y), (x, to_x_or_y)
+        else:
+            start, end = (x, horizontal_y), (to_x_or_y, horizontal_y)
+        if self.platform == "ios":
+            self.driver.execute_script(
+                "mobile: dragFromToForDuration",
+                {
+                    "duration": 0.3,
+                    "fromX": start[0],
+                    "fromY": start[1],
+                    "toX": end[0],
+                    "toY": end[1],
+                },
+            )
+            return
         actions = ActionChains(self.driver)
         actions.w3c_actions = ActionBuilder(
             self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "finger"), duration=300
         )
         pointer = actions.w3c_actions.pointer_action
-        pointer.move_to_location(x, from_y).pointer_down()
-        pointer.move_to_location(x, to_y).pause(hold).release()
+        pointer.move_to_location(*start).pointer_down()
+        pointer.move_to_location(*end).release()
         actions.perform()
 
     def _settle(self, timeout: float = REFRESH_SETTLE) -> None:
@@ -127,21 +149,34 @@ class JobsViewMixin:
             shown = [c.job_id for c in self.visible_cards()]
             assert not shown, f"cards shown: {shown}"
 
+    def wait_content(self, timeout: float | None = None) -> None:
+        """Cards or the empty state are on screen (the view has loaded / finished a transition)."""
+
+        def shown(driver) -> bool:
+            return "No jobs" in driver.page_source or bool(self.visible_cards())
+
+        waits.wait_until(self.driver, shown, timeout, "neither job cards nor 'No jobs' on screen")
+
     def all_cards(self) -> list[Card]:
-        """Every card of the scrolled content, top → bottom; scrolls back the same distance."""
+        """Every card of the scrolled content, top → bottom: wait for the content, scroll to the
+        top, then collect while scrolling down (run 1: counting mid-scroll right after a back
+        navigation saw no card at all)."""
+        self.wait_content()
         height = self.driver.get_window_size()["height"]
         up, down = int(height * 0.75), int(height * 0.35)
+        for _ in range(SCAN_LIMIT):  # to the top: drag the content down until it stops moving
+            first = self.visible_cards()[:1]
+            self._drag_at(10, down, up)
+            if self.visible_cards()[:1] == first:
+                break
+        self.wait_content()
         seen: list[Card] = []
-        drags = 0
-        while drags < SCAN_LIMIT:
+        for _ in range(SCAN_LIMIT):
             fresh = [c for c in self.visible_cards() if c not in seen]
             if not fresh:
                 break
             seen += fresh
             self._drag_at(10, up, down)
-            drags += 1
-        for _ in range(drags):
-            self._drag_at(10, down, up)
         return seen
 
     def card_count(self, job_id: str) -> int:
@@ -152,15 +187,9 @@ class JobsListPage(JobsViewMixin, BasePage):
     screen = JOBS_LIST
 
     def wait_loaded(self, timeout: float | None = None) -> None:
-        """List loaded = its empty state or at least one card is on screen (a tap on the toggle
-        while the list is still loading is ignored by the app — recon 4)."""
-
-        def loaded(driver) -> bool:
-            source = driver.page_source
-            return "No jobs" in source or bool(cards_on_screen(source))
-
+        """List loaded — a tap on the toggle while it is still loading is ignored (recon 4)."""
         with allure.step("wait for the Jobs list to load"):
-            waits.wait_until(self.driver, loaded, timeout, "the Jobs list did not load")
+            self.wait_content(timeout)
 
     def to_calendar(self) -> None:
         """Tap the toggle → calendar mode (day cells visible)."""

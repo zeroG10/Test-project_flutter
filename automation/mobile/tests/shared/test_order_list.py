@@ -126,7 +126,7 @@ def test_empty_jobs_list(no_active_jobs, ui_login, pages, expected, evidence):
     pages.tabbar.expect_selected(expected("jobs"))
     jobs.expect_text("empty-state", expected("No jobs"), SERVER)
     jobs.expect_text("empty-message", expected(EMPTY_MESSAGE))
-    jobs.visible("empty-image")
+    jobs.expect_drawn("empty-image")  # the tree reports it not visible while drawn (TD-JOBS-002)
     jobs.expect_no_cards()
     evidence.checkpoint("jobs-list-empty")
 
@@ -404,7 +404,7 @@ def test_calendar_selection_kept_and_card_opens(jobs_seed, ui_login, pages, expe
     "TC-ORDL-005 An unviewed job carries 'Updated' in the list and in the calendar until its "
     "details are opened"
 )
-def test_updated_label_until_viewed(jobs_seed, ui_login, pages, expected):
+def test_updated_label_until_viewed(jobs_seed, ui_login, field_services_api, pages, expected):
     job = jobs_seed["unviewed"]
     jobs = pages.jobs
     jobs.pull_to_refresh()
@@ -419,6 +419,12 @@ def test_updated_label_until_viewed(jobs_seed, ui_login, pages, expected):
     pages.details.go_back()
     jobs.to_list()
     jobs.pull_to_refresh()
+    server = field_services_api.job(job.id)  # evidence: what the server says after the viewing
+    allure.attach(
+        f"isViewed={server.get('isViewed')} updatedAt={server.get('updatedAt')}",
+        name="server state of the job after its details were opened",
+        attachment_type=allure.attachment_type.TEXT,
+    )
     jobs.expect_card_field(job.job_id, "updated", False)
 
 
@@ -435,7 +441,7 @@ MISMATCH_CHKS = ("CHK-ORDL-004", "CHK-ORDL-005", "CHK-ORDL-006")
 @pytest.mark.chk(*MISMATCH_CHKS)
 @allure.tag(*MISMATCH_CHKS)
 @allure.title("TC-ORDL-012 A job link for another phone number shows the mismatch dialog")
-def test_mismatch_dialog_shown(ui_login, job_links, pages, expected, evidence):
+def test_mismatch_dialog_shown(ui_login, job_links, pages, platform, expected, evidence):
     with ui_login.alerts_left_alone():
         ui_login.open_link(job_links.other_phone)
         seen = pages.mismatch.snapshot(SERVER)
@@ -444,7 +450,9 @@ def test_mismatch_dialog_shown(ui_login, job_links, pages, expected, evidence):
             assert expected("Assigned to a different phone number") in seen["texts"]
             assert expected(MISMATCH_MESSAGE) in seen["texts"]
             assert {expected("Cancel"), expected("Log out")} <= set(seen["buttons"])
-        if pages.mismatch.is_open(1):  # a device keeps it open: leave it the way a user would
+        # A device keeps the dialog open: leave it the way a user would. On the iOS simulator it
+        # closes by itself (Q-ORDL-8) — a tap there races that close (run 1: stale element).
+        if platform != "ios":
             pages.mismatch.tap("cancel")
     pages.jobs.assert_open(SERVER)
 

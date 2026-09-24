@@ -44,7 +44,8 @@ JOBS_LIST = Screen(
         "empty-message": El(ios=(_A, EMPTY_MESSAGE)),
         "empty-image": El(
             ios=(_P, "type == 'XCUIElementTypeImage' AND (name == nil OR name == '')"),
-            note="unlabelled picture above 'No jobs' — presence only (CHK-ORDL-027 partial)",
+            note="unlabelled picture above 'No jobs'; the tree reports it visible=false in list "
+            "mode while it is drawn — decide by pixels (expect_drawn), TD-JOBS-002",
         ),
     },
 )
