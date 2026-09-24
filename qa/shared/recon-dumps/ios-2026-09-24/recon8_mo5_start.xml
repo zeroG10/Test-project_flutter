@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="53782" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="118" index="0" traits=""/>
+                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="Back" label="Back" enabled="true" visible="true" accessible="true" x="4" y="66" width="48" height="48" index="1" traits="Button"/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" name="Survey" label="Survey" enabled="true" visible="true" accessible="true" x="72" y="76" width="72" height="28" index="2" traits="Header"/>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                    <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="true" accessible="true" x="0" y="118" width="402" height="658" index="0" traits=""/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Mo5 Radio Logic Mapping Survey_Radio with multiple logic paths" name="Mo5 Radio Logic Mapping Survey_Radio with multiple logic paths" label="Mo5 Radio Logic Mapping Survey_Radio with multiple logic paths" enabled="true" visible="true" accessible="true" x="16" y="126" width="370" height="96" index="1" traits="StaticText"/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" name="2. &#10;Q2 Describe the site access issue&#10;3. &#10;Q3 Select the missing or damaged equipment&#10;4. &#10;Q4 Select the follow-up visit date&#10;5. &#10;Q5 Enter customer-related notes" label="2. &#10;Q2 Describe the site access issue&#10;3. &#10;Q3 Select the missing or damaged equipment&#10;4. &#10;Q4 Select the follow-up visit date&#10;5. &#10;Q5 Enter customer-related notes" enabled="true" visible="true" accessible="true" x="16" y="238" width="370" height="538" index="0" traits=""/>
+                      <XCUIElementTypeImage type="XCUIElementTypeImage" name="Issue Routing" label="Issue Routing" enabled="true" visible="true" accessible="true" x="16" y="238" width="370" height="60" index="1" traits="Image"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" name="1. &#10;What issue type was identified on site?" label="1. &#10;What issue type was identified on site?" enabled="true" visible="true" accessible="true" x="32" y="298" width="338" height="228" index="0" traits=""/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Access issue" label="Access issue" enabled="true" visible="true" accessible="true" x="32" y="334" width="338" height="48" index="1" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Equipment issue" label="Equipment issue" enabled="true" visible="true" accessible="true" x="32" y="382" width="338" height="48" index="2" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Customer issue" label="Customer issue" enabled="true" visible="true" accessible="true" x="32" y="430" width="338" height="48" index="3" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="No issue found" label="No issue found" enabled="true" visible="true" accessible="true" x="32" y="478" width="338" height="48" index="4" traits="Button"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="3" traits="">
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="Description" label="Description" enabled="true" visible="true" accessible="true" x="32" y="578" width="338" height="124" index="0" traits=""/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="500 characters remaining" name="500 characters remaining" label="500 characters remaining" enabled="true" visible="true" accessible="true" x="314" y="686" width="36" height="16" index="1" traits="StaticText"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="0" name="Router" label="Router" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="4" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="0" name="Modem" label="Modem" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="5" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="0" name="Fiber cable" label="Fiber cable" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="6" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="0" name="Connector" label="Connector" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="7" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="0" name="ON" label="ON" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="8" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="9" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="Select date" label="Select date" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits=""/>
+                        <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="false" accessible="false" x="334" y="1086" width="24" height="24" index="2" traits="Image"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="10" traits="">
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="Description" label="Description" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="500 characters remaining" name="500 characters remaining" label="500 characters remaining" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits="StaticText"/>
+                      </XCUIElementTypeOther>
+                    </XCUIElementTypeOther>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeButton type="XCUIElementTypeButton" name="Save" label="Save" enabled="false" visible="true" accessible="true" x="16" y="784" width="370" height="48" index="3" traits="NotEnabled, Button"/>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

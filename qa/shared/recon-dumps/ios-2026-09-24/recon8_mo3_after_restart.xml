@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="50547" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="118" index="0" traits=""/>
+                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="Back" label="Back" enabled="true" visible="true" accessible="true" x="4" y="66" width="48" height="48" index="1" traits="Button"/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" name="Survey" label="Survey" enabled="true" visible="true" accessible="true" x="72" y="76" width="72" height="28" index="2" traits="Header"/>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                    <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="true" accessible="true" x="0" y="118" width="402" height="658" index="0" traits=""/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Mo3 All Question Types Survey_Single section with all question types" name="Mo3 All Question Types Survey_Single section with all question types" label="Mo3 All Question Types Survey_Single section with all question types" enabled="true" visible="true" accessible="true" x="16" y="126" width="370" height="96" index="1" traits="StaticText"/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" name="1. &#10;Was the job completed successfully?&#10;3. &#10;Which tasks were performed on site?&#10;4. &#10;Add technician notes&#10;5. &#10;Upload a photo of the completed work&#10;6. &#10;Select the work completion date&#10;7. &#10;Select the work completion time" label="1. &#10;Was the job completed successfully?&#10;3. &#10;Which tasks were performed on site?&#10;4. &#10;Add technician notes&#10;5. &#10;Upload a photo of the completed work&#10;6. &#10;Select the work completion date&#10;7. &#10;Select the work completion time" enabled="true" visible="true" accessible="true" x="16" y="238" width="370" height="538" index="0" traits=""/>
+                      <XCUIElementTypeImage type="XCUIElementTypeImage" name="On-Site Work Details" label="On-Site Work Details" enabled="true" visible="true" accessible="true" x="16" y="238" width="370" height="60" index="1" traits="Image"/>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" value="1" name="Yes" label="Yes" enabled="true" visible="true" accessible="true" x="32" y="334" width="169" height="52" index="2" traits="Selected, Image, Button"/>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="No" label="No" enabled="true" visible="true" accessible="true" x="201" y="334" width="169" height="52" index="3" traits="Button"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="4" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" name="2. &#10;What is the current job result?" label="2. &#10;What is the current job result?" enabled="true" visible="true" accessible="true" x="32" y="414" width="338" height="180" index="0" traits=""/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Completed" label="Completed" enabled="true" visible="true" accessible="true" x="32" y="450" width="338" height="48" index="1" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" value="1" name="Partially completed" label="Partially completed" enabled="true" visible="true" accessible="true" x="32" y="498" width="338" height="48" index="2" traits="Selected, Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Not completed" label="Not completed" enabled="true" visible="true" accessible="true" x="32" y="546" width="338" height="48" index="3" traits="Button"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="1" name="Cable installation" label="Cable installation" enabled="true" visible="true" accessible="true" x="32" y="646" width="338" height="48" index="5" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="0" name="Equipment setup" label="Equipment setup" enabled="true" visible="true" accessible="true" x="32" y="694" width="338" height="48" index="6" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="1" name="Testing" label="Testing" enabled="true" visible="true" accessible="true" x="32" y="742" width="338" height="34" index="7" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="0" name="Cleanup" label="Cleanup" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="8" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeSwitch type="XCUIElementTypeSwitch" value="1" name="ON!!!" label="ON!!!" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="9" traits="ToggleButton, Button"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="10" traits="">
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" value="QA-AUTO other task&#10;" label="" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="231 characters remaining" name="231 characters remaining" label="231 characters remaining" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits="StaticText"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="11" traits="">
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" value="QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUTO text limit QA-AUT" label="" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="No characters remaining" name="No characters remaining" label="No characters remaining" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits="StaticText"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="12" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="32" y="1526" width="338" height="251" index="0" traits=""/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                              <XCUIElementTypeImage type="XCUIElementTypeImage" name="QA-AUTO survey photo" label="QA-AUTO survey photo" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="0" traits="Image"/>
+                              <XCUIElementTypeButton type="XCUIElementTypeButton" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits="Image, Button"/>
+                            </XCUIElementTypeOther>
+                          </XCUIElementTypeOther>
+                        </XCUIElementTypeOther>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="Upload photo" label="Upload photo" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="13" traits="Image, Button"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="14" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" value="Sep 15, 2026" label="" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits=""/>
+                        <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="false" accessible="false" x="334" y="1916" width="24" height="25" index="2" traits="Image"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="15" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" value="16:45" label="" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits=""/>
+                        <XCUIElementTypeImage type="XCUIElementTypeImage" enabled="true" visible="false" accessible="false" x="334" y="2036" width="24" height="25" index="2" traits="Image"/>
+                      </XCUIElementTypeOther>
+                    </XCUIElementTypeOther>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeButton type="XCUIElementTypeButton" name="Save" label="Save" enabled="true" visible="true" accessible="true" x="16" y="784" width="370" height="48" index="3" traits="Button"/>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

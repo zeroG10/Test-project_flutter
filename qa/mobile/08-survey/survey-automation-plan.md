@@ -21,7 +21,14 @@
   pages, the repeatable-section cards, the delete dialog), and the shape of `surveyResponse` on the server. Recon 8 settles
   these (Q-SRV-4).
 
-**Readiness: Ready with conditions** (Q-SRV-1…5, recon 8).
+**Readiness: Ready** after recon 8 (2026-09-24). Open with the owner: Q-SRV-1 (the admin flag vs "every question
+required" — a concrete example is shown), TWO-15 (a backward rule into another section), Q-SRV-6 (dates saved one
+day earlier in UTC). Harness facts from recon 8:
+- visible questions = the numbered titles parsed from the card labels (TD-SRV-001);
+- fields = their type and order inside a card;
+- photos: the system picker's cells are chosen by grid position, the editor's ✓ is the right unnamed button;
+- the stored survey is read from `GET /job/{id}` → `surveyResponse.items[]` (section and question ids = the template ids;
+  `value[].data`; photos in `files[]`).
 
 **Approach:**
 - One job per test, created **directly In progress** through `POST /job` with the survey under test. The timer is not
@@ -148,4 +155,4 @@ TC-SRV-001 (smoke) → 002…005 → logic 006…009 → CR-2 010…013 → phot
 
 ## Step 16 — Recommendation
 
-Owner's word on Q-SRV-1…5 and the logic tables → recon 8 → test cases → maps / tests.
+Done: owner's word on Q-SRV-3…5, recon 8. Next: owner's word on Q-SRV-1, TWO-15, Q-SRV-6 → test cases → maps / tests.

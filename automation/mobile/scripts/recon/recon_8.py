@@ -10,9 +10,9 @@ the tree. Jobs are created directly In progress (the timer is not under test), o
     PYTHONPATH=. uv run python scripts/recon/recon_8.py server  <state.json> <kind>
     PYTHONPATH=. uv run python scripts/recon/recon_8.py cleanup <state.json>
 
-Actions: ``open:<kind>`` (Jobs list → the job's details) · ``tap:<predicate>`` · ``tapi:<n>:<predicate>`` ·
-``type:<predicate>:<text>`` · ``clear:<predicate>`` · ``swipe:up|down`` · ``scrollto:<predicate>`` · ``back`` ·
-``sleep:<s>`` · ``dump:<name>`` · ``rows`` · ``shot:<path.png>`` · ``alert:accept|dismiss|show`` · ``launch`` ·
+Actions: ``open:<kind>`` (Jobs list → the job's details) · ``tap:<predicate>`` · ``tapi:<n>:<predicate>`` · ``tapxy:<x>,<y>`` · ``tapnth:<n>:<predicate>`` ·
+``type:<predicate>:<text>`` · ``keys:<text>`` · ``clearfocused`` · ``clear:<predicate>`` · ``swipe:up|down`` · ``scrollto:<predicate>`` · ``back`` ·
+``sleep:<s>`` · ``dump:<name>`` · ``rows`` · ``titles`` · ``shot:<path.png>`` · ``alert:accept|dismiss|show`` · ``launch`` ·
 ``terminate`` · ``bg:<s>``. The state file holds job ids only (scratchpad, never committed).
 """
 
@@ -142,11 +142,37 @@ def do(state: Path, dumps: Path, actions: list[str]) -> None:
                     print(f"    {len(found)} visible match(es)")
                     found[int(index)].click()
                     time.sleep(1.5)
+                elif verb == "tapnth":  # the n-th match in form order: scroll towards it, then tap
+                    index, _, pred = arg.partition(":")
+                    n = int(index)
+                    for _ in range(20):
+                        found = drv.find_elements(P, pred)
+                        shown = [k for k, e in enumerate(found)
+                                 if e.is_displayed() and 120 < e.rect["y"] < 740]  # fmt: skip
+                        if n in shown:
+                            break
+                        down = not shown or n > max(shown)
+                        h = size["height"]
+                        drag(int(h * 0.62), int(h * 0.42)) if down else drag(int(h * 0.42), int(h * 0.62))
+                    el = drv.find_elements(P, pred)[n]
+                    print(f"    tapping #{n} of {len(found)} at y={el.rect['y']}")
+                    el.click()
+                    time.sleep(1.5)
+                elif verb == "tapxy":
+                    x, _, y = arg.partition(",")
+                    drv.execute_script("mobile: tap", {"x": float(x), "y": float(y)})
+                    time.sleep(1.5)
                 elif verb == "type":
                     pred, _, text = arg.rpartition(":")
-                    el = visible(pred)[0]
-                    el.click()
-                    el.send_keys(text)
+                    visible(pred)[0].click()
+                    time.sleep(0.8)  # the field re-renders on focus: type into the focused one
+                    drv.switch_to.active_element.send_keys(text)
+                    time.sleep(1)
+                elif verb == "keys":
+                    drv.switch_to.active_element.send_keys(arg)
+                    time.sleep(1)
+                elif verb == "clearfocused":
+                    drv.switch_to.active_element.clear()
                     time.sleep(1)
                 elif verb == "clear":
                     visible(arg)[0].clear()
@@ -171,6 +197,16 @@ def do(state: Path, dumps: Path, actions: list[str]) -> None:
                     rows = rows_of(src)
                     print(f"---- {arg}: {len(rows)} visible")
                     print("\n".join("     " + r for r in rows), flush=True)
+                elif verb == "titles":  # the numbered question titles the form currently renders
+                    import re
+
+                    seen = []
+                    for el in ET.fromstring(drv.page_source).iter():
+                        for num, title in re.findall(r"(\d+)\. \n(.+?)(?=\n\d+\. \n|\n|$)",
+                                                     el.attrib.get("name") or ""):
+                            if (num, title) not in seen:
+                                seen.append((num, title))
+                    print("    " + " · ".join(f"{n}. {t}" for n, t in seen))
                 elif verb == "rows":
                     print("\n".join("     " + r for r in rows_of(drv.page_source)), flush=True)
                 elif verb == "shot":  # a full path: screenshots stay out of the repo

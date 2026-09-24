@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="45241" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" name="Dismiss" label="Dismiss" enabled="true" visible="true" accessible="true" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="62" width="402" height="778" index="0" traits=""/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" name="Select date&#10;Thu, Sep 24" label="Select date&#10;Thu, Sep 24" enabled="true" visible="true" accessible="true" x="21" y="167" width="360" height="120" index="0" traits=""/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="321" y="227" width="48" height="48" index="0" traits=""/>
+                          <XCUIElementTypeButton type="XCUIElementTypeButton" name="Switch to input" label="Switch to input" enabled="true" visible="true" accessible="true" x="321" y="227" width="48" height="48" index="1" traits="Button"/>
+                        </XCUIElementTypeOther>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="Select year&#10;September 2026" label="Select year&#10;September 2026" enabled="true" visible="true" accessible="true" x="37" y="287" width="232" height="52" index="2" traits="Button"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="3" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="21" y="287" width="360" height="388" index="0" traits=""/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Previous month" label="Previous month" enabled="true" visible="true" accessible="true" x="281" y="289" width="48" height="48" index="1" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Next month" label="Next month" enabled="true" visible="true" accessible="true" x="329" y="289" width="48" height="48" index="2" traits="Button"/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="3" traits="">
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="21" y="339" width="360" height="336" index="0" traits=""/>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="21" y="339" width="360" height="336" index="0" traits=""/>
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="21" y="339" width="360" height="336" index="0" traits=""/>
+                              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="21" y="339" width="360" height="336" index="0" traits=""/>
+                                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="33" y="339" width="336" height="336" index="0" traits=""/>
+                                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                                    <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="false" accessible="false" x="33" y="339" width="336" height="336" index="0" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="33" y="339" width="48" height="48" index="1" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="81" y="339" width="48" height="48" index="2" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="129" y="339" width="48" height="48" index="3" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="177" y="339" width="48" height="48" index="4" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="225" y="339" width="48" height="48" index="5" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="273" y="339" width="48" height="48" index="6" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="321" y="339" width="48" height="48" index="7" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="33" y="387" width="48" height="48" index="8" traits=""/>
+                                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="81" y="387" width="48" height="48" index="9" traits=""/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="1, Tuesday, September 1, 2026" label="1, Tuesday, September 1, 2026" enabled="true" visible="true" accessible="true" x="129" y="387" width="48" height="48" index="10" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="2, Wednesday, September 2, 2026" label="2, Wednesday, September 2, 2026" enabled="true" visible="true" accessible="true" x="177" y="387" width="48" height="48" index="11" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="3, Thursday, September 3, 2026" label="3, Thursday, September 3, 2026" enabled="true" visible="true" accessible="true" x="225" y="387" width="48" height="48" index="12" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="4, Friday, September 4, 2026" label="4, Friday, September 4, 2026" enabled="true" visible="true" accessible="true" x="273" y="387" width="48" height="48" index="13" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="5, Saturday, September 5, 2026" label="5, Saturday, September 5, 2026" enabled="true" visible="true" accessible="true" x="321" y="387" width="48" height="48" index="14" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="6, Sunday, September 6, 2026" label="6, Sunday, September 6, 2026" enabled="true" visible="true" accessible="true" x="33" y="435" width="48" height="48" index="15" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="7, Monday, September 7, 2026" label="7, Monday, September 7, 2026" enabled="true" visible="true" accessible="true" x="81" y="435" width="48" height="48" index="16" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="8, Tuesday, September 8, 2026" label="8, Tuesday, September 8, 2026" enabled="true" visible="true" accessible="true" x="129" y="435" width="48" height="48" index="17" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="9, Wednesday, September 9, 2026" label="9, Wednesday, September 9, 2026" enabled="true" visible="true" accessible="true" x="177" y="435" width="48" height="48" index="18" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="10, Thursday, September 10, 2026" label="10, Thursday, September 10, 2026" enabled="true" visible="true" accessible="true" x="225" y="435" width="48" height="48" index="19" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="11, Friday, September 11, 2026" label="11, Friday, September 11, 2026" enabled="true" visible="true" accessible="true" x="273" y="435" width="48" height="48" index="20" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="12, Saturday, September 12, 2026" label="12, Saturday, September 12, 2026" enabled="true" visible="true" accessible="true" x="321" y="435" width="48" height="48" index="21" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="13, Sunday, September 13, 2026" label="13, Sunday, September 13, 2026" enabled="true" visible="true" accessible="true" x="33" y="483" width="48" height="48" index="22" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="14, Monday, September 14, 2026" label="14, Monday, September 14, 2026" enabled="true" visible="true" accessible="true" x="81" y="483" width="48" height="48" index="23" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="15, Tuesday, September 15, 2026" label="15, Tuesday, September 15, 2026" enabled="true" visible="true" accessible="true" x="129" y="483" width="48" height="48" index="24" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="16, Wednesday, September 16, 2026" label="16, Wednesday, September 16, 2026" enabled="true" visible="true" accessible="true" x="177" y="483" width="48" height="48" index="25" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="17, Thursday, September 17, 2026" label="17, Thursday, September 17, 2026" enabled="true" visible="true" accessible="true" x="225" y="483" width="48" height="48" index="26" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="18, Friday, September 18, 2026" label="18, Friday, September 18, 2026" enabled="true" visible="true" accessible="true" x="273" y="483" width="48" height="48" index="27" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="19, Saturday, September 19, 2026" label="19, Saturday, September 19, 2026" enabled="true" visible="true" accessible="true" x="321" y="483" width="48" height="48" index="28" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="20, Sunday, September 20, 2026" label="20, Sunday, September 20, 2026" enabled="true" visible="true" accessible="true" x="33" y="531" width="48" height="48" index="29" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="21, Monday, September 21, 2026" label="21, Monday, September 21, 2026" enabled="true" visible="true" accessible="true" x="81" y="531" width="48" height="48" index="30" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="22, Tuesday, September 22, 2026" label="22, Tuesday, September 22, 2026" enabled="true" visible="true" accessible="true" x="129" y="531" width="48" height="48" index="31" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="23, Wednesday, September 23, 2026" label="23, Wednesday, September 23, 2026" enabled="true" visible="true" accessible="true" x="177" y="531" width="48" height="48" index="32" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" value="1" name="24, Thursday, September 24, 2026, Today" label="24, Thursday, September 24, 2026, Today" enabled="true" visible="true" accessible="true" x="225" y="531" width="48" height="48" index="33" traits="Selected, Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="25, Friday, September 25, 2026" label="25, Friday, September 25, 2026" enabled="true" visible="true" accessible="true" x="273" y="531" width="48" height="48" index="34" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="26, Saturday, September 26, 2026" label="26, Saturday, September 26, 2026" enabled="true" visible="true" accessible="true" x="321" y="531" width="48" height="48" index="35" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="27, Sunday, September 27, 2026" label="27, Sunday, September 27, 2026" enabled="true" visible="true" accessible="true" x="33" y="579" width="48" height="48" index="36" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="28, Monday, September 28, 2026" label="28, Monday, September 28, 2026" enabled="true" visible="true" accessible="true" x="81" y="579" width="48" height="48" index="37" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="29, Tuesday, September 29, 2026" label="29, Tuesday, September 29, 2026" enabled="true" visible="true" accessible="true" x="129" y="579" width="48" height="48" index="38" traits="Button"/>
+                                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="30, Wednesday, September 30, 2026" label="30, Wednesday, September 30, 2026" enabled="true" visible="true" accessible="true" x="177" y="579" width="48" height="48" index="39" traits="Button"/>
+                                  </XCUIElementTypeOther>
+                                </XCUIElementTypeOther>
+                              </XCUIElementTypeOther>
+                            </XCUIElementTypeOther>
+                          </XCUIElementTypeOther>
+                        </XCUIElementTypeOther>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="Cancel" label="Cancel" enabled="true" visible="true" accessible="true" x="230" y="685" width="71" height="48" index="4" traits="Button"/>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="OK" label="OK" enabled="true" visible="true" accessible="true" x="309" y="685" width="64" height="48" index="5" traits="Button"/>
+                    </XCUIElementTypeOther>
+                  </XCUIElementTypeOther>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

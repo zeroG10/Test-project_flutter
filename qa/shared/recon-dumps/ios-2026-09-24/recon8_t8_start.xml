@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="54958" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="118" index="0" traits=""/>
+                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="Back" label="Back" enabled="true" visible="true" accessible="true" x="4" y="66" width="48" height="48" index="1" traits="Button"/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" name="Survey" label="Survey" enabled="true" visible="true" accessible="true" x="72" y="76" width="72" height="28" index="2" traits="Header"/>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                    <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="true" accessible="true" x="0" y="118" width="402" height="658" index="0" traits=""/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="T8 Branching Workflow Template_Multi-section branching template" name="T8 Branching Workflow Template_Multi-section branching template" label="T8 Branching Workflow Template_Multi-section branching template" enabled="true" visible="true" accessible="true" x="16" y="126" width="370" height="96" index="1" traits="StaticText"/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                      <XCUIElementTypeImage type="XCUIElementTypeImage" name="S1 Job Entry&#10;1. &#10;S1Q3 Was the site ready?" label="S1 Job Entry&#10;1. &#10;S1Q3 Was the site ready?" enabled="true" visible="true" accessible="true" x="16" y="238" width="370" height="192" index="0" traits="Image"/>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="Yes" label="Yes" enabled="true" visible="true" accessible="true" x="32" y="334" width="169" height="52" index="1" traits="Button"/>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="No" label="No" enabled="true" visible="true" accessible="true" x="201" y="334" width="169" height="52" index="2" traits="Button"/>
+                    </XCUIElementTypeOther>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="3" traits="">
+                      <XCUIElementTypeImage type="XCUIElementTypeImage" name="S2 Site Ready Path" label="S2 Site Ready Path" enabled="true" visible="true" accessible="true" x="16" y="430" width="370" height="320" index="0" traits="Image"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" name="2. &#10;S2Q5 Which tasks were completed?" label="2. &#10;S2Q5 Which tasks were completed?" enabled="true" visible="true" accessible="true" x="32" y="490" width="338" height="228" index="0" traits=""/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Cabling" label="Cabling" enabled="true" visible="true" accessible="true" x="32" y="526" width="338" height="48" index="1" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Device mounting" label="Device mounting" enabled="true" visible="true" accessible="true" x="32" y="574" width="338" height="48" index="2" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Testing" label="Testing" enabled="true" visible="true" accessible="true" x="32" y="622" width="338" height="48" index="3" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Cleanup" label="Cleanup" enabled="true" visible="true" accessible="true" x="32" y="670" width="338" height="48" index="4" traits="Button"/>
+                      </XCUIElementTypeOther>
+                    </XCUIElementTypeOther>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="4" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" name="4. &#10;S3Q7 Describe the blocker" label="4. &#10;S3Q7 Describe the blocker" enabled="true" visible="true" accessible="true" x="16" y="750" width="370" height="26" index="0" traits=""/>
+                      <XCUIElementTypeImage type="XCUIElementTypeImage" name="S3 Site Not Ready Path" label="S3 Site Not Ready Path" enabled="true" visible="true" accessible="true" x="16" y="750" width="370" height="26" index="1" traits="Image"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" name="3. &#10;S3Q6 What blocked the work?" label="3. &#10;S3Q6 What blocked the work?" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="No access" label="No access" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Customer absent" label="Customer absent" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="2" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Missing equipment" label="Missing equipment" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="3" traits="Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Safety issue" label="Safety issue" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="4" traits="Button"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="3" traits="">
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="Description" label="Description" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="500 characters remaining" name="500 characters remaining" label="500 characters remaining" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits="StaticText"/>
+                      </XCUIElementTypeOther>
+                    </XCUIElementTypeOther>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="5" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" name="5. &#10;S4Q9 Add final summary&#10;6. &#10;S4Q8 Upload evidence photo" label="5. &#10;S4Q9 Add final summary&#10;6. &#10;S4Q8 Upload evidence photo" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                      <XCUIElementTypeImage type="XCUIElementTypeImage" name="S4 Closure" label="S4 Closure" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits="Image"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                        <XCUIElementTypeTextField type="XCUIElementTypeTextField" name="Description" label="Description" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="0" traits=""/>
+                        <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="500 characters remaining" name="500 characters remaining" label="500 characters remaining" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="1" traits="StaticText"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="Upload photo" label="Upload photo" enabled="true" visible="false" accessible="true" x="0" y="0" width="0" height="0" index="3" traits="Image, Button"/>
+                    </XCUIElementTypeOther>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeButton type="XCUIElementTypeButton" name="Save" label="Save" enabled="false" visible="true" accessible="true" x="16" y="784" width="370" height="48" index="3" traits="NotEnabled, Button"/>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

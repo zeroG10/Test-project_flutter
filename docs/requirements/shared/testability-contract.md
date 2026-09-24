@@ -110,6 +110,9 @@ around a defect stay **Blocked**, never Passed.
 | TD-CHIO-001 | Check-in / check-out confirmation | the X (close) has no label — the only unnamed app-bar button (recon 6c) | located by that rule | CHK-CHIO-003, -009 |
 | TD-ORDP-001 | Job details — In progress timer | the stopwatch's label is its digits and colons on separate lines; while a digit rolls over the label carries both digits (recon 7) — no plain `HH:MM:SS` value | the page joins the lines and waits for a clean read (≤ 5 s) | CHK-ORDP-002, -003 |
 | TD-ORDP-002 | Job details — Survey / Photo report / Notes rows | the row icon and the chevron are unnamed images (recon 7) | two images inside the row's rect: left = icon, right = chevron | CHK-ORDP-005 |
+| TD-SRV-001 | Survey form | question titles are not elements: every title of a card is merged into the card's label (`1. \nTitle\n3. \nTitle…`); fields carry only their hint (`Description`, `Select date`, `Select time`, `0`), so a field cannot be tied to its question | visible questions = the numbered titles parsed from the labels; a field = its type and order inside the card | CHK-SRV-001…-057 |
+| TD-SRV-002 | Survey form — card without a section | a card holding one text question is itself a `TextField` (label = the titles); a tap on its centre does not reach the input | tap the input area (above the counter) | CHK-SRV-008, -009 |
+| TD-SRV-003 | Survey photos | a thumbnail is named by the photo's description (unnamed without one); its remove button is unnamed; the system photo picker's cells are not in the tree | thumbnail count; picker cell by grid position | CHK-SRV-019…-022 |
 | TD-PHOTO-001 | Photo editor | four toolbar buttons unnamed; palette and canvas absent from the tree | position only; markup checks `Blocked` | module 09 (9 checks) |
 
 Suggested ids for the dev team follow §1 (`<screen>-<element>`), e.g. `registration-channel-sms`,
