@@ -11,7 +11,7 @@ location entry is unreachable on the simulator; the owner verified it on a real 
 
 The stored result is read back through ``GET /job/{id}``. Order of the functions = order of the
 run: TC-CHIO-008 → 009 use the job `guard`; TC-CHIO-006 reads `far` (after 003) and
-`submitted_keep` (after 005). Every expected value goes through ``expected(...)``.
+`kept` (after 005). Every expected value goes through ``expected(...)``.
 """
 
 from datetime import UTC, datetime
@@ -60,8 +60,7 @@ def pages(driver, platform):
 
 def open_job(pages, job, expected) -> None:
     pages.jobs.pull_to_refresh()
-    pages.jobs.scroll_to("card", text=job.job_id)
-    pages.jobs.tap("card", text=job.job_id)
+    pages.jobs.open_card(job.job_id)
     pages.details.expect_header(expected(job.title_line), SERVER)
 
 
@@ -273,7 +272,7 @@ def test_check_out_on_site(
 @allure.tag("CHK-CHIO-008")
 @allure.title("TC-CHIO-005 Cancel on the check-out confirmation keeps the job Submitted")
 def test_check_out_cancelled(check_seed, on_site, ui_login, field_services_api, pages, expected):
-    job = check_seed["submitted_keep"]
+    job = check_seed["kept"]
     open_job(pages, job, expected)
     with ui_login.alerts_left_alone():  # WDA may press a dialog button
         pages.details.tap("check-out")
@@ -300,7 +299,7 @@ def test_actions_per_status(check_seed, ui_login, pages, expected):
     for kind, offered, absent in (
         ("far", "check-in", ("check-out",)),
         ("in_progress", "submit-deliverables", ("check-in", "check-out")),
-        ("submitted_keep", "check-out", ("check-in",)),
+        ("kept", "check-out", ("check-in",)),
     ):
         job = check_seed[kind]
         open_job(pages, job, expected)

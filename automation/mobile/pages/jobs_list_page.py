@@ -29,6 +29,7 @@ _CARD_START = re.compile(r"^(Updated\n)?\d{1,2} [A-Z][a-z]{2} \d{4}\n\d{2}:\d{2}
 _CARD_TYPES = ("XCUIElementTypeStaticText", "XCUIElementTypeImage")
 REFRESH_SETTLE = 8.0  # a pull-to-refresh against the weak DEV server
 SCAN_LIMIT = 8  # drags while collecting every card of the list
+CARD_BOTTOM_MARGIN = 130  # the bottom tab bar covers the lowest ~125 pt (y 750 of 874, recon 4)
 UPDATED_RGB = (0xB8, 0x0B, 0x22)  # the "Updated" banner fill: app theme `tertiary`
 UPDATED_SHARE = 0.005  # calibrated 2026-09-24: 0.016–0.027 with a banner in view, 0.000 without
 
@@ -142,6 +143,20 @@ class JobsViewMixin:
         """The card of ``job_id``, scrolled into view and parsed."""
         self.scroll_to("card", text=job_id)
         return parse_card(self.find("card", text=job_id).get_attribute("name"))
+
+    def open_card(self, job_id: str) -> None:
+        """Tap a job's card only once it is still and wholly above the bottom tab bar: a tap on a
+        list that is still coasting after a drag, or on a card half under the tab bar, does not
+        open the job (module 05 run 1, the 5th of 8 cards)."""
+        self.scroll_to("card", text=job_id)
+        self._settle(3.0)
+        limit = self.driver.get_window_size()["height"] - CARD_BOTTOM_MARGIN
+        rect = self.find("card", text=job_id).rect
+        if rect["y"] + rect["height"] > limit:
+            width = self.driver.get_window_size()["width"]
+            self._drag_at(width // 2, limit - 20, limit - 20 - rect["height"])
+            self._settle(3.0)
+        self.tap("card", text=job_id)
 
     def expect_card_field(self, job_id: str, field: str, value: str) -> None:
         with allure.step(f"expect {self.screen.id}.card[{job_id}].{field} = {value!r}"):

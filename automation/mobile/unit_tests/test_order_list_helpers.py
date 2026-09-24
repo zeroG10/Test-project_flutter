@@ -146,6 +146,18 @@ class SeedDays(unittest.TestCase):
         self.assertEqual(day_title(date(2026, 9, 24)), "Thursday, 24 September")
 
 
+class SeedIds(unittest.TestCase):
+    def test_no_job_id_is_the_start_of_another(self):
+        # cards are found by "name CONTAINS <jobId>": a prefix opens the wrong job (module 05 run 1)
+        from fixtures.check import PLAN
+        from fixtures.jobs import SEED_PLAN
+
+        for kinds in ([k for k, _, _ in PLAN], [k for k, *_ in SEED_PLAN]):
+            ids = [f"QA-AUTO-0924-120000-{k.upper()}" for k in kinds]
+            clashes = [(a, b) for a in ids for b in ids if a != b and b.startswith(a)]
+            self.assertEqual(clashes, [], "a job id is the start of another")
+
+
 class MismatchDialogRead(unittest.TestCase):
     TITLE = (
         '<XCUIElementTypeStaticText name="Assigned to a different phone number" visible="true"/>'

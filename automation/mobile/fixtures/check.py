@@ -2,12 +2,14 @@
 
 | Test-case placeholder / precondition                  | Fixture              |
 |-------------------------------------------------------|----------------------|
-| ``{{job.<kind>}}`` — gps, cancel, far, double, guard, in_progress, submitted, … | ``check_seed`` |
+| ``{{job.<kind>}}`` (8 kinds, ``PLAN`` below)            | ``check_seed``       |
 | location granted, device on site, mock switch ON      | ``on_site``          |
 | … device ~5.5 km away                                 | ``away``             |
 | location granted, device on site, mock switch OFF     | ``guarded``          |
 
-Every check-in / check-out changes its job, so each TC that completes one owns a job. The device
+Every check-in / check-out changes its job, so each TC that completes one owns a job. No kind may
+be the start of another: cards are found by ``name CONTAINS <jobId>``, and "…-SUBMITTED" also
+matched "…-SUBMITTED_KEEP" (module 05 run 1 — the wrong job opened). The device
 state is global: every fixture sets it before ``ui_login`` relaunches the app and puts the mock
 switch back OFF afterwards (owner, Q-CHIO-5; recon 6 / 6c).
 """
@@ -27,7 +29,7 @@ AWAY = (SITE[0] + 0.05, SITE[1])  # ~5.5 km north — far outside the app's 100 
 PLAN = (  # kind, status, hour
     ("gps", "new", 8), ("cancel", "new", 9), ("far", "new", 10), ("double", "new", 11),
     ("guard", "new", 12), ("in_progress", "in_progress", 13), ("submitted", "submitted", 14),
-    ("submitted_keep", "submitted", 15),
+    ("kept", "submitted", 15),
 )  # fmt: skip
 
 

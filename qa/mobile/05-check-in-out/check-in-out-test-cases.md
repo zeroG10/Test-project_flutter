@@ -143,12 +143,12 @@
 | ID | TC-CHIO-005 |
 | Source CHK IDs | CHK-CHIO-008 |
 | Priority | P1 |
-| Preconditions | as TC-CHIO-004; `{{job.submitted_keep}}` Submitted |
+| Preconditions | as TC-CHIO-004; `{{job.kept}}` Submitted |
 | Oracle | spec — SRS FR-CIO-06 |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
-| 1 | click | jobs-list.card[{{job.submitted_keep.jobId}}] | — | the details open |
+| 1 | click | jobs-list.card[{{job.kept.jobId}}] | — | the details open |
 | 2 | click | job-details.check-out | — | "Confirm check out" |
 | 3 | click | confirm-check.cancel | — | back on the details |
 | 4 | expect-visible | job-details.check-out | — | Check out is still offered |
@@ -163,7 +163,7 @@
 | ID | TC-CHIO-006 |
 | Source CHK IDs | CHK-CHIO-040 |
 | Priority | P1 |
-| Preconditions | signed in; `{{job.far}}` New (after TC-CHIO-003), `{{job.in_progress}}` In progress, `{{job.submitted_keep}}` Submitted |
+| Preconditions | signed in; `{{job.far}}` New (after TC-CHIO-003), `{{job.in_progress}}` In progress, `{{job.kept}}` Submitted |
 | Oracle | spec — SRS FR-ORD-D-08, FR-CIO-04; accepted D-CHIO-1 |
 
 | # | Action | Target (alias) | Data | Expected |
@@ -172,7 +172,7 @@
 | 2 | back | — | — | Jobs list |
 | 3 | click | jobs-list.card[{{job.in_progress.jobId}}] | — | In progress: neither `Check in` nor `Check out` (`Submit deliverables` is the action) |
 | 4 | back | — | — | Jobs list |
-| 5 | click | jobs-list.card[{{job.submitted_keep.jobId}}] | — | Submitted: `Check out` shown, `Check in` not |
+| 5 | click | jobs-list.card[{{job.kept.jobId}}] | — | Submitted: `Check out` shown, `Check in` not |
 
 ---
 
