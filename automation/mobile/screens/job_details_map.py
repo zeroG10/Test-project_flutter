@@ -58,6 +58,20 @@ JOB_DETAILS = Screen(
             ios=(_P, _BUTTON + "name BEGINSWITH 'Attachments ('"),
             note="'Attachments (N)' — N is the number of documents + photos",
         ),
+        "timer": El(
+            ios=(_P, _TEXT + "name CONTAINS ':' AND rect.x > 200 AND rect.y < 200"),
+            note="the In progress stopwatch, top right (@238,118): digits and colons joined by "
+            "line breaks, e.g. '0\\n0\\n:\\n0\\n0\\n:\\n0\\n5' (recon 6c / 7) — read by the page",
+        ),
+        "deliverable": El(
+            ios=(_P, "type == 'XCUIElementTypeOther' AND name == {text}"),
+            note="'Survey' / 'Photo report' / 'Notes' rows of an In progress job (recon 6c / 7)",
+        ),
+        "images": El(
+            ios=(_P, "type == 'XCUIElementTypeImage'"),
+            note="every image on the details — a deliverable row has its icon (x 43) and chevron "
+            "(x 346) inside its rect (recon 7)",
+        ),
         "check-in": El(ios=(_P, _BUTTON + "name == 'Check in'")),
         "check-out": El(
             ios=(_P, _BUTTON + "name == 'Check out'"),

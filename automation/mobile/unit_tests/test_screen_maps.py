@@ -27,10 +27,11 @@ TEST_CASES = {
     "03-order-list": REPO / "qa/mobile/03-order-list/order-list-test-cases.md",
     "04-order-details": REPO / "qa/mobile/04-order-details/order-details-test-cases.md",
     "05-check-in-out": REPO / "qa/mobile/05-check-in-out/check-in-out-test-cases.md",
+    "06-order-progress": REPO / "qa/mobile/06-order-progress/order-progress-test-cases.md",
 }
 MIN_ALIASES = {
     "01-splash": 5, "02-authentication": 40, "03-order-list": 30, "04-order-details": 35,
-    "05-check-in-out": 15,
+    "05-check-in-out": 15, "06-order-progress": 15,
 }  # fmt: skip
 STEP_ROW = re.compile(r"^\| \d+ \| ([a-z-]+) \| ([^|]+?) \|")
 # Test-case targets that are not elements: lifecycle and navigation shortcuts ("open | login").

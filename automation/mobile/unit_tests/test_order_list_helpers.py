@@ -1,4 +1,5 @@
-"""Offline checks of the module 01 / 03 helpers: card parsing, pixel oracles, seed dates.
+"""Offline checks of the module 01 / 03 / 06 helpers: card parsing, pixel oracles, seed dates,
+the In progress timer.
 
 cd automation/mobile && uv run python -m unittest discover -s unit_tests -v
 """
@@ -151,11 +152,29 @@ class SeedIds(unittest.TestCase):
         # cards are found by "name CONTAINS <jobId>": a prefix opens the wrong job (module 05 run 1)
         from fixtures.check import PLAN
         from fixtures.jobs import SEED_PLAN
+        from fixtures.progress import PLAN as PROGRESS_PLAN
 
-        for kinds in ([k for k, _, _ in PLAN], [k for k, *_ in SEED_PLAN]):
+        for kinds in ([k for k, _, _ in PLAN], [k for k, *_ in SEED_PLAN],
+                      [k for k, _, _ in PROGRESS_PLAN]):  # fmt: skip
             ids = [f"QA-AUTO-0924-120000-{k.upper()}" for k in kinds]
             clashes = [(a, b) for a in ids for b in ids if a != b and b.startswith(a)]
             self.assertEqual(clashes, [], "a job id is the start of another")
+
+
+class TimerName(unittest.TestCase):
+    """The In progress stopwatch's name: digits and colons on separate lines (recon 6c / 7)."""
+
+    def test_a_clean_name_is_hh_mm_ss(self):
+        from pages.job_details_page import TIMER
+
+        match = TIMER.fullmatch("0\n0\n:\n0\n1\n:\n0\n5".replace("\n", ""))
+        self.assertEqual(match.groups(), ("00", "01", "05"))
+
+    def test_a_name_caught_mid_roll_over_is_not_read(self):
+        from pages.job_details_page import TIMER
+
+        # recon 7, recon7_progress_top.xml: two digits of the seconds at once
+        self.assertIsNone(TIMER.fullmatch("0\n0\n:\n0\n0\n:\n4\n1\n2".replace("\n", "")))
 
 
 class MismatchDialogRead(unittest.TestCase):
