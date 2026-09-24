@@ -108,6 +108,8 @@ around a defect stay **Blocked**, never Passed.
 | TD-ORDD-001 | PDF viewer (attachments) | the close (X) icon has no label; once the PDF loads, the download icon is a second unnamed button left of it (run 1 tapped download instead of X) (app code audit §3) | X = the right-most unnamed app-bar button | CHK-ORDD-067, -068 |
 | TD-ORDD-002 | Attachments → Photos | photo thumbnails are not in the tree at all (no element per cell) | grid cells by position + pixels | CHK-ORDD-073…-075 |
 | TD-CHIO-001 | Check-in / check-out confirmation | the X (close) has no label — the only unnamed app-bar button (recon 6c) | located by that rule | CHK-CHIO-003, -009 |
+| TD-ORDP-001 | Job details — In progress timer | the stopwatch's label is its digits and colons on separate lines; while a digit rolls over the label carries both digits (recon 7) — no plain `HH:MM:SS` value | the page joins the lines and waits for a clean read (≤ 5 s) | CHK-ORDP-002, -003 |
+| TD-ORDP-002 | Job details — Survey / Photo report / Notes rows | the row icon and the chevron are unnamed images (recon 7) | two images inside the row's rect: left = icon, right = chevron | CHK-ORDP-005 |
 | TD-PHOTO-001 | Photo editor | four toolbar buttons unnamed; palette and canvas absent from the tree | position only; markup checks `Blocked` | module 09 (9 checks) |
 
 Suggested ids for the dev team follow §1 (`<screen>-<element>`), e.g. `registration-channel-sms`,
