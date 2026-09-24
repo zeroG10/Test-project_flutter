@@ -27,6 +27,10 @@ ATTACHMENTS = Screen(
             ios=(_P, "name BEGINSWITH {text} AND name CONTAINS 'Tab '"),
             note="'Documents' / 'Photos' — the tab's name starts with its label",
         ),
+        "tabs": El(
+            ios=(_P, "name CONTAINS 'Tab ' AND rect.y < 200"),
+            note="every tab of the top tab bar (y 118 in recon 5b) — not the app's bottom tab bar",
+        ),
         "selected-tab": El(
             ios=(_P, "traits CONTAINS 'Selected' AND name CONTAINS 'Tab '"),
             note="the tab whose traits contain 'Selected' (recon 5b)",
@@ -49,7 +53,8 @@ PDF_VIEWER = Screen(
         "back": El(ios=(_P, _BUTTON + "name == 'Back'")),
         "close": El(
             ios=(_P, _BUTTON + "(name == nil OR name == '') AND rect.y < 140"),
-            note="TD-ORDD-001: the X icon has no label — the only unnamed button of the app bar",
+            note="TD-ORDD-001: the X icon has no label; once the PDF loads the download icon is a "
+            "second unnamed button to its left — the page taps the right-most one",
         ),
         "any-editable": El(
             ios=(

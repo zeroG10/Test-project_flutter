@@ -53,7 +53,7 @@ class AttachmentsPage(BasePage):
 
     def tab_names(self) -> list[str]:
         """Names of the tabs, left → right: '<label>\nTab N of M' (recon 5b)."""
-        tabs = self.driver.find_elements(*self.locator("tab", text=""))
+        tabs = [e for e in self.driver.find_elements(*self.locator("tabs")) if e.is_displayed()]
         return [e.get_attribute("name") or "" for e in sorted(tabs, key=lambda e: e.rect["x"])]
 
     def open_tab(self, label: str) -> None:
@@ -111,6 +111,14 @@ class PdfViewerPage(BasePage):
                 allure.attach(self.driver.get_screenshot_as_png(),
                               name=f"pdf viewer (block share {last[-1] if last else '-'})",
                               attachment_type=allure.attachment_type.PNG)  # fmt: skip
+
+    def close(self) -> None:
+        """Tap X — the right-most unnamed app-bar button (the download icon sits left of it
+        once the PDF has loaded; run 1, 2026-09-24)."""
+        buttons = self.driver.find_elements(*self.locator("close"))
+        assert buttons, "no unnamed app-bar button in the PDF viewer"
+        with allure.step(f"tap pdf-viewer.close (right-most of {len(buttons)} unnamed buttons)"):
+            max(buttons, key=lambda b: b.rect["x"]).click()
 
     def expect_read_only(self) -> None:
         with allure.step("expect no editable element in the viewer"):

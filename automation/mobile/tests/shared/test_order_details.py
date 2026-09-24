@@ -27,6 +27,7 @@ from pages.location_dialogs_page import LocationDisabledDialog, LocationPromptPa
 from screens.location_dialogs_map import LOCATION_DISABLED_MESSAGE
 
 SERVER = 20.0
+MAPS_PAGE = 40.0  # maps.apple.com loads slowly on the simulator (recon 5: blank at 4 s)
 
 
 @pytest.fixture
@@ -159,7 +160,7 @@ def test_pdf_viewer(details_seed, ui_login, pages, expected, evidence):
     a.wait_gone("tab", 2, text="Documents")
     pdf.expect_read_only()
     pdf.visible("close")
-    pdf.tap("close")
+    pdf.close()
     a.expect_selected_tab(expected("Documents"), SERVER)
     a.visible("document", SERVER, text=doc)
 
@@ -198,8 +199,8 @@ def test_photos_grid_and_viewer(details_seed, ui_login, pages, expected, evidenc
 @pytest.mark.regression
 @pytest.mark.shared
 @pytest.mark.tc("TC-ORDD-003")
-@pytest.mark.chk("CHK-ORDD-012")
-@allure.tag("CHK-ORDD-012")
+@pytest.mark.chk("CHK-ORDD-012", "CHK-ORDD-013")
+@allure.tag("CHK-ORDD-012", "CHK-ORDD-013")
 @allure.title(
     "TC-ORDD-003 'On map' opens the job's location in the in-app browser, and Close returns "
     "to the details"
@@ -209,6 +210,8 @@ def test_on_map_opens_browser(details_seed, ui_login, pages, expected, evidence)
     open_job(pages, job, expected)
     pages.details.tap("on-map")
     pages.browser.expect_host(expected("maps.apple.com"), SERVER)
+    street = job.address.split(", ")[1]  # "QA test site, 350 5th Ave, …" → "350 5th Ave"
+    pages.browser.visible("place", MAPS_PAGE, text=expected(street))
     evidence.checkpoint("on-map-browser")
     pages.browser.tap("close")
     pages.details.expect_header(expected(job.title_line), SERVER)
@@ -278,12 +281,13 @@ def test_check_in_starts_flow(
     ui_login.launch()
     pages.jobs.assert_open(SERVER)
     open_job(pages, job, expected)
-    with system_alerts(driver, platform):
+    with ui_login.alerts_left_alone():  # the test answers the prompt and the dialog itself
         d.tap("check-in")
         d.wait_checking_in(SERVER)
-        pages.prompt.expect_text("title", expected("to use your location"), SERVER)
-        evidence.checkpoint("location-prompt")
-        pages.prompt.tap("dont-allow")
+        with system_alerts(driver, platform):  # the system prompt is readable only inside
+            pages.prompt.expect_text("title", expected("to use your location"), SERVER)
+            evidence.checkpoint("location-prompt")
+            pages.prompt.tap("dont-allow")
         pages.disabled.expect_text("title", expected("Location disabled"), SERVER)
         pages.disabled.expect_text("message", expected(LOCATION_DISABLED_MESSAGE))
         pages.disabled.tap("cancel")

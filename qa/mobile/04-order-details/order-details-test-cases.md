@@ -125,7 +125,7 @@ is taller than the screen (recon 5) — asserted in TC-ORDD-001 step 15 on the s
 |---|---|
 | ID | TC-ORDD-003 |
 | Title | "On map" opens the job's location in the in-app browser, and Close returns to the details |
-| Source CHK IDs | CHK-ORDD-012 |
+| Source CHK IDs | CHK-ORDD-012, CHK-ORDD-013 |
 | Platforms | ios, android |
 | Priority | P2 |
 | Automation | candidate |
@@ -141,12 +141,13 @@ is taller than the screen (recon 5) — asserted in TC-ORDD-001 step 15 on the s
 | 1 | click | jobs-list.card[{{job.full.jobId}}] | — | the details open |
 | 2 | click | job-details.on-map | — | — |
 | 3 | expect-text | in-app-browser.url | — | maps.apple.com |
-| 4 | click | in-app-browser.close | — | — |
-| 5 | expect-text | job-details.header | — | {{job.full.jobId}} - {{job.full.title}} |
+| 4 | expect-visible | in-app-browser.place[{{job.full.street}}] | — | the Maps page shows the job's street ("350 5th Ave") — within 40 s |
+| 5 | click | in-app-browser.close | — | the browser's own Close (top bar) |
+| 6 | expect-text | job-details.header | — | {{job.full.jobId}} - {{job.full.title}} |
 
 **Postconditions / cleanup:** none beyond the seed.
-**Notes:** CHK-ORDD-013 (the map shows the right place) is **not** covered: the browser shows only the host, and the
-page stays blank on the simulator (recon 5); the app sends the address, not coordinates (D-ORDD-4). Android: the
+**Notes:** CHK-ORDD-013 is checked by the address the Maps page shows (run 1: its place card "350 5th Ave"); the app
+sends the address, not coordinates (D-ORDD-4, accepted). In recon 5 the page was still blank after 4 s — it needs time. Android: the
 default maps app may open instead — the Android map of this TC is written in the Android phase.
 
 ---
@@ -271,7 +272,7 @@ the name is asserted.
 | Source CHK IDs | CHK-ORDD-062, CHK-ORDD-063, CHK-ORDD-066, CHK-ORDD-067, CHK-ORDD-068, CHK-ORDD-087 |
 | Platforms | ios, android |
 | Priority | P1 |
-| Automation | candidate — **depends on Q-ORDD-6** |
+| Automation | candidate |
 | Device / OS | P0 devices from the matrix |
 | App state | warm start, signed in |
 | Permissions | notifications: granted |
@@ -294,7 +295,7 @@ the name is asserted.
 | 11 | expect-visible | attachments.document[{{doc.safety.name}}] | — | the list |
 
 **Postconditions / cleanup:** none beyond the seed.
-**Notes:** in recon 5b the viewer opened (title, X) but **the page was not drawn within 5 s** — Q-ORDD-6. Page
+**Notes:** once the PDF has loaded, the download icon is a second unnamed button left of X — X is the right-most (run 1). Page
 scrolling and zoom (CHK-ORDD-064, -065) are deferred (gestures). Saving (CHK-ORDD-069, -070) is the system share
 sheet without a toast (D-ORDD-6) — manual / skipped.
 
@@ -309,7 +310,7 @@ sheet without a toast (D-ORDD-6) — manual / skipped.
 | Source CHK IDs | CHK-ORDD-056, CHK-ORDD-058, CHK-ORDD-073, CHK-ORDD-074, CHK-ORDD-075, CHK-ORDD-076, CHK-ORDD-079, CHK-ORDD-080, CHK-ORDD-087 |
 | Platforms | ios, android |
 | Priority | P2 |
-| Automation | candidate — **depends on Q-ORDD-6** |
+| Automation | candidate |
 | Device / OS | P0 devices from the matrix |
 | App state | warm start, signed in |
 | Permissions | notifications: granted |
@@ -331,8 +332,8 @@ sheet without a toast (D-ORDD-6) — manual / skipped.
 | 10 | expect-text | attachments.selected-tab | — | Photos — the tab did not reset |
 
 **Postconditions / cleanup:** none beyond the seed.
-**Notes:** in recon 5b both thumbnails showed **the error icon** — Q-ORDD-6. Pinch / pan (CHK-ORDD-077, -078) are
-deferred (gestures).
+**Notes:** recon 5b saw error icons only because it reused files whose records were deleted (Q-ORDD-6, closed). Pinch /
+pan (CHK-ORDD-077, -078) are deferred (gestures).
 
 ---
 
@@ -382,7 +383,7 @@ so the ios column is a work order, not an unknown.
 | job-details.any-editable | job-details | step 7 | **MISSING** — `TextField OR TextView OR SecureTextField` |
 | job-details.updated-banner | job-details | step 7 | **MISSING** — pixels only (banner fill #B80B22), as the list |
 | job-details.root | job-details | step 7 | **MISSING** — the scrolling content (pull to refresh) |
-| in-app-browser.url, .close | system in-app browser | step 7 | **MISSING** — `Button 'URL'` (value `maps.apple.com`), `Button 'Close'` |
+| in-app-browser.url, .close, .place[{{street}}] | system in-app browser | step 7 | yes — `Button 'URL'` (value `maps.apple.com`), `Button 'Close'` in the top bar (`rect.y < 120`), the page's place card `StaticText '<street>'` |
 | location-prompt.title, .dont-allow | system alert | step 7 | **MISSING** — `Alert` / `StaticText` "Allow “[DEV] CT Mobile” to use your location?", `Button 'Don’t Allow'`; needs `respectSystemAlerts` |
 | location-disabled.title, .message, .cancel, .go-to-settings | app dialog | step 7 | **MISSING** — texts as recon 5b |
 | attachments.title, .back | attachments | step 7 | **MISSING** — `Other 'Attachments'` (Header), `Button 'Back'` |
@@ -405,6 +406,7 @@ so the ios column is a work order, not an unknown.
 | {{job.reschedule}} | `details_seed`: New, today 10:00 local, an 18-line description | `new_when` = +1 day +2 h; `PATCH /job/{id}` in the test |
 | {{job.unviewed}} | `details_seed`: New, today 13:00 local, `isViewed=false` | opened only by TC-ORDD-009 |
 | {{job.*.date}}, {{job.*.time}} | from `scheduleDate` in the device time zone | `d MMM y`, `HH:mm` |
+| {{job.full.street}} | the second part of the address | `350 5th Ave` |
 
 ## Coverage
 
@@ -415,23 +417,22 @@ so the ios column is a work order, not an unknown.
 | CHK-ORDD-005, -008, -010, -011, -016, -018, -020, -021 | TC-ORDD-001 | |
 | CHK-ORDD-014 | TC-ORDD-001 | **partial** — texts; icons manual |
 | CHK-ORDD-015 | TC-ORDD-002 | |
-| CHK-ORDD-012 | TC-ORDD-003 | in-app browser `maps.apple.com` (D-ORDD-4) |
+| CHK-ORDD-012, -013 | TC-ORDD-003 | in-app browser `maps.apple.com`; the job's street on the page (D-ORDD-4) |
 | CHK-ORDD-017 | TC-ORDD-004 | Android; iOS Blocked — simulator limitation |
 | CHK-ORDD-022 | TC-ORDD-005 | |
 | CHK-ORDD-019, -051…-055, -057, -059, -060 | TC-ORDD-006 | |
 | CHK-ORDD-061 | TC-ORDD-006 | **partial** — extension; icon manual |
-| CHK-ORDD-062, -063, -066…-068 | TC-ORDD-007 | depends on Q-ORDD-6 |
+| CHK-ORDD-062, -063, -066…-068 | TC-ORDD-007 | |
 | CHK-ORDD-087 | TC-ORDD-007, TC-ORDD-008 | |
-| CHK-ORDD-056, -058, -073…-076, -079, -080 | TC-ORDD-008 | depends on Q-ORDD-6; -079 back arrow (D-ORDD-7) |
+| CHK-ORDD-056, -058, -073…-076, -079, -080 | TC-ORDD-008 | -079 back arrow (D-ORDD-7) |
 | CHK-ORDD-007 | TC-ORDD-009 | |
 
-**Total: 42 CHK IDs in 9 TCs** (2 partial). Changed from the plan after recon 5: **CHK-ORDD-006 → manual** (the banner
-lives ~0.3 s), **CHK-ORDD-013 → not automated on the simulator** (blank page, host only). Not covered here, with
+**Total: 43 CHK IDs in 9 TCs** (2 partial). Changed from the plan after recon 5: **CHK-ORDD-006 → manual** (the banner
+lives ~0.3 s); CHK-ORDD-013 — back in after run 1 (the Maps page shows the address once loaded). Not covered here, with
 reasons, in the plan: -023…-047 (module 05), -009, -086, -069 (manual), -048…-050, -081…-085, -089 (manual, verified
 by the owner on iOS), -064, -065, -077, -078 (gestures deferred), -070 (skipped — D-ORDD-6), -071 (manual — D-ORDD-5), -072, -088 (not recommended now).
 
 ## Open questions
 
 - D-ORDD-1…9 — accepted by the owner 2026-09-24 ([order-details-questions.md](order-details-questions.md)).
-- **Q-ORDD-6** — photos and PDFs of the attachments did not load in the app on the simulator (recon 5b); TC-ORDD-007
-  and -008 depend on it.
+- Q-ORDD-6 — closed: not an app bug (recon 5b reused files whose records were gone).
