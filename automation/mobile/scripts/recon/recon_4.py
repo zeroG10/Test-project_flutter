@@ -360,7 +360,7 @@ def main() -> None:
             note("relaunch with a session: screens seen (s, screen)", seen,
                  not any(s == "welcome" for _, s in seen))
 
-        if any(p in PASSES for p in ("login", "list", "calendar", "calendar2", "tabs", "links", "links2", "links3", "links3-tail", "links5", "links6")):
+        if any(p in PASSES for p in ("login", "list", "calendar", "calendar2", "tabs", "links", "links2", "links3", "links3-tail", "links5", "links6", "sort")):
             step("LOGIN: UI login + relaunch hand-over", login_pass)
 
         # ------------------------------------------------------------------ seed
@@ -399,6 +399,41 @@ def main() -> None:
 
         if "seed" in PASSES:
             step("SEED: 8 jobs through the API", seed_pass)
+
+        # ------------------------------------------------------------------ sort (D-ORDL-10)
+        def sort_pass() -> None:
+            techs = api.find_technicians_by_email(tech.email)
+            user_id = str(techs[0]["user"]["id"])
+            state["tech_user_id"] = user_id
+            active = [j for j in jobs_of_user(api, user_id)
+                      if j.get("statusType") not in ("completed", "canceled", "expired")]
+            note("active jobs of the technician before the probe", [j.get("jobId") for j in active], not active)
+            base = datetime.now().replace(hour=12, minute=0, second=0, microsecond=0)
+            # created on purpose NOT in date order: tomorrow, yesterday, today
+            for kind, when in (("sort-tomorrow", base + timedelta(days=1)),
+                               ("sort-yesterday", base - timedelta(days=1)),
+                               ("sort-today", base)):
+                job = create_job(api, user_id, kind, when, "new")
+                state["jobs"][kind] = job
+                save_state(state)
+                note(f"created {kind} (creation order)", {"jobId": job["jobId"], "date": job["when_local"]}, True)
+                time.sleep(1.5)  # distinct creation timestamps
+            pull_down()
+            order = [n.split("\n")[3].split(" - ")[0] if len(n.split("\n")) > 3 else n for n, _ in sorted(cards(), key=lambda c: c[1])]
+            dates = [" ".join(n.split("\n")[:2]) for n, _ in sorted(cards(), key=lambda c: c[1])]
+            note("list order top → bottom", list(zip(order, dates)), None)
+            dump(drv, "recon4f_sort_probe", shot=True)
+            by = {"date descending": ["SORT-TOMORROW", "SORT-TODAY", "SORT-YESTERDAY"],
+                  "date ascending": ["SORT-YESTERDAY", "SORT-TODAY", "SORT-TOMORROW"],
+                  "created newest first": ["SORT-TODAY", "SORT-YESTERDAY", "SORT-TOMORROW"],
+                  "created oldest first": ["SORT-TOMORROW", "SORT-YESTERDAY", "SORT-TODAY"]}
+            seen = [o.rsplit("-", 1)[-1] for o in order]
+            seen = ["SORT-" + s for s in seen]
+            match = [name for name, want in by.items() if seen == want]
+            note("the order matches", match or "none of the four hypotheses", bool(match))
+
+        if "sort" in PASSES:
+            step("SORT: 3 jobs created out of date order", sort_pass)
 
         # ------------------------------------------------------------------ list
         def list_pass() -> None:

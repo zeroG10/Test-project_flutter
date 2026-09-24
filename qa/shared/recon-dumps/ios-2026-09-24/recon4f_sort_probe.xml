@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="48323" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="118" index="0" traits=""/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" name="Jobs list" label="Jobs list" enabled="true" visible="true" accessible="true" x="16" y="76" width="87" height="28" index="1" traits="Header"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" enabled="true" visible="true" accessible="true" x="354" y="66" width="48" height="48" index="2" traits="Image, Button"/>
+                      </XCUIElementTypeOther>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="118" width="402" height="756" index="0" traits=""/>
+                        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                          <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="false" accessible="false" x="0" y="118" width="402" height="756" index="0" traits=""/>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="118" width="402" height="152" index="0" traits=""/>
+                            <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="24 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-TODAY - QA-AUTO recon4 sort-today&#10;QA test site, 350 5th Ave, New York, NY 10118" name="24 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-TODAY - QA-AUTO recon4 sort-today&#10;QA test site, 350 5th Ave, New York, NY 10118" label="24 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-TODAY - QA-AUTO recon4 sort-today&#10;QA test site, 350 5th Ave, New York, NY 10118" enabled="true" visible="true" accessible="true" x="0" y="118" width="402" height="152" index="1" traits="StaticText"/>
+                          </XCUIElementTypeOther>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="270" width="402" height="176" index="0" traits=""/>
+                            <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="23 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-YESTERDAY - QA-AUTO recon4 sort-yesterday&#10;QA test site, 350 5th Ave, New York, NY 10118" name="23 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-YESTERDAY - QA-AUTO recon4 sort-yesterday&#10;QA test site, 350 5th Ave, New York, NY 10118" label="23 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-YESTERDAY - QA-AUTO recon4 sort-yesterday&#10;QA test site, 350 5th Ave, New York, NY 10118" enabled="true" visible="true" accessible="true" x="0" y="270" width="402" height="176" index="1" traits="StaticText"/>
+                          </XCUIElementTypeOther>
+                          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="3" traits="">
+                            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="446" width="402" height="176" index="0" traits=""/>
+                            <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="25 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-TOMORROW - QA-AUTO recon4 sort-tomorrow&#10;QA test site, 350 5th Ave, New York, NY 10118" name="25 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-TOMORROW - QA-AUTO recon4 sort-tomorrow&#10;QA test site, 350 5th Ave, New York, NY 10118" label="25 Sep 2026&#10;12:00&#10;New&#10;QA-AUTO-R4-0924-1005-SORT-TOMORROW - QA-AUTO recon4 sort-tomorrow&#10;QA test site, 350 5th Ave, New York, NY 10118" enabled="true" visible="true" accessible="true" x="0" y="446" width="402" height="176" index="1" traits="StaticText"/>
+                          </XCUIElementTypeOther>
+                        </XCUIElementTypeOther>
+                      </XCUIElementTypeOther>
+                    </XCUIElementTypeOther>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="16" y="750" width="370" height="74" index="0" traits=""/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="Jobs&#10;Tab 1 of 3" label="Jobs&#10;Tab 1 of 3" enabled="true" visible="true" accessible="true" x="16" y="750" width="124" height="74" index="1" traits="Selected, Image"/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="Notifications&#10;Tab 2 of 3" label="Notifications&#10;Tab 2 of 3" enabled="true" visible="true" accessible="true" x="139" y="750" width="124" height="74" index="2" traits="Image"/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="Profile&#10;Tab 3 of 3" label="Profile&#10;Tab 3 of 3" enabled="true" visible="true" accessible="true" x="262" y="750" width="124" height="74" index="3" traits="Image"/>
+                  </XCUIElementTypeOther>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

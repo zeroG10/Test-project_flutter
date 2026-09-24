@@ -112,7 +112,7 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 | CHK-ORDL-066 | no flicker when switching weeks | Manual only | L | L | L | Manual Only | — | @manual-only | — | subjective |
 | CHK-ORDL-067 | many jobs without slowdown | Not applicable yet | L | L | M | Not Recommended Now | — | — | — | load on DEV is excluded (decision 2026-09-23) |
 | CHK-ORDL-068 | selected date kept across list ↔ calendar | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | TC-ORDL-008 | — |
-| CHK-ORDL-069 | cards sorted by scheduled date and time, ascending (added 2026-09-24) | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | — | SRS FR-ORD-02; the app does not sort on the device — the server order is observed in recon → TC-ORDL-014 after recon |
+| CHK-ORDL-069 | cards sorted by scheduled date and time, ascending (added 2026-09-24) | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | TC-ORDL-014 | SRS FR-ORD-02; probe 2026-09-24: the list follows creation time, newest first — red today (D-ORDL-10) |
 | CHK-ORDL-070 | jobs in the refreshed list are also in the calendar (added 2026-09-24) | E2E UI + API setup | M | H | M | Good Candidate | P2 | @regression | TC-ORDL-015 | regression check for BUG-ORDL-001 — red until it is fixed |
 
 ## Step 5 — Best first candidates
@@ -125,7 +125,7 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 
 ## Step 5b — Selected CHK IDs (handoff to prompts/mobile/03)
 
-**50 of 70 → 14 test cases** (updated after recon 4), plus CHK-ORDL-001 through the existing TC-AUTH-005 (owner, 2026-09-24) = 51. CHK-ORDL-069 waits for D-ORDL-10.
+**51 of 70 → 15 test cases** (updated after recon 4 and the sort probe), plus CHK-ORDL-001 through the existing TC-AUTH-005 (owner, 2026-09-24) = 52.
 
 | CHK ID | Automation Level | Priority | Automation Status | Blockers to clear before Prompt 07 | Note |
 |---|---|---|---|---|---|
@@ -144,6 +144,7 @@ Status legend as in the Auth plan. **deferred** = automatable, left out only by 
 | CHK-ORDL-049…055, -060…063 | E2E UI + API setup | P1–P2 | Good Candidate | jobs on two days of the week | → TC-ORDL-007 |
 | CHK-ORDL-058, -068 | E2E UI + API setup | P1–P2 | Good Candidate | as -049 | → TC-ORDL-008 |
 | CHK-ORDL-070 | E2E UI + API setup | P2 | Good Candidate | must run before any calendar refresh in the module | → TC-ORDL-015 |
+| CHK-ORDL-069 | E2E UI + API setup | P2 | Good Candidate | seed created out of date order (`other_day` → `yesterday` → today) | → TC-ORDL-014 |
 | CHK-ORDL-043, -047, -048 | E2E UI | P3 | Medium Candidate | — (D-ORDL-7, -12 accepted) | → TC-ORDL-009 |
 | CHK-ORDL-057 | E2E UI + API setup | P1 | Good Candidate | — (D-ORDL-8 accepted) | → TC-ORDL-010 |
 | CHK-ORDL-038 | E2E UI | P1 | Good Candidate | as -003 | → TC-ORDL-011 |
@@ -180,7 +181,7 @@ parses it into fields; the card is found by `name CONTAINS '<jobId>'`.
 | TC | Data | Source | Reusable | Cleanup |
 |---|---|---|---|---|
 | TC-ORDL-001, -002, -006, -009 | none; no active job for the technician | API read | — | leftover `QA-AUTO-*` jobs deleted before |
-| TC-ORDL-003, -004, -005, -007, -008, -010 | **one module seed of 8 jobs**: new, in_progress, submitted, completed, canceled, expired (today, 12:00 local), one new job on another day of the current week, one new job with `isViewed=false` | `POST /job` × 8 | within the module | `DELETE /job/{id}` × 8 in `finally` (16 calls per run — DEV-gentle) |
+| TC-ORDL-003, -004, -005, -007, -008, -010, -014, -015 | **one module seed of 9 jobs**: new, in_progress, submitted, completed, canceled, expired (today), one new job on another day of the current week, one new job yesterday, one new job with `isViewed=false`; **created out of date order** (other day → yesterday → today) | `POST /job` × 9 | within the module | `DELETE /job/{id}` × 9 in `finally` (18 calls per run — DEV-gentle) |
 | TC-ORDL-011 | a random key `QA-AUTO-INVALID-<ts>` | generated | — | nothing created |
 | TC-ORDL-012 | link key for `+1 202 555 01xx` | `POST /job/assign/{phone}` | no | the link expires by itself (72 h); nothing to delete |
 
@@ -219,7 +220,7 @@ Order-sensitive facts, written into the plan so nobody "fixes" them: TC-ORDL-005
 - Fixtures / helpers: `helpers/field_services_api.py` gets `create_job` / `delete_job` / `find_active_jobs`;
   fixture `jobs_seed` (module scope, `finally` cleanup, refuses to delete anything not `QA-AUTO-*`); helper
   `open_deep_link(url)` (`mobile: deepLink` on iOS, `am start` on Android).
-- Order: 011 → 001 → 002 → 006 → 009 → 013 → (seed) 003 → 004 → **015** (before any calendar refresh) → 010 → 007 → 008 → 005 → 012.
+- Order: 011 → 001 → 002 → 006 → 009 → 013 → (seed) 003 → 004 → 014 → **015** (before any calendar refresh) → 010 → 007 → 008 → 005 → 012.
 - Job-link helper: `xcrun simctl openurl booted <https link>` (iOS), `adb shell am start -a android.intent.action.VIEW -d <link>` (Android); `defaultAlertAction` off for these steps (recon 4).
 - Estimate: 12 TCs × ~1.5–2.5 h ≈ **20–28 h** incl. maps, the job fixture and stabilisation. Maintenance risk:
   **Medium** — the parsed card format and the unnamed toggle.

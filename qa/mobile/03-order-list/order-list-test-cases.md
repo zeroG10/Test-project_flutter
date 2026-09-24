@@ -11,7 +11,7 @@
 | Feature | Order list — Jobs list, weekly calendar, job links |
 | Platform | cross-platform (Flutter app driven by native drivers) — iOS first, then Android |
 | Source checklist | `qa/mobile/03-order-list/order-list-checklist.md` (CHK-ORDL-001…070) |
-| Selection | `qa/mobile/03-order-list/order-list-automation-plan.md` → Selected CHK IDs (50) |
+| Selection | `qa/mobile/03-order-list/order-list-automation-plan.md` → Selected CHK IDs (51) |
 | Min OS | iOS 16.0 / Android 12.1 (SRS §2.4) — not run by decision; see [supported-devices.md](../../../docs/platform-specs/supported-devices.md) |
 | Devices | iPhone 17 · iOS 26.5 (simulator); Pixel 7 · Android 15 / API 35 (emulator) — [device matrix](../../shared/device-matrix/device-matrix.md) |
 | Build | `[DEV] CT Mobile` 1.1.1 (178), flavor `development`, `CLIENT_BUILD=true` |
@@ -509,6 +509,35 @@ email link flows manually on production (2026-09-24) — reported as a manual ch
 
 ---
 
+## TC-ORDL-014 — The Jobs list is ordered by scheduled date, earliest first
+
+| Field | Value |
+|---|---|
+| ID | TC-ORDL-014 |
+| Title | The Jobs list is ordered by scheduled date, earliest first |
+| Source CHK IDs | CHK-ORDL-069 |
+| Platforms | ios, android |
+| Priority | P2 |
+| Automation | candidate |
+| Device / OS | P0 devices from the matrix |
+| App state | warm start, signed in |
+| Permissions | notifications: granted |
+| Network | online Wi-Fi |
+| Preconditions | signed in; seed jobs created **not in date order** — `{{job.other_day}}` (a later day) first, `{{job.yesterday}}` second, today's jobs last — so an order by creation time and an order by date differ |
+| Oracle | spec — SRS §3.1.2.1 FR-ORD-02 ("Orders shall be sorted by a date and time (ascending order)"); human — owner, 2026-09-24: the order is judged by the date only, the time within a date is not considered; spec — checklist CHK-ORDL-069 |
+
+| # | Action | Target (alias) | Data | Expected |
+|---|---|---|---|---|
+| 1 | swipe | jobs-list.root | down | pull to refresh |
+| 2 | expect-text | jobs-list.card-order | {{job.yesterday.jobId}}, {{job.new.jobId}}, {{job.other_day.jobId}} | these three appear top → bottom in this order |
+| 3 | expect-text | jobs-list.card-dates | — | the dates of all `QA-AUTO-<run>` cards never decrease from top to bottom (times within one date are not compared) |
+
+**Postconditions / cleanup:** the seed is removed after the module.
+**Known issue:** D-ORDL-10 — the probe of 2026-09-24 showed the list ordered by **creation time, newest first** (dates
+24 → 23 → 25). The TC keeps the SRS / owner expectation and is **red today**; a bug report waits for the owner's word.
+
+---
+
 ## TC-ORDL-015 — Jobs that the refreshed list shows are shown in the calendar on their dates
 
 | Field | Value |
@@ -553,7 +582,7 @@ Screen maps come in step 5 of the module; `MISSING` = not in a map yet — every
 | jobs-list.view-toggle | jobs-list | step 7 | **MISSING** — the only unnamed button in the app bar, y ≈ 66 (TD-JOBS-001) |
 | jobs-list.empty-message, .empty-image, .any-card | jobs-list | step 7 | **MISSING** — texts as recon 4; image unlabelled |
 | jobs-list.card[{{jobId}}] (+ `.title`, `.date`, `.status`, `.address`, `.updated`) | jobs-list | step 7 | **MISSING** — `name CONTAINS jobId`, any type (StaticText, or Image with "Updated"); fields by the page parser |
-| jobs-list.card-count[{{jobId}}] | jobs-list | step 7 | **MISSING** — page method |
+| jobs-list.card-count[{{jobId}}], .card-order, .card-dates | jobs-list | step 7 | **MISSING** — page methods over the parsed cards (scrolling the whole list) |
 | jobs-calendar.root, .week, .week-days, .day[{{date}}], .selected-day-title | jobs-calendar | step 7 | **MISSING** — day cells `'Thursday, September 24, 2026'`, title `'Thursday, 24 September'` |
 | jobs-calendar.card[{{jobId}}] (+ fields, `.updated`), .any-card, .empty-state, .empty-message | jobs-calendar | step 7 | **MISSING** — same card format as the list |
 | tabbar.jobs, .notifications, .profile | tab bar (shared) | step 7 | **MISSING** as `tabbar.*` — today `jobs-list.tab-*` (move) |
@@ -573,8 +602,9 @@ Screen maps come in step 5 of the module; `MISSING` = not in a map yet — every
 | {{job.new}}, {{job.in_progress}}, {{job.submitted}}, {{job.completed}}, {{job.canceled}}, {{job.expired}} | `jobs_seed`, `POST /job` with `statusType`, today | `jobId` `QA-AUTO-<run>-<kind>`, `surveyId` = Short Survey, address and coordinates of recon 3b; distinct times (09:00…14:00) |
 | {{job.other_day}} | `jobs_seed` | status `new` on `{{day.with_job}}` |
 | {{job.unviewed}} | `jobs_seed` | status `new`, today, `isViewed=false` |
+| {{job.yesterday}} | `jobs_seed` | status `new`, yesterday; **creation order of the seed:** `other_day` → `yesterday` → today's jobs (TC-ORDL-014) |
 | {{job.*.date}}, {{job.*.time}} | derived from `scheduleDate` in the device time zone | `d MMM y`, `HH:mm` |
-| {{today}}, {{day.with_job}}, {{day.empty}} | computed from the device date | "other day" and "empty day" are chosen inside the current Sunday–Saturday week |
+| {{today}}, {{day.with_job}}, {{day.empty}} | computed from the device date | "other day" and "empty day" are chosen inside the current Sunday–Saturday week; the empty day is neither today, the other day nor yesterday |
 | {{link.invalid}} | generated | `https://copsfieldservices.dev.concerttech.com/redirect/QA-AUTO-INVALID-<ts>`; nothing created |
 | {{link.other_phone}}, {{other.phone}} | `POST /job/assign/{phone}` → `message` (https link) | reserved `+1 202 555 01xx`; owner go 2026-09-24 |
 | {{link.own_phone}} | `POST /job/assign/{phone}` for `{{tech.phone}}` → `message` | owner go 2026-09-24 (phone not real) |
@@ -607,13 +637,14 @@ Screen maps come in step 5 of the module; `MISSING` = not in a map yet — every
 | CHK-ORDL-057 | TC-ORDL-010 | Submitted shown too — correct per the owner (D-ORDL-8) |
 | CHK-ORDL-070 | TC-ORDL-015 | red today — BUG-ORDL-001 (regression check) |
 | CHK-ORDL-030 | — | **manual — verified by the owner on production** (2026-09-24); not automatable on DEV without COPS |
-| CHK-ORDL-069 | — | TC-ORDL-014 after D-ORDL-10 is settled |
+| CHK-ORDL-069 | TC-ORDL-014 | red today — order by creation time (D-ORDL-10, bug candidate) |
 
-**Total: 50 CHK IDs in 14 TCs** (+ CHK-ORDL-001 via TC-AUTH-005; 3 partial). Not covered here, with reasons, in the
-plan: -030 (manual, owner), -069 (pending D-ORDL-10), -014, -021, -041 (control / label does not exist), -023, -066
+**Total: 51 CHK IDs in 15 TCs** (+ CHK-ORDL-001 via TC-AUTH-005; 3 partial). Not covered here, with reasons, in the
+plan: -030 (manual, owner), -014, -021, -041 (control / label does not exist), -023, -066
 (manual), -025, -045, -046, -059 (deferred), -031…-035, -064, -065 (network — Android phase), -067 (load).
 
 ## Open questions
 
-- D-ORDL-1…9, -12 — accepted; D-ORDL-11 — bug BUG-ORDL-001; D-ORDL-10 (sort order) — being clarified.
+- D-ORDL-1…9, -12 — accepted; D-ORDL-11 — bug BUG-ORDL-001; D-ORDL-10 (the list is ordered by creation time) — bug
+  candidate, the owner decides.
   All in [order-list-questions.md](order-list-questions.md).
