@@ -1,0 +1,29 @@
+# Order progress (In progress) — питання
+
+Розбіжності між документами і застосунком. За моделлю оракула (`docs/notes/decisions.md`, 2026-09-23) тести
+стверджують **поведінку застосунку**; тут фіксуємо, щоб розбіжність не загубилась. Власник може перевести будь-який
+рядок у баг.
+
+Статус: `відкрите` · `прийнято як є` · `баг`
+
+Джерела: код `lib/features/jobs/presentation/widgets/{job_detail_content,deliverables_section,submit_deliverables_dialog,connection_restored_dialog}.dart`,
+`lib/core/feature_flags.dart` (лише читання, 2026-09-24); recon 6c (деталі джоби In progress після check-in:
+`recon6c_site_after_confirm.xml`); чекліст модуля 07 (CSV) — для розмежування; модулі 04 / 05 (D-ORDD-1…9, D-CHIO-1…6 прийнято).
+
+## Розбіжності (D)
+
+| # | Що | Документ каже | Застосунок | Джерело | Статус |
+|---|---|---|---|---|---|
+| D-ORDP-1 | Позначка «виконано» біля Survey / Photo report / Notes | є, «якщо додадуть» (CHK-ORDP-009 — placeholder) | **немає** — рядки лише з іконкою і стрілкою | код `deliverables_section.dart`, recon 6c | відкрите |
+| D-ORDP-2 | Location | «site name and City, State» (CHK-ORDP-011) | один рядок адреси — як у списку й деталях (D-ORDL-4 / модуль 04, прийнято) | recon 6c | відкрите |
+| D-ORDP-3 | On map | «external maps application» (CHK-ORDP-013) | `maps.apple.com` у браузері апки (D-ORDD-4, прийнято) | модуль 04 | відкрите |
+| D-ORDP-4 | Коли «Submit deliverables» неактивна | лише офлайн (CHK-ORDP-029) | офлайн **або** коли шаблон опитування оновився («Survey was updated. Please review and complete the new survey questions before submitting.») | код | відкрите (довідково) |
+| D-ORDP-5 | Таймер | HH:MM:SS, у реальному часі (CHK-ORDP-002) | `00:00:05` — у дереві цифри через перенос рядка; відлік від check-in (або від зміни джоби, якщо check-in не було — джоба створена одразу In progress) | код `AppStopwatchView`, recon 6c | відкрите (довідково) |
+
+## Питання (Q)
+
+| # | Питання | Навіщо | Статус |
+|---|---|---|---|
+| Q-ORDP-1 | **Обсяг.** Процес здачі робіт — вікно «Submit deliverables», Cancel / Submit, «Submitting deliverables», «Deliverables sent to review successfully», «Successful», поява Check out, помилки й повтор (CHK-ORDP-019…028, -038, -039, -041) — докладно описує модуль 07 Submit deliverables. Пропоную перевіряти їх **у модулі 07**, а в 06 — сам екран джоби в роботі: статус, таймер, Survey / Photo report / Notes і перехід до них, блок інформації, яка головна кнопка показується (CHK-ORDP-001…018, -042). | не робити той самий процес двічі (як 04 → 05) | відкрите |
+| Q-ORDP-2 | **Офлайн і «Connection restored»** (CHK-ORDP-029…037, -040): мережу iOS-симулятора з тесту не вимкнути. Ти перевіряв це вручну на iOS? Тоді — ручні з коментарем, як у 04 / 05. | як Q-ORDD-4 | відкрите |
+| Q-ORDP-3 | **Recon 7** на симуляторі: 1–2 тестові джоби одразу в статусі In progress (API), відкрити Survey / Photo report / Notes (що за екрани, як їх упізнати), перевірити таймер після згортання апки, стан кнопки «Submit deliverables». Нічого не заповнюю і не здаю; джоби видаляються. | екрани Survey / Photo report / Notes ще не бачили в дереві | відкрите |

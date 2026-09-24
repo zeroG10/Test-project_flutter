@@ -14,7 +14,7 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 | 03 | `order-list` | `ORDL` | 70 | `2451:82604` | android · ios · tablet | traced (iOS) | Jobs list + weekly calendar + job links — 16 тестів (15 TC); 46 Passed, 4 Failed (BUG-ORDL-001…003), 2 Blocked (iOS-симулятор); D-ORDL-1…12 |
 | 04 | `order-details` | `ORDD` | 89 | `2451:82657` | android · ios · tablet | traced (iOS) | Order details + Attachments — 9 тестів; разом з перевірками check-in у модулі 05: 55 Passed, 1 Blocked (телефон PF — обмеження симулятора) |
 | 05 | `check-in-out` | `CHIO` | 41 (+25 ORDD) | `2451:83073` | android · ios · tablet | traced (iOS) | Check-In / Check-Out — 9 тестів; 25 CHIO Passed (+ CHK-ORDD 024…047 частково); перемикач підробленої локації для потоків, захист — окремий тест (Q-CHIO-5) |
-| 06 | `order-progress` | `ORDP` | 42 | `<node-id>` | android · ios · tablet | intake | Order details — In progress state |
+| 06 | `order-progress` | `ORDP` | 42 | `2451:82704` | android · ios · tablet | candidates (draft) | Order details — In progress: план ~18 CHK → 5 TC, здача → 07; Q-ORDP-1…3 чекають власника |
 | 07 | `submit-deliverables` | `DLV` | 33 | `<node-id>` | android · ios · tablet | intake | Submit Deliverables |
 | 08 | `survey` | `SRV` | 40 **+нові** | `4009:12410` | android · ios · tablet | intake | Survey screen. ⚠️ **CR-2 Repeatable Sections у проді, але в чеклісті 0 перевірок** — пишемо заново з PRD (stories 3–6, §9.2) |
 | 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | intake | Photo report screen |
