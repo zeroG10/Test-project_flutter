@@ -65,3 +65,7 @@
 1. [CHK-CHIO-038] Check that the confirmation modal remains responsive during slow GPS acquisition or network conditions.
 2. [CHK-CHIO-039] Check that multiple rapid taps on the Confirm button do not trigger duplicate Check-In or Check-Out events.
 3. [CHK-CHIO-040] Check that the user cannot initiate Check-In or Check-Out actions that are invalid for the current order status.
+
+## Location integrity (added 2026-09-24 on the owner's decision Q-CHIO-5)
+
+1. [CHK-CHIO-041] Check that check-in is refused with the "Location could not be trusted" message when the device reports a simulated (mock) location, and the order status stays unchanged.

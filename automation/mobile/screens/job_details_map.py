@@ -59,6 +59,14 @@ JOB_DETAILS = Screen(
             note="'Attachments (N)' — N is the number of documents + photos",
         ),
         "check-in": El(ios=(_P, _BUTTON + "name == 'Check in'")),
+        "check-out": El(
+            ios=(_P, _BUTTON + "name == 'Check out'"),
+            note="only for a Submitted job (D-CHIO-1, recon 6)",
+        ),
+        "submit-deliverables": El(
+            ios=(_P, _BUTTON + "name == 'Submit deliverables'"),
+            note="the action of an In progress job (recon 6)",
+        ),
         "checking-in": El(
             ios=(_P, _BUTTON + "name == 'Checking in'"),
             note="the Check in button while the location is acquired (NotEnabled, recon 5)",

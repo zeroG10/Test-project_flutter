@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="92507" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="118" index="0" traits=""/>
+                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="Back" label="Back" enabled="true" visible="true" accessible="true" x="4" y="66" width="48" height="48" index="1" traits="Button"/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" name="QA-AUTO-R6C-0924-1442-FAR - QA-AUTO recon6c far" label="QA-AUTO-R6C-0924-1442-FAR - QA-AUTO recon6c far" enabled="true" visible="true" accessible="true" x="72" y="76" width="314" height="28" index="2" traits="Header"/>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                    <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="false" accessible="false" x="0" y="118" width="402" height="371" index="0" traits=""/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="New" name="New" label="New" enabled="true" visible="true" accessible="true" x="34" y="128" width="27" height="16" index="1" traits="StaticText"/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="QA-AUTO-R6C-0924-1442-FAR - QA-AUTO recon6c far" name="QA-AUTO-R6C-0924-1442-FAR - QA-AUTO recon6c far" label="QA-AUTO-R6C-0924-1442-FAR - QA-AUTO recon6c far" enabled="true" visible="true" accessible="true" x="16" y="162" width="370" height="48" index="2" traits="StaticText"/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Recon 6c (module 05)." name="Recon 6c (module 05)." label="Recon 6c (module 05)." enabled="true" visible="true" accessible="true" x="16" y="214" width="154" height="20" index="3" traits="StaticText"/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Location" name="Location" label="Location" enabled="true" visible="true" accessible="true" x="16" y="251" width="67" height="24" index="4" traits="StaticText"/>
+                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="On map" label="On map" enabled="true" visible="true" accessible="true" x="317" y="252" width="69" height="22" index="5" traits="Button"/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="QA test site, 350 5th Ave, New York, NY 10118" name="QA test site, 350 5th Ave, New York, NY 10118" label="QA test site, 350 5th Ave, New York, NY 10118" enabled="true" visible="true" accessible="true" x="16" y="275" width="308" height="20" index="6" traits="StaticText"/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Scheduled date &amp; time" name="Scheduled date &amp; time" label="Scheduled date &amp; time" enabled="true" visible="true" accessible="true" x="16" y="312" width="172" height="24" index="7" traits="StaticText"/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="24 Sep 2026" name="24 Sep 2026" label="24 Sep 2026" enabled="true" visible="true" accessible="true" x="16" y="336" width="88" height="20" index="8" traits="StaticText"/>
+                    <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="10:00" name="10:00" label="10:00" enabled="true" visible="true" accessible="true" x="112" y="336" width="37" height="20" index="9" traits="StaticText"/>
+                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="Attachments (0)" label="Attachments (0)" enabled="true" visible="true" accessible="true" x="0" y="373" width="402" height="56" index="10" traits="Image, Button"/>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeButton type="XCUIElementTypeButton" name="Check in" label="Check in" enabled="true" visible="true" accessible="true" x="16" y="776" width="370" height="48" index="3" traits="Button"/>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

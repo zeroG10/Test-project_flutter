@@ -12,7 +12,12 @@ import contextlib
 from collections.abc import Iterator
 
 from pages.base_page import BasePage
-from screens.location_dialogs_map import LOCATION_DISABLED, LOCATION_PROMPT
+from screens.location_dialogs_map import (
+    LOCATION_DISABLED,
+    LOCATION_PROMPT,
+    MOCK_LOCATION,
+    NOT_AT_SITE,
+)
 
 
 @contextlib.contextmanager
@@ -35,3 +40,11 @@ class LocationPromptPage(BasePage):
 
 class LocationDisabledDialog(BasePage):
     screen = LOCATION_DISABLED
+
+
+class NotAtSiteDialog(BasePage):
+    screen = NOT_AT_SITE
+
+
+class MockLocationDialog(BasePage):
+    screen = MOCK_LOCATION

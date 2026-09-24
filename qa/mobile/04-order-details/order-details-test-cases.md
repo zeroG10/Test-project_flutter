@@ -188,7 +188,7 @@ there (recon 5).
 |---|---|
 | ID | TC-ORDD-005 |
 | Title | Check in starts the check-in flow; refusing location and cancelling leaves the job New |
-| Source CHK IDs | CHK-ORDD-022 |
+| Source CHK IDs | CHK-ORDD-022 (+ CHK-ORDD-024, -027, CHK-CHIO-022 — module 05) |
 | Platforms | ios, android |
 | Priority | P2 |
 | Automation | candidate |
@@ -205,6 +205,7 @@ there (recon 5).
 | 2 | click | job-details.check-in | — | — |
 | 3 | expect-visible | job-details.checking-in | — | "Checking in", disabled |
 | 4 | expect-text | location-prompt.title | — | Allow "[DEV] CT Mobile" to use your location? — the system prompt (within 15 s) |
+| 4a | expect-text | location-prompt.message | — | This app needs your location to verify you are on site when checking in or out of a job. (CHK-ORDD-024) |
 | 5 | click | location-prompt.dont-allow | — | — |
 | 6 | expect-text | location-disabled.title | — | Location disabled |
 | 7 | expect-text | location-disabled.message | — | To use GPS check-in, please enable location services in your device settings. You can still check in manually if you prefer. |

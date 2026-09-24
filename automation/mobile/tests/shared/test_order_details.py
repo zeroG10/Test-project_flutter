@@ -24,7 +24,7 @@ from pages.in_app_browser_page import InAppBrowserPage
 from pages.job_details_page import JobDetailsPage
 from pages.jobs_list_page import JobsListPage
 from pages.location_dialogs_page import LocationDisabledDialog, LocationPromptPage, system_alerts
-from screens.location_dialogs_map import LOCATION_DISABLED_MESSAGE
+from screens.location_dialogs_map import LOCATION_DISABLED_MESSAGE, LOCATION_PROMPT_MESSAGE
 
 SERVER = 20.0
 MAPS_PAGE = 40.0  # maps.apple.com loads slowly on the simulator (recon 5: blank at 4 s)
@@ -267,8 +267,9 @@ def test_updated_gone_after_viewing(details_seed, ui_login, field_services_api, 
 @pytest.mark.regression
 @pytest.mark.shared
 @pytest.mark.tc("TC-ORDD-005")
-@pytest.mark.chk("CHK-ORDD-022")
-@allure.tag("CHK-ORDD-022")
+# + CHK-CHIO-022, CHK-ORDD-024, -027 (module 05): flow starts; its explanation; refusal
+@pytest.mark.chk("CHK-ORDD-022", "CHK-ORDD-024", "CHK-ORDD-027", "CHK-CHIO-022")
+@allure.tag("CHK-ORDD-022", "CHK-ORDD-024", "CHK-ORDD-027", "CHK-CHIO-022")
 @allure.title(
     "TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves "
     "the job New"
@@ -286,6 +287,7 @@ def test_check_in_starts_flow(
         d.wait_checking_in(SERVER)
         with system_alerts(driver, platform):  # the system prompt is readable only inside
             pages.prompt.expect_text("title", expected("to use your location"), SERVER)
+            pages.prompt.expect_text("message", expected(LOCATION_PROMPT_MESSAGE))
             evidence.checkpoint("location-prompt")
             pages.prompt.tap("dont-allow")
         pages.disabled.expect_text("title", expected("Location disabled"), SERVER)

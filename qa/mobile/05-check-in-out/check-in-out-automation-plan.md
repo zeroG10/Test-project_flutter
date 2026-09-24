@@ -3,8 +3,9 @@
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/05-check-in-out/check-in-out-checklist.md`
 > (40 items, `CHK-CHIO-001…040`, imported 2026-09-24) **plus CHK-ORDD-023…047** moved here from module 04 (owner,
 > Q-ORDD-1). The **Selected CHK IDs** table is the contract for `prompts/mobile/03`. Date: 2026-09-24. Owner:
-> mykola.zhuchenko. **Status: draft — waits for the owner (Q-CHIO-1…4 in [check-in-out-questions.md](check-in-out-questions.md))
-> and recon 6.**
+> mykola.zhuchenko. **Status: decided — Q-CHIO-1…5 answered by the owner 2026-09-24 (Q-CHIO-5: the app's mock-location
+> switch ON for these tests, the guard proven without it); recon 6 / 6b / 6c done. Final selection:
+> [check-in-out-test-cases.md](check-in-out-test-cases.md) → Coverage.**
 
 | Field | Value |
 |---|---|
@@ -97,7 +98,9 @@ Status legend as in the Auth plan. **needs recon 6** = decided by what recon 6 s
 
 ## Step 5b — Selected CHK IDs (handoff to prompts/mobile/03)
 
-**Draft: about 29 of 40 CHIO + 14 of 25 ORDD in ~9 TCs**, final after recon 6 and Q-CHIO-1…4. GPS-dependent items (Q-4):
+**After recon 6c: 9 TCs** — CHIO 001–012, 014, 016–018, 020, 022, 023, 035–037, 039 (partial), 040, 041 (new, the guard) and
+ORDD 024, 027 (partial), 028, 030–035, 044–047. Manual entry (CHIO-013, -019, -024, -025, -026; ORDD-036…042) — unreachable on
+the simulator, **verified by the owner on a real device**. Earlier draft: about 29 of 40 CHIO + 14 of 25 ORDD. GPS-dependent items (Q-4):
 CHK-CHIO-011, -012, -017, -018, -037; CHK-ORDD-030…035, -045, -046.
 
 ## Step 6 — Manual-only / Skipped
