@@ -83,7 +83,7 @@ def _check_in(app, driver, platform, job) -> None:
                 confirm.visible("confirm", SERVER)
                 confirm.tap("confirm")
             details.expect_field("status", "In progress", SERVER)
-            details.go_back()
+            details.tap("back")
             jobs.assert_open(SERVER)
     except (TimeoutException, AssertionError) as exc:
         reason = getattr(exc, "msg", None) or str(exc).splitlines()[0]

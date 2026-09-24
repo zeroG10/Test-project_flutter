@@ -22,6 +22,8 @@
 - **The timer** is one element whose name holds the six digits and two colons separated by line breaks
   (`0\n0\n:\n0\n0\n:\n0\n5`, recon 6c / 7); the page joins it into `HH:MM:SS`.
 - **Nothing is filled, uploaded or submitted** in this module (the submission flow is module 07).
+- **Back = the app bar's `Back` button**, not the edge swipe: Flutter ignores the swipe while a screen is still
+  sliding in, so a swipe right after opening the details can do nothing (run 2 of TC-ORDP-005 — a harness defect, fixed).
 
 ---
 
@@ -117,9 +119,9 @@
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
-| 1 | back | — | — | Jobs list (from the open details of `{{job.progress}}`) |
+| 1 | click | job-details.back | — | Jobs list (from the open details of `{{job.progress}}`) |
 | 2 | click | jobs-list.card[{{job.progress.jobId}}] | — | "Submit deliverables", no "Check out" |
-| 3 | back | — | — | Jobs list |
+| 3 | click | job-details.back | — | Jobs list |
 | 4 | click | jobs-list.card[{{job.done.jobId}}] | — | "Check out", no "Submit deliverables" |
 | 5 | click | job-details.deliverable[Survey] | — | nothing opens within 3 s — the details stay (read-only) |
 
@@ -139,7 +141,7 @@
 
 | Alias | ios map |
 |---|---|
-| job-details.status, .description, .address, .on-map, .date, .pf-name, .pf-phone, .attachments, .check-out, .submit-deliverables | yes (modules 04 / 05) |
+| job-details.back, .status, .description, .address, .on-map, .date, .pf-name, .pf-phone, .attachments, .check-out, .submit-deliverables | yes (modules 04 / 05) |
 | job-details.timer | yes — `StaticText` top right whose name holds the digits and colons (the page joins them) |
 | job-details.deliverable[{{name}}] | yes — `Other '<name>'`; icon and chevron = the two images inside its rect (`job-details.images`) |
 | deliverable-screen.title, .survey-name, .back | yes — `Other` Header `Survey` / `Photo report` / `Notes`, the survey's name, `Button 'Back'` (recon 7) |

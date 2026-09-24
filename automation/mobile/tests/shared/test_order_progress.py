@@ -173,13 +173,13 @@ def test_primary_action_follows_status(
 ):
     job, done, d = in_progress_job, progress_seed["done"], pages.details
     open_job(pages, job, expected)
-    d.go_back()
+    d.tap("back")  # not the edge swipe: Flutter ignores it while the details still slide in (run 2)
     pages.jobs.assert_open(SERVER)
     pages.jobs.open_card(job.job_id)
     d.expect_header(expected(job.title_line), SERVER)
     d.expect_enabled("submit-deliverables", timeout=SERVER)
     assert not d.is_visible("check-out", 0), "'Check out' on an In progress job"
-    d.go_back()
+    d.tap("back")
     pages.jobs.assert_open(SERVER)
     pages.jobs.open_card(done.job_id)
     d.expect_header(expected(done.title_line), SERVER)
