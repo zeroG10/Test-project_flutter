@@ -22,8 +22,11 @@ from screens import Screen, fill, template_fields
 
 REPO = Path(__file__).resolve().parents[3]
 TEST_CASES = {
+    "01-splash": REPO / "qa/mobile/01-splash/splash-test-cases.md",
     "02-authentication": REPO / "qa/mobile/02-authentication/authentication-test-cases.md",
+    "03-order-list": REPO / "qa/mobile/03-order-list/order-list-test-cases.md",
 }
+MIN_ALIASES = {"01-splash": 5, "02-authentication": 40, "03-order-list": 30}
 STEP_ROW = re.compile(r"^\| \d+ \| ([a-z-]+) \| ([^|]+?) \|")
 # Test-case targets that are not elements: lifecycle and navigation shortcuts ("open | login").
 NOT_ELEMENTS = {"app", "—", "login", "registration"}
@@ -34,7 +37,20 @@ PAGE_RESOLVED = {
     "registration.channel-sms": "RegistrationPage.choose_channel / selected_channel",
     "registration.channel-email": "RegistrationPage.choose_channel / selected_channel",
     "registration.error[{{field}}]": "RegistrationPage.field_errors (texts inside the field)",
+    # module 01 — the splash has no labelled element (recon 4)
+    "splash.logo": "SplashPage.expect_logo_centred (pixels: centre of the light logo)",
+    # module 03 — one card = one element; lists of cards and states read from the page source
+    "jobs-list.card-count": "JobsListPage.card_count (whole scrolled list)",
+    "jobs-list.card-order": "JobsListPage.all_cards (order top → bottom)",
+    "jobs-list.card-dates": "JobsListPage.all_cards (dates top → bottom)",
+    "jobs-list.any-card": "JobsListPage.expect_no_cards (card-shaped names in the page source)",
+    "jobs-calendar.any-card": "JobsCalendarPage.expect_no_cards",
+    "jobs-calendar.week-days": "JobsCalendarPage.week_days (day cells left → right)",
+    "tabbar.jobs-selected": "TabBarPage.selected (page-source traits contain 'Selected')",
 }
+# Fields of a parsed job card (``screen.card[{{jobId}}].<field>``, pages/jobs_list_page.parse_card)
+CARD_FIELDS = {"title", "date", "status", "address", "updated"}
+PARAMS = re.compile(r"\[[^\]]*\]")
 REGISTRATION_FIELDS = ("first-name", "last-name", "phone", "email")
 
 
@@ -61,7 +77,12 @@ def test_case_aliases(path: Path) -> set[str]:
         if target == "registration.{{field}}":
             aliases.update(f"registration.{f}" for f in REGISTRATION_FIELDS)
             continue
-        aliases.add(target)
+        if target in PAGE_RESOLVED:
+            aliases.add(target)
+            continue
+        aliases.add(
+            PARAMS.sub("", target)
+        )  # "jobs-list.card[{{job.new.jobId}}].title" → ….card.title
     return aliases
 
 
@@ -72,12 +93,16 @@ class MapHealth(unittest.TestCase):
     def test_every_test_case_alias_resolves(self):
         for module, path in TEST_CASES.items():
             aliases = test_case_aliases(path)
-            self.assertGreater(len(aliases), 40, f"{module}: parsed too few aliases")
+            self.assertGreater(len(aliases), MIN_ALIASES[module], f"{module}: too few aliases")
             missing = []
             for alias in sorted(aliases):
                 if alias in PAGE_RESOLVED:
                     continue
                 screen_id, _, element = alias.partition(".")
+                element, _, card_field = element.partition(".")
+                if card_field and card_field not in CARD_FIELDS:
+                    missing.append(alias)
+                    continue
                 screen = self.screens.get(screen_id)
                 if screen is None or element not in screen.elements:
                     missing.append(alias)
@@ -87,7 +112,8 @@ class MapHealth(unittest.TestCase):
 
     def test_page_resolved_aliases_are_still_used(self):
         used = set().union(*(test_case_aliases(p) for p in TEST_CASES.values()))
-        self.assertEqual(set(PAGE_RESOLVED) - used, set(), "stale PAGE_RESOLVED entries")
+        stale = {a for a in PAGE_RESOLVED if a not in used and PARAMS.sub("", a) not in used}
+        self.assertEqual(stale, set(), "stale PAGE_RESOLVED entries")
 
     def test_every_screen_has_an_anchor_and_ios_locators(self):
         for screen in self.screens.values():

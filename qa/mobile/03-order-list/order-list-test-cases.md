@@ -533,8 +533,8 @@ email link flows manually on production (2026-09-24) — reported as a manual ch
 | 3 | expect-text | jobs-list.card-dates | — | the dates of all `QA-AUTO-<run>` cards never decrease from top to bottom (times within one date are not compared) |
 
 **Postconditions / cleanup:** the seed is removed after the module.
-**Known issue:** D-ORDL-10 — the probe of 2026-09-24 showed the list ordered by **creation time, newest first** (dates
-24 → 23 → 25). The TC keeps the SRS / owner expectation and is **red today**; a bug report waits for the owner's word.
+**Known issue:** [BUG-ORDL-002](bugs/BUG-ORDL-002.md) (P4) — the list is ordered by **creation time, newest first**
+(probe 2026-09-24: dates 24 → 23 → 25). The TC keeps the SRS / owner expectation and **stays red** as the regression check.
 
 ---
 
@@ -637,7 +637,7 @@ Screen maps come in step 5 of the module; `MISSING` = not in a map yet — every
 | CHK-ORDL-057 | TC-ORDL-010 | Submitted shown too — correct per the owner (D-ORDL-8) |
 | CHK-ORDL-070 | TC-ORDL-015 | red today — BUG-ORDL-001 (regression check) |
 | CHK-ORDL-030 | — | **manual — verified by the owner on production** (2026-09-24); not automatable on DEV without COPS |
-| CHK-ORDL-069 | TC-ORDL-014 | red today — order by creation time (D-ORDL-10, bug candidate) |
+| CHK-ORDL-069 | TC-ORDL-014 | red today — BUG-ORDL-002 (regression check) |
 
 **Total: 51 CHK IDs in 15 TCs** (+ CHK-ORDL-001 via TC-AUTH-005; 3 partial). Not covered here, with reasons, in the
 plan: -030 (manual, owner), -014, -021, -041 (control / label does not exist), -023, -066
@@ -645,6 +645,5 @@ plan: -030 (manual, owner), -014, -021, -041 (control / label does not exist), -
 
 ## Open questions
 
-- D-ORDL-1…9, -12 — accepted; D-ORDL-11 — bug BUG-ORDL-001; D-ORDL-10 (the list is ordered by creation time) — bug
-  candidate, the owner decides.
+- D-ORDL-1…9, -12 — accepted; D-ORDL-11 — bug BUG-ORDL-001; D-ORDL-10 — bug BUG-ORDL-002 (P4).
   All in [order-list-questions.md](order-list-questions.md).

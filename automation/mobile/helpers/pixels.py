@@ -38,3 +38,60 @@ def ink_ratio(png: bytes, box: dict, scale: float, threshold: int = INK_THRESHOL
         if sum(abs(a - b) for a, b in zip(colour, background, strict=True)) > threshold
     )
     return ink / area
+
+
+# --- whole-screen oracles (module 01 Splash: no labelled element to ask the tree about) ---
+
+SPLASH_DOWNSCALE = 6  # every 6th pixel is plenty for a flat brand colour and a 100-pt logo
+COLOUR_TOLERANCE = 45  # summed RGB distance still counted as "the same colour"
+LIGHT = 600  # R+G+B above this = the white logo on the brand colour
+
+
+def hex_to_rgb(hex_colour: str) -> tuple[int, int, int]:
+    """``"#782A2A"`` → (120, 42, 42). Raises ValueError on anything else (e.g. a prove-red text)."""
+    value = hex_colour.strip().lstrip("#")
+    if len(value) != 6:
+        raise ValueError(f"not a #RRGGBB colour: {hex_colour!r}")
+    return int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16)
+
+
+def _small(png: bytes) -> Image.Image:
+    image = Image.open(io.BytesIO(png)).convert("RGB")
+    return image.resize(
+        (image.width // SPLASH_DOWNSCALE, image.height // SPLASH_DOWNSCALE), Image.NEAREST
+    )
+
+
+def colour_share(png: bytes, rgb: tuple[int, int, int], tolerance: int = COLOUR_TOLERANCE) -> float:
+    """Share of the whole screenshot painted in ``rgb`` (± ``tolerance``)."""
+    small = _small(png)
+    colours = small.getcolors(maxcolors=small.width * small.height) or []
+    same = sum(
+        count
+        for count, colour in colours
+        if sum(abs(a - b) for a, b in zip(colour, rgb, strict=True)) <= tolerance
+    )
+    return same / (small.width * small.height)
+
+
+def light_blob_offset(
+    png: bytes, points_wide: float, skip_top_pt: float = 60, skip_bottom_pt: float = 30
+) -> tuple[float, float] | None:
+    """Centre of the light pixels (the logo) relative to the screen centre, as fractions of the
+    screen width / height; ``None`` when nothing light is drawn yet. The status bar (top) and the
+    home indicator (bottom) are left out — their glyphs are light too."""
+    small = _small(png)
+    pt_per_px = points_wide / small.width
+    top, bottom = int(skip_top_pt / pt_per_px), small.height - int(skip_bottom_pt / pt_per_px)
+    xs: list[int] = []
+    ys: list[int] = []
+    pixels = small.load()
+    for y in range(top, bottom):
+        for x in range(small.width):
+            if sum(pixels[x, y]) > LIGHT:
+                xs.append(x)
+                ys.append(y)
+    if not xs:
+        return None
+    cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    return (cx - small.width / 2) / small.width, (cy - small.height / 2) / small.height

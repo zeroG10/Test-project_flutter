@@ -13,6 +13,10 @@ Clearing data = signing out, on both OSes:
   clearApp; there the only way is a reinstall.
 """
 
+import contextlib
+import subprocess
+from collections.abc import Iterator
+
 import allure
 from appium.webdriver.webdriver import WebDriver
 
@@ -57,3 +61,40 @@ class AppControl:
         with allure.step(f"app: reinstall from {path.name}"):
             self.driver.remove_app(self.app_id)
             self.driver.install_app(str(path))
+
+    # --- job links (module 03; recon 4, 2026-09-24) -----------------------------------------
+
+    def open_link(self, url: str) -> None:
+        """Open a job link the way a tap in an SMS / email does: as a universal link (iOS) or an
+        App Link (Android). The app's own scheme ``ctflutter://jobs/<key>`` does not carry the key
+        (recon 4), so tests always use the https link from ``POST /job/assign/{phone}``.
+
+        iOS simulator: ``xcrun simctl openurl`` (``mobile: deepLink`` did not deliver the link to
+        the app in recon 4). Android: ``mobile: deepLink`` = ``am start -a VIEW -d <url>``.
+        """
+        with allure.step(f"open job link {url}"):
+            if self.platform == "android":
+                self.driver.execute_script("mobile: deepLink", {"url": url, "package": self.app_id})
+                return
+            udid = self.driver.capabilities.get("udid") or "booted"
+            subprocess.run(
+                ["xcrun", "simctl", "openurl", udid, url],
+                check=True,
+                capture_output=True,
+                timeout=30,
+            )
+
+    @contextlib.contextmanager
+    def alerts_left_alone(self) -> Iterator[None]:
+        """Switch the session's alert auto-accept off for a few steps (iOS). ``autoAcceptAlerts``
+        exists for the OS permission prompts, but WDA may also press a button of an app dialog
+        — a link dialog must be answered by the test itself (recon 4)."""
+        if self.platform != "ios":
+            yield
+            return
+        self.driver.update_settings({"defaultAlertAction": ""})
+        try:
+            yield
+        finally:
+            with contextlib.suppress(Exception):
+                self.driver.update_settings({"defaultAlertAction": "accept"})

@@ -55,11 +55,11 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 |---|---|---|---|---|
 | 1 | open | app | cold start | — |
 | 2 | expect-visible | splash.root | — | the first captured frame: ≥ 90 % of the screen is the brand colour `#782A2A` (D-SPL-2) |
-| 3 | expect-visible | splash.logo | — | a light logo on the brand colour, its centre within 2 % of the screen centre (both axes) |
-| 4 | expect-hidden | splash.interactive | — | no text, button, link or input in the tree |
-| 5 | click | splash.root | screen centre | nothing happens |
-| 6 | back | — | edge swipe | nothing happens |
-| 7 | expect-visible | splash.root | — | still the splash — steps 5–6 landed on it and changed nothing |
+| 3 | expect-hidden | splash.interactive | — | no text, button, link or input in the tree |
+| 4 | click | splash.root | screen centre | nothing happens |
+| 5 | back | — | edge swipe | nothing happens |
+| 6 | expect-visible | splash.root | — | still the splash — steps 4–5 landed on it and changed nothing |
+| 7 | expect-visible | splash.logo | — | the logo appears (debug build: ~8 s after launch); its centre within 2 % of the screen centre (both axes) |
 | 8 | wait-for | welcome.root | — | appears without any input |
 | 9 | expect-visible | welcome.root | — | visible — Welcome, not Login (D-SPL-3) |
 | 10 | expect-hidden | login.root | — | hidden |
@@ -68,7 +68,8 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 **Notes:** recon 4 (2026-09-24, debug build): the first screenshot comes 2.2–3.4 s after launch and is already 99.8 %
 brand colour; the logo appears at ~8 s (centre within 0.5 %); Welcome after ~9 s; the tree holds no text / button /
 field during the splash. The debug build starts far slower than the code's 2.0 s + 0.8 s — step 3 waits for the logo.
-If a step cannot be observed inside the splash, the TC is **Blocked (timing)**, never Passed. The long press on the logo is **not** used: in the `development`
+If a step cannot be observed inside the splash, the TC is **Blocked (timing)**, never Passed. The logo step comes
+after the interactions because in the debug build the logo is drawn only at the end of the splash (recon 4). The long press on the logo is **not** used: in the `development`
 flavour it opens the debug screen by design (D-SPL-4). The logo animates while it grows (fade, scale, a half turn);
 its centre does not move, so step 3 holds at any moment of the animation.
 
@@ -125,7 +126,7 @@ splash's own look is proven by TC-SPL-001. Overlaps TC-AUTH-003 by design (plan,
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
 | 1 | open | app | cold start | — |
-| 2 | wait-for | welcome.root | — | within 15 s |
+| 2 | wait-for | welcome.root | — | within 30 s (the debug build needs ~10 s to its first screen) |
 | 3 | expect-visible | welcome.root | — | signed out |
 | 4 | expect-hidden | jobs-list.root | — | the Jobs list is not shown |
 | 5 | open | app | terminate, then cold start | — |

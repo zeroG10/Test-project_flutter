@@ -7,7 +7,8 @@ phone. Screenshots never leave the scratchpad; the trees go to the repo, so they
     PYTHONPATH=. uv run python scripts/recon/redact_dumps.py <dumps-dir> [--name "<shown name>"]
 
 Replaces APP_USER_EMAIL, APP_USER_PHONE (E.164 and its 10 national digits) and the optional shown
-name with <APP_USER_EMAIL>, <APP_USER_PHONE>, <APP_USER_NAME>. Prints what it changed.
+name with [APP_USER_EMAIL], [APP_USER_PHONE], [APP_USER_NAME] — square brackets keep the XML
+well-formed. Prints what it changed.
 """
 
 import argparse
@@ -25,13 +26,13 @@ def main() -> None:
     digits = re.sub(r"\D", "", settings.app_user_phone)
     national = digits[-10:]
     pairs = [
-        (settings.app_user_email, "<APP_USER_EMAIL>"),
-        (settings.app_user_phone, "<APP_USER_PHONE>"),
-        (f"({national[:3]}) {national[3:6]}-{national[6:]}", "<APP_USER_PHONE>"),
-        (national, "<APP_USER_PHONE>"),
+        (settings.app_user_email, "[APP_USER_EMAIL]"),
+        (settings.app_user_phone, "[APP_USER_PHONE]"),
+        (f"({national[:3]}) {national[3:6]}-{national[6:]}", "[APP_USER_PHONE]"),
+        (national, "[APP_USER_PHONE]"),
     ]
     if args.name:
-        pairs.append((args.name, "<APP_USER_NAME>"))
+        pairs.append((args.name, "[APP_USER_NAME]"))
     for path in sorted(Path(args.dumps).glob("*.xml")):
         text = path.read_text(encoding="utf-8")
         hits = {}

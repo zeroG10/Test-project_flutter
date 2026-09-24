@@ -36,7 +36,7 @@ from config.settings import normalize_platform, settings
 from helpers.evidence import ScreenRecorder
 from helpers.reporting import PLATFORM_TITLE, env_label, module_for, write_allure_run_files
 
-pytest_plugins = ["fixtures.app_state"]
+pytest_plugins = ["fixtures.app_state", "fixtures.jobs"]
 
 CHK_ID = re.compile(r"^CHK-[A-Z]{2,5}-\d{3,}$")
 TC_ID = re.compile(r"^TC-[A-Z]{2,5}-\d{3,}$")

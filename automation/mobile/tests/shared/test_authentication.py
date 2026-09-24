@@ -59,12 +59,12 @@ def pages(driver, platform):
 @pytest.mark.chk(
     "CHK-AUTH-110", "CHK-AUTH-115", "CHK-AUTH-117", "CHK-AUTH-119",
     "CHK-AUTH-073", "CHK-AUTH-074", "CHK-AUTH-075", "CHK-AUTH-088", "CHK-AUTH-089",
-    "CHK-ORDL-001",  # module 03: the Jobs list is the landing screen after login (owner, 2026-09-24)
+    "CHK-ORDL-001",  # module 03: the Jobs list is the landing screen (owner, 2026-09-24)
 )  # fmt: skip
 @allure.tag(
     "CHK-AUTH-110", "CHK-AUTH-115", "CHK-AUTH-117", "CHK-AUTH-119",
     "CHK-AUTH-073", "CHK-AUTH-074", "CHK-AUTH-075", "CHK-AUTH-088", "CHK-AUTH-089",
-    "CHK-ORDL-001",  # module 03: the Jobs list is the landing screen after login (owner, 2026-09-24)
+    "CHK-ORDL-001",  # module 03: the Jobs list is the landing screen (owner, 2026-09-24)
 )  # fmt: skip
 @allure.title("TC-AUTH-005 Login with email and the OTP opens the Jobs list")
 def test_login_with_email(logged_out_app, pages, tech, expected, evidence):

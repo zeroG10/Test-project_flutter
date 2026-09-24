@@ -28,6 +28,8 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# Recon scripts are one-off discovery tools (qa/shared/recon-*.md), not part of the harness.
+extend-exclude = ["scripts/recon"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
