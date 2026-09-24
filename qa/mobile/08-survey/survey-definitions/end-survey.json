@@ -1,0 +1,529 @@
+{
+ "id": "5478a9d2-8786-491d-bc09-bcc3a66d71e5",
+ "title": "End Survey",
+ "status": "published",
+ "createdAt": "2026-07-29T11:16:03.047Z",
+ "updatedAt": "2026-07-29T11:16:18.090Z",
+ "items": [
+  {
+   "question": {
+    "answers": [
+     {
+      "id": "538be643-ba1a-4885-83e5-fe7d9f147d13",
+      "title": "Yes",
+      "sort": 0,
+      "options": {
+       "enabled": false
+      },
+      "logic": [
+       {
+        "when": {
+         "op": "eq",
+         "value": true
+        },
+        "actions": [
+         {
+          "type": "skipToField",
+          "targetFieldId": "__end__"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "e794162a-167d-427e-8efb-42156bc0b194",
+      "title": "No",
+      "sort": 1,
+      "options": {
+       "enabled": false
+      },
+      "logic": [
+       {
+        "when": {
+         "op": "eq",
+         "value": true
+        },
+        "actions": [
+         {
+          "type": "skipToField",
+          "targetFieldId": "__next__"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "id": "d9b57457-bebc-4d6e-9f87-8c7807a5868f",
+    "title": "End Survey",
+    "type": "toggle",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "287e868e-9d7e-49e8-8e81-7b254e7cf4ec",
+   "sort": 0
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "155f05bd-2f11-46ec-8589-71dbc946cc39",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__end__"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "fca2dfd6-0dbb-49c1-91f5-1cbb20abc9f1",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__next__"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "9273c0e8-c690-484c-a65f-2caaa68c3c05",
+      "title": "Q1 Enter the work order ID",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "256d23b9-8de7-4be0-b7c0-33035ca9cd3e",
+      "title": "Q2 text Select the visit date",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [],
+      "id": "63af9e2f-76ab-4f9d-bb55-caa419264ac0",
+      "title": "Q3 photo Question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [
+       {
+        "id": "ce482bc0-03de-4549-bf37-d823cbd29bc0",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "7817a486-daaa-4e10-aa95-af95cf8461a2"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "e9c4b780-9dbb-4964-84cf-135ba479887c",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "95cd4f7d-5c1a-4fda-b953-ba41840683a4"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "52149bc5-29b7-4772-9f4f-058bef851eef",
+      "title": "Q4 Select the technician arrival time",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     },
+     {
+      "answers": [],
+      "id": "7817a486-daaa-4e10-aa95-af95cf8461a2",
+      "title": "Q5 time Question",
+      "type": "time",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 4
+     },
+     {
+      "answers": [],
+      "id": "95cd4f7d-5c1a-4fda-b953-ba41840683a4",
+      "title": "Q6 date Question",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 5
+     },
+     {
+      "answers": [
+       {
+        "id": "f8717e5d-a01f-4f8e-acd0-5838b1005539",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "6d65df32-f739-45f5-b282-b8f61fe96e38"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "730a2fad-368d-410d-baa9-6ab99ecb39b0",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "4a563d1a-80a4-4826-bbde-7f4ff5432e38"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "192ccf02-4105-4da5-9db8-a2bde72696c4",
+      "title": "Q7 yes/no Question",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 6
+     },
+     {
+      "answers": [
+       {
+        "id": "b406e3e7-53e7-44ab-acad-0654517cde05",
+        "title": "Option 1 Q8",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "4a563d1a-80a4-4826-bbde-7f4ff5432e38"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "cab5afc5-19c9-44ac-b0eb-7b03d0e8f995",
+        "title": "Option 2 Q8",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "b3559c23-ce56-4dc7-86e9-54ee705b2238"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "7ce8b99e-7e7a-4ff5-b155-007b9b075daf",
+        "title": "Option 3 Q8",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "00bb3c01-343f-4fe4-ba64-754a74c353ed"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "97c79e52-04c4-46b3-b41a-8d45e6b20424",
+        "title": "Option 4 Q8",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__end__"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "6d65df32-f739-45f5-b282-b8f61fe96e38",
+      "title": "Q8 Radio Question",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 7
+     },
+     {
+      "answers": [],
+      "id": "4a563d1a-80a4-4826-bbde-7f4ff5432e38",
+      "title": "Q9 test question",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 8
+     },
+     {
+      "answers": [],
+      "id": "b3559c23-ce56-4dc7-86e9-54ee705b2238",
+      "title": "Q10 photo question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 9
+     },
+     {
+      "answers": [
+       {
+        "id": "f9c71ef6-c4e4-46df-baa4-10ad99b28ee6",
+        "title": "Option 1 Q11",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "38b39366-37cc-4eb0-a93a-761ffe8fc000",
+        "title": "Option 2 Q12",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "59034dec-a19a-4ac8-9b36-d51264e51b96",
+        "title": "Option 3 Q12",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "00bb3c01-343f-4fe4-ba64-754a74c353ed",
+      "title": "Q11 Checkbox Question",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 10
+     },
+     {
+      "answers": [
+       {
+        "id": "36efdc72-a1b7-487b-a747-9fb77e834dac",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "e08111b6-76c1-498b-807d-b3066311b580",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "9d91491e-5283-488b-b9ba-1a7e8ca3fa4e",
+      "title": "Bad?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 11
+     },
+     {
+      "answers": [
+       {
+        "id": "79cb3a23-1ebc-4149-8182-20717470d20d",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "580e02b5-05dc-4c39-8714-3efa93154395",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "8abfd287-6fba-490e-84e0-9b4e9d59e006",
+      "title": "Good?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 12
+     },
+     {
+      "answers": [],
+      "id": "9bdbf5bd-e98c-4c5d-a963-479765995ddf",
+      "title": "Problems?",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 13
+     }
+    ],
+    "id": "76b2dc48-dc51-473d-8afd-cd860be3347c",
+    "title": "S1 Job Details Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nisl tincidunt eget nullam non. Quis hendrerit dolor magna eget est lorem ip",
+    "isRepeatable": true,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "e318fead-eeed-4898-8e8d-1280419d2bec",
+   "sort": 1
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

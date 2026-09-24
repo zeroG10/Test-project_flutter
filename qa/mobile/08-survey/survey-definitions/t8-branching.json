@@ -1,0 +1,251 @@
+{
+ "id": "3fa5b8f2-7813-4055-97dd-a1a303d284c5",
+ "title": "T8 Branching Workflow Template_Multi-section branching template",
+ "status": "published",
+ "createdAt": "2026-03-16T20:20:26.186Z",
+ "updatedAt": "2026-04-01T12:22:51.570Z",
+ "items": [
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "0c53ff64-7bc2-4604-9856-7cfb2694e413",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__next__"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "a9c45058-0f96-43c2-afda-d6ad0dd7eae0",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "4ef70897-11a3-470d-b314-9b0479fde769"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "c6ff9680-1b4d-405c-96df-b5cee946ff51",
+      "title": "S1Q3 Was the site ready?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     }
+    ],
+    "id": "19b24066-bd8e-4dff-83f5-1fb038cdce9a",
+    "title": "S1 Job Entry",
+    "isRepeatable": false,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "f28e8419-64b8-4d26-8509-15ec71fe5ef2",
+   "sort": 0
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "93d79a6b-ae32-4147-aefb-3398309f3acb",
+        "title": "Cabling",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "fa119669-d136-4dc9-9d78-f4653243c251",
+        "title": "Device mounting",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "5c0eba71-19e5-4d90-b5a3-d991adfde935",
+        "title": "Testing",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "61f105b2-b666-4eb8-80db-f48fc2e503d3",
+        "title": "Cleanup",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "9e8b56a0-b3a4-47c1-bcfe-8d77fedd8783",
+      "title": "S2Q5 Which tasks were completed?",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     }
+    ],
+    "id": "46c23eb4-8ddf-42aa-8fb1-c3e2d56238c9",
+    "title": "S2 Site Ready Path",
+    "isRepeatable": false,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "8867e9be-6a5b-4754-93a1-19218c38b3b6",
+   "sort": 1
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "1c8753ea-6091-4b9f-9e01-13a71bd98cd5",
+        "title": "No access",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "20dbf7d0-21a5-43fa-883b-db6219157811",
+        "title": "Customer absent",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "c858e355-e361-4ee7-8c76-0c083b27bff2",
+        "title": "Missing equipment",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "b3bc694b-50a1-4245-b7a9-c05c935cef38",
+        "title": "Safety issue",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "4ef70897-11a3-470d-b314-9b0479fde769",
+      "title": "S3Q6 What blocked the work?",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "7615cf1b-20ef-437c-a5dc-39d3aead0ae0",
+      "title": "S3Q7 Describe the blocker",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     }
+    ],
+    "id": "a67992bd-6931-4887-9282-a3e957c4502b",
+    "title": "S3 Site Not Ready Path",
+    "isRepeatable": false,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "6f1497d6-5009-4cdf-96de-634591182d84",
+   "sort": 2
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [],
+      "id": "77e13067-b8cc-4ce8-bda9-ebeba47ff3cb",
+      "title": "S4Q9 Add final summary",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "0ef6f8e2-3b78-4328-8a34-9faaeae54da9",
+      "title": "S4Q8 Upload evidence photo",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 1
+     }
+    ],
+    "id": "f7ed5e88-9ed0-4781-94d5-df7cb250eb5e",
+    "title": "S4 Closure",
+    "isRepeatable": false,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "028127a3-2773-471f-9318-ea9114935dbb",
+   "sort": 3
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

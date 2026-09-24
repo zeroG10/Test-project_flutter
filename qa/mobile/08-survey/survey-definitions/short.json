@@ -1,0 +1,61 @@
+{
+ "id": "2964b433-b734-4505-a8c5-6fb42c30fc33",
+ "title": "Short Survey",
+ "status": "published",
+ "createdAt": "2026-06-23T10:07:52.821Z",
+ "updatedAt": "2026-06-23T13:00:52.737Z",
+ "items": [
+  {
+   "question": {
+    "answers": [
+     {
+      "id": "d910d8af-a7d3-42ae-a865-d468424e492b",
+      "title": "Yes",
+      "sort": 0,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     },
+     {
+      "id": "a780821c-98fc-4510-b48d-49ee9d6a94f8",
+      "title": "No",
+      "sort": 1,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     }
+    ],
+    "id": "e579b048-a505-4666-8899-aae6d93f56a2",
+    "title": "Good?",
+    "type": "toggle",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "7d14bec2-461a-457b-98b8-02997df8e9db",
+   "sort": 0
+  },
+  {
+   "question": {
+    "answers": [],
+    "id": "08262f28-2b2a-4842-87b5-9998a3a3f045",
+    "title": "Text?",
+    "type": "text",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "a002c70d-f38d-4c2d-be3f-2af5417e5eef",
+   "sort": 1
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

@@ -1,0 +1,543 @@
+{
+ "id": "cd20d2a6-a9e8-4269-991b-3a544655425e",
+ "title": "Fiber Site Survey",
+ "status": "published",
+ "createdAt": "2026-07-27T09:11:18.310Z",
+ "updatedAt": "2026-07-27T12:41:48.710Z",
+ "items": [
+  {
+   "question": {
+    "answers": [
+     {
+      "id": "3ab0f343-4626-4f48-afcc-635c63b1a255",
+      "title": "Yes",
+      "sort": 0,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     },
+     {
+      "id": "8d31d58e-8533-4819-bd14-d2282882cb77",
+      "title": "No",
+      "sort": 1,
+      "options": {
+       "enabled": false
+      },
+      "logic": [
+       {
+        "when": {
+         "op": "eq",
+         "value": true
+        },
+        "actions": [
+         {
+          "type": "skipToField",
+          "targetFieldId": "b1c9681e-b82e-41ab-abb3-bfc84561c049"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "id": "96672ac5-be0c-4f4f-a618-3b655c035827",
+    "title": "Are there any rooms to survey on this site?",
+    "type": "singleSelect",
+    "options": {
+     "enabled": false
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "96672ac5-be0c-4f4f-a618-3b655c035827",
+   "sort": 0
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [],
+      "id": "6f0a0376-f74e-44e5-925a-57f1efb33a4b",
+      "title": "Room name / number",
+      "type": "text",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [
+       {
+        "id": "49ce3ab3-6bc8-40af-923a-83023449fc93",
+        "title": "Office",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "9e72589b-6b81-4779-9ed6-65b2831f454b",
+        "title": "Server room",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "d3633f30-683f-4602-a0bf-cd4fce5af9ce",
+        "title": "Storage",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "e20c024f-43b6-4470-aa08-8d5fba4e3ee0",
+        "title": "Other",
+        "sort": 3,
+        "options": {
+         "multiline": false,
+         "minLength": 2,
+         "maxLength": 120,
+         "enabled": true
+        },
+        "logic": []
+       }
+      ],
+      "id": "f66d6c4b-acbf-4e07-a35e-51afc45f2fe4",
+      "title": "Room type",
+      "type": "singleSelect",
+      "options": {
+       "multiline": true,
+       "minLength": 3,
+       "maxLength": 250,
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [],
+      "id": "da77d126-db53-4ee9-a5f8-7e02dc31e27e",
+      "title": "Number of outlets",
+      "type": "number",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [],
+      "id": "8b2bf13d-59c1-46dc-9707-96314534df79",
+      "title": "Room photo",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 3
+     }
+    ],
+    "id": "07a1a869-d4f9-491a-8008-fcbe9a7084e0",
+    "title": "Room Information",
+    "isRepeatable": true,
+    "repeatConfig": {
+     "itemLabel": "Room",
+     "allowDelete": true,
+     "allowManualRename": false
+    },
+    "sort": 1
+   },
+   "id": "07a1a869-d4f9-491a-8008-fcbe9a7084e0",
+   "sort": 1
+  },
+  {
+   "question": {
+    "answers": [],
+    "id": "b1c9681e-b82e-41ab-abb3-bfc84561c049",
+    "title": "Additional comments",
+    "type": "text",
+    "options": {
+     "multiline": true,
+     "enabled": false
+    },
+    "logic": [],
+    "sort": 2
+   },
+   "section": null,
+   "id": "b1c9681e-b82e-41ab-abb3-bfc84561c049",
+   "sort": 2
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "b935ec97-378f-451e-a9ca-9ad3765e911b",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "0c437646-1bca-4530-8659-e433508d31a0",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "ec7545ef-91e2-4030-9125-4afd763bd708",
+      "title": "Was the job completed successfully?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "9dd342f5-5b2c-4a49-9c21-4f9d5779731b",
+      "title": "Date of work.",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [
+       {
+        "id": "eeada508-1612-4d55-be37-46bec1726932",
+        "title": "Cable installation",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "acdf64f8-a9b5-46d4-b254-4c67293a0566",
+        "title": "Splicing",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "fa176972-5666-4299-8bfe-4fdb0c872605",
+        "title": "Testing",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "94fdd495-d91e-46b9-a419-ae1dfee2f60d",
+        "title": "Cleanup",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "bd800fe6-a4a5-4314-800d-9bd0c235662c",
+        "title": "Equipment setup",
+        "sort": 4,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "9f248a54-6509-445e-8b27-57a5c0e151a6",
+      "title": "Which tasks were performed on site?",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [
+       {
+        "id": "17f9b865-b443-48a6-a3bb-b260dc221702",
+        "title": "Completed as planned",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "48cb95d8-3bad-4b16-9e1d-c1a6c66bee8a",
+        "title": "Completed with issues",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "0113d09e-01eb-4377-9c1e-3aacf32638b0",
+        "title": "Partially completed",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "b79aa912-0288-45f2-908b-ce918f9e3d55",
+        "title": "Not completed",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "6ea3dd44-ebd8-4518-ba28-96b3d974202c",
+        "title": "Other (please specify)",
+        "sort": 4,
+        "options": {
+         "multiline": true,
+         "minLength": 3,
+         "maxLength": 250,
+         "enabled": true
+        },
+        "logic": []
+       }
+      ],
+      "id": "da017e79-1a95-40b8-8e77-f056d912618d",
+      "title": "Overall job status.",
+      "type": "singleSelect",
+      "options": {
+       "multiline": true,
+       "minLength": 3,
+       "maxLength": 250,
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     }
+    ],
+    "id": "e98c8ff5-3033-466d-887e-88d3b6ac0595",
+    "title": "Fiber installation report long title section name for tests",
+    "isRepeatable": true,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "27649705-19fd-44d7-9053-e32291e977c7",
+   "sort": 3
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "e003d0a0-aef9-42c6-9c8e-72f02b07b32e",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__end__"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "622fd101-e9cc-498d-ad49-c4a80b3e3211",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "1168d806-50cc-48e3-b8b2-acb46e2db42e",
+      "title": "Was the job completed successfully?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "002847d1-35dc-4758-94f7-58a5a1a5bc06",
+      "title": "Date of work.",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [
+       {
+        "id": "72d31cc8-1c9b-4ce0-92da-057b1701ac6b",
+        "title": "Cable installation",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "fff0b2c9-3682-401c-80b9-310f40bc1d5c",
+        "title": "Splicing",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "0557e629-4617-4435-a65c-9286f0f87679",
+        "title": "Testing",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "290d7653-cb63-4b42-a0d6-c8ba139745f6",
+        "title": "Cleanup",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "b529373c-df78-4eb2-80fb-b5dc026948e9",
+        "title": "Equipment setup",
+        "sort": 4,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "88e186e3-75f3-4c77-95ff-f31e5181dc75",
+      "title": "Which tasks were performed on site?",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [
+       {
+        "id": "e2587da3-c29b-4526-8dbd-245b6ac85b97",
+        "title": "Completed as planned",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "92324ea7-7282-4c5a-917f-ea8fd646553f",
+        "title": "Completed with issues",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "abba9c37-6c27-4054-83a3-43f8cc20377a",
+        "title": "Partially completed",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "9faf58e6-67cf-4a91-84fd-0f4031a59010",
+        "title": "Not completed",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "d43b0012-352f-4de3-b5f8-fb85d2093b7c",
+        "title": "Other (please specify)",
+        "sort": 4,
+        "options": {
+         "multiline": true,
+         "minLength": 3,
+         "maxLength": 250,
+         "enabled": true
+        },
+        "logic": []
+       }
+      ],
+      "id": "3e8022ce-b3e8-4e0c-bf16-b084261cc41d",
+      "title": "Overall job status.",
+      "type": "singleSelect",
+      "options": {
+       "multiline": true,
+       "minLength": 3,
+       "maxLength": 250,
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     }
+    ],
+    "id": "622a6009-6a09-47d1-9bd1-8d48c5e54164",
+    "title": "Fiber installation report long title section name for tests (Copy)",
+    "isRepeatable": true,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "04b33dbd-0423-4c3e-94b8-011a6a5d13a8",
+   "sort": 4
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

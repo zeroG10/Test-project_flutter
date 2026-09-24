@@ -1,0 +1,1440 @@
+{
+ "id": "4044453f-6660-43c7-9c58-9499c63c2b45",
+ "title": "Repeatable_TWO_sections_with logic+questions_Repeatable",
+ "status": "published",
+ "createdAt": "2026-07-29T07:14:51.037Z",
+ "updatedAt": "2026-07-29T10:40:33.986Z",
+ "items": [
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "45fd9499-7b5a-4616-924d-cf142177d0c2",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "2d57eeeb-ef31-4952-b054-491f452972a9"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "9c2abc8b-c07e-4491-a79d-7134eef1da53",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "972d83d4-d1f0-402b-9f5d-d91e177f3aa9"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "94019045-c2e2-4b70-8f49-a47a55600769",
+      "title": "Q1 Enter the work order ID",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "2d57eeeb-ef31-4952-b054-491f452972a9",
+      "title": "Q2 text Select the visit date",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [],
+      "id": "972d83d4-d1f0-402b-9f5d-d91e177f3aa9",
+      "title": "Q3 photo Question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [
+       {
+        "id": "a7d89264-dab2-4eb9-b92d-f79a1744d929",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "c1f5d8cb-6748-4196-9240-b8c7aaa3ed1c"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "20577ae5-18db-4c65-b625-2c230a708ee9",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "0d4d29b3-e58d-4385-bfae-ad9a4111bee1"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "aed7d046-fc03-4a16-a9ae-1df789e9a083",
+      "title": "Q4 Select the technician arrival time",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     },
+     {
+      "answers": [],
+      "id": "c1f5d8cb-6748-4196-9240-b8c7aaa3ed1c",
+      "title": "Q5 time Question",
+      "type": "time",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 4
+     },
+     {
+      "answers": [],
+      "id": "0d4d29b3-e58d-4385-bfae-ad9a4111bee1",
+      "title": "Q6 date Question",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 5
+     },
+     {
+      "answers": [
+       {
+        "id": "53b688b3-1d0a-4952-950d-d9a3965ad253",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "7a961a21-05db-4fb2-a750-cebea5551cc5"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "2e350974-c98a-466f-a4ba-50c0663ab6d7",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "5d7cc600-b479-48de-be0e-ca1c52a6f02f"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "0bcebbb2-1fe9-4aa6-968b-9ae20846b80e",
+      "title": "Q7 yes/no Question",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 6
+     },
+     {
+      "answers": [
+       {
+        "id": "ddbe1641-e262-40d1-ae94-36c5969ff4b7",
+        "title": "Option 1 Q8",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "5d7cc600-b479-48de-be0e-ca1c52a6f02f"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "f387be50-8be5-4c22-893c-279f745ee5ee",
+        "title": "Option 2 Q8",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "5d08df29-5872-4f1a-872c-aa381c390666"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "1e65f1ec-4f7e-4e91-b901-d905d005340e",
+        "title": "Option 3 Q8",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "b4983ba5-a009-45ec-8d57-c4da55c2b11b"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "7491ba57-3f79-4a3b-b0f3-faff2d27e3df",
+        "title": "Option 4 Q8",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "836db152-f18b-4451-be65-e4cc1658d4f9"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "7a961a21-05db-4fb2-a750-cebea5551cc5",
+      "title": "Q8 Radio Question",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 7
+     },
+     {
+      "answers": [],
+      "id": "5d7cc600-b479-48de-be0e-ca1c52a6f02f",
+      "title": "Q9 test question",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 8
+     },
+     {
+      "answers": [],
+      "id": "5d08df29-5872-4f1a-872c-aa381c390666",
+      "title": "Q10 photo question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 9
+     },
+     {
+      "answers": [
+       {
+        "id": "b1efb46e-adfa-4777-bf0b-48ef821b2966",
+        "title": "Option 1 Q11",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "1d250ba5-7970-4e7c-bccb-a9316e8d8679",
+        "title": "Option 2 Q12",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "c5a77896-9846-4744-b613-bdbaa934950f",
+        "title": "Option 3 Q12",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "b4983ba5-a009-45ec-8d57-c4da55c2b11b",
+      "title": "Q11 Checkbox Question",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 10
+     },
+     {
+      "answers": [
+       {
+        "id": "42b6f4b1-d218-4c1f-9729-5f8785842f93",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "d27cfb95-bfb3-47ed-89f7-9f8e2ddd2df4"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "f5cc8468-bec5-41f4-91dd-dae72e3e55dc",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__end__"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "6c88dc17-7f83-47d5-9515-2e284f3ab0a5",
+      "title": "Bad?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 11
+     },
+     {
+      "answers": [
+       {
+        "id": "b5b627c4-d0e7-47dc-8ee9-7d6a5715d2c8",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "2b9791a0-27d1-438a-8521-1d9fb94a2642"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "d8be560e-446f-4bd6-8819-6a87a5e6fe8c",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "718d53b7-0bdd-41e2-914e-c3d0262168cb"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "4f91afab-eeaa-4a7f-ae76-3f3a0559ca10",
+      "title": "Good?  Redirect to S2",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 12
+     },
+     {
+      "answers": [],
+      "id": "836db152-f18b-4451-be65-e4cc1658d4f9",
+      "title": "Problems?",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 13
+     }
+    ],
+    "id": "a89cf83e-f05a-45cc-bb00-dbeefb417f22",
+    "title": "S1 Job Details Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nisl tincidunt eget nullam non. Quis hendrerit dolor magna eget est lorem ip",
+    "isRepeatable": true,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "5577a6b4-a297-419f-81a3-31501af88970",
+   "sort": 0
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "13d1af5b-e703-487c-9532-81c204a02038",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "603b8d66-c213-4577-bdf7-72384b1371f8",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "2b9791a0-27d1-438a-8521-1d9fb94a2642",
+      "title": "S2 Q1 Enter the work order ID",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "78c86760-dd3f-48c4-9ca1-90f5f185323e",
+      "title": "S2 Q2 text Select the visit date",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [],
+      "id": "1287985b-eb70-4af4-b589-aad4940c938a",
+      "title": "S2 Q3 photo Question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [
+       {
+        "id": "a17f0f25-d1ca-42b9-b845-0104237827e0",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "5f872fdf-d954-4f61-be2c-936b60c77b7e",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "718d53b7-0bdd-41e2-914e-c3d0262168cb",
+      "title": "S2 Q4 Select the technician arrival time",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     },
+     {
+      "answers": [],
+      "id": "ee04e138-84da-49e6-b151-6ce521671a29",
+      "title": "S2 Q5 time Question",
+      "type": "time",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 4
+     },
+     {
+      "answers": [],
+      "id": "528846bb-1d09-4b26-8c11-72846b1735b2",
+      "title": "S2 Q6 date Question",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 5
+     },
+     {
+      "answers": [
+       {
+        "id": "0e147175-d447-4ee3-b036-aae98488121f",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "38c3fc1a-5c91-4d38-845a-e1e7540701a2",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "4c3cdc8e-a4af-4ef3-be4e-c0df5c324495",
+      "title": "S2 Q7 yes/no Question",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 6
+     },
+     {
+      "answers": [
+       {
+        "id": "d82ffd9c-6672-4257-bac6-378e2772b70b",
+        "title": "Option 1 S2 Q8",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "e11b7a9b-fe2c-480c-902d-3d8d042022b3",
+        "title": "Option 2 S2 Q8",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "9accf49a-bac0-4135-a08f-e2d35fe0be1b",
+        "title": "Option 3 S2 Q8",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "9744b973-e75c-408a-a396-a73ed87cd15c",
+        "title": "Option 4 S2 Q8",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "8a8a3c72-5e80-4c5c-8ba9-b042c963d6f8",
+      "title": "S2 Q8 Radio Question",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 7
+     },
+     {
+      "answers": [],
+      "id": "5ee215b4-e07e-450e-83ed-03fe095642ce",
+      "title": "S2 Q9 test question",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 8
+     },
+     {
+      "answers": [],
+      "id": "eafff241-39f5-4649-b6f6-b1b34154f622",
+      "title": "S2 Q10 photo question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 9
+     },
+     {
+      "answers": [
+       {
+        "id": "972b05a2-6012-42c4-920d-b658cb9f35c9",
+        "title": "Option 1 S2 Q11",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "656b745f-6c6a-4d7b-bdb5-a695e4682532",
+        "title": "Option 2 S2 Q12",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "ed9627c4-c8eb-46da-8839-802b8825ec05",
+        "title": "Option 3 S2 Q12",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "45453d08-4db9-4d79-845c-15a7b28a0e54",
+      "title": "S2 Q11 Checkbox Question",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 10
+     },
+     {
+      "answers": [
+       {
+        "id": "576fb2de-e595-486f-9812-424a74465c86",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "562ee021-be48-4b41-aa18-68532ebcb734",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "8539ab62-25fe-40fa-90cf-c4314e818ab6",
+      "title": "S2 Bad?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 11
+     },
+     {
+      "answers": [
+       {
+        "id": "93aff44a-3a96-45e4-9c15-55558fee5ccd",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "68479df1-8f7b-441c-95e3-4c95333861bd",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "94019045-c2e2-4b70-8f49-a47a55600769"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "37799b4f-9508-4476-8636-cd9408893a9c",
+      "title": "S2 Good? if No than  Redirect to S1 Q1",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 12
+     },
+     {
+      "answers": [
+       {
+        "id": "45a7eb73-6710-4bea-b6ca-ad368bf048a2",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__end__"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "6ecff793-d962-4d88-becb-7b6a41571315",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "8539ab62-25fe-40fa-90cf-c4314e818ab6"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "a4f901c0-9c9b-4314-8e9b-073c4f3276a0",
+      "title": "S2 Finish?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 13
+     }
+    ],
+    "id": "6fbfedb0-3954-483c-af41-32e2c6b82bb0",
+    "title": "S2 Job Details Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nisl tincidunt eget nullam non. Quis hendrerit dolor magna eget est lorem ip (Copy)",
+    "isRepeatable": true,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "20bc2eb2-14ad-4455-9d5e-3566a57928f6",
+   "sort": 1
+  },
+  {
+   "question": {
+    "answers": [],
+    "id": "d3157cb2-b10a-4727-874d-d8b107d547f6",
+    "title": "Question 1",
+    "type": "text",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "009186da-f904-4d7b-b66b-6aa51dbd1b5e",
+   "sort": 2
+  },
+  {
+   "question": {
+    "answers": [],
+    "id": "5b5caee0-6db4-4bad-bc39-3feff9141930",
+    "title": "Question 2",
+    "type": "date",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "7ed04ae2-7ca2-4e5d-b8b0-822dc3122cd8",
+   "sort": 3
+  },
+  {
+   "question": {
+    "answers": [],
+    "id": "e76e8ac8-079c-4d6e-9f00-66de3d97088f",
+    "title": "Question 3",
+    "type": "image",
+    "options": {
+     "enabled": false
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "ddbf732c-83c5-47c6-8884-829e5f0ed209",
+   "sort": 4
+  },
+  {
+   "question": {
+    "answers": [],
+    "id": "8c0a9456-e68e-4b8d-aa64-cf0f66ecd859",
+    "title": "Question 4",
+    "type": "time",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "5df442b5-1e8a-403f-8ebf-da7639853bec",
+   "sort": 5
+  },
+  {
+   "question": {
+    "answers": [
+     {
+      "id": "7d44de91-3ef7-4e84-8938-10ed471af3c9",
+      "title": "Option 1",
+      "sort": 0,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     },
+     {
+      "id": "68b87659-a789-4c60-911b-2de6609876cb",
+      "title": "Option 2",
+      "sort": 1,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     },
+     {
+      "id": "bfc93974-eae4-4dd5-be8a-b83a5821159c",
+      "title": "Option 3",
+      "sort": 2,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     }
+    ],
+    "id": "941bc1bd-16b9-4a20-b81f-5bcdbc21b04e",
+    "title": "Question 5",
+    "type": "singleSelect",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "5fad9460-7e0e-4205-a661-4e26e0433100",
+   "sort": 6
+  },
+  {
+   "question": {
+    "answers": [
+     {
+      "id": "82252509-241f-4afd-a10e-080403143a84",
+      "title": "Option 1",
+      "sort": 0,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     },
+     {
+      "id": "6b6d5d5a-5e3c-485a-ae3b-29b4d9e30b77",
+      "title": "Option 2",
+      "sort": 1,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     },
+     {
+      "id": "b55e5a38-2722-4e2d-90f4-b56a1c749046",
+      "title": "Option 3",
+      "sort": 2,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     }
+    ],
+    "id": "409c9956-cde7-433b-ac0e-84dff92074e6",
+    "title": "Question 6",
+    "type": "multiSelect",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "ee21d8fe-e7cc-41fb-88db-b1e2f5a9cefd",
+   "sort": 7
+  },
+  {
+   "question": {
+    "answers": [
+     {
+      "id": "45c58f58-66aa-4e06-977f-7867a399f25c",
+      "title": "Yes",
+      "sort": 0,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     },
+     {
+      "id": "0a97915f-8aa4-4680-944b-1fcfb426b002",
+      "title": "No",
+      "sort": 1,
+      "options": {
+       "enabled": false
+      },
+      "logic": []
+     }
+    ],
+    "id": "38415904-60e4-4ce2-87af-b5c5653d72a4",
+    "title": "Question 7",
+    "type": "toggle",
+    "options": {
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "6cb0fa70-01b8-4357-9588-f5e6471047f5",
+   "sort": 8
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "09697afb-5111-4bab-b296-787d3faa3d6f",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "4fe2fa5e-2dce-4a99-a40e-97079747d1aa",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "6603c1e9-53e7-41fe-a527-b149dffb261f",
+      "title": "S3 Q1 Enter the work order ID",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "fa6a5f67-6c20-423b-a409-072f3a619bb9",
+      "title": "S3 Q2 text Select the visit date",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [],
+      "id": "eaa5cc31-d5a3-45ea-b90a-8a06ef727244",
+      "title": "S3 Q3 photo Question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [
+       {
+        "id": "f03c767f-32e3-4e49-914c-ce6f922896e1",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "2d9c0626-2bbe-434d-b279-70ec58afa41b",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "11fbdebd-87ae-4d0a-90de-55eb5eddf2be",
+      "title": "S3 Q4 Select the technician arrival time",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     },
+     {
+      "answers": [],
+      "id": "304f41a6-10f6-4b72-a0bb-911ee8dd01e3",
+      "title": "S3 Q5 time Question",
+      "type": "time",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 4
+     },
+     {
+      "answers": [],
+      "id": "d27cfb95-bfb3-47ed-89f7-9f8e2ddd2df4",
+      "title": "S3 Q6 date Question",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 5
+     },
+     {
+      "answers": [
+       {
+        "id": "33773aff-2c67-48a2-ac12-31f6044d47de",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "25310d88-5957-4534-a414-661cea0c5226",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "a15b5be7-6ac5-4eb7-a29d-f66cc9a2efe1",
+      "title": "S3 Q7 yes/no Question",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 6
+     },
+     {
+      "answers": [
+       {
+        "id": "040b6ffd-75ea-421d-9967-e26e8fc6e925",
+        "title": "Option 1 S2 Q8",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "d8612490-75c1-4a9d-81ef-12dcfa16a35c",
+        "title": "Option 2 S2 Q8",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "862c73c1-43a4-4e4d-91d8-86ee88079ba5",
+        "title": "Option 3 S2 Q8",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "ca8006a0-6ac8-48ad-959d-e1ac8d578ee8",
+        "title": "Option 4 S2 Q8",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "d4c9966b-7855-48b2-b751-120e775b882d",
+      "title": "S3 Q8 Radio Question",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 7
+     },
+     {
+      "answers": [],
+      "id": "4836b6ed-2811-4f4c-9a51-787934f19a0f",
+      "title": "S3 Q9 test question",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 8
+     },
+     {
+      "answers": [],
+      "id": "35fe754f-82dc-487b-b2c4-43516d4b89ec",
+      "title": "S3 Q10 photo question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 9
+     },
+     {
+      "answers": [
+       {
+        "id": "cab23004-71fa-4402-aa25-111c57c11768",
+        "title": "Option 1 S2 Q11",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "953f6554-13d4-43ab-9d74-32b8b09552fd",
+        "title": "Option 2 S2 Q12",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "f1a5b274-e4e8-40d7-a70f-2ee13e914c94",
+        "title": "Option 3 S2 Q12",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "b2476944-34e9-43b9-9bc7-ab13b4c6fb50",
+      "title": "S3 Q11 Checkbox Question",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 10
+     },
+     {
+      "answers": [
+       {
+        "id": "06520bd2-1c24-4485-ae60-92a6cc6c4154",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "1e1ab556-7f89-4ef8-b050-7448ad73c1dd",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "58a2d268-18b5-474d-9246-294af07cd49f",
+      "title": "S3 Bad?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 11
+     },
+     {
+      "answers": [
+       {
+        "id": "4b51b7af-f2be-4677-a502-aa1a2171f358",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "bfcc6381-d342-4dd5-99d4-ac887198c74c",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "190feea5-7d21-4115-8c79-4859cdd44370",
+      "title": "S3 Good? if No than  Redirect to S1 Q1",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 12
+     },
+     {
+      "answers": [
+       {
+        "id": "c2a6b6fb-6269-4008-9a26-194d8c33c96f",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "439daf60-198e-47b2-8d78-b4fc61aca594",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "1d703dfa-3cbd-4508-8efc-72a11ae7f13c",
+      "title": "S3 Finish?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 13
+     }
+    ],
+    "id": "e79693ab-06f5-4d69-960a-26173097d585",
+    "title": "S3 Job Details_No Logic",
+    "isRepeatable": true,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "a9006c8b-1d6b-4fe2-9596-21b8ec729f3b",
+   "sort": 9
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

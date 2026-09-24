@@ -1,0 +1,217 @@
+{
+ "id": "2db0c23c-1f90-4ed9-bb13-fe18c13f9421",
+ "title": "Mo5 Radio Logic Mapping Survey_Radio with multiple logic paths",
+ "status": "published",
+ "createdAt": "2026-03-12T15:35:33.301Z",
+ "updatedAt": "2026-03-26T12:20:24.499Z",
+ "items": [
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "652f36b9-9cf0-4e60-8436-0989449ebe94",
+        "title": "Access issue",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "185f22e4-69c8-47b1-b20d-d78d1eaebbcd"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "ddcd9927-c5f5-4900-a2ce-a5e1b3eebd8e",
+        "title": "Equipment issue",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "319a3ffd-7d32-4dd3-b41b-5e40bf51d7ff"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "6165fd21-7e02-4d29-a439-8232cc8da613",
+        "title": "Customer issue",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__next__"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "8f29d1f1-70f6-43ea-bbea-489536bcab71",
+        "title": "No issue found",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "216fedc7-a304-48a0-a6c7-30860a63378c"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "c57812ba-342c-431c-9697-5bce8ce92c55",
+      "title": "What issue type was identified on site?",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "185f22e4-69c8-47b1-b20d-d78d1eaebbcd",
+      "title": "Q2 Describe the site access issue",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [
+       {
+        "id": "a719e170-4df7-434a-85ca-9005a247acbd",
+        "title": "Router",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "e08a1f05-0200-46d8-965f-c35ea246ad20",
+        "title": "Modem",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "97d6ab22-70ce-49c6-9a0e-58d3e28baba9",
+        "title": "Fiber cable",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "bfae3f40-0b03-42b3-a7cb-ea8110007c6d",
+        "title": "Connector",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "e2bcae3d-bc9a-45b7-a513-a50c3b4d9e38",
+        "title": "ON",
+        "sort": 4,
+        "options": {
+         "multiline": true,
+         "minLength": 3,
+         "maxLength": 250,
+         "enabled": true
+        },
+        "logic": []
+       }
+      ],
+      "id": "319a3ffd-7d32-4dd3-b41b-5e40bf51d7ff",
+      "title": "Q3 Select the missing or damaged equipment",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [],
+      "id": "216fedc7-a304-48a0-a6c7-30860a63378c",
+      "title": "Q4 Select the follow-up visit date",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     },
+     {
+      "answers": [],
+      "id": "49073e4e-ca3f-421a-b4eb-cb9ff2286366",
+      "title": "Q5 Enter customer-related notes",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 4
+     }
+    ],
+    "id": "99fcdb7a-1696-45ed-98c3-561b86e37a1d",
+    "title": "Issue Routing",
+    "isRepeatable": false,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "95de0bcc-e045-4ff8-a748-a0c7e49767d1",
+   "sort": 0
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

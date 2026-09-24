@@ -198,7 +198,7 @@ POST /job
 Модель: `items[]` → питання або секція (`section.questions[]`, `isRepeatable`). Логіка — на **варіантах відповіді**:
 `answers[].logic[] = {when:{op:'eq',value:true}, actions:[{type:'skipToField', targetFieldId}]}`; `targetFieldId='__end__'` —
 дострокове завершення опитування, порожній — «далі». Рушій логіки в апці: `lib/features/survey/domain/survey_logic_engine.dart`.
-`options.enabled` на питанні — імовірно «обов'язкове» (**не підтверджено**, питання в `qa/mobile/08-survey/`).
+`options.enabled` на **варіанті відповіді** — варіант «Other» з власним текстом (код апки: `isCustom`); на **питанні** — імовірно «обов'язкове», апка його не читає (обов'язкові всі питання) — **Q-SRV-1** у `qa/mobile/08-survey/survey-questions.md`.
 
 | surveyId | Назва | Питань | Секцій | Повтор. | Правил логіки | `__end__` | Типи полів |
 |---|---|---|---|---|---|---|---|

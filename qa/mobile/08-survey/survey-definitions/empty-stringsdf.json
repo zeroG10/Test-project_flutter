@@ -1,0 +1,9 @@
+{
+ "id": "553411d6-9a98-4e97-bd58-1b2b0a6d6e2c",
+ "title": "stringsdf",
+ "status": "published",
+ "createdAt": "2026-02-24T10:18:36.253Z",
+ "updatedAt": "2026-02-24T10:18:36.253Z",
+ "items": [],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

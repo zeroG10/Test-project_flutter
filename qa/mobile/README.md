@@ -16,7 +16,7 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 | 05 | `check-in-out` | `CHIO` | 41 (+25 ORDD) | `2451:83073` | android · ios · tablet | traced (iOS) | Check-In / Check-Out — 9 тестів; 25 CHIO Passed (+ CHK-ORDD 024…047 частково); перемикач підробленої локації для потоків, захист — окремий тест (Q-CHIO-5) |
 | 06 | `order-progress` | `ORDP` | 42 | `2451:82704` | android · ios · tablet | traced (iOS) | Order details — In progress — 6 тестів (6 TC); 17 Passed, 1 Blocked (телефон PF — обмеження симулятора); здача → 07; Q-ORDP-4 (таймер) прийнято як є |
 | 07 | `submit-deliverables` | `DLV` | 33 | `<node-id>` | android · ios · tablet | intake | Submit Deliverables |
-| 08 | `survey` | `SRV` | 40 **+нові** | `4009:12410` | android · ios · tablet | intake | Survey screen. ⚠️ **CR-2 Repeatable Sections у проді, але в чеклісті 0 перевірок** — пишемо заново з PRD (stories 3–6, §9.2) |
+| 08 | `survey` | `SRV` | 40 (+17 запропоновано) | `4009:12410` | android · ios · tablet | candidates (draft) | Survey screen: план 46 CHK → 16 TC (8 опитувань + фото + порожнє + після здачі); таблиці логіки й Q-SRV-1…5 чекають власника; офлайн → етап Android |
 | 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | intake | Photo report screen |
 | 10 | `notes` | `NOTE` | 52 | `<node-id>` | android · ios · tablet | intake | Notes screen |
 | 11 | `notifications` | `NOTIF` | 31 | `<node-id>` | android · ios · tablet | intake | Notifications screen |

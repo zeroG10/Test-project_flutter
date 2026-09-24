@@ -1,0 +1,239 @@
+{
+ "id": "accc4039-cc3d-455f-b617-f89026760768",
+ "title": "Mo3 All Question Types Survey_Single section with all question types",
+ "status": "published",
+ "createdAt": "2026-03-12T14:05:43.424Z",
+ "updatedAt": "2026-03-30T09:46:04.341Z",
+ "items": [
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "ad0f8120-9ba4-43bb-a803-16a341ac49c4",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__next__"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "ef0501df-9d8c-44f3-8ebb-9dd90c79cb78",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": [
+         {
+          "when": {
+           "op": "eq",
+           "value": true
+          },
+          "actions": [
+           {
+            "type": "skipToField",
+            "targetFieldId": "__next__"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      "id": "29561487-8946-4055-a5db-ddfb6c66f6d6",
+      "title": "Was the job completed successfully?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [
+       {
+        "id": "a3ac603d-e301-4b87-92fb-4c0664c913a0",
+        "title": "Completed",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "75c3b48e-659d-4cc1-9a47-31e4f033c0dd",
+        "title": "Partially completed",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "6848e711-2f52-4c2d-bf86-cf1135dfc2de",
+        "title": "Not completed",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "59e1c695-41f1-45f6-b3b7-ba0e16f6d176",
+      "title": "What is the current job result?",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [
+       {
+        "id": "9ee730bd-7f92-4eef-9cda-420707001330",
+        "title": "Cable installation",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "26f3235b-75c0-4402-bf89-237722763ff8",
+        "title": "Equipment setup",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "465f2cce-83fa-4105-a024-99e61ce91441",
+        "title": "Testing",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "d5690894-53c4-4e86-97a8-407047bfb266",
+        "title": "Cleanup",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "b9152171-e64a-498c-99f3-0c4c3eb9e3d7",
+        "title": "ON!!!",
+        "sort": 4,
+        "options": {
+         "multiline": true,
+         "minLength": 3,
+         "maxLength": 250,
+         "enabled": true
+        },
+        "logic": []
+       }
+      ],
+      "id": "d81e5ab7-8fdc-41c4-b580-05c55d5c67e8",
+      "title": "Which tasks were performed on site?",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [],
+      "id": "2603396d-ec74-40c3-a6c2-647cb0c4bafb",
+      "title": "Add technician notes",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     },
+     {
+      "answers": [
+       {
+        "id": "80ea829f-7ae9-4b45-a898-95f3f1163ef6",
+        "title": "You answer",
+        "sort": 0,
+        "options": {
+         "multiline": true,
+         "minLength": 3,
+         "maxLength": 250,
+         "enabled": true
+        },
+        "logic": []
+       }
+      ],
+      "id": "85f55b5e-4b32-4429-80f0-0670188c5043",
+      "title": "Upload a photo of the completed work",
+      "type": "image",
+      "options": {
+       "multiline": true,
+       "minLength": 3,
+       "maxLength": 250,
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 4
+     },
+     {
+      "answers": [],
+      "id": "7121de08-a39a-4834-bbf6-0fd20a65212a",
+      "title": "Select the work completion date",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 5
+     },
+     {
+      "answers": [],
+      "id": "b6e6107c-4abb-406b-a3da-4eb140b40d17",
+      "title": "Select the work completion time",
+      "type": "time",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 6
+     }
+    ],
+    "id": "9f0836ce-1e4a-4376-8ead-8f237c7c7b89",
+    "title": "On-Site Work Details",
+    "isRepeatable": false,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "88e46777-202f-4873-ace7-678ad653ba7a",
+   "sort": 0
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

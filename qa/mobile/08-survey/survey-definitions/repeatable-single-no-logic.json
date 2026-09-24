@@ -1,0 +1,338 @@
+{
+ "id": "4c694562-dae5-494c-a8f9-c7e99b016d0f",
+ "title": "Repeatable_Single section_withOUT logic_Repeatable",
+ "status": "published",
+ "createdAt": "2026-07-28T10:03:04.369Z",
+ "updatedAt": "2026-07-28T10:03:21.443Z",
+ "items": [
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [
+       {
+        "id": "1721d421-f216-41b9-a147-09d3112c5214",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "26afcf73-3a6d-4650-86f8-c8f8d7bb5f30",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "4bc615a1-4630-4ed9-bd78-1b5bfd0d99ba",
+      "title": "Q1 Enter the work order ID",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "3c151c83-f65b-41a0-ab8f-9299ecebbc33",
+      "title": "Q2 text Select the visit date",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 1
+     },
+     {
+      "answers": [],
+      "id": "599772b5-fd44-4c61-a223-4235be7e4e47",
+      "title": "Q3 photo Question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 2
+     },
+     {
+      "answers": [
+       {
+        "id": "960ce5d4-2fcc-445f-bd91-9b4817b41232",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "69e992e7-4826-4d4a-8e77-a92938128d45",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "6b3321fa-003b-4c3e-8953-b088a8ca387b",
+      "title": "Q4 Select the technician arrival time",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 3
+     },
+     {
+      "answers": [],
+      "id": "87402395-8c2c-4b2f-a26d-f3c1f854b8a9",
+      "title": "Q5 time Question",
+      "type": "time",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 4
+     },
+     {
+      "answers": [],
+      "id": "56a54c35-57af-4ead-9efd-9c0897b12ced",
+      "title": "Q6 date Question",
+      "type": "date",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 5
+     },
+     {
+      "answers": [
+       {
+        "id": "f100c621-7293-481d-8b13-6e2133621941",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "dae94d49-591c-49e6-ab40-23f6953b0381",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "97d1d05b-8c44-4484-9c90-0c84bf691a56",
+      "title": "Q7 yes/no Question",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 6
+     },
+     {
+      "answers": [
+       {
+        "id": "b4f5b897-a69a-4d50-b5cd-1c1af54a5447",
+        "title": "Option 1 Q8",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "95a3ba6e-fe80-44d8-bf5f-1e89143333e9",
+        "title": "Option 2 Q8",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "d64b7dc9-80b1-48e8-a148-dd7a03e40762",
+        "title": "Option 3 Q8",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "4b29204e-b857-45f6-81a3-5d3435fca312",
+        "title": "Option 4 Q8",
+        "sort": 3,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "5dc74a25-660e-4dc7-8c32-c1b3b3494152",
+      "title": "Q8 Radio Question",
+      "type": "singleSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 7
+     },
+     {
+      "answers": [],
+      "id": "29897f3b-5a71-4940-a405-457a49beda7e",
+      "title": "Q9 test question",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 8
+     },
+     {
+      "answers": [],
+      "id": "efdf8e53-025c-4677-be80-db36743c394b",
+      "title": "Q10 photo question",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 9
+     },
+     {
+      "answers": [
+       {
+        "id": "045b9f0b-69a8-4611-a653-40cb8cb83668",
+        "title": "Option 1 Q11",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "6a34d7d5-0d5e-4b3e-9a99-6cefa86f5e75",
+        "title": "Option 2 Q12",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "beec32b5-3368-4028-9f66-59f69e04e296",
+        "title": "Option 3 Q12",
+        "sort": 2,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "56464997-0879-49ef-b7f3-75fb37eb1635",
+      "title": "Q11 Checkbox Question",
+      "type": "multiSelect",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 10
+     },
+     {
+      "answers": [
+       {
+        "id": "05e40b4a-ee35-422f-93cd-41349833d3e5",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "0365d83f-ca3b-4da5-8e42-50abab0d7b10",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "cc94afc9-6355-4842-9ebc-ca951b967b57",
+      "title": "Bad?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 11
+     },
+     {
+      "answers": [
+       {
+        "id": "799e859f-5149-4970-b21c-a98e3b5566e6",
+        "title": "Yes",
+        "sort": 0,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       },
+       {
+        "id": "9fb90fa7-96eb-4dee-af78-dfa927554141",
+        "title": "No",
+        "sort": 1,
+        "options": {
+         "enabled": false
+        },
+        "logic": []
+       }
+      ],
+      "id": "2f857d7b-842c-4408-9362-c46ba87a0adb",
+      "title": "Good?",
+      "type": "toggle",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 12
+     },
+     {
+      "answers": [],
+      "id": "a7272538-39fb-43cb-bc02-9e302e49d902",
+      "title": "Problems?",
+      "type": "text",
+      "options": {
+       "enabled": true
+      },
+      "logic": [],
+      "sort": 13
+     }
+    ],
+    "id": "531991b4-8175-4de6-ae73-ac0259074f05",
+    "title": "S1 Job Details Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nisl tincidunt eget nullam non. Quis hendrerit dolor magna eget est lorem ip",
+    "isRepeatable": true,
+    "repeatConfig": {},
+    "sort": 0
+   },
+   "id": "fadebb3a-0ddb-4593-8056-848ac8f5d29c",
+   "sort": 0
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}

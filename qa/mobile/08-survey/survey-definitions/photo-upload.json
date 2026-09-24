@@ -1,0 +1,114 @@
+{
+ "id": "b4e9b124-0048-4be0-9e22-4db8f446af41",
+ "title": "Photo Upload Test Survey",
+ "status": "published",
+ "createdAt": "2026-08-26T12:11:28.862Z",
+ "updatedAt": "2026-08-26T12:11:28.862Z",
+ "items": [
+  {
+   "question": {
+    "answers": [],
+    "id": "b13b4756-e87e-4e7b-9d5b-dfce4dea72cb",
+    "title": "Site overview photos",
+    "type": "image",
+    "options": {
+     "enabled": false
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "40af9385-c7fd-43a7-9ac5-5d005c3b19e5",
+   "sort": 0
+  },
+  {
+   "question": {
+    "answers": [
+     {
+      "id": "1972a9b2-bd5d-47c5-b91a-579018742fb2",
+      "title": "Other (please specify)",
+      "sort": 0,
+      "options": {
+       "multiline": true,
+       "minLength": 3,
+       "maxLength": 250,
+       "enabled": true
+      },
+      "logic": []
+     }
+    ],
+    "id": "96965d1c-d598-45fc-bc8f-fe3ee5a8cef9",
+    "title": "Equipment close-up (add a note if something looks off)",
+    "type": "image",
+    "options": {
+     "multiline": true,
+     "minLength": 3,
+     "maxLength": 250,
+     "enabled": true
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "7f47ce96-78b4-4fe6-a16f-bc397de2cf0f",
+   "sort": 1
+  },
+  {
+   "question": null,
+   "section": {
+    "questions": [
+     {
+      "answers": [],
+      "id": "9fade604-c01c-4263-be07-338ba32c31ef",
+      "title": "Room name",
+      "type": "text",
+      "options": {
+       "multiline": false,
+       "maxLength": 120,
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 0
+     },
+     {
+      "answers": [],
+      "id": "8b8e7569-ea1b-49d1-962f-96810a5a3625",
+      "title": "Room photos",
+      "type": "image",
+      "options": {
+       "enabled": false
+      },
+      "logic": [],
+      "sort": 1
+     }
+    ],
+    "id": "0a9ddecb-ce12-4c40-adcc-a8f7a946a4ce",
+    "title": "Per-room photos",
+    "isRepeatable": true,
+    "repeatConfig": {},
+    "sort": 2
+   },
+   "id": "835c7857-0122-40e8-976a-297a69577110",
+   "sort": 2
+  },
+  {
+   "question": {
+    "answers": [],
+    "id": "43d1b031-e90d-480d-9cbb-e00c72f2dd52",
+    "title": "Additional comments",
+    "type": "text",
+    "options": {
+     "multiline": true,
+     "maxLength": 500,
+     "enabled": false
+    },
+    "logic": [],
+    "sort": 0
+   },
+   "section": null,
+   "id": "8a2c1ace-52df-4758-899e-7f7316991c66",
+   "sort": 3
+  }
+ ],
+ "_snapshot": "GET /survey/{id} on DEV, 2026-09-24; user and jobs removed"
+}
