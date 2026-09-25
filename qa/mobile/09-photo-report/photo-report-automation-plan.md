@@ -2,7 +2,8 @@
 
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/09-photo-report/photo-report-checklist.md`
 > (54 items, `CHK-PHR-001…054`, imported 2026-09-24). Date: 2026-09-24. Owner: mykola.zhuchenko.
-> **Status: draft — waits for the owner (Q-PHR-1…5 in [photo-report-questions.md](photo-report-questions.md)).**
+> **Status: accepted by the owner 2026-09-25 (Q-PHR-2…5 closed; Q-PHR-1 checked in recon 9, validated by the owner) —
+> [photo-report-questions.md](photo-report-questions.md).**
 
 | Field | Value |
 |---|---|
