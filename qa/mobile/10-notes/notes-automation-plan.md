@@ -2,7 +2,7 @@
 
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/10-notes/notes-checklist.md` (52 items,
 > `CHK-NOTE-001…052`, imported 2026-09-25). Date: 2026-09-25. Owner: mykola.zhuchenko.
-> **Status: draft — waits for the owner (Q-NOTE-1…3 in [notes-questions.md](notes-questions.md)).**
+> **Status: accepted by the owner 2026-09-25 (Q-NOTE-1…3 closed) — [notes-questions.md](notes-questions.md).**
 
 | Field | Value |
 |---|---|
