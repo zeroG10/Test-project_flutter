@@ -114,6 +114,7 @@ around a defect stay **Blocked**, never Passed.
 | TD-SRV-002 | Survey form — card without a section | a card holding one text question is itself a `TextField` (label = the titles); a tap on its centre does not reach the input | tap the input area (above the counter) | CHK-SRV-008, -009 |
 | TD-SRV-003 | Survey photos | a thumbnail is named by the photo's description (unnamed without one); its remove button is unnamed; the system photo picker's cells are not in the tree | thumbnail count; picker cell by grid position | CHK-SRV-019…-022 |
 | TD-PHR-001 | Photo report grid | a photo's delete icon is an unnamed Button in the photo's corner; a photo without a description is an unnamed Image | the delete = the unnamed Button over the photo's top-right; the photo = its position | CHK-PHR-039…044 |
+| TD-NOTE-001 | Notes list | a note row is one Image whose label is the date, the text and 'Show menu' joined; the ⋮ menu button is not an element | ⋮ = a tap on the row's right end | CHK-NOTE-010, -024, -030 |
 | TD-PHOTO-001 | Photo editor | four toolbar buttons unnamed; palette and canvas absent from the tree | position only; markup checks `Blocked` | module 09 (9 checks) |
 
 Suggested ids for the dev team follow §1 (`<screen>-<element>`), e.g. `registration-channel-sms`,
