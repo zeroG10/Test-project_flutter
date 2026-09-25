@@ -17,7 +17,7 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 | 06 | `order-progress` | `ORDP` | 42 | `2451:82704` | android · ios · tablet | traced (iOS) | Order details — In progress — 6 тестів (6 TC); 17 Passed, 1 Blocked (телефон PF — обмеження симулятора); здача → 07; Q-ORDP-4 (таймер) прийнято як є |
 | 07 | `submit-deliverables` | `DLV` | 33 | `<node-id>` | android · ios · tablet | intake | Submit Deliverables |
 | 08 | `survey` | `SRV` | 57 (40 + 17 додано) | `4009:12410` | android · ios · tablet | traced (iOS) | Survey — 16 тестів (16 TC), 8 опитувань + фото + порожнє + після здачі; 46 Passed; офлайн → етап Android, помилки збереження / фото — власник перевірив вручну |
-| 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | candidates (draft) | Photo report: план 34 CHK → 7 TC; камера, обрізка / малювання, офлайн, помилки — ручні / Android; Q-PHR-1…5 (зокрема можливий баг: видалене фото лишається на сервері) чекають власника |
+| 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | traced (iOS) | Photo report — 8 тестів (8 TC); 33 Passed, 1 Failed (**BUG-PHR-001** — видалене фото лишається на сервері, чернетка); камера, обрізка / малювання — власник перевірив вручну; офлайн → Android |
 | 10 | `notes` | `NOTE` | 52 | `<node-id>` | android · ios · tablet | intake | Notes screen |
 | 11 | `notifications` | `NOTIF` | 31 | `<node-id>` | android · ios · tablet | intake | Notifications screen |
 | 12 | `profile` | `PRF` | 35 | `<node-id>` | android · ios · tablet | intake | Profile screen |
