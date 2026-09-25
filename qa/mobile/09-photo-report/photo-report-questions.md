@@ -16,11 +16,12 @@
 
 | # | Що | Документ каже | Застосунок (код) | Статус |
 |---|---|---|---|---|
-| D-PHR-1 | Текст вікна видалення | «Are you sure you want delete this photo. All descriptions will be lost?» | «Are you sure you want **to** delete this photo. All descriptions will be lost?» (з сітки — з переносом рядка) | відкрите |
-| D-PHR-2 | Натискання на фото | «Tap on photo opens photo actions» | відкриває **«Edit photo»** — опис і теги (з кнопкою видалення); **фото вже не обрізати й не малювати на ньому** (редактор лише для нового фото) | відкрите |
-| D-PHR-3 | Попередження при виході без Save | «optional warning» | є: **«Unsaved Changes» / «You have unsaved changes. If you leave this screen, your changes will be lost.»** (Cancel / Leave) — лише якщо щось змінено | відкрите |
-| D-PHR-4 | Save на «Add photo» | активна лише коли є фото і валідні обов'язкові поля | фото є завжди (екран відкривається з фото), опис і теги **необов'язкові** — Save активна одразу | відкрите |
-| D-PHR-5 | Коли фото йде на сервер | зберегти локально, вивантажити, коли є мережа | **одразу** після Save: `POST /file/upload` + `POST /job/{id}/response {photoIds}` (+ опис і теги `PATCH /file/{id}`) | відкрите |
+| D-PHR-1 | Текст вікна видалення | «Are you sure you want delete this photo. All descriptions will be lost?» | «Are you sure you want **to** delete this photo. All descriptions will be lost?» (з сітки — з переносом рядка) | **прийнято як є** (власник, 2026-09-25) |
+| D-PHR-2 | Натискання на фото | «Tap on photo opens photo actions» | відкриває **«Edit photo»** — опис і теги (з кнопкою видалення); **фото вже не обрізати й не малювати на ньому** (редактор лише для нового фото) | **прийнято як є** (власник, 2026-09-25) |
+| D-PHR-3 | Попередження при виході без Save | «optional warning» | є: **«Unsaved Changes» / «You have unsaved changes. If you leave this screen, your changes will be lost.»** (Cancel / Leave) — лише якщо щось змінено | **прийнято як є** (власник, 2026-09-25) |
+| D-PHR-4 | Save на «Add photo» | активна лише коли є фото і валідні обов'язкові поля | фото є завжди (екран відкривається з фото), опис і теги **необов'язкові** — Save активна одразу | **прийнято як є** (власник, 2026-09-25) |
+| D-PHR-5 | Коли фото йде на сервер | зберегти локально, вивантажити, коли є мережа | **одразу** після Save: `POST /file/upload` + `POST /job/{id}/response {photoIds}` (+ опис і теги `PATCH /file/{id}`) | **прийнято як є** (власник, 2026-09-25) |
+| D-PHR-6 | Кнопка «Add photo» після збереження | — | після кожного збереження плашка «Photo added successfully» / «Changes saved successfully» внизу **3 с закриває кнопку «Add photo»** — натиснути її не можна (прогін 1 модуля 09) | **зауваження** (власник, 2026-09-25: «запиши як зауваження») — UX, не баг |
 
 ## Питання (Q)
 
