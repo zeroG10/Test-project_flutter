@@ -33,6 +33,7 @@ PHOTO_EDITOR = Screen(
     anchor="crop",
     elements={
         "crop": El(ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == 'Crop'")),
+        "markup": El(ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == 'Markup'")),
         "done": El(
             ios=(_P, _BUTTON + "(name == nil OR name == '') AND rect.x > 330 AND rect.y < 140"),
             note="✓ — the right-most unnamed app-bar button (TD-PHOTO-001); undo / redo (x 258, "
@@ -60,5 +61,26 @@ PHOTO_METADATA = Screen(
             )
         ),  # fmt: skip
         "save": El(ios=(_P, _BUTTON + "name == 'Save'")),
+        "edit-title": El(
+            ios=(
+                _P,
+                "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' "
+                "AND name == 'Edit photo'",
+            ),
+            note="the same page opened on a saved photo (Photo report, recon 9)",
+        ),  # fmt: skip
+        "back": El(ios=(_P, _BUTTON + "name == 'Back'")),
+        "label": El(
+            ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == 'Description'"),
+            note="the field's label — a tap here dismisses the keyboard without touching a field",
+        ),
+        "counter": El(
+            ios=(_P, "name MATCHES '^[0-9]+ / 500$'"),
+            note="'N / 500' — a StaticText, or an Other while it updates",
+        ),
+        "tag": El(
+            ios=(_P, _BUTTON + "name == {text}"),
+            note="a tag chip from the Admin Panel (selected: value 1, trait Selected)",
+        ),
     },
 )
