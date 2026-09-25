@@ -21,6 +21,7 @@ from screens.photo_report_map import (
 from screens.survey_photo_map import PHOTO_EDITOR, PHOTO_METADATA, PHOTO_PICKER
 
 PICKER_WAIT = 10.0  # the system photo picker takes a few seconds to appear (recon 8 / 9)
+TOAST = 8.0  # the save toast stays 3 s
 SAVE_WAIT = 30.0  # Save uploads the photo before it returns (D-PHR-5)
 GRID_MIN_WIDTH = 150  # grid photos are ~189 pt wide; the preview on the metadata page is 156
 
@@ -52,8 +53,10 @@ class PhotoMetadata(BasePage):
         return self.is_visible("edit-title", timeout)
 
     def hide_keyboard(self) -> None:
-        """Tap the field's label: the page drops the focus on a tap outside the field."""
-        self.tap("label")
+        """Tap the page's left margin: the page drops the focus on a tap outside the field. (The
+        field's label scrolls away under a long description — module 09 run 1.)"""
+        height = self.driver.get_window_size()["height"]
+        self.driver.execute_script("mobile: tap", {"x": 6, "y": int(height * 0.3)})
         time.sleep(0.5)
 
     def fill_description(self, text: str) -> None:
@@ -149,6 +152,7 @@ class PhotoReportPage(BasePage):
     def start_add_photo(self) -> None:
         """The bottom "Add photo" (two in the empty state) → the Camera / Gallery sheet."""
         with allure.step("tap photo-report.add-photo"):
+            self.wait_gone("toast", TOAST)  # the save toast lies over the button for 3 s
             buttons = self.driver.find_elements(*self.locator("add-photo"))
             bottom = max(buttons, key=lambda b: b.rect["y"])
             bottom.click()

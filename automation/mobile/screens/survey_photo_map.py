@@ -54,12 +54,10 @@ PHOTO_METADATA = Screen(
             )
         ),  # fmt: skip
         "description": El(
-            ios=(
-                _P,
-                "type == 'XCUIElementTypeTextField' AND "
-                "(name == 'Photo description' OR name == '')",
-            )
-        ),  # fmt: skip
+            ios=(_P, "type == 'XCUIElementTypeTextField'"),
+            note="the only text field of the page; named 'Photo description' while empty, unnamed "
+            "once it holds text (Edit photo — module 09 run 1)",
+        ),
         "save": El(ios=(_P, _BUTTON + "name == 'Save'")),
         "edit-title": El(
             ios=(

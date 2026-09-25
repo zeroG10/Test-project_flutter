@@ -44,6 +44,10 @@ PHOTO_REPORT = Screen(
             ios=(_P, "type == 'XCUIElementTypeImage' AND rect.width > 150"),
             note="every photo of the grid (the page pairs each with its delete icon)",
         ),
+        "toast": El(
+            ios=(_P, "name == 'Photo added successfully' OR name == 'Changes saved successfully'"),
+            note="a bottom toast for 3 s after a save — it lies over Add photo (module 09 run 1)",
+        ),
         "delete": El(
             ios=(_P, _BUTTON + "(name == nil OR name == '') AND rect.width < 50"),
             note="a photo's delete icon — unnamed, top-right of the photo (TD-PHR-001)",
