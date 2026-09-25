@@ -18,7 +18,7 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 | 07 | `submit-deliverables` | `DLV` | 33 | `<node-id>` | android · ios · tablet | intake | Submit Deliverables |
 | 08 | `survey` | `SRV` | 57 (40 + 17 додано) | `4009:12410` | android · ios · tablet | traced (iOS) | Survey — 16 тестів (16 TC), 8 опитувань + фото + порожнє + після здачі; 46 Passed; офлайн → етап Android, помилки збереження / фото — власник перевірив вручну |
 | 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | traced (iOS) | Photo report — 8 тестів (8 TC); 33 Passed, 1 Failed (**BUG-PHR-001** — видалене фото лишається на сервері, чернетка); камера, обрізка / малювання — власник перевірив вручну; офлайн → Android |
-| 10 | `notes` | `NOTE` | 52 | `<node-id>` | android · ios · tablet | intake | Notes screen |
+| 10 | `notes` | `NOTE` | 52 | `<node-id>` | android · ios · tablet | candidates (draft) | Notes: план 41 CHK → 7 TC; апка здебільшого як SRS, нотатки синхронізуються повністю; Q-NOTE-1…3 чекають власника |
 | 11 | `notifications` | `NOTIF` | 31 | `<node-id>` | android · ios · tablet | intake | Notifications screen |
 | 12 | `profile` | `PRF` | 35 | `<node-id>` | android · ios · tablet | intake | Profile screen |
 | | **разом** | | **625** | | | | Google Sheet: `Working_Regression Check-list_Concert Technologies– Flutter App` |
