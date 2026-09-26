@@ -2,7 +2,8 @@
 
 > Structured, alias-based test cases for the CHK IDs selected in [submit-deliverables-automation-plan.md](submit-deliverables-automation-plan.md).
 > Format: [qa/_templates/test-case-format.md](../../_templates/test-case-format.md) · prompt `prompts/mobile/03`.
-> **Status: draft. Written after recon 11 ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)) and the
+> **Status: automated and traced on iOS (run 2, 2026-09-26: 5 Passed, 1 Blocked — TC-DLV-004, Q-DLV-5); the owner sees
+> them with the results. Written after recon 11 ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)) and the
 > owner's decisions of 2026-09-26: D-DLV-1…7, Q-DLV-1…6 — [submit-deliverables-questions.md](submit-deliverables-questions.md).**
 
 | Field | Value |
