@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-25 06:43 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-09-26 07:17 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/09-photo-report/photo-report-checklist.md` — 54 items
-- Results (allure): `automation/mobile/allure-results-09` — 8 tests (7 passed, 1 failed, 0 skipped)
+- Results (allure): `automation/mobile/allure-results-09` — 7 tests (7 passed, 0 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `iOS simulator iPhone 17 · iOS 26.5 · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true`
-- Harness commit (this repo): `704490b`
+- Harness commit (this repo): `745acba (uncommitted changes)`
 - Environment label (pytest): `iOS · iPhone 17 · iOS 26.5 · build 1.1.1 (178)`
-- Run label (suite / filter): `pytest --platform=ios tests/shared/test_photo_report.py (module 09 run 2, 2026-09-25; one In progress job per test; gallery: 2 test photos)`
+- Run label (suite / filter): `pytest --platform=ios tests/shared/test_photo_report.py (module 09 run 3, 2026-09-26, after the owner's decision: server checks before submission withdrawn)`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -51,7 +51,7 @@ Generated: 2026-09-25 06:43 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-PHR-030 | Check that the user can select one or more tags for a photo. | 1 — `tests.shared.test_photo_report#test_description_and_tags (TC-PHR-002 Description up to 500 characters with a counter; tags are chosen and unchosen)` | Passed | allure: passed |
 | CHK-PHR-031 | Check that selecting a tag visually marks it as selected. | 1 — `tests.shared.test_photo_report#test_description_and_tags (TC-PHR-002 Description up to 500 characters with a counter; tags are chosen and unchosen)` | Passed | allure: passed |
 | CHK-PHR-032 | Check that deselecting a tag removes it from the photo metadata. | 1 — `tests.shared.test_photo_report#test_description_and_tags (TC-PHR-002 Description up to 500 characters with a counter; tags are chosen and unchosen)` | Passed | allure: passed |
-| CHK-PHR-033 | Check that tapping Save persists the photo, edits, description, and tags locall… | 2 — `tests.shared.test_photo_report#test_photos_after_restart (TC-PHR-006 Photos and descriptions survive an app restart)`; `tests.shared.test_photo_report#test_add_photo (TC-PHR-001 The empty Photo report leads through the gallery to a saved photo with its description)` | Passed | allure: passed<br>allure: passed |
+| CHK-PHR-033 | Check that tapping Save persists the photo, edits, description, and tags locall… | 2 — `tests.shared.test_photo_report#test_add_photo (TC-PHR-001 The empty Photo report leads through the gallery to a saved photo with its description)`; `tests.shared.test_photo_report#test_photos_after_restart (TC-PHR-006 Photos and descriptions survive an app restart)` | Passed | allure: passed<br>allure: passed |
 | CHK-PHR-034 | Check that tapping Save returns the user to the Photo Report screen. | 1 — `tests.shared.test_photo_report#test_add_photo (TC-PHR-001 The empty Photo report leads through the gallery to a saved photo with its description)` | Passed | allure: passed |
 | CHK-PHR-035 | Check that the newly added or edited photo appears immediately in the Photo Rep… | 1 — `tests.shared.test_photo_report#test_add_photo (TC-PHR-001 The empty Photo report leads through the gallery to a saved photo with its description)` | Passed | allure: passed |
 | CHK-PHR-036 | Check that previously saved data is preloaded when editing an existing photo. | 1 — `tests.shared.test_photo_report#test_edit_photo (TC-PHR-004 Editing: 'Edit photo' preloads the photo's data; Save updates it; leaving without Save warns and keeps it)` | Passed | allure: passed |
@@ -61,7 +61,7 @@ Generated: 2026-09-25 06:43 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-PHR-040 | Check that the Delete Photo pop-up displays the title “Delete photo” and destru… | 1 — `tests.shared.test_photo_report#test_delete_photo (TC-PHR-005 Deleting: the dialog; Cancel keeps the photo; Delete removes it and the grid updates)` | Passed | allure: passed |
 | CHK-PHR-041 | Check that the pop-up displays Cancel and Delete actions. | 1 — `tests.shared.test_photo_report#test_delete_photo (TC-PHR-005 Deleting: the dialog; Cancel keeps the photo; Delete removes it and the grid updates)` | Passed | allure: passed |
 | CHK-PHR-042 | Check that tapping Cancel closes the pop-up and preserves the photo and metadat… | 1 — `tests.shared.test_photo_report#test_delete_photo (TC-PHR-005 Deleting: the dialog; Cancel keeps the photo; Delete removes it and the grid updates)` | Passed | allure: passed |
-| CHK-PHR-043 | Check that tapping Delete permanently removes the photo and all associated meta… | 1 — `tests.shared.test_photo_report#test_deleted_photo_leaves_the_server (TC-PHR-008 A deleted photo is removed from the job on the server)` | Failed | allure: failed — AssertionError: the deleted photo is still on the job: ['51ab4bcc-3ef3-44ed-b1ac-3d5e9fe26ec2'] |
+| CHK-PHR-043 | Check that tapping Delete permanently removes the photo and all associated meta… | 1 — `tests.shared.test_photo_report#test_delete_photo (TC-PHR-005 Deleting: the dialog; Cancel keeps the photo; Delete removes it and the grid updates)` | Passed | allure: passed |
 | CHK-PHR-044 | Check that the Photo Report grid updates immediately after photo deletion. | 1 — `tests.shared.test_photo_report#test_delete_photo (TC-PHR-005 Deleting: the dialog; Cancel keeps the photo; Delete removes it and the grid updates)` | Passed | allure: passed |
 | CHK-PHR-045 | Check that photos can be added, edited, tagged, and deleted while offline. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-PHR-046 | Check that photos and metadata are stored locally when added offline. | 0 |  | no tagged test — not run (manual / exploratory), never green |
@@ -74,15 +74,13 @@ Generated: 2026-09-25 06:43 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-PHR-053 | Check that photo edits and metadata are retained locally if saving fails. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-PHR-054 | Check that the user can retry saving or syncing after an error. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 
-**Summary:** total 54 · automated 34 · Passed 33 · Failed 1 · Blocked 0 · Not run 20 (= total − Passed − Failed − Blocked)
+**Summary:** total 54 · automated 34 · Passed 34 · Failed 0 · Blocked 0 · Not run 20 (= total − Passed − Failed − Blocked)
 
-## Failed rows → defects
+## Notes on this run
 
-| CHK ID | Test | Defect |
-|---|---|---|
-| CHK-PHR-043 | TC-PHR-008 — the deleted photo is still on the job on the server | [BUG-PHR-001](bugs/BUG-PHR-001.md) (draft — the owner validates) |
-
-**Not automated (20):**
-- CHK-PHR-010 (camera) and CHK-PHR-016…-024 (crop / markup): skipped with a comment — the owner verified them manually (Q-PHR-2, Q-PHR-3).
-- CHK-PHR-045…-050: offline, Android stage.
-- CHK-PHR-051…-054: skipped with a comment (Q-PHR-4).
+- The owner's decision 2026-09-26: the job's photos / notes on the server **before submission** are not an oracle
+  (deleting and editing work on a real device, possibly applied through the job update at submission). The drafts
+  BUG-PHR-001 / BUG-NOTE-001 are **not filed**. The server checks were withdrawn from modules 09 / 10, and the final
+  server state is checked after submission in module 07.
+- Not automated here: manual checks verified by the owner, offline checks (Android stage), and checks skipped with a
+  comment — listed in the module's test cases, "Not here".

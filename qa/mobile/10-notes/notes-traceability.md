@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-25 18:23 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-09-26 07:17 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/10-notes/notes-checklist.md` — 52 items
-- Results (allure): `automation/mobile/allure-results-10` — 9 tests (7 passed, 2 failed, 0 skipped)
+- Results (allure): `automation/mobile/allure-results-10` — 7 tests (7 passed, 0 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `iOS simulator iPhone 17 · iOS 26.5 · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true`
-- Harness commit (this repo): `61dabbb`
+- Harness commit (this repo): `745acba (uncommitted changes)`
 - Environment label (pytest): `iOS · iPhone 17 · iOS 26.5 · build 1.1.1 (178)`
-- Run label (suite / filter): `pytest --platform=ios tests/shared/test_notes.py (module 10 run 1, 2026-09-25; one In progress job per test, a Submitted one for TC-NOTE-007)`
+- Run label (suite / filter): `pytest --platform=ios tests/shared/test_notes.py (module 10 run 2, 2026-09-26, after the owner's decision: server checks before submission withdrawn)`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -46,7 +46,7 @@ Generated: 2026-09-25 18:23 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-NOTE-025 | Check that the Edit note screen displays the title “Edit note”. | 1 — `tests.shared.test_notes#test_edit_note (TC-NOTE-004 Editing: 'Edit note' preloads the text; Save updates it in place with 'Note saved successfully'; leaving without Save warns)` | Passed | allure: passed |
 | CHK-NOTE-026 | Check that the existing note content is preloaded into the note input field. | 1 — `tests.shared.test_notes#test_edit_note (TC-NOTE-004 Editing: 'Edit note' preloads the text; Save updates it in place with 'Note saved successfully'; leaving without Save warns)` | Passed | allure: passed |
 | CHK-NOTE-027 | Check that editing a note preserves its original creation timestamp. | 1 — `tests.shared.test_notes#test_edit_note (TC-NOTE-004 Editing: 'Edit note' preloads the text; Save updates it in place with 'Note saved successfully'; leaving without Save warns)` | Passed | allure: passed |
-| CHK-NOTE-028 | Check that saving an edited note updates the note content and last-modified tim… | 2 — `tests.shared.test_notes#test_edited_note_on_server (TC-NOTE-008 An edited note is updated on the job on the server)`; `tests.shared.test_notes#test_edit_note (TC-NOTE-004 Editing: 'Edit note' preloads the text; Save updates it in place with 'Note saved successfully'; leaving without Save warns)` | Failed | allure: failed — AssertionError: the server holds ['QA-AUTO server note']<br>allure: passed |
+| CHK-NOTE-028 | Check that saving an edited note updates the note content and last-modified tim… | 1 — `tests.shared.test_notes#test_edit_note (TC-NOTE-004 Editing: 'Edit note' preloads the text; Save updates it in place with 'Note saved successfully'; leaving without Save warns)` | Passed | allure: passed |
 | CHK-NOTE-029 | Check that a success message “Note saved successfully” is displayed after editi… | 1 — `tests.shared.test_notes#test_edit_note (TC-NOTE-004 Editing: 'Edit note' preloads the text; Save updates it in place with 'Note saved successfully'; leaving without Save warns)` | Passed | allure: passed |
 | CHK-NOTE-030 | Check that the Delete note action is available from the note context menu in th… | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
 | CHK-NOTE-031 | Check that the Delete note action is available from the Edit note screen. | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
@@ -55,7 +55,7 @@ Generated: 2026-09-25 18:23 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-NOTE-034 | Check that the warning message about irreversible deletion is displayed in the… | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
 | CHK-NOTE-035 | Check that the pop-up displays both Cancel and Delete actions. | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
 | CHK-NOTE-036 | Check that tapping Cancel closes the pop-up and preserves the note content. | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
-| CHK-NOTE-037 | Check that tapping Delete permanently removes the note from the order. | 1 — `tests.shared.test_notes#test_deleted_note_leaves_server (TC-NOTE-009 A deleted note is removed from the job on the server)` | Failed | allure: failed — AssertionError: the deleted note is still on the job: ['QA-AUTO to delete'] |
+| CHK-NOTE-037 | Check that tapping Delete permanently removes the note from the order. | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
 | CHK-NOTE-038 | Check that the Notes List updates immediately after successful note deletion. | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
 | CHK-NOTE-039 | Check that a success message “Note deleted successfully” is displayed after del… | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
 | CHK-NOTE-040 | Check that deleted notes are no longer accessible for viewing or editing. | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
@@ -72,16 +72,13 @@ Generated: 2026-09-25 18:23 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-NOTE-051 | Check that an error message is displayed if note deletion fails. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-NOTE-052 | Check that the note is retained when deletion fails and the user can retry. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 
-**Summary:** total 52 · automated 41 · Passed 39 · Failed 2 · Blocked 0 · Not run 11 (= total − Passed − Failed − Blocked)
+**Summary:** total 52 · automated 41 · Passed 41 · Failed 0 · Blocked 0 · Not run 11 (= total − Passed − Failed − Blocked)
 
-## Failed rows → defects
+## Notes on this run
 
-| CHK ID | Test | Defect |
-|---|---|---|
-| CHK-NOTE-028 | TC-NOTE-008 — the server keeps the old text after an edit (TC-NOTE-004 passed: the app shows the edit) | [BUG-NOTE-001](bugs/BUG-NOTE-001.md) (draft — the owner validates) |
-| CHK-NOTE-037 | TC-NOTE-009 — the deleted note is still on the job on the server | [BUG-NOTE-001](bugs/BUG-NOTE-001.md) |
-
-**Not automated (11):**
-- CHK-NOTE-041: skipped with a comment — there is no "required notes" setting (owner, Q-NOTE-2).
-- CHK-NOTE-043…-047: offline, Android stage.
-- CHK-NOTE-048…-052: skipped with a comment (owner, Q-NOTE-1).
+- The owner's decision 2026-09-26: the job's photos / notes on the server **before submission** are not an oracle
+  (deleting and editing work on a real device, possibly applied through the job update at submission). The drafts
+  BUG-PHR-001 / BUG-NOTE-001 are **not filed**. The server checks were withdrawn from modules 09 / 10, and the final
+  server state is checked after submission in module 07.
+- Not automated here: manual checks verified by the owner, offline checks (Android stage), and checks skipped with a
+  comment — listed in the module's test cases, "Not here".

@@ -17,8 +17,8 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 | 06 | `order-progress` | `ORDP` | 42 | `2451:82704` | android · ios · tablet | traced (iOS) | Order details — In progress — 6 тестів (6 TC); 17 Passed, 1 Blocked (телефон PF — обмеження симулятора); здача → 07; Q-ORDP-4 (таймер) прийнято як є |
 | 07 | `submit-deliverables` | `DLV` | 33 | `<node-id>` | android · ios · tablet | intake | Submit Deliverables |
 | 08 | `survey` | `SRV` | 57 (40 + 17 додано) | `4009:12410` | android · ios · tablet | traced (iOS) | Survey — 16 тестів (16 TC), 8 опитувань + фото + порожнє + після здачі; 46 Passed; офлайн → етап Android, помилки збереження / фото — власник перевірив вручну |
-| 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | traced (iOS) | Photo report — 8 тестів (8 TC); 33 Passed, 1 Failed (**BUG-PHR-001** — видалене фото лишається на сервері, чернетка); камера, обрізка / малювання — власник перевірив вручну; офлайн → Android |
-| 10 | `notes` | `NOTE` | 52 | `<node-id>` | android · ios · tablet | traced (iOS) | Notes — 9 тестів (9 TC); 39 Passed, 2 Failed (**BUG-NOTE-001** — зміни й видалення нотаток не доходять до сервера, чернетка); офлайн → Android, помилки й CHK-NOTE-041 — пропущено з коментарем |
+| 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | traced (iOS) | Photo report — 7 тестів; 34 Passed; камера, обрізка / малювання — власник перевірив вручну; офлайн → Android; стан на сервері після здачі → модуль 07 (BUG-PHR-001 не заведено, власник) |
+| 10 | `notes` | `NOTE` | 52 | `<node-id>` | android · ios · tablet | traced (iOS) | Notes — 7 тестів; 41 Passed; офлайн → Android, помилки й CHK-NOTE-041 — пропущено з коментарем; стан на сервері після здачі → модуль 07 (BUG-NOTE-001 не заведено, власник) |
 | 11 | `notifications` | `NOTIF` | 31 | `<node-id>` | android · ios · tablet | intake | Notifications screen |
 | 12 | `profile` | `PRF` | 35 | `<node-id>` | android · ios · tablet | intake | Profile screen |
 | | **разом** | | **625** | | | | Google Sheet: `Working_Regression Check-list_Concert Technologies– Flutter App` |
