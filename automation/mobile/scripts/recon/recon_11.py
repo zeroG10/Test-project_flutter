@@ -15,9 +15,10 @@ server.
 
 Added actions: ``deliv:<Survey|Photo report|Notes>`` · ``survey:<text>`` (Short Survey: Yes + the
 text, Save) · ``addphoto:<cell>:<description>`` · ``editphoto:<n>:<append>`` · ``delphoto:<n>`` ·
-``addnote:<text>`` · ``editnote:<n>:<append>`` · ``delnote:<n>`` · ``watch:<s>`` (poll the tree,
-print each change of the buttons and messages) · ``tapwatch:<s>:<predicate>`` (tap, then watch at
-once — the "Submitting" / "Successful" states last ~1.5 s). Everything of ``recon_8.py`` works too.
+``addnote:<text>`` · ``editnote:<n>:<append>`` · ``delnote:<n>`` · ``setstatus:<kind>:<status>``
+(PATCH in the same session) · ``watch:<s>`` (poll the tree, print each change of the buttons and
+messages) · ``tapwatch:<s>:<predicate>`` (tap, then watch at once — the "Submitting" state lasts
+~1 s). Everything of ``recon_8.py`` works too.
 """
 
 import json
@@ -164,6 +165,13 @@ def extra(drv, verb: str, arg: str, jobs: dict) -> bool:
         notes.wait_toast_gone()
     elif verb == "delnote":
         NotesPage(drv, "ios").delete_from_menu(int(arg), True)
+    elif verb == "setstatus":  # in the same session: fast enough for the 4 s Retry snackbar
+        from helpers.field_services_api import FieldServicesApi
+
+        kind, _, status_type = arg.partition(":")
+        FieldServicesApi().update_job(jobs[kind]["id"], jobs[kind]["jobId"],
+                                      {"statusType": status_type})  # fmt: skip
+        print(f"    PATCH /job {kind}: statusType={status_type}", flush=True)
     elif verb == "watch":
         watch(drv, float(arg))
     elif verb == "tapwatch":

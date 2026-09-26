@@ -68,6 +68,20 @@ On a failure, a red snackbar with Retry.
 
 **The rest:** 4 offline (Android stage).
 
+## After recon 11 (2026-09-26) — proposed, waiting for Q-DLV-5 / -6
+
+| CHK | Was | Now (proposed) | Why |
+|---|---|---|---|
+| CHK-DLV-002 | After recon | Good Candidate — TC-DLV-001 | the modal layer `Dismiss` covers the screen; the job's elements leave the tree |
+| CHK-DLV-003 | After recon | Skipped with a comment | the checkmark is not in the tree (D-DLV-6); visible on the screenshot |
+| CHK-DLV-018, -019 · CHK-ORDP-024, -025 | After recon | Good Candidate — TC-DLV-002 / -003 | "Submitting deliverables", disabled, caught every time |
+| CHK-DLV-020 · CHK-ORDP-026, -027 | Good / After recon | Blocked on DEV | `POST /job/{id}/submit` answers 500 for every test job (Q-DLV-5) |
+| CHK-DLV-027…-029 · CHK-ORDP-038, -039 | After recon | Good Candidate — TC-DLV-007 | the job set Canceled through the API → "Job is not found." + Retry; set back → Retry sends again, data kept |
+| CHK-DLV-032 (all deleted) | Good Candidate | Q-DLV-6 | the server keeps the deleted photo and note |
+
+In every test the job becomes Submitted **on the server**. The app shows it (Submitted, Check out, locked) after the
+job is opened again. Right after the tap, it shows the 500 error.
+
 ## Step 9 — Test data
 
 - One job per test, created through `POST /job` directly In progress with the *Short Survey* (2 questions: Yes/No and
