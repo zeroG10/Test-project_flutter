@@ -95,7 +95,8 @@ def server(state: Path, kind: str) -> None:
                      ensure_ascii=False)[:12000])  # fmt: skip
 
 
-def do(state: Path, dumps: Path, actions: list[str]) -> None:
+def do(state: Path, dumps: Path, actions: list[str], extra=None) -> None:
+    """``extra(drv, verb, arg, jobs) -> bool`` handles verbs of a later recon (True = handled)."""
     from appium import webdriver
     from appium.options.ios import XCUITestOptions
 
@@ -125,7 +126,9 @@ def do(state: Path, dumps: Path, actions: list[str]) -> None:
             verb, _, arg = action.partition(":")
             print(f"\n>>> {action}", flush=True)
             try:
-                if verb == "open":
+                if extra is not None and extra(drv, verb, arg, jobs):
+                    pass
+                elif verb == "open":
                     jl = JobsListPage(drv, "ios")
                     jl.pull_to_refresh()
                     time.sleep(2)
