@@ -2,7 +2,7 @@
 
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/11-notifications/notifications-checklist.md`
 > (31 items, `CHK-NOTIF-001…031`, imported 2026-09-26). Date: 2026-09-26. Owner: mykola.zhuchenko.
-> **Status: draft — recon 12 and the owner's word on [notifications-questions.md](notifications-questions.md) pending.**
+> **Status: draft — recon 12 done (2026-09-26); the owner's word on [notifications-questions.md](notifications-questions.md) pending.**
 
 | Field | Value |
 |---|---|
@@ -64,6 +64,31 @@ notifications, so the empty state can be reached.
 | TC-NOTIF-005 *(after recon)* | push not allowed → the banner and its texts → Go to Settings → the app's settings; allowed → no banner |
 
 **The rest:** "Job starts today" (2) — a server schedule; offline (2) — Android stage.
+
+## After recon 12 (2026-09-26) — proposed, waiting for D-NOTIF-1…5 / Q-NOTIF-1…4
+
+**Up to 26 of 31 → 6 TCs:**
+
+| TC | Covers |
+|---|---|
+| TC-NOTIF-001 | the tab → "Notification list", tab selected; no notification → the empty state (CHK-NOTIF-001…003, -026, -027) |
+| TC-NOTIF-002 | a job created, updated and another cancelled → the rows: description as the server's body, chevron (not for the cancelled job), newest first, the tab's count; "Job cancelled" arrives read (CHK-NOTIF-011…013, -015, -016) |
+| TC-NOTIF-003 | an unread row → the job's details → back: tab bar there, the row read (the red dot gone — pixels, Q-NOTIF-4), the server `viewed`, the count −1 (CHK-NOTIF-019, -020, -022…-025) |
+| TC-NOTIF-004 | a cancelled job's row: no chevron, the tap stays on the list, no message (CHK-NOTIF-021, D-NOTIF-2) |
+| TC-NOTIF-005 | push not allowed (the Settings app) → the banner and its texts, with the empty state → Go to Settings → the Settings app; allowed → no banner (CHK-NOTIF-005…009, -028; Q-NOTIF-3, D-NOTIF-4) |
+| TC-NOTIF-006 | 10 jobs, one with a long title → the list scrolls; the long description wraps inside the screen, rows do not overlap (CHK-NOTIF-004, -014 on this device, -031) |
+
+**Not automated (5):**
+- CHK-NOTIF-010: the icon by type is not in the tree (Q-NOTIF-4).
+- CHK-NOTIF-017, -018: "Job starts today" is a server schedule (Q-NOTIF-1).
+- CHK-NOTIF-029, -030: offline, Android stage (Q-NOTIF-2).
+
+**Harness notes from recon 12:**
+- A row is one element named `<date>\n<time>\n<description>`: `Other` when the job can be opened, `Image` when not.
+- The `visible` attribute lies for part of a long list, so rows are read from the page source by their rect.
+- The tabs appear in the tree a moment after launch.
+- "Go to Settings" is part of the banner's single element, so it is tapped by position.
+- The Settings switch is tapped on the switch itself, not on its label.
 
 ## Step 9 — Test data
 

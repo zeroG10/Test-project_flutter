@@ -19,7 +19,7 @@ Stage legend: intake → analysed → checklist → candidates → test cases �
 | 08 | `survey` | `SRV` | 57 (40 + 17 додано) | `4009:12410` | android · ios · tablet | traced (iOS) | Survey — 16 тестів (16 TC), 8 опитувань + фото + порожнє + після здачі; 46 Passed; офлайн → етап Android, помилки збереження / фото — власник перевірив вручну |
 | 09 | `photo-report` | `PHR` | 54 | `<node-id>` | android · ios · tablet | traced (iOS) | Photo report — 7 тестів; 34 Passed; камера, обрізка / малювання — власник перевірив вручну; офлайн → Android; стан на сервері після здачі → модуль 07 (BUG-PHR-001 не заведено, власник) |
 | 10 | `notes` | `NOTE` | 52 | `<node-id>` | android · ios · tablet | traced (iOS) | Notes — 7 тестів; 41 Passed; офлайн → Android, помилки й CHK-NOTE-041 — пропущено з коментарем; стан на сервері після здачі → модуль 07 (BUG-NOTE-001 не заведено, власник) |
-| 11 | `notifications` | `NOTIF` | 31 | `<node-id>` | android · ios · tablet | intake | Notifications screen |
+| 11 | `notifications` | `NOTIF` | 31 | `<node-id>` | android · ios · tablet | checklist + plan + recon 12 (iOS) | Notifications — план: до 26 з 31 → 6 TC; питання D-NOTIF-1…5 / Q-NOTIF-1…4 — у власника |
 | 12 | `profile` | `PRF` | 35 | `<node-id>` | android · ios · tablet | intake | Profile screen |
 | | **разом** | | **625** | | | | Google Sheet: `Working_Regression Check-list_Concert Technologies– Flutter App` |
 
