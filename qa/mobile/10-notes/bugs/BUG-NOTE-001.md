@@ -1,6 +1,10 @@
 # BUG-NOTE-001 — Editing or deleting a note never reaches the server; each new note replaces the job's notes there
 
-> Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md). **Draft for the owner's validation.** Found in
+> **Status: NOT FILED — owner's decision 2026-09-26:** editing and deleting work in the app on a real device, possibly
+> applied through the job update at submission; not a bug for now. The final server state is checked after submission
+> in module 07.
+>
+> Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md). Draft for the owner's validation. Found in
 > recon 10 (2026-09-25). Tracker: not configured, nothing sent anywhere. Sibling: [BUG-PHR-001](../../09-photo-report/bugs/BUG-PHR-001.md).
 
 ## Summary

@@ -1,6 +1,9 @@
 # BUG-PHR-001 — A photo deleted from the Photo report stays on the job on the server
 
-> Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md). **Draft for the owner's validation** (Q-PHR-1,
+> **Status: NOT FILED — owner's decision 2026-09-26:** deleting works in the app on a real device, possibly applied through the
+> job update at submission; not a bug for now. The final server state is checked after submission in module 07.
+>
+> Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md). Draft for the owner's validation (Q-PHR-1,
 > owner 2026-09-25: «перевіриш, я провалідую»). Found in recon 9. Tracker: not configured, nothing sent anywhere.
 
 ## Summary

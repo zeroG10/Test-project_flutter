@@ -1,13 +1,13 @@
-"""Notes (module 10) — TC-NOTE-001…009.
+"""Notes (module 10) — TC-NOTE-001…007.
 
 Source of every step and expectation: qa/mobile/10-notes/notes-test-cases.md (recon 10; the owner's
 decisions 2026-09-25). Data: fixtures/survey.py — one job per test, directly In progress (Submitted
 for TC-NOTE-007), deleted after it. The server copy is ``GET /job/{id}`` → ``notes``.
 
-TC-NOTE-008 / -009 assert what the SRS requires of an edited / deleted note on the server; they are
-expected to fail while BUG-NOTE-001 (draft, the owner validates) stands. Offline and failures are
-not here (owner, Q-NOTE-1); CHK-NOTE-041 is skipped (Q-NOTE-2). Every expected value goes through
-``expected(...)``.
+The job's notes on the server before submission are not an oracle (owner, 2026-09-26: editing and
+deleting work on a real device; BUG-NOTE-001 not filed); the final server state is checked after
+submission in module 07. Offline and failures are not here (owner, Q-NOTE-1); CHK-NOTE-041 is
+skipped (Q-NOTE-2). Every expected value goes through ``expected(...)``.
 """
 
 import contextlib
@@ -204,8 +204,8 @@ def test_edit_note(survey_job, ui_login, pages, expected, evidence):
 
 
 DELETE_CHKS = ("CHK-NOTE-030", "CHK-NOTE-031", "CHK-NOTE-032", "CHK-NOTE-033", "CHK-NOTE-034",
-               "CHK-NOTE-035", "CHK-NOTE-036", "CHK-NOTE-038", "CHK-NOTE-039",
-               "CHK-NOTE-040")  # fmt: skip
+               "CHK-NOTE-035", "CHK-NOTE-036", "CHK-NOTE-037", "CHK-NOTE-038",
+               "CHK-NOTE-039", "CHK-NOTE-040")  # fmt: skip
 
 
 @pytest.mark.smoke
@@ -271,52 +271,3 @@ def test_submitted_notes_read_only(survey_job, ui_login, pages, expected, eviden
         assert not pages.notes.is_visible("header", READ_ONLY_WATCH), "Notes opened"
     evidence.checkpoint("submitted-notes-read-only")
     pages.details.expect_header(expected(job.title_line))
-
-
-@pytest.mark.regression
-@pytest.mark.shared
-@pytest.mark.tc("TC-NOTE-008")
-@pytest.mark.chk("CHK-NOTE-028")
-@allure.tag("CHK-NOTE-028")
-@allure.title("TC-NOTE-008 An edited note is updated on the job on the server")
-def test_edited_note_on_server(survey_job, ui_login, field_services_api, driver, pages, expected):
-    job, n = survey_job("short"), pages.notes
-    open_notes(pages, job, expected)
-    n.add_note("QA-AUTO server note")
-    before = server_notes(
-        field_services_api, job, driver, until=lambda t: t == ["QA-AUTO server note"]
-    )
-    assert before == [expected("QA-AUTO server note")], before
-    editor = n.edit(0)
-    editor.type_text(" edited")
-    editor.tap("save")
-    n.assert_open(SERVER)
-    n.expect_texts([expected("QA-AUTO server note edited")])
-    after = server_notes(field_services_api, job, driver,
-                         until=lambda t: t == ["QA-AUTO server note edited"])  # fmt: skip
-    with allure.step("expect the edited text on the server (SRS FR-NOT-06/-10; BUG-NOTE-001)"):
-        assert after == [expected("QA-AUTO server note edited")], f"the server holds {after}"
-
-
-@pytest.mark.regression
-@pytest.mark.shared
-@pytest.mark.tc("TC-NOTE-009")
-@pytest.mark.chk("CHK-NOTE-037")
-@allure.tag("CHK-NOTE-037")
-@allure.title("TC-NOTE-009 A deleted note is removed from the job on the server")
-def test_deleted_note_leaves_server(
-    survey_job, ui_login, field_services_api, driver, pages, expected, evidence
-):
-    job, n = survey_job("short"), pages.notes
-    open_notes(pages, job, expected)
-    n.add_note("QA-AUTO to delete")
-    before = server_notes(
-        field_services_api, job, driver, until=lambda t: t == ["QA-AUTO to delete"]
-    )
-    assert before == [expected("QA-AUTO to delete")], before
-    n.delete_from_menu(0, confirm=True)
-    n.visible("empty-title", 10)
-    evidence.checkpoint("notes-empty-after-delete")
-    after = server_notes(field_services_api, job, driver, until=lambda t: not t)
-    with allure.step("expect no note on the job on the server (SRS FR-NOT-08; BUG-NOTE-001)"):
-        assert after == [], f"the deleted note is still on the job: {after}"

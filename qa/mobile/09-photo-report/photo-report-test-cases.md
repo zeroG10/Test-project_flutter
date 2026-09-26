@@ -3,7 +3,8 @@
 > Structured, alias-based test cases for the CHK IDs selected in [photo-report-automation-plan.md](photo-report-automation-plan.md).
 > Format: [qa/_templates/test-case-format.md](../../_templates/test-case-format.md) · prompt `prompts/mobile/03`.
 > **Status: draft — written after recon 9 ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)) and the
-> owner's decisions (2026-09-25: Q-PHR-2…5 closed; Q-PHR-1 → BUG-PHR-001 draft for validation).**
+> owner's decisions (2026-09-25: Q-PHR-2…5 closed; 2026-09-26: Q-PHR-1 not a bug, the server check before submission
+> withdrawn — TC-PHR-008 removed).**
 
 | Field | Value |
 |---|---|
@@ -106,7 +107,7 @@
 
 | Field | Value |
 |---|---|
-| Source CHK IDs | CHK-PHR-039, -040, -041, -042, -044 |
+| Source CHK IDs | CHK-PHR-039, -040, -041, -042, -043, -044 |
 | Priority | P0 |
 | Preconditions | two photos in the grid |
 | Oracle | spec — FR-DEL-PH-01…03; D-PHR-1 (the message wording) |
@@ -148,22 +149,6 @@
 | 2 | expect-visible | photo-editor.crop | — | Crop and Markup |
 | 3 | click | photo-editor.done | — | photo-metadata.title "Add photo" |
 
-## TC-PHR-008 — A deleted photo is removed from the job on the server
-
-| Field | Value |
-|---|---|
-| Source CHK IDs | CHK-PHR-043 |
-| Priority | P1 |
-| Preconditions | one photo `QA-AUTO to delete`, saved (on the server) |
-| Oracle | spec — FR-DEL-PH-03, -04, -08 |
-| Known defect | **BUG-PHR-001** (draft, owner's validation pending) — the app deletes on the device only |
-
-| # | Action | Target (alias) | Data | Expected |
-|---|---|---|---|---|
-| 1 | expect-text | api.jobPhotos | — | the photo is on the server |
-| 2 | click | photo-report.delete[1] | then photo-delete-dialog.delete | photo-report.empty-title |
-| 3 | expect-text | api.jobPhotos | — | no photo on the job |
-
 ## Aliases used
 
 | Alias | ios map |
@@ -182,8 +167,7 @@
 | CHK-PHR-012 | TC-PHR-007 | |
 | CHK-PHR-015, -036…-038 | TC-PHR-004 | |
 | CHK-PHR-025…-032 | TC-PHR-002 | |
-| CHK-PHR-039…-042, -044 | TC-PHR-005 | |
-| CHK-PHR-043 | TC-PHR-008 | BUG-PHR-001 |
+| CHK-PHR-039…-044 | TC-PHR-005 | -043: removed from the report on the device; the server copy after submission — module 07 (owner, 2026-09-26) |
 
 **Not here:**
 - CHK-PHR-010 (camera) and CHK-PHR-016…-024 (crop / markup) — skipped with a comment: the owner verified them manually

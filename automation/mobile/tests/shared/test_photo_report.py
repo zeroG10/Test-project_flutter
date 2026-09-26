@@ -1,13 +1,14 @@
-"""Photo report (module 09) — TC-PHR-001…008.
+"""Photo report (module 09) — TC-PHR-001…007.
 
 Source of every step and expectation: qa/mobile/09-photo-report/photo-report-test-cases.md (recon 9;
 the owner's decisions 2026-09-25). Data: fixtures/survey.py — one job per test, directly In
 progress, deleted after it; photos from the simulator gallery (``gallery_photos``: cell 1 = a small
 photo). The server copy is ``GET /job/{id}`` → ``photos``.
 
-TC-PHR-008 asserts what the SRS requires of a deleted photo on the server; it is expected to fail
-while BUG-PHR-001 (draft, the owner validates) stands. Camera, crop / markup, offline and failures
-are not here (owner, Q-PHR-2…4). Every expected value goes through ``expected(...)``.
+The job's photos on the server before submission are not an oracle (owner, 2026-09-26: deleting
+works on a real device; BUG-PHR-001 not filed); the final server state is checked after submission
+in module 07. Camera, crop / markup, offline and failures are not here (owner, Q-PHR-2…4). Every
+expected value goes through ``expected(...)``.
 """
 
 import contextlib
@@ -222,7 +223,8 @@ def test_edit_photo(
         assert [t.get("name") for t in photos[0].get("tags") or []] == [expected("tag1")], photos[0]
 
 
-DELETE_CHKS = ("CHK-PHR-039", "CHK-PHR-040", "CHK-PHR-041", "CHK-PHR-042", "CHK-PHR-044")
+DELETE_CHKS = ("CHK-PHR-039", "CHK-PHR-040", "CHK-PHR-041", "CHK-PHR-042", "CHK-PHR-043",
+               "CHK-PHR-044")  # fmt: skip
 
 
 @pytest.mark.smoke
@@ -286,27 +288,3 @@ def test_editor_opens(survey_job, gallery_photos, ui_login, pages, expected, evi
     evidence.checkpoint("photo-editor")
     pages.editor.tap("done")
     pages.meta.assert_open(15)
-
-
-@pytest.mark.regression
-@pytest.mark.shared
-@pytest.mark.tc("TC-PHR-008")
-@pytest.mark.chk("CHK-PHR-043")
-@allure.tag("CHK-PHR-043")
-@allure.title("TC-PHR-008 A deleted photo is removed from the job on the server")
-def test_deleted_photo_leaves_the_server(
-    survey_job, gallery_photos, ui_login, field_services_api, driver, pages, expected, evidence
-):
-    job, r = survey_job("short"), pages.report
-    open_report(pages, job, expected)
-    r.add_photo(1, "QA-AUTO to delete")
-    before = server_photos(field_services_api, job, driver, until=lambda p: len(p) == 1)
-    assert [p.get("note") for p in before] == [expected("QA-AUTO to delete")], before
-    r.delete_photo(0)
-    r.visible("empty-title", 10)
-    evidence.checkpoint("photo-report-empty-after-delete")
-    after = server_photos(field_services_api, job, driver, until=lambda p: not p)
-    with allure.step(
-        "expect no photo on the job on the server (SRS FR-DEL-PH-03/-04/-08; BUG-PHR-001)"
-    ):
-        assert after == [], f"the deleted photo is still on the job: {[p.get('id') for p in after]}"

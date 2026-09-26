@@ -3,7 +3,8 @@
 > Structured, alias-based test cases for the CHK IDs selected in [notes-automation-plan.md](notes-automation-plan.md).
 > Format: [qa/_templates/test-case-format.md](../../_templates/test-case-format.md) · prompt `prompts/mobile/03`.
 > **Status: draft — written after recon 10 ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)) and the
-> owner's decisions (2026-09-25: Q-NOTE-1…3 closed; BUG-NOTE-001 draft for validation).**
+> owner's decisions (2026-09-25: Q-NOTE-1…3 closed; 2026-09-26: BUG-NOTE-001 not filed, the server checks before
+> submission withdrawn — TC-NOTE-008 / -009 removed).**
 
 | Field | Value |
 |---|---|
@@ -102,7 +103,7 @@
 
 | Field | Value |
 |---|---|
-| Source CHK IDs | CHK-NOTE-030, -031, -032, -033, -034, -035, -036, -038, -039, -040 |
+| Source CHK IDs | CHK-NOTE-030, -031, -032, -033, -034, -035, -036, -037, -038, -039, -040 |
 | Priority | P0 |
 | Preconditions | two notes |
 | Oracle | spec — FR-NOT-07/08; SRS §3.1.3.4.7 (the dialog text) |
@@ -144,38 +145,6 @@
 | 1 | click | job-details.deliverable[Notes] | — | — |
 | 2 | expect-hidden | notes.header | 3 s | the details stay |
 
-## TC-NOTE-008 — An edited note is updated on the job on the server
-
-| Field | Value |
-|---|---|
-| Source CHK IDs | CHK-NOTE-028 |
-| Priority | P1 |
-| Preconditions | a note `QA-AUTO server note`, saved (on the server) |
-| Oracle | spec — FR-NOT-06, FR-NOT-10 |
-| Known defect | **BUG-NOTE-001** (draft) |
-
-| # | Action | Target (alias) | Data | Expected |
-|---|---|---|---|---|
-| 1 | expect-text | api.jobNotes | — | `QA-AUTO server note` |
-| 2 | click | notes.menu[1] | then note-menu.edit, append ` edited`, note-editor.save | — |
-| 3 | expect-text | api.jobNotes | — | `QA-AUTO server note edited` |
-
-## TC-NOTE-009 — A deleted note is removed from the job on the server
-
-| Field | Value |
-|---|---|
-| Source CHK IDs | CHK-NOTE-037 |
-| Priority | P1 |
-| Preconditions | a note `QA-AUTO to delete`, saved (on the server) |
-| Oracle | spec — FR-NOT-08 ("permanently remove the note from the order") |
-| Known defect | **BUG-NOTE-001** (draft) |
-
-| # | Action | Target (alias) | Data | Expected |
-|---|---|---|---|---|
-| 1 | expect-text | api.jobNotes | — | `QA-AUTO to delete` |
-| 2 | click | notes.menu[1] | then note-menu.delete, note-delete-dialog.delete | notes.empty-title |
-| 3 | expect-text | api.jobNotes | — | no note |
-
 ## Aliases used
 
 | Alias | ios map |
@@ -191,9 +160,8 @@
 | CHK-NOTE-001…-006, -012…-016, -020…-023 | TC-NOTE-001 (+ -006) | |
 | CHK-NOTE-007…-011 | TC-NOTE-002 | |
 | CHK-NOTE-017…-019 | TC-NOTE-003 | |
-| CHK-NOTE-024…-029 | TC-NOTE-004 (+ -008 for -028 on the server) | BUG-NOTE-001 |
-| CHK-NOTE-030…-036, -038…-040 | TC-NOTE-005 | |
-| CHK-NOTE-037 | TC-NOTE-009 | BUG-NOTE-001 |
+| CHK-NOTE-024…-029 | TC-NOTE-004 | |
+| CHK-NOTE-030…-040 | TC-NOTE-005 | -037: removed from the order on the device; the server copy after submission — module 07 (owner, 2026-09-26) |
 | CHK-NOTE-042 | TC-NOTE-007 | |
 
 **Not here:**
