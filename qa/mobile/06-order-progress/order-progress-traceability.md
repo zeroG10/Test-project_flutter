@@ -1,6 +1,6 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-26 12:22 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-09-26 12:41 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/06-order-progress/order-progress-checklist.md` — 42 items
@@ -10,9 +10,9 @@ Generated: 2026-09-26 12:22 UTC by `automation/tools/trace_results.py` (read-onl
 
 - Target: `iOS simulator iPhone 17 · iOS 26.5 · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true`
-- Harness commit (this repo): `afae26c`
+- Harness commit (this repo): `20d8ad3 (uncommitted changes)`
 - Environment label (pytest): `iOS · iPhone 17 · iOS 26.5 · build 1.1.1 (178)`
-- Run label (suite / filter): `module 06 run 3 (2026-09-24, tests/shared/test_order_progress.py) + module 07 run 2 (2026-09-26, tests/shared/test_submit_deliverables.py — the submission checks CHK-ORDP-019…028, -038, -039, -041 handed over to 07)`
+- Run label (suite / filter): `module 06 run 3 (2026-09-24, tests/shared/test_order_progress.py) + module 07 run 3 (2026-09-26, tests/shared/test_submit_deliverables.py — the submission checks CHK-ORDP-019…028, -038, -039, -041 handed over to 07)`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -46,7 +46,7 @@ Generated: 2026-09-26 12:22 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDP-025 | Check that the Submit deliverables button is disabled while submission is in pr… | 1 — `tests.shared.test_submit_deliverables#test_submission_recorded_and_locked (TC-DLV-003 A completed job is submitted: 'Submitting deliverables' while it runs; the server records the job, the time and every deliverable; the job opened again is Submitted with Check out and locked, also after an app restart)` | Passed | allure: passed |
 | CHK-ORDP-026 | Check that a success toast “Deliverables sent to review successfully” is displa… | 1 — `tests.shared.test_submit_deliverables#test_success_reaction (TC-DLV-004 The app's reaction to a successful submission: 'Deliverables sent to review successfully', 'Successful', then Check out, locked at once)` | Blocked | allure: skipped — Skipped: Blocked: DEV answers POST /job/{id}/submit with 500 although the submission is recorded (COPS; owner, Q-DLV-5, 2026-09-26) — the app shows 'Server err… |
 | CHK-ORDP-027 | Check that the primary action area displays a success state label (e.g., “Succe… | 1 — `tests.shared.test_submit_deliverables#test_success_reaction (TC-DLV-004 The app's reaction to a successful submission: 'Deliverables sent to review successfully', 'Successful', then Check out, locked at once)` | Blocked | allure: skipped — Skipped: Blocked: DEV answers POST /job/{id}/submit with 500 although the submission is recorded (COPS; owner, Q-DLV-5, 2026-09-26) — the app shows 'Server err… |
-| CHK-ORDP-028 | Check that the primary action button changes to “Check out” after deliverables… | 1 — `tests.shared.test_submit_deliverables#test_success_reaction (TC-DLV-004 The app's reaction to a successful submission: 'Deliverables sent to review successfully', 'Successful', then Check out, locked at once)` | Blocked | allure: skipped — Skipped: Blocked: DEV answers POST /job/{id}/submit with 500 although the submission is recorded (COPS; owner, Q-DLV-5, 2026-09-26) — the app shows 'Server err… |
+| CHK-ORDP-028 | Check that the primary action button changes to “Check out” after deliverables… | 1 — `tests.shared.test_submit_deliverables#test_submission_recorded_and_locked (TC-DLV-003 A completed job is submitted: 'Submitting deliverables' while it runs; the server records the job, the time and every deliverable; the job opened again is Submitted with Check out and locked, also after an app restart)` | Passed | allure: passed |
 | CHK-ORDP-029 | Check that the Submit deliverables button is disabled when the device is offlin… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDP-030 | Check that an offline informational message is displayed when the device is off… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDP-031 | Check that deliverables progress is saved locally while offline and remains ava… | 0 |  | no tagged test — not run (manual / exploratory), never green |
@@ -62,7 +62,7 @@ Generated: 2026-09-26 12:22 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDP-041 | Check that deliverables cannot be edited after successful submission if the con… | 1 — `tests.shared.test_submit_deliverables#test_submission_recorded_and_locked (TC-DLV-003 A completed job is submitted: 'Submitting deliverables' while it runs; the server records the job, the time and every deliverable; the job opened again is Submitted with Check out and locked, also after an app restart)` | Passed | allure: passed |
 | CHK-ORDP-042 | Check that returning to the In Progress screen preserves the correct primary ac… | 1 — `tests.shared.test_order_progress#test_primary_action_follows_status (TC-ORDP-005 The primary action follows the status after leaving and reopening; a Submitted job's deliverables are read-only)` | Passed | allure: passed |
 
-**Summary:** total 42 · automated 31 · Passed 27 · Failed 0 · Blocked 4 · Not run 11 (= total − Passed − Failed − Blocked)
+**Summary:** total 42 · automated 31 · Passed 28 · Failed 0 · Blocked 3 · Not run 11 (= total − Passed − Failed − Blocked)
 
 ## Tagged tests with no checklist item
 
@@ -81,7 +81,7 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 | CHK-DLV-010 | 1 — `tests.shared.test_submit_deliverables#test_incomplete_survey_refused (TC-DLV-002 With the survey not completed, Submit is refused with 'Complete the survey before job submission.'; nothing is submitted)` | passed |
 | CHK-DLV-011 | 1 — `tests.shared.test_submit_deliverables#test_incomplete_survey_refused (TC-DLV-002 With the survey not completed, Submit is refused with 'Complete the survey before job submission.'; nothing is submitted)` | passed |
 | CHK-DLV-012 | 1 — `tests.shared.test_submit_deliverables#test_incomplete_survey_refused (TC-DLV-002 With the survey not completed, Submit is refused with 'Complete the survey before job submission.'; nothing is submitted)` | passed |
-| CHK-DLV-013 | 1 — `tests.shared.test_submit_deliverables#test_success_reaction (TC-DLV-004 The app's reaction to a successful submission: 'Deliverables sent to review successfully', 'Successful', then Check out, locked at once)` | skipped |
+| CHK-DLV-013 | 1 — `tests.shared.test_submit_deliverables#test_submission_recorded_and_locked (TC-DLV-003 A completed job is submitted: 'Submitting deliverables' while it runs; the server records the job, the time and every deliverable; the job opened again is Submitted with Check out and locked, also after an app restart)` | passed |
 | CHK-DLV-014 | 1 — `tests.shared.test_submit_deliverables#test_submission_recorded_and_locked (TC-DLV-003 A completed job is submitted: 'Submitting deliverables' while it runs; the server records the job, the time and every deliverable; the job opened again is Submitted with Check out and locked, also after an app restart)` | passed |
 | CHK-DLV-015 | 1 — `tests.shared.test_submit_deliverables#test_submission_recorded_and_locked (TC-DLV-003 A completed job is submitted: 'Submitting deliverables' while it runs; the server records the job, the time and every deliverable; the job opened again is Submitted with Check out and locked, also after an app restart)` | passed |
 | CHK-DLV-016 | 1 — `tests.shared.test_submit_deliverables#test_submission_recorded_and_locked (TC-DLV-003 A completed job is submitted: 'Submitting deliverables' while it runs; the server records the job, the time and every deliverable; the job opened again is Submitted with Check out and locked, also after an app restart)` | passed |
@@ -101,12 +101,14 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 
 ## Notes on this run
 
-- **Two runs merged.** Module 06 run 3 (2026-09-24) and module 07 run 2 (2026-09-26). The submission checks
+- **Two runs merged.** Module 06 run 3 (2026-09-24) and module 07 run 3 (2026-09-26). The submission checks
   CHK-ORDP-019…028, -038, -039 and -041 were handed over to module 07; they are tested by
   `tests/shared/test_submit_deliverables.py` (TC-DLV-001, -003, -004, -006).
 - **Blocked:**
-  - CHK-ORDP-026…028 (TC-DLV-004): DEV answers `POST /job/{id}/submit` with 500 although the submission is recorded
-    (COPS; owner, Q-DLV-5). The app's success message, "Successful" and the change to Check out are not observable on DEV.
+  - CHK-ORDP-026, -027 (TC-DLV-004): DEV answers `POST /job/{id}/submit` with 500 although the submission is recorded
+    (COPS; owner, Q-DLV-5). The app's success message and "Successful" are not observable on DEV.
   - The PF phone: no Phone app on the simulator. Unchanged from run 3.
+- **CHK-ORDP-028** is checked on the job opened again after the submission (TC-DLV-003). The owner decided this on
+  2026-09-26.
 - **CHK-DLV-* rows under "tagged tests with no checklist item"** belong to module 07 — see
   [submit-deliverables-traceability.md](../07-submit-deliverables/submit-deliverables-traceability.md).
