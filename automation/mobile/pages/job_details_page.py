@@ -14,7 +14,7 @@ from selenium.common.exceptions import TimeoutException
 from helpers import pixels, waits
 from pages.base_page import BasePage, normalized
 from pages.jobs_list_page import UPDATED_RGB, UPDATED_SHARE
-from pages.submit_dialog_page import SETTLE, Submission, SubmitDialog, watch_submission
+from pages.submit_dialog_page import SETTLE, Submission, SubmitDialog, snackbars, watch_submission
 from screens.job_details_map import JOB_DETAILS
 
 TIMER = re.compile(r"(\d\d):(\d\d):(\d\d)")
@@ -138,9 +138,11 @@ class JobDetailsPage(BasePage):
 
     def open_submit_dialog(self) -> SubmitDialog:
         """Tap "Submit deliverables" → the confirmation dialog. A snackbar of an earlier save
-        ("Survey saved", recon 11) lies over the button for a few seconds: it must be gone first."""
+        ("Survey saved") lies over the button for ~4 s and takes the tap (run 1): it must be gone
+        first — the button itself reads as visible under it."""
         with allure.step("tap job-details.submit-deliverables → submit-dialog"):
             self.visible("submit-deliverables", SNACKBAR)
+            waits.wait_until(self.driver, lambda d: not snackbars(d.page_source), SNACKBAR)
             self.tap("submit-deliverables")
             dialog = SubmitDialog(self.driver, self.platform)
             dialog.assert_open(10)

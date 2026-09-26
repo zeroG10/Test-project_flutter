@@ -68,6 +68,18 @@ def observe(source: str, seen: Submission) -> None:
             seen.messages.append(name)
 
 
+def snackbars(source: str) -> list[str]:
+    """The names of the snackbars on screen (a visible Other at the bottom)."""
+    return [
+        node.attrib.get("name", "")
+        for node in ET.fromstring(source).iter()
+        if node.tag.endswith("Other")
+        and node.attrib.get("visible") == "true"
+        and node.attrib.get("name")
+        and int(node.attrib.get("y", "0")) > MESSAGE_MIN_Y
+    ]
+
+
 class SubmitDialog(BasePage):
     screen = SUBMIT_DIALOG
 
