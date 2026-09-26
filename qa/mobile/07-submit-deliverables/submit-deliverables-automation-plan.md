@@ -85,7 +85,7 @@ job is opened again. Right after the tap, it shows the 500 error.
 ## Final selection (2026-09-26)
 
 **41 of 46 automated → 6 TCs** ([submit-deliverables-test-cases.md](submit-deliverables-test-cases.md)): 28 DLV + 13 ORDP.
-5 of the 41 are expected `Blocked` on DEV (TC-DLV-004, Q-DLV-5).
+3 of the 41 are expected `Blocked` on DEV (TC-DLV-004, Q-DLV-5); CHK-DLV-013 / CHK-ORDP-028 moved to TC-DLV-003 (owner, 2026-09-26).
 
 | TC | Covers |
 |---|---|

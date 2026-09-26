@@ -183,10 +183,13 @@ def test_incomplete_survey_refused(
         assert not body.get("surveyResponse"), body.get("surveyResponse")
 
 
-SUBMIT_CHKS = ("CHK-DLV-014", "CHK-DLV-015", "CHK-DLV-016", "CHK-DLV-017", "CHK-DLV-018",
-               "CHK-DLV-019", "CHK-DLV-021", "CHK-DLV-022", "CHK-DLV-030", "CHK-DLV-031",
-               "CHK-DLV-032", "CHK-DLV-033", "CHK-ORDP-023", "CHK-ORDP-024", "CHK-ORDP-025",
-               "CHK-ORDP-041")  # fmt: skip
+# CHK-DLV-013 and CHK-ORDP-028 ("locked" / "Check out" right after the submission) are checked on
+# the job opened again: on DEV the app learns of the submission only then (the /submit 500, Q-DLV-5;
+# moved here from TC-DLV-004 by the owner, 2026-09-26)
+SUBMIT_CHKS = ("CHK-DLV-013", "CHK-DLV-014", "CHK-DLV-015", "CHK-DLV-016", "CHK-DLV-017",
+               "CHK-DLV-018", "CHK-DLV-019", "CHK-DLV-021", "CHK-DLV-022", "CHK-DLV-030",
+               "CHK-DLV-031", "CHK-DLV-032", "CHK-DLV-033", "CHK-ORDP-023", "CHK-ORDP-024",
+               "CHK-ORDP-025", "CHK-ORDP-028", "CHK-ORDP-041")  # fmt: skip
 
 
 @pytest.mark.smoke
@@ -249,7 +252,7 @@ def test_submission_recorded_and_locked(
     expect_locked(pages, expected, "Survey", pages.survey)
 
 
-SUCCESS_CHKS = ("CHK-DLV-013", "CHK-DLV-020", "CHK-ORDP-026", "CHK-ORDP-027", "CHK-ORDP-028")
+SUCCESS_CHKS = ("CHK-DLV-020", "CHK-ORDP-026", "CHK-ORDP-027")
 
 
 @pytest.mark.regression

@@ -71,10 +71,10 @@
 
 | Field | Value |
 |---|---|
-| Source CHK IDs | CHK-DLV-014, -015, -016, -017, -018, -019, -021, -022, -030, -031, -032, -033 · CHK-ORDP-023, -024, -025, -041 |
+| Source CHK IDs | CHK-DLV-013, -014, -015, -016, -017, -018, -019, -021, -022, -030, -031, -032, -033 · CHK-ORDP-023, -024, -025, -028, -041 |
 | Priority | P0 · smoke |
 | Preconditions | `{{job.progress}}` In progress; `gallery_photos` |
-| Oracle | spec — FR-SUB-03 … -05, FR-IP-07; the submission record (D-DLV-4); recon 11 |
+| Oracle | spec — FR-SUB-03 … -05, FR-IP-07; the submission record (D-DLV-4); recon 11. CHK-DLV-013 / CHK-ORDP-028 (locked, Check out after the submission) are checked on the job opened again — on DEV the app learns of the submission only then (Q-DLV-5); moved here from TC-DLV-004 by the owner, 2026-09-26 |
 
 | # | Action | Target (alias) | Data | Expected |
 |---|---|---|---|---|
@@ -94,7 +94,7 @@
 
 | Field | Value |
 |---|---|
-| Source CHK IDs | CHK-DLV-013, -020 · CHK-ORDP-026, -027, -028 |
+| Source CHK IDs | CHK-DLV-020 · CHK-ORDP-026, -027 |
 | Priority | P1 |
 | Preconditions | `{{job.progress}}` In progress, the survey completed |
 | Oracle | spec — SRS §3.1.3.4.1 (success notification), FR-SUB-04, FR-IP-07; code `job_detail_content.dart` ("Successful" 1.5 s); D-DLV-2 |
@@ -164,8 +164,8 @@
 |---|---|---|
 | CHK-DLV-001, -002, -004…-009 · CHK-ORDP-019…-022 | TC-DLV-001 | |
 | CHK-DLV-010…-012 | TC-DLV-002 | |
-| CHK-DLV-014…-019, -021, -022, -030…-033 · CHK-ORDP-023…-025, -041 | TC-DLV-003 | |
-| CHK-DLV-013, -020 · CHK-ORDP-026…-028 | TC-DLV-004 | `Blocked` on DEV (Q-DLV-5) |
+| CHK-DLV-013…-019, -021, -022, -030…-033 · CHK-ORDP-023…-025, -028, -041 | TC-DLV-003 | -013 / ORDP-028 on the job opened again (owner, 2026-09-26) |
+| CHK-DLV-020 · CHK-ORDP-026, -027 | TC-DLV-004 | `Blocked` on DEV (Q-DLV-5) |
 | CHK-DLV-032 | TC-DLV-003, TC-DLV-005 | all deleted → D-DLV-7 (remark, no test) |
 | CHK-DLV-027…-029 · CHK-ORDP-038, -039 | TC-DLV-006 | |
 
