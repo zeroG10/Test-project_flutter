@@ -6,6 +6,7 @@ card) is not an element; "Check in fully on screen" is the button's rect inside 
 
 import re
 import time
+from datetime import UTC, datetime
 
 import allure
 from selenium.common.exceptions import TimeoutException
@@ -13,12 +14,14 @@ from selenium.common.exceptions import TimeoutException
 from helpers import pixels, waits
 from pages.base_page import BasePage, normalized
 from pages.jobs_list_page import UPDATED_RGB, UPDATED_SHARE
+from pages.submit_dialog_page import SETTLE, Submission, SubmitDialog, watch_submission
 from screens.job_details_map import JOB_DETAILS
 
 TIMER = re.compile(r"(\d\d):(\d\d):(\d\d)")
 TIMER_READ = 5.0  # seconds to catch a clean timer name between digit roll-overs
 TIMER_TOLERANCE = 2.0  # whole seconds shown (±1) + the time a tree read takes (up to ~0.5 s)
 BANNER_WATCH = 2.0  # seconds a "no Updated banner" check keeps looking (the banner lives ~0.3 s)
+SNACKBAR = 10.0  # seconds for an earlier snackbar to leave the bottom action (recon 11: ~4 s)
 
 
 class JobDetailsPage(BasePage):
@@ -132,6 +135,23 @@ class JobDetailsPage(BasePage):
                                   attachment_type=allure.attachment_type.PNG)  # fmt: skip
                     raise AssertionError(f"'Updated' banner drawn (fill {shares[-1]:.4f})")
             assert shares, "no screenshot taken"
+
+    def open_submit_dialog(self) -> SubmitDialog:
+        """Tap "Submit deliverables" → the confirmation dialog. A snackbar of an earlier save
+        ("Survey saved", recon 11) lies over the button for a few seconds: it must be gone first."""
+        with allure.step("tap job-details.submit-deliverables → submit-dialog"):
+            self.visible("submit-deliverables", SNACKBAR)
+            self.tap("submit-deliverables")
+            dialog = SubmitDialog(self.driver, self.platform)
+            dialog.assert_open(10)
+            return dialog
+
+    def retry_submission(self, settle: float = SETTLE) -> Submission:
+        """Tap the failed submission's Retry, then watch as ``SubmitDialog.submit`` does."""
+        with allure.step("tap job-details.retry and watch the submission"):
+            seen = Submission(tapped_at=datetime.now(UTC))
+            self.tap("retry", 2)
+            return watch_submission(self.driver, seen, settle=settle)
 
     def open_attachments(self, timeout: float | None = None) -> None:
         self.scroll_to("attachments")

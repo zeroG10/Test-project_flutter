@@ -4,8 +4,8 @@
 > (33 items, `CHK-DLV-001…033`, imported 2026-09-26). The 13 checks handed over by module 06 are planned here too:
 > CHK-ORDP-019…028, -038, -039, -041 (see [order-progress-automation-plan.md](../06-order-progress/order-progress-automation-plan.md)).
 > Date: 2026-09-26. Owner: mykola.zhuchenko.
-> **Status: accepted by the owner 2026-09-26 (D-DLV-1…4 accepted, Q-DLV-1…4 closed, recon 11 allowed) —
-> [submit-deliverables-questions.md](submit-deliverables-questions.md).**
+> **Status: accepted by the owner 2026-09-26 (D-DLV-1…7, Q-DLV-1…6 closed) — [submit-deliverables-questions.md](submit-deliverables-questions.md).
+> The final selection is in «Final selection» below; the tables above are the draft of the first pass.**
 
 | Field | Value |
 |---|---|
@@ -68,7 +68,7 @@ On a failure, a red snackbar with Retry.
 
 **The rest:** 4 offline (Android stage).
 
-## After recon 11 (2026-09-26) — proposed, waiting for Q-DLV-5 / -6
+## After recon 11 (2026-09-26) — accepted by the owner
 
 | CHK | Was | Now (proposed) | Why |
 |---|---|---|---|
@@ -77,10 +77,26 @@ On a failure, a red snackbar with Retry.
 | CHK-DLV-018, -019 · CHK-ORDP-024, -025 | After recon | Good Candidate — TC-DLV-002 / -003 | "Submitting deliverables", disabled, caught every time |
 | CHK-DLV-020 · CHK-ORDP-026, -027 | Good / After recon | Blocked on DEV | `POST /job/{id}/submit` answers 500 for every test job (Q-DLV-5) |
 | CHK-DLV-027…-029 · CHK-ORDP-038, -039 | After recon | Good Candidate — TC-DLV-007 | the job set Canceled through the API → "Job is not found." + Retry; set back → Retry sends again, data kept |
-| CHK-DLV-032 (all deleted) | Good Candidate | Q-DLV-6 | the server keeps the deleted photo and note |
+| CHK-DLV-032 (all deleted) | Good Candidate | no test — remark D-DLV-7 (owner) | the server keeps the deleted photo and note |
 
 In every test the job becomes Submitted **on the server**. The app shows it (Submitted, Check out, locked) after the
 job is opened again. Right after the tap, it shows the 500 error.
+
+## Final selection (2026-09-26)
+
+**41 of 46 automated → 6 TCs** ([submit-deliverables-test-cases.md](submit-deliverables-test-cases.md)): 28 DLV + 13 ORDP.
+5 of the 41 are expected `Blocked` on DEV (TC-DLV-004, Q-DLV-5).
+
+| TC | Covers |
+|---|---|
+| TC-DLV-001 | the dialog (modal), Cancel: In progress, nothing on the server, a note can still be added |
+| TC-DLV-002 | the survey not completed → "Complete the survey before job submission."; the server unchanged |
+| TC-DLV-003 | survey + photo + note → "Submitting deliverables" (disabled) → the server record → the job opened again: Submitted, Check out, locked, also after a restart |
+| TC-DLV-004 | the success message, "Successful", Check out and the lock at once — `Blocked` on DEV while `/submit` answers 500 |
+| TC-DLV-005 | 2 photos + 2 notes, edit one / delete one of each → the server after submission holds exactly what the phone holds |
+| TC-DLV-006 | the job set Canceled → "Job is not found." + Retry, not submitted → set back → Retry sends again, data kept |
+
+**The rest:** CHK-DLV-003 skipped with a comment (D-DLV-6); CHK-DLV-023…026 offline (Android stage).
 
 ## Step 9 — Test data
 
