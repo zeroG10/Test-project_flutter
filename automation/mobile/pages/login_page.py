@@ -13,6 +13,13 @@ class LoginPage(BasePage):
         """Email or phone (E.164, as the field's hint says) → Continue → an OTP is requested."""
         with allure.step(f"Login: request a code for {identifier}"):
             self.type("identifier", identifier)
+            self.submit()
+
+    def submit(self) -> None:
+        """Hide the keyboard, then Continue: the server's message is a banner at the bottom for
+        ~4 s, and an open software keyboard hides it (final run 1, 2026-09-27)."""
+        with allure.step("hide the keyboard, tap login.continue"):
+            self.hide_keyboard()
             self.tap("continue")
 
     def expect_error(self, text: str, timeout: float | None = None) -> None:

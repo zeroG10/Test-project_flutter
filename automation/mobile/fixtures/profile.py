@@ -99,8 +99,7 @@ def throwaway_account(new_user, logged_out_app, driver, platform, tech, field_se
             reg.fill_form(new_user.first_name, new_user.last_name, new_user.phone_national,
                           new_user.email)  # fmt: skip
             reg.choose_channel("email")
-            reg.scroll_to("continue")
-            reg.tap("continue")
+            reg.submit()
             OtpPage(driver, platform).enter_code(tech.otp)
             JobsListPage(driver, platform).assert_open(30)
             found = field_services_api.find_technicians_by_email(new_user.email)

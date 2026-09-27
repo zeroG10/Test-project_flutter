@@ -198,7 +198,16 @@ class AppAndEvidence(unittest.TestCase):
     def test_clear_data_uses_the_platform_parameter(self):
         for platform, key in (("ios", "bundleId"), ("android", "appId")):
             drv = FakeDriver()
-            AppControl(drv, platform).clear_data()
+            with (
+                tempfile.TemporaryDirectory() as data,
+                mock.patch.object(
+                    AppControl, "_simctl", return_value=mock.Mock(stdout=data + "\n")
+                ),
+            ):
+                AppControl(drv, platform).clear_data()
+                if platform == "ios":  # the container folders a fresh install has come back
+                    for folder in AppControl.IOS_CONTAINER_DIRS:
+                        self.assertTrue((Path(data) / folder).is_dir(), folder)
             self.assertEqual(drv.calls, [("execute_script", "mobile: clearApp", {key: mock.ANY})])
 
     def test_recorder_that_cannot_start_does_not_fail_the_test(self):

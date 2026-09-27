@@ -73,7 +73,7 @@ def test_login_with_email(logged_out_app, pages, tech, expected, evidence):
     pages.login.type("identifier", tech.email)
     pages.login.expect_enabled("continue")
     evidence.checkpoint("login-filled")
-    pages.login.tap("continue")
+    pages.login.submit()
 
     pages.otp.expect_text("title", expected("Email address verification"), SERVER)
     pages.otp.expect_text(
@@ -197,7 +197,7 @@ def test_login_with_phone(logged_out_app, pages, tech, expected):
     pages.login.expect_text("title", expected("Log in"))  # before any server call
     pages.login.type("identifier", tech.phone)  # E.164, as the field's hint asks (Q-A1)
     pages.login.expect_enabled("continue")
-    pages.login.tap("continue")
+    pages.login.submit()
     pages.otp.expect_text("title", expected("Phone number verification"), SERVER)
     pages.otp.expect_sent_to(tech.phone_last4)
     pages.otp.enter_code(tech.otp)
@@ -224,13 +224,13 @@ def test_login_rejects_invalid_and_unregistered_email(logged_out_app, pages, exp
     email = test_data.unregistered_email()
     login.type("identifier", email)
     login.expect_enabled("continue")  # the invalid state is cleared (CHK-AUTH-114)
-    login.tap("continue")
+    login.submit()
     login.expect_error(expected(UNREGISTERED_EMAIL), SERVER)  # red banner, ~4 s
     login.expect_text("identifier", email)  # value preserved (CHK-AUTH-121)
 
     retry = test_data.unregistered_email()
     login.type("identifier", retry)  # retry without reopening the screen (CHK-AUTH-125)
-    login.tap("continue")
+    login.submit()
     login.expect_error(expected(UNREGISTERED_EMAIL), SERVER)
 
 
@@ -252,7 +252,7 @@ def test_login_rejects_unregistered_phone(logged_out_app, pages, expected):
     phone = test_data.unregistered_phone()
     login.type("identifier", phone)
     login.expect_enabled("continue")
-    login.tap("continue")
+    login.submit()
     login.expect_error(expected(UNREGISTERED_PHONE), SERVER)
     login.expect_text("identifier", phone)
 
@@ -487,8 +487,7 @@ def test_registration_duplicate_phone(new_user, logged_out_app, pages, tech, exp
     reg.expect_text("title", expected("Registration"), LANDING)
     reg.fill_form(new_user.first_name, new_user.last_name, tech.phone_national, new_user.email)
     reg.choose_channel("email")
-    reg.scroll_to("continue")
-    reg.tap("continue")
+    reg.submit()
     reg.visible("form-error", SERVER, text=expected(DUPLICATE_PHONE))  # red banner (D-7)
     reg.scroll_to("phone")
     with allure.step("expect the phone value preserved"):
@@ -517,7 +516,7 @@ def test_registration_with_email_channel(new_user, logged_out_app, pages, tech, 
     reg.scroll_to("continue")
     reg.expect_enabled("continue")
     evidence.checkpoint("registration-filled")
-    reg.tap("continue")
+    reg.submit()
 
     pages.otp.expect_text("title", expected("Email address verification"), SERVER)
     pages.otp.expect_sent_to(new_user.email)

@@ -348,6 +348,6 @@ def test_delete_throwaway_account(throwaway_account, field_services_api, pages, 
         assert not found, found
     pages.welcome.open_login()
     pages.login.type("identifier", user.email)
-    pages.login.tap("continue")
+    pages.login.submit()
     pages.login.expect_error(expected(UNREGISTERED_EMAIL), SERVER)
     evidence.checkpoint("email-not-registered")

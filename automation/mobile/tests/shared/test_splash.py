@@ -121,8 +121,7 @@ def test_deleted_account_session_ends(
             new_user.first_name, new_user.last_name, new_user.phone_national, new_user.email
         )
         reg.choose_channel("email")
-        reg.scroll_to("continue")
-        reg.tap("continue")
+        reg.submit()
         pages.otp.enter_code(tech.otp)
         pages.jobs.assert_open(LANDING)
     app.terminate()

@@ -50,11 +50,22 @@ class AppControl:
         with allure.step(f"app: background for {seconds}s"):
             self.driver.background_app(seconds)
 
+    # The folders iOS creates in an app's data container at install and never removes.
+    # ``mobile: clearApp`` deletes them, and the app does not create them again, so photos and
+    # the tags cache fail to save (final run 1, 2026-09-27: "savePhoto failed", no Documents).
+    IOS_CONTAINER_DIRS = ("Documents", "Library/Application Support", "Library/Caches", "tmp")
+
     def clear_data(self) -> None:
-        """Terminate the app and wipe its data (signed out, first-launch state)."""
+        """Terminate the app and wipe its data (signed out, first-launch state). iOS: the
+        standard container folders are made again, as a fresh install has them."""
         key = "appId" if self.platform == "android" else "bundleId"
         with allure.step("app: clear data"):
             self.driver.execute_script("mobile: clearApp", {key: self.app_id})
+            if self.platform == "ios":
+                data = self._simctl("get_app_container", "{udid}", self.app_id, "data")
+                root = Path(data.stdout.strip())
+                for folder in self.IOS_CONTAINER_DIRS:
+                    (root / folder).mkdir(parents=True, exist_ok=True)
 
     def reinstall(self) -> None:
         """Remove and install the build from .env — slower than clear_data, always clean."""
