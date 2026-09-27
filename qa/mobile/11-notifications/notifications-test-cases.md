@@ -2,7 +2,8 @@
 
 > Structured, alias-based test cases for the CHK IDs selected in [notifications-automation-plan.md](notifications-automation-plan.md).
 > Format: [qa/_templates/test-case-format.md](../../_templates/test-case-format.md) · prompt `prompts/mobile/03`.
-> **Status: draft. Written after recon 12 ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)) and the
+> **Status: automated and traced on iOS (run 2, 2026-09-27: 6 of 6 passed); the owner sees them with the results.
+> Written after recon 12 ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)) and the
 > owner's decisions of 2026-09-27: D-NOTIF-1…5, Q-NOTIF-1…4 — [notifications-questions.md](notifications-questions.md).**
 
 | Field | Value |
