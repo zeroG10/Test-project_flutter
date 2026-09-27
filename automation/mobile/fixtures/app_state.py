@@ -23,6 +23,8 @@ Pages the fixtures drive (step 5 implements them, aliases from the Auth test cas
 """
 
 import dataclasses
+import re
+import time
 
 import allure
 import pytest
@@ -120,15 +122,50 @@ def ui_login(app, driver, platform, tech) -> AppControl:
         from pages.otp_page import OtpPage
 
         welcome, jobs = _pages(driver, platform)
-        try:
+
+        def sign_in() -> None:
             with allure.step(f"UI login as {tech.email}"):
                 welcome.open_login()
                 LoginPage(driver, platform).request_code(tech.email)
                 OtpPage(driver, platform).enter_code(tech.otp)
                 jobs.assert_open(LANDING_TIMEOUT)
+
+        try:
+            sign_in()
         except TimeoutException as exc:
-            pytest.skip(f"Blocked: UI login precondition failed ({exc.msg or 'timeout'})")
+            wait = _throttle_seconds(driver.page_source)
+            if wait is None:
+                pytest.skip(f"Blocked: UI login precondition failed ({exc.msg or 'timeout'})")
+            # DEV throttles code requests (FR-OTP-13): it names the wait itself. Waiting it out
+            # is not a retry of a flaky test — the server said when a code may be asked again.
+            with allure.step(f"DEV: 'Too many requests' — wait {wait}s, then sign in again"):
+                time.sleep(wait + THROTTLE_MARGIN)
+                app.relaunch()
+                if _landing(driver, platform) != "welcome":
+                    pytest.skip("Blocked: after the throttle wait the app did not show Welcome")
+                try:
+                    sign_in()
+                except TimeoutException as again:
+                    pytest.skip(
+                        f"Blocked: UI login failed after the server's throttle wait "
+                        f"({again.msg or 'timeout'})"
+                    )
     return app
+
+
+THROTTLE = re.compile(r"Too many requests\. You can request a new code in (\d+):(\d\d)")
+THROTTLE_MARGIN = 5
+THROTTLE_MAX = 300  # seconds: longer than FR-OTP-13's two minutes means something else is wrong
+
+
+def _throttle_seconds(source: str) -> int | None:
+    """The wait the OTP screen names after "Too many requests", in seconds; ``None`` without it
+    (verification run 2026-09-27: logins right after the Auth tests)."""
+    found = THROTTLE.search(source)
+    if not found:
+        return None
+    seconds = int(found.group(1)) * 60 + int(found.group(2))
+    return seconds if seconds <= THROTTLE_MAX else None
 
 
 @pytest.fixture(scope="session")
