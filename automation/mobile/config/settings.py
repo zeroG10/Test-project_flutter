@@ -55,7 +55,10 @@ class Settings(BaseSettings):
     flutter_enabled: bool | None = None  # deprecated alias — see module docstring
 
     default_timeout: float = 15.0  # seconds, explicit waits (helpers/waits.py)
-    new_command_timeout: int = 300  # seconds, Appium session idle timeout
+    # seconds, Appium session idle timeout. 900: API calls that wait out a network blip or the
+    # server's code throttle must not end the one session a run shares (stable run 1, 2026-09-27:
+    # 300 s of API timeouts ended it and 89 tests errored)
+    new_command_timeout: int = 900
 
     android_device_name: str = "Pixel_7_API_34"
     android_platform_version: str = "14"
