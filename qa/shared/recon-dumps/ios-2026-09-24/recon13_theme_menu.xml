@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="30505" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="218" y="413" width="168" height="161" index="0" traits=""/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                        <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="false" accessible="false" x="218" y="413" width="168" height="161" index="0" traits=""/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Auto" label="Auto" enabled="true" visible="true" accessible="true" x="218" y="421" width="168" height="49" index="1" traits="Image, Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Light" label="Light" enabled="true" visible="true" accessible="true" x="218" y="469" width="168" height="49" index="2" traits="Image, Button"/>
+                        <XCUIElementTypeButton type="XCUIElementTypeButton" name="Dark" label="Dark" enabled="true" visible="true" accessible="true" x="218" y="517" width="168" height="49" index="3" traits="Image, Button"/>
+                      </XCUIElementTypeOther>
+                    </XCUIElementTypeOther>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeStaticText type="XCUIElementTypeStaticText" value="Dismiss menu" name="Dismiss menu" label="Dismiss menu" enabled="true" visible="true" accessible="true" x="0" y="0" width="402" height="874" index="2" traits="StaticText"/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="3" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="16" y="750" width="370" height="74" index="0" traits=""/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="Jobs&#10;Tab 1 of 3" label="Jobs&#10;Tab 1 of 3" enabled="true" visible="true" accessible="true" x="16" y="750" width="124" height="74" index="1" traits="Image"/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="Notifications&#10;Tab 2 of 3" label="Notifications&#10;Tab 2 of 3" enabled="true" visible="true" accessible="true" x="139" y="750" width="124" height="74" index="2" traits="Image"/>
+                    <XCUIElementTypeImage type="XCUIElementTypeImage" name="Profile&#10;Tab 3 of 3" label="Profile&#10;Tab 3 of 3" enabled="true" visible="true" accessible="true" x="262" y="750" width="124" height="74" index="3" traits="Selected, Image"/>
+                  </XCUIElementTypeOther>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="false" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

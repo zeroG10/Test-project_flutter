@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication type="XCUIElementTypeApplication" name="[DEV] CT Mobile" label="[DEV] CT Mobile" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="" processId="30505" bundleId="com.concerttechnologies.app.dev">
+    <XCUIElementTypeWindow type="XCUIElementTypeWindow" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+        <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+          <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+            <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits="">
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+              <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="0" traits=""/>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="118" index="0" traits=""/>
+                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="Back" label="Back" enabled="true" visible="true" accessible="true" x="4" y="66" width="48" height="48" index="1" traits="Button"/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" name="Edit profile" label="Edit profile" enabled="true" visible="true" accessible="true" x="72" y="76" width="113" height="28" index="2" traits="Header"/>
+                    <XCUIElementTypeButton type="XCUIElementTypeButton" name="Save" label="Save" enabled="true" visible="true" accessible="true" x="305" y="74" width="81" height="32" index="3" traits="Image, Button"/>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="2" traits="">
+                    <XCUIElementTypeScrollView type="XCUIElementTypeScrollView" enabled="true" visible="false" accessible="false" x="0" y="118" width="402" height="674" index="0" traits=""/>
+                    <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="0" y="0" width="402" height="874" index="1" traits="">
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" enabled="true" visible="true" accessible="false" x="16" y="118" width="370" height="392" index="0" traits=""/>
+                      <XCUIElementTypeTextField type="XCUIElementTypeTextField" value="[APP_USER_FIRST_NAME]" name="First name" label="First name" enabled="true" visible="true" accessible="true" x="16" y="142" width="370" height="56" index="1" traits=""/>
+                      <XCUIElementTypeTextField type="XCUIElementTypeTextField" value="[APP_USER_LAST_NAME]" name="Last name" label="Last name" enabled="true" visible="true" accessible="true" x="16" y="234" width="370" height="56" index="2" traits=""/>
+                      <XCUIElementTypeButton type="XCUIElementTypeButton" name="United States + 1&#10;+ 1" label="United States + 1&#10;+ 1" enabled="false" visible="true" accessible="true" x="16" y="330" width="62" height="48" index="3" traits="NotEnabled, Button"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" value="[APP_USER_PHONE]" name="Phone number" label="Phone number" enabled="false" visible="true" accessible="true" x="16" y="326" width="370" height="56" index="4" traits="NotEnabled"/>
+                      <XCUIElementTypeOther type="XCUIElementTypeOther" value="[APP_USER_EMAIL]" name="Email" label="Email" enabled="false" visible="true" accessible="true" x="16" y="418" width="370" height="56" index="5" traits="NotEnabled"/>
+                    </XCUIElementTypeOther>
+                  </XCUIElementTypeOther>
+                  <XCUIElementTypeButton type="XCUIElementTypeButton" name="Delete account" label="Delete account" enabled="true" visible="true" accessible="true" x="8" y="792" width="125" height="48" index="3" traits="Button"/>
+                </XCUIElementTypeOther>
+              </XCUIElementTypeOther>
+            </XCUIElementTypeOther>
+          </XCUIElementTypeOther>
+        </XCUIElementTypeOther>
+      </XCUIElementTypeOther>
+    </XCUIElementTypeWindow>
+  </XCUIElementTypeApplication>
+</AppiumAUT>
