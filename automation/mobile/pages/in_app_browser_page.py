@@ -25,9 +25,13 @@ class InAppBrowserPage(BasePage):
             )
 
     def close(self, timeout: float = 30.0) -> None:
-        """Close once the page has loaded — a Close tapped while it loads is ignored (module 12
-        run 1: the browser stayed open)."""
-        with allure.step("tap in-app-browser.close once the page has loaded"):
+        """Close once the page has loaded, by a tap at the button's centre. Module 12 runs 1–2:
+        an element click on Close left the browser open (the address bar's button lies over it,
+        26…376 × 62…106); a tap at Close's centre closes it at once."""
+        with allure.step("tap in-app-browser.close (its centre) once the page has loaded"):
             self.find("loaded", timeout)
-            self.tap("close")
+            r = self.visible("close", 5).rect
+            self.driver.execute_script(
+                "mobile: tap", {"x": r["x"] + r["width"] / 2, "y": r["y"] + r["height"] / 2}
+            )
             self.wait_gone("close", 10)
