@@ -2,7 +2,8 @@
 
 > Structured, alias-based test cases for the CHK IDs selected in [profile-automation-plan.md](profile-automation-plan.md).
 > Format: [qa/_templates/test-case-format.md](../../_templates/test-case-format.md) · prompt `prompts/mobile/03`.
-> **Status: draft. Written after recon 13 ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)) and the
+> **Status: automated and traced on iOS (run 3, 2026-09-27: 8 of 8 passed); the owner sees them with the results.
+> Written after recon 13 ([qa/shared/recon-2026-09-24-ios.md](../../shared/recon-2026-09-24-ios.md)) and the
 > owner's decisions of 2026-09-27: D-PRF-1…6, Q-PRF-1…5 — [profile-questions.md](profile-questions.md).**
 
 | Field | Value |
