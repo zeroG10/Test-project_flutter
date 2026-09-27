@@ -155,7 +155,7 @@ def test_on_map_in_progress(in_progress_job, ui_login, pages, expected, evidence
     street = job.address.split(", ")[1]  # "QA test site, 350 5th Ave, …" → "350 5th Ave"
     pages.browser.visible("place", MAPS_PAGE, text=expected(street))
     evidence.checkpoint("on-map-in-progress")
-    pages.browser.tap("close")
+    pages.browser.close()
     pages.details.expect_header(expected(job.title_line), SERVER)
 
 
