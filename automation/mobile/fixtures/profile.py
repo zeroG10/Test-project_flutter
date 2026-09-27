@@ -105,7 +105,9 @@ def throwaway_account(new_user, logged_out_app, driver, platform, tech, field_se
             JobsListPage(driver, platform).assert_open(30)
             found = field_services_api.find_technicians_by_email(new_user.email)
             user_ids += [str(t["user"]["id"]) for t in found if (t.get("user") or {}).get("id")]
+            allure.attach(f"user ids: {user_ids}", name="throwaway user id",
+                          attachment_type=allure.attachment_type.TEXT)  # fmt: skip
         yield Throwaway(new_user, user_ids[0] if user_ids else "")
     finally:
         for user_id in user_ids:
-            field_services_api.delete_test_user(user_id)
+            field_services_api.delete_test_user(user_id, new_user.email)

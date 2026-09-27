@@ -289,15 +289,18 @@ class FieldServicesApi:
             if resp.status_code != 200:
                 raise ApiBlocked(f"cleanup failed: PATCH /user/{user_id} → HTTP {resp.status_code}")
 
-    def delete_test_user(self, user_id: str) -> None:
-        """UserController_fullDelete for a test-owned user still found by id (module 12: the app
-        deletes the technician; the user record may stay)."""
+    def delete_test_user(self, user_id: str, email: str) -> None:
+        """UserController_fullDelete for the test-owned user ``user_id`` (registered as ``email``)
+        if it is still found. Module 12 run 1: after the app deletes the account, the user record
+        stays with its email emptied — it is removed too."""
+        if not TEST_EMAIL_RE.match(email):
+            raise ValueError(f"refusing to delete a non-test user: {email!r}")
         current = self.user(user_id)
         if current is None:
             return
-        email = str(current.get("email", ""))
-        if not TEST_EMAIL_RE.match(email):
-            raise ValueError(f"refusing to delete a non-test user: {email!r}")
+        now = current.get("email")
+        if now and now != email:
+            raise ValueError(f"refusing: user {user_id} is {now!r}, registered as {email!r}")
         with allure.step(f"cleanup: delete test user {email} (id)"):
             resp = self._call("DELETE", f"/user/full-delete/{user_id}")
             if resp.status_code != 200 or self.user(user_id) is not None:

@@ -248,7 +248,7 @@ def test_privacy_policy(ui_login, pages, expected, evidence):
     pages.browser.assert_open(SERVER)
     pages.browser.expect_host(expected("concerttech.com"), SERVER)
     evidence.checkpoint("privacy-policy")
-    pages.browser.tap("close")
+    pages.browser.close()
     pages.profile.assert_open(10)
 
 

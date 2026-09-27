@@ -23,3 +23,11 @@ class InAppBrowserPage(BasePage):
                 timeout,
                 f"in-app browser shows {self.shown_host()!r}, expected {host!r}",
             )
+
+    def close(self, timeout: float = 30.0) -> None:
+        """Close once the page has loaded — a Close tapped while it loads is ignored (module 12
+        run 1: the browser stayed open)."""
+        with allure.step("tap in-app-browser.close once the page has loaded"):
+            self.find("loaded", timeout)
+            self.tap("close")
+            self.wait_gone("close", 10)
