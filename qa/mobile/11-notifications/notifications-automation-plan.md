@@ -2,7 +2,8 @@
 
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/11-notifications/notifications-checklist.md`
 > (31 items, `CHK-NOTIF-001…031`, imported 2026-09-26). Date: 2026-09-26. Owner: mykola.zhuchenko.
-> **Status: draft — recon 12 done (2026-09-26); the owner's word on [notifications-questions.md](notifications-questions.md) pending.**
+> **Status: accepted by the owner 2026-09-27 (D-NOTIF-1…5 accepted, Q-NOTIF-1…4 closed) — [notifications-questions.md](notifications-questions.md).
+> The selection is «After recon 12» below.**
 
 | Field | Value |
 |---|---|
@@ -65,7 +66,7 @@ notifications, so the empty state can be reached.
 
 **The rest:** "Job starts today" (2) — a server schedule; offline (2) — Android stage.
 
-## After recon 12 (2026-09-26) — proposed, waiting for D-NOTIF-1…5 / Q-NOTIF-1…4
+## After recon 12 (2026-09-26) — accepted by the owner 2026-09-27
 
 **Up to 26 of 31 → 6 TCs:**
 

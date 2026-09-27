@@ -25,6 +25,16 @@ class TabBarPage(BasePage):
                     return tab
         return None
 
+    def notifications_count(self) -> int:
+        """The unread count on the Notifications tab — the first line of its label
+        ('3\nNotifications\nTab 2 of 3'; no number = 0, recon 12)."""
+        for node in ET.fromstring(self.driver.page_source).iter():
+            name = node.attrib.get("name") or ""
+            if name.endswith("Tab 2 of 3"):
+                first = name.split("\n")[0]
+                return int(first) if first.isdigit() else 0
+        raise AssertionError("no Notifications tab in the page source")
+
     def expect_selected(self, tab: str) -> None:
         with allure.step(f"expect the {tab} tab selected"):
             actual = self.selected()

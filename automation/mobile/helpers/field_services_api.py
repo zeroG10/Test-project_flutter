@@ -267,6 +267,16 @@ class FieldServicesApi:
             raise ApiBlocked(f"Blocked: GET /job/<id> returned HTTP {resp.status_code}")
         return resp.json()
 
+    def notifications(self, user_id: str) -> list[dict]:
+        """NotificationController_findAll for one user, newest first — read-only (module 11)."""
+        resp = self._call(
+            "GET", "/notification", params={"page": 1, "pageSize": 100, "userId": user_id}
+        )
+        if resp.status_code != 200:
+            raise ApiBlocked(f"Blocked: GET /notification returned HTTP {resp.status_code}")
+        items = resp.json().get("data") or []
+        return sorted(items, key=lambda n: n.get("createdAt") or "", reverse=True)
+
     def survey(self, survey_id: str) -> dict:
         """SurveyController_findOne — read-only: the template a job's survey is built from."""
         resp = self._call("GET", f"/survey/{survey_id}")

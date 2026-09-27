@@ -40,6 +40,27 @@ def ink_ratio(png: bytes, box: dict, scale: float, threshold: int = INK_THRESHOL
     return ink / area
 
 
+def box_colour_share(
+    png: bytes, box: dict, scale: float, rgb: tuple[int, int, int], tolerance: int = 45
+) -> float:
+    """Share of the pixels in ``box`` (points) painted in ``rgb`` (± ``tolerance``) — a small mark
+    the tree does not hold, e.g. the unread dot of a notification (module 11)."""
+    image = Image.open(io.BytesIO(png)).convert("RGB")
+    region = image.crop((
+        round(box["x"] * scale), round(box["y"] * scale),
+        round((box["x"] + box["width"]) * scale), round((box["y"] + box["height"]) * scale),
+    ))  # fmt: skip
+    area = region.width * region.height
+    if area == 0:
+        return 0.0
+    same = sum(
+        count
+        for count, colour in region.getcolors(maxcolors=area)
+        if sum(abs(a - b) for a, b in zip(colour, rgb, strict=True)) <= tolerance
+    )
+    return same / area
+
+
 # --- whole-screen oracles (module 01 Splash: no labelled element to ask the tree about) ---
 
 SPLASH_DOWNSCALE = 6  # every 6th pixel is plenty for a flat brand colour and a 100-pt logo

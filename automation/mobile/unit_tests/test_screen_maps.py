@@ -33,11 +33,12 @@ TEST_CASES = {
     "08-survey": REPO / "qa/mobile/08-survey/survey-test-cases.md",
     "09-photo-report": REPO / "qa/mobile/09-photo-report/photo-report-test-cases.md",
     "10-notes": REPO / "qa/mobile/10-notes/notes-test-cases.md",
+    "11-notifications": REPO / "qa/mobile/11-notifications/notifications-test-cases.md",
 }
 MIN_ALIASES = {
     "01-splash": 5, "02-authentication": 40, "03-order-list": 30, "04-order-details": 35,
     "05-check-in-out": 15, "06-order-progress": 15, "07-submit-deliverables": 15, "08-survey": 20,
-    "09-photo-report": 12, "10-notes": 12,
+    "09-photo-report": 12, "10-notes": 12, "11-notifications": 8,
 }  # fmt: skip
 STEP_ROW = re.compile(r"^\| \d+ \| ([a-z-]+) \| ([^|]+?) \|")
 # Test-case targets that are not elements: lifecycle and navigation shortcuts ("open | login").
@@ -69,6 +70,7 @@ PAGE_RESOLVED = {
     "api.jobPhotos": "GET /job/{id} → photos (tests/shared/test_photo_report.py)",
     "api.jobNotes": "GET /job/{id} → notes (tests/shared/test_notes.py)",
     "notes.menu": "NotesPage.open_menu — a tap on the row's right end (TD-NOTE-001)",
+    "api.notifications": "GET /notification?userId= (fixtures/notifications.py)",
     "api.job": "GET /job/{id} (and PATCH /job/{id} of the test's own job — TC-DLV-006)",
 }
 # Fields of a parsed job card (``screen.card[{{jobId}}].<field>``, pages/jobs_list_page.parse_card)
