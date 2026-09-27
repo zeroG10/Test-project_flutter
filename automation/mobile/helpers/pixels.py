@@ -11,7 +11,7 @@ Deliberately simple and objective: background = the most frequent colour in the 
 
 import io
 
-from PIL import Image
+from PIL import Image, ImageStat
 
 INK_THRESHOLD = 60  # RGB distance that separates glyph pixels from a flat background
 MIN_INK_RATIO = 0.03  # share of the box a drawn line of text covers at the very least
@@ -59,6 +59,12 @@ def box_colour_share(
         if sum(abs(a - b) for a, b in zip(colour, rgb, strict=True)) <= tolerance
     )
     return same / area
+
+
+def mean_brightness(png: bytes) -> float:
+    """Mean grey level of the whole screenshot, 0–255 (module 12: the light theme ~246, the dark
+    one ~39)."""
+    return ImageStat.Stat(Image.open(io.BytesIO(png)).convert("L")).mean[0]
 
 
 # --- whole-screen oracles (module 01 Splash: no labelled element to ask the tree about) ---

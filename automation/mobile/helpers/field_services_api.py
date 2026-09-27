@@ -267,6 +267,42 @@ class FieldServicesApi:
             raise ApiBlocked(f"Blocked: GET /job/<id> returned HTTP {resp.status_code}")
         return resp.json()
 
+    def user(self, user_id: str) -> dict | None:
+        """UserController_findOne — read-only; ``None`` when the user no longer exists."""
+        resp = self._call("GET", f"/user/{user_id}")
+        if resp.status_code == 404:
+            return None
+        if resp.status_code != 200:
+            raise ApiBlocked(f"Blocked: GET /user/<id> returned HTTP {resp.status_code}")
+        return resp.json()
+
+    def restore_user_name(self, user_id: str, first_name: str, last_name: str) -> None:
+        """UserController_update — puts the test account's name back (module 12, owner Q-PRF-1).
+        Refuses any user but the test technician of .env or a test-owned one."""
+        current = self.user(user_id) or {}
+        email = str(current.get("email", ""))
+        if email != settings.app_user_email and not TEST_EMAIL_RE.match(email):
+            raise ValueError(f"refusing to rename a non-test user: {email!r}")
+        with allure.step(f"cleanup: name of {email} back to {first_name} {last_name}"):
+            resp = self._call("PATCH", f"/user/{user_id}",
+                              json={"firstName": first_name, "lastName": last_name})  # fmt: skip
+            if resp.status_code != 200:
+                raise ApiBlocked(f"cleanup failed: PATCH /user/{user_id} → HTTP {resp.status_code}")
+
+    def delete_test_user(self, user_id: str) -> None:
+        """UserController_fullDelete for a test-owned user still found by id (module 12: the app
+        deletes the technician; the user record may stay)."""
+        current = self.user(user_id)
+        if current is None:
+            return
+        email = str(current.get("email", ""))
+        if not TEST_EMAIL_RE.match(email):
+            raise ValueError(f"refusing to delete a non-test user: {email!r}")
+        with allure.step(f"cleanup: delete test user {email} (id)"):
+            resp = self._call("DELETE", f"/user/full-delete/{user_id}")
+            if resp.status_code != 200 or self.user(user_id) is not None:
+                raise ApiBlocked(f"cleanup failed: user {user_id} ({email}) still there")
+
     def notifications(self, user_id: str) -> list[dict]:
         """NotificationController_findAll for one user, newest first — read-only (module 11)."""
         resp = self._call(

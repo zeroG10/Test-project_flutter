@@ -88,6 +88,7 @@ class AppControl:
     # --- device location and the app's location switches (module 05; recon 6 / 6c) ---------
 
     MOCK_SWITCH = "flutter.mock_location_override_enabled"
+    THEME_KEY = "flutter.theme_mode"  # ThemeCubit: system / light / dark
 
     def _simctl(self, *args: str) -> subprocess.CompletedProcess:
         udid = self.driver.capabilities.get("udid") or "booted"
@@ -133,6 +134,19 @@ class AppControl:
             read = self._simctl("spawn", "{udid}", "defaults", "read", plist, self.MOCK_SWITCH)
             if read.stdout.strip() != ("1" if allowed else "0"):
                 raise RuntimeError(f"mock-location switch not written: {read.stdout!r}")
+
+    def reset_theme(self) -> None:
+        """App theme back to Auto (the app's ``theme_mode`` preference = 'system'), written while
+        the app is closed — the undo of a theme test that failed half way (module 12). iOS only
+        for now: the Android stage adds its own."""
+        if self.platform != "ios":
+            return
+        with allure.step("app: theme preference → Auto (system)"):
+            self.terminate()
+            data = self._simctl("get_app_container", "{udid}", self.app_id, "data").stdout.strip()
+            plist = f"{data}/Library/Preferences/{self.app_id}"
+            self._simctl("spawn", "{udid}", "defaults", "write", plist, self.THEME_KEY,
+                         "-string", "system")  # fmt: skip
 
     def add_media(self, *paths: Path) -> None:
         """Put photos into the device gallery; the last one becomes the newest (iOS simulator:

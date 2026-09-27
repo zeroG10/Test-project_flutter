@@ -2,7 +2,7 @@
 
 > Output of `prompts/06-select-automation-candidates.md` for `qa/mobile/12-profile/profile-checklist.md` (35 items,
 > `CHK-PRF-001…035`, imported 2026-09-27). Date: 2026-09-27. Owner: mykola.zhuchenko.
-> **Status: draft — recon 13 done; the owner's word on [profile-questions.md](profile-questions.md) pending.**
+> **Status: accepted by the owner 2026-09-27 (D-PRF-1…6, Q-PRF-1…5: «все ок») — [profile-questions.md](profile-questions.md).**
 
 | Field | Value |
 |---|---|
