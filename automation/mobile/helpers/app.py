@@ -50,22 +50,22 @@ class AppControl:
         with allure.step(f"app: background for {seconds}s"):
             self.driver.background_app(seconds)
 
-    # The folders iOS creates in an app's data container at install and never removes.
-    # ``mobile: clearApp`` deletes them, and the app does not create them again, so photos and
-    # the tags cache fail to save (final run 1, 2026-09-27: "savePhoto failed", no Documents).
-    IOS_CONTAINER_DIRS = ("Documents", "Library/Application Support", "Library/Caches", "tmp")
-
     def clear_data(self) -> None:
-        """Terminate the app and wipe its data (signed out, first-launch state). iOS: the
-        standard container folders are made again, as a fresh install has them."""
-        key = "appId" if self.platform == "android" else "bundleId"
+        """Terminate the app and wipe its data (signed out, first-launch state).
+
+        iOS: a reinstall from the build, NOT ``mobile: clearApp``. On the iOS 26 simulator
+        clearApp also deletes the container's hidden ``.com.apple.mobile_container_manager
+        .metadata.plist``; the first launch after it works, but when the system photo picker hands
+        a photo to the app, iOS resets the container — Documents and the app's database are gone
+        and every later local write fails ("savePhoto failed"; final runs 1 and 2, 2026-09-27,
+        TC-PHR-001 after the Auth tests). A reinstall gives the true fresh-install state."""
         with allure.step("app: clear data"):
-            self.driver.execute_script("mobile: clearApp", {key: self.app_id})
             if self.platform == "ios":
-                data = self._simctl("get_app_container", "{udid}", self.app_id, "data")
-                root = Path(data.stdout.strip())
-                for folder in self.IOS_CONTAINER_DIRS:
-                    (root / folder).mkdir(parents=True, exist_ok=True)
+                with contextlib.suppress(Exception):
+                    self.driver.terminate_app(self.app_id)
+                self.reinstall()
+                return
+            self.driver.execute_script("mobile: clearApp", {"appId": self.app_id})
 
     def reinstall(self) -> None:
         """Remove and install the build from .env — slower than clear_data, always clean."""

@@ -196,19 +196,16 @@ class Api(unittest.TestCase):
 
 class AppAndEvidence(unittest.TestCase):
     def test_clear_data_uses_the_platform_parameter(self):
-        for platform, key in (("ios", "bundleId"), ("android", "appId")):
-            drv = FakeDriver()
-            with (
-                tempfile.TemporaryDirectory() as data,
-                mock.patch.object(
-                    AppControl, "_simctl", return_value=mock.Mock(stdout=data + "\n")
-                ),
-            ):
-                AppControl(drv, platform).clear_data()
-                if platform == "ios":  # the container folders a fresh install has come back
-                    for folder in AppControl.IOS_CONTAINER_DIRS:
-                        self.assertTrue((Path(data) / folder).is_dir(), folder)
-            self.assertEqual(drv.calls, [("execute_script", "mobile: clearApp", {key: mock.ANY})])
+        # Android: mobile: clearApp. iOS: a reinstall — clearApp there deletes the container's
+        # metadata and iOS later resets the container (final runs 1–2, 2026-09-27).
+        drv = FakeDriver()
+        AppControl(drv, "android").clear_data()
+        self.assertEqual(drv.calls, [("execute_script", "mobile: clearApp", {"appId": mock.ANY})])
+        drv = FakeDriver()
+        with mock.patch.object(AppControl, "reinstall") as reinstall:
+            AppControl(drv, "ios").clear_data()
+        reinstall.assert_called_once_with()
+        self.assertNotIn("mobile: clearApp", [c[1] for c in drv.calls if len(c) > 1])
 
     def test_recorder_that_cannot_start_does_not_fail_the_test(self):
         drv = FakeDriver(fail_recording=True)

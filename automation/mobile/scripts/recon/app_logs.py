@@ -48,7 +48,8 @@ def text_of(event: dict) -> str:
         record = event.get("logRecord", {})
         name = (record.get("loggerName") or {}).get("valueAsString", "")
         message = (record.get("message") or {}).get("valueAsString", "")
-        error = (record.get("error") or {}).get("valueAsString", "")
+        err = record.get("error") or {}
+        error = err.get("valueAsString") or (err.get("classRef") or {}).get("name", "")
         return f"[log {name}] {message}" + (f" | error: {error}" if error and error != "null" else "")
     if kind in ("WriteEvent",):
         return base64.b64decode(event.get("bytes", "")).decode("utf-8", "replace").rstrip()
