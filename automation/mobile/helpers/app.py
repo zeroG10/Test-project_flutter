@@ -15,6 +15,7 @@ Clearing data = signing out, on both OSes:
 
 import contextlib
 import subprocess
+import time
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -64,8 +65,28 @@ class AppControl:
                 with contextlib.suppress(Exception):
                     self.driver.terminate_app(self.app_id)
                 self.reinstall()
+                self._first_launch()
                 return
             self.driver.execute_script("mobile: clearApp", {"appId": self.app_id})
+
+    FIRST_LAUNCH_WAIT = 10.0  # seconds for the notification prompt of a fresh install
+
+    def _first_launch(self) -> None:
+        """After a reinstall: launch once, allow the system notification prompt, stop the app —
+        the state ``mobile: clearApp`` used to leave (signed out, permission kept, not running).
+        Without it the prompt lies over the next cold start (stable run 1: TC-SPL-001 saw the
+        splash under it and was Blocked)."""
+        with allure.step("app: first launch after the reinstall — allow notifications, stop"):
+            self.driver.activate_app(self.app_id)
+            end = time.monotonic() + self.FIRST_LAUNCH_WAIT
+            while time.monotonic() < end:
+                with contextlib.suppress(Exception):
+                    self.driver.execute_script("mobile: alert", {"action": "accept"})
+                    break
+                if "Welcome to Concert" in self.driver.page_source:
+                    break  # no prompt (already accepted by autoAcceptAlerts)
+                time.sleep(0.5)
+            self.driver.terminate_app(self.app_id)
 
     def reinstall(self) -> None:
         """Remove and install the build from .env — slower than clear_data, always clean."""

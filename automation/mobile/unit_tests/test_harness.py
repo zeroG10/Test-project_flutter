@@ -202,9 +202,13 @@ class AppAndEvidence(unittest.TestCase):
         AppControl(drv, "android").clear_data()
         self.assertEqual(drv.calls, [("execute_script", "mobile: clearApp", {"appId": mock.ANY})])
         drv = FakeDriver()
-        with mock.patch.object(AppControl, "reinstall") as reinstall:
+        with (
+            mock.patch.object(AppControl, "reinstall") as reinstall,
+            mock.patch.object(AppControl, "_first_launch") as first_launch,
+        ):
             AppControl(drv, "ios").clear_data()
         reinstall.assert_called_once_with()
+        first_launch.assert_called_once_with()  # the notification prompt is answered once
         self.assertNotIn("mobile: clearApp", [c[1] for c in drv.calls if len(c) > 1])
 
     def test_recorder_that_cannot_start_does_not_fail_the_test(self):
