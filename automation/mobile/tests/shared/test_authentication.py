@@ -242,14 +242,14 @@ def test_login_rejects_invalid_and_unregistered_email(logged_out_app, pages, exp
 @allure.title("TC-AUTH-007 Login rejects an unregistered phone number")
 @allure.link("qa/mobile/02-authentication/bugs/BUG-AUTH-001.md", name="BUG-AUTH-001")
 @allure.label("bug", "BUG-AUTH-001")
-def test_login_rejects_unregistered_phone(logged_out_app, pages, expected):
+def test_login_rejects_unregistered_phone(logged_out_app, field_services_api, pages, expected):
     # BUG-AUTH-001 (S3, filed 2026-09-23): the app shows "An unexpected error occurred. Please
     # try logging in again." for an unregistered phone. The test stays RED against the checklist
     # until the bug is fixed — it is the regression check (prompts/08).
     login = pages.login
     pages.welcome.open_login()
     login.expect_text("title", expected("Log in"))  # before any server call
-    phone = test_data.unregistered_phone()
+    phone = f"+1{test_data.free_fictional_national(field_services_api)}"
     login.type("identifier", phone)
     login.expect_enabled("continue")
     login.submit()

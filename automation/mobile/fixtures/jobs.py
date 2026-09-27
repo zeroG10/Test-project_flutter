@@ -198,9 +198,9 @@ def job_links(field_services_api, tech) -> JobLinks:
     """https job links from ``POST /job/assign/{phone}`` (owner go 2026-09-24): one for a reserved
     555-01xx number without an account, one for the test account's (not real) phone, and a key
     that was never issued. Links expire by themselves (72 h) — nothing to clean."""
-    other = test_data.new_user().phone
-    if other.endswith(tech.phone[-4:]):
-        other = test_data.new_user().phone
+    other = "+1" + test_data.free_fictional_national(
+        field_services_api, avoid=(tech.phone_national,)
+    )
     try:
         return JobLinks(
             invalid=f"{LINK_BASE}QA-AUTO-INVALID-{_run_stamp()}",

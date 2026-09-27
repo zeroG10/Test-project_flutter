@@ -26,10 +26,8 @@ class RegistrationPage(BasePage):
     # --- form ---------------------------------------------------------------------------
 
     def submit(self) -> None:
-        """Hide the keyboard, scroll to Continue and tap it: a server message is a banner at
-        the bottom that an open software keyboard hides (final run 1, 2026-09-27)."""
-        with allure.step("hide the keyboard, tap registration.continue"):
-            self.hide_keyboard()
+        """Scroll to Continue and tap it."""
+        with allure.step("tap registration.continue"):
             self.scroll_to("continue")
             self.tap("continue")
 

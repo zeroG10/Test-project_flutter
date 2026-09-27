@@ -22,6 +22,8 @@ Pages the fixtures drive (step 5 implements them, aliases from the Auth test cas
 ``OtpPage.enter_code(code)``, ``JobsListPage`` / ``WelcomePage`` anchors.
 """
 
+import dataclasses
+
 import allure
 import pytest
 from selenium.common.exceptions import TimeoutException
@@ -149,7 +151,9 @@ def new_user(field_services_api, app):
     The app is then reset too: it may still hold a session of the deleted user.
     A failed delete is a harness error with the user id in the message (manual recovery).
     """
-    user = test_data.new_user()
+    user = dataclasses.replace(
+        test_data.new_user(), phone_national=test_data.free_fictional_national(field_services_api)
+    )
     allure.attach(
         f"first name: {user.first_name}\nlast name: {user.last_name}\n"
         f"email: {user.email}\nphone: {user.phone}",

@@ -137,6 +137,15 @@ class FieldServicesApi:
 
     TEST_JOB_PREFIX = "QA-AUTO-"
 
+    def phone_in_use(self, national: str) -> bool:
+        """Does ``GET /technician`` find anyone by this 10-digit US number? Any hit counts as
+        taken (final run 1: the fictional 555-01xx block is partly taken on DEV)."""
+        params = {"search": national, "page": 1, "pageSize": 10}
+        resp = self._call("GET", "/technician", params=params)
+        if resp.status_code != 200:
+            raise ApiBlocked(f"Blocked: GET /technician returned HTTP {resp.status_code}")
+        return bool(resp.json().get("data"))
+
     def technician_user_id(self, email: str) -> str:
         """``user.id`` of the technician with this email (``userId`` of ``POST /job``)."""
         found = self.find_technicians_by_email(email)

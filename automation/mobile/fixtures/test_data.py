@@ -105,6 +105,19 @@ def unregistered_email() -> str:
     return f"qa-auto+unreg-{_stamp()}@{TEST_EMAIL_DOMAIN}"
 
 
+def free_fictional_national(api, avoid: tuple[str, ...] = ()) -> str:
+    """A 555-01xx number no technician on DEV holds (final run 1: TC-AUTH-013 drew 555-0115, which
+    a manual tester's account already had). Blocked when the whole block is taken."""
+    import pytest
+
+    candidates = [f"{FICTIONAL_PREFIX}01{n:02d}" for n in range(100)]
+    secrets.SystemRandom().shuffle(candidates)
+    for national in candidates:
+        if national not in avoid and not api.phone_in_use(national):
+            return national
+    pytest.skip("Blocked: every fictional 555-01xx number is registered on DEV")
+
+
 def unregistered_phone() -> str:
     """E.164 — the login field format."""
     return f"+1{_fictional_national()}"
