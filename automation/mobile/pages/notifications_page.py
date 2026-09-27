@@ -2,7 +2,7 @@
 
 What the tree does not say is read another way:
 - rows come from the page source by their rect (the ``visible`` attribute is wrong for part of a
-  long list);
+  long list; rows off the screen have an empty rect and are left out);
 - the unread red dot is pixels: ``#EB0101`` (theme ``error``) in a 16-pt box at the top right of
   the icon. The icon is centred in the row's height (recon 12: 6.8 % of the box when unread, 0 %
   when read);
@@ -64,6 +64,8 @@ def rows_in(source: str) -> list[NotificationRow]:
             continue
         a = node.attrib
         x, y, w, h = (int(a.get(k, 0)) for k in ("x", "y", "width", "height"))
+        if h == 0:  # not laid out: XCUITest gives an empty rect to rows off the screen (run 1)
+            continue
         chevron = any(
             y <= int(c.get("y", 0)) + int(c.get("height", 0)) / 2 <= y + h for c in chevrons
         )

@@ -16,10 +16,25 @@ from screens.settings_map import SETTINGS
 
 SETTINGS_APP = "com.apple.Preferences"
 SWITCH_FROM_RIGHT = 30  # the switch itself — a tap on its label does not toggle it (recon 12)
+SCROLLS = 15  # the app sits at the end of Settings → Apps ('[DEV] …' sorts after the letters)
 
 
 class SystemSettingsPage(BasePage):
     screen = SETTINGS
+
+    def _reach(self, alias: str) -> None:
+        """Scroll down until ``alias`` is displayed, then tap it (run 1: six scrolls were not
+        enough to reach the app in the Apps list)."""
+        size = self.driver.get_window_size()
+        for _ in range(SCROLLS):
+            shown = [e for e in self.driver.find_elements(*self.locator(alias)) if e.is_displayed()]
+            if shown:
+                shown[0].click()
+                return
+            self.driver.execute_script("mobile: dragFromToForDuration", {
+                "duration": 0.3, "fromX": size["width"] // 2, "fromY": int(size["height"] * 0.7),
+                "toX": size["width"] // 2, "toY": int(size["height"] * 0.35)})  # fmt: skip
+        raise AssertionError(f"settings.{alias} not found after {SCROLLS} scrolls")
 
     def is_foreground(self) -> bool:
         return self.driver.query_app_state(SETTINGS_APP) == 4
@@ -32,10 +47,8 @@ class SystemSettingsPage(BasePage):
                 self.driver.terminate_app(SETTINGS_APP)
             self.driver.activate_app(SETTINGS_APP)
             self.assert_open(15)
-            self.scroll_to("apps")
-            self.tap("apps", 10)
-            self.scroll_to("app-row")
-            self.tap("app-row", 10)
+            self._reach("apps")
+            self._reach("app-row")
             self.tap("notifications", 10)
             switch = self.visible("allow-notifications", 10)
             want = "1" if allowed else "0"
