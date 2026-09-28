@@ -8,7 +8,7 @@ chain described in [`automation/README.md`](../README.md):
 | `sync_checklist_to_sheets.py` | 0 → Sheet | checklist `.md` → Google Sheet | the team Sheet (**the only Sheets writer in this repo**) |
 | `import_checklist_from_sheets.py` | Sheet → 0 (one-time) | Google Sheet → per-feature checklist `.md` | markdown under `qa/web/<NN-slug>/` — **reads** Sheets, never writes them |
 | `trace_results.py` | 4 (closure) | run results → checklist IDs | one markdown report, by convention `qa/{web,mobile}/<NN-module>/<module>-traceability.md` — never Sheets |
-| `build_summary.py` | 4 (report) | one mobile run → summary page for the lead | local `automation/mobile/reports/summary/` (gitignored) — publishing is an owner call |
+| `build_summary.py` | 4 (report) | one mobile run → report site: summary, a page per module and per defect | local `automation/mobile/reports/summary/` (gitignored) — publishing is an owner call |
 
 All of them honour the QA Doctrine in `CLAUDE.md`: no result is ever upgraded to
 Passed by a tool, a skip is Blocked, an empty run is not a passing run.
@@ -251,32 +251,55 @@ a successful import. Register the codes used by the map in
 
 ---
 
-## build_summary.py — summary page for the lead (mobile)
+## build_summary.py — mobile report site for the lead and the team
 
-One local HTML page over **one clean run**: a PM half (checklist items verified, what failed,
-what was blocked and why, run time against an optional manual estimate) and an engineering
-half (coverage per module, results per test, key screens from the checkpoint screenshots,
-run context). CHK verdicts are computed by `trace_results.py` itself, so the page and the
-traceability matrix never disagree. Read-only over the results; writes only `--out-dir`.
+A small static site over **one clean run**, laid out like the admin panel's report (web, same
+product) so the two read alike:
+
+- `index.html` — the verdict (*No unexpected failures* only when every red test is a filed
+  defect's regression check), KPIs, one phone screen per module, coverage by module, what needs
+  a decision, open defects with the checks each holds red, what could not run and why, why
+  checks are not automated (kinds from `qa/mobile/not-automated-ios.md`), stability over the
+  history runs, delivery pace from git, technical detail;
+- `<NN-module>.html` — every check with its verdict, the test that proved it
+  (`test_x.py:line`) and the screens that test saved; every test with its steps;
+- `bugs/<BUG-ID>.html` — each filed defect report rendered from its markdown, with its
+  evidence (a draft marked `Status: NOT FILED` is not an open defect).
+
+CHK verdicts come from `trace_results.py` itself, so the pages and the traceability matrix
+never disagree. A failed test is *held red* only when a filed bug names it as its regression
+check (`- Test case: \`TC-…\`` or `::test_name`); any other failure is *unexpected*. Read-only
+over the results; writes only `--out-dir`.
 
 ```bash
 uv run python build_summary.py \
-  --allure-dir ../mobile/allure-results \
-  --checklist ../../qa/mobile/02-authentication/authentication-checklist.md \
-  --run-label "pytest --platform=ios, Authentication" \
-  [--manual-minutes-per-check 3] [--out-dir ../mobile/reports/summary]
+  --allure-dir ../mobile/allure-results-stable-3 \
+  --checklist ../../qa/mobile/01-splash/splash-checklist.md ...        # one per module \
+  --history-dir ../mobile/allure-results-stable-1 ...                  # earlier full runs, oldest first \
+  --target "iOS simulator · iPhone 17 · iOS 26.5" --run-label "…" \
+  [--note "…"] [--decision "…"] [--history-note "…"] \
+  [--public --redact-boxes boxes.json --redact-text-env QA_FIRST] [--out-dir ../mobile/reports/summary]
 ```
 
 | Option | Meaning |
 |---|---|
 | `--allure-dir DIR` | allure `*-result.json` of **one clean run** (required); empty → exit 2, Blocked |
-| `--checklist MD` | repeat per module (required); the module name comes from its `qa/mobile/<NN-module>/` folder |
-| `--run-label TEXT` | what was run |
-| `--manual-minutes-per-check N` | owner's estimate; omitted → the manual comparison is shown as not recorded |
-| `--out-dir DIR` | default `automation/mobile/reports/summary/` (`index.html` + `assets/`, gitignored) |
+| `--checklist MD` | repeat per module (required); a module page per `qa/mobile/<NN-module>/` folder |
+| `--history-dir DIR` | earlier full runs, oldest first — the run history table and the "same verdicts N runs in a row" line |
+| `--reasons MD` | why checks have no test (default `qa/mobile/not-automated-ios.md`); a check with no row shows "reason missing" |
+| `--target`, `--run-label` | the device and what was run, as the page names them |
+| `--note` / `--decision` / `--history-note` | lines under *Scope of this run* / *What needs a decision* / the history table |
+| `--manual-minutes-per-check N` | owner's estimate; omitted → not shown |
+| `--public` | the copy that may leave this machine: no text attachments (API bodies, page sources), no videos |
+| `--redact-env`, `--redact-text-env NAME`, `--redact-boxes JSON` | hide the test account in text (values never printed) and pixelate boxes on the screens |
+| `--no-git` | skip the delivery-pace chart |
+| `--out-dir DIR` | default `automation/mobile/reports/summary/` (gitignored) |
 
-The page shows screenshots of the client's app — it stays local; publishing it is an owner
-call. `assets/` is rebuilt on every run (only a folder this script created is ever deleted).
+The pages show screenshots of the client's app — they stay local; publishing is an owner
+call, and only the `--public` build is published. For an artifact publish the main page is
+`page.html` (a fragment, served as `index.html`); every other file goes in `files`.
+`assets/` and `bugs/` are rebuilt on every run (only folders this script created are ever
+deleted).
 
 ## trace_results.py — layer 4, traceability closure
 

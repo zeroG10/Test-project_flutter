@@ -25,6 +25,22 @@ CHECKLIST_MD = """\
 5. [CHK-AUTH-005] A manual-only item.
 """
 
+REASONS_MD = """\
+# Why
+
+## Kinds
+
+| Kind | Title | What it means |
+|---|---|---|
+| person | A person's check | A judgement no assertion can make |
+
+## Checks
+
+| Checks | Kind | Why | Source |
+|---|---|---|---|
+| CHK-AUTH-005 | person | Layout is visual | 02 plan |
+"""
+
 
 def _result(
     tmp: Path,
@@ -42,6 +58,7 @@ def _result(
         (tmp / source).write_bytes(b"x")
         atts.append({"name": att_name, "source": source, "type": "image/png"})
     data = {
+        "uuid": uid,
         "name": name,
         "fullName": f"tests.shared.test_auth#{uid}",
         "status": status,
@@ -59,7 +76,7 @@ def _result(
 
 
 @pytest.fixture
-def run_dir(tmp_path: Path) -> Path:
+def run_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     results = tmp_path / "allure-results"
     results.mkdir()
     _result(
@@ -88,7 +105,7 @@ def run_dir(tmp_path: Path) -> Path:
         "skipped",
         ["CHK-AUTH-004"],
         1_060_000,
-        message="Blocked: no signed-out Welcome after clear data + reinstall",
+        message="Skipped: Blocked: no signed-out Welcome after clear data + reinstall",
     )
     (results / "environment.properties").write_text(
         "Platform=iOS\nDevice=iPhone 17 · iOS 26.5\nBuild=1.1.1 (178)\nHarness.commit=abc1234\n",
@@ -97,6 +114,9 @@ def run_dir(tmp_path: Path) -> Path:
     module = tmp_path / "qa" / "mobile" / "02-authentication"
     module.mkdir(parents=True)
     (module / "authentication-checklist.md").write_text(CHECKLIST_MD, encoding="utf-8")
+    (tmp_path / "reasons.md").write_text(REASONS_MD, encoding="utf-8")
+    real = bs.load_bugs
+    monkeypatch.setattr(bs, "load_bugs", lambda: real(tmp_path / "qa" / "mobile"))
     return tmp_path
 
 
@@ -110,6 +130,11 @@ def _build(run_dir: Path, *extra: str) -> tuple[int, str, Path]:
             str(run_dir / "qa/mobile/02-authentication/authentication-checklist.md"),
             "--run-label",
             "pytest --platform=ios",
+            "--reasons",
+            str(run_dir / "reasons.md"),
+            "--redact-env",
+            str(run_dir / "no.env"),
+            "--no-git",
             "--out-dir",
             str(out),
             *extra,
@@ -119,33 +144,112 @@ def _build(run_dir: Path, *extra: str) -> tuple[int, str, Path]:
     return code, page, out
 
 
+def _module(out: Path) -> str:
+    return (out / "02-authentication.html").read_text(encoding="utf-8")
+
+
+def _file_bug(run_dir: Path, name: str, text: str) -> None:
+    bugs = run_dir / "qa" / "mobile" / "02-authentication" / "bugs"
+    bugs.mkdir(exist_ok=True)
+    (bugs / f"{name}.md").write_text(text, encoding="utf-8")
+
+
+BUG_MD = (
+    "# BUG-AUTH-009 — Login content is wrong\n\n"
+    "- **Severity:** S3 (minor) — **branch fired:** #3\n"
+    "- **Priority:** *proposal* P3 — owner / PM decide.\n\n"
+    "## Layer\n\n- [x] App (UI)\n- [ ] Backend\n\n"
+    "## Evidence\n\n[shot.png](evidence/BUG-AUTH-009/shot.png) and "
+    "[the test cases](../authentication-test-cases.md)\n\n"
+    "## Regression info\n\n- Test case: `TC-AUTH-004` — red until the fix.\n"
+)
+
+
 def test_verdicts_match_trace_results(run_dir: Path) -> None:
     code, page, _ = _build(run_dir)
     assert code == 0
-    assert "<b>2 / 5</b>checklist items" in page  # 001+002 passed of 5
-    assert "3</b>automated tests: 1 passed, 1 failed, 1 blocked" in page
-    # per module: 5 items, 4 automated, 2 passed, 1 failed, 1 blocked, 1 not run
-    assert "<td>02 · Authentication</td><td>5</td><td>4</td><td>2</td><td>1</td><td>1</td><td>1</td>" in page
+    # 5 checks, 4 automated: 001+002 passed, 003 failed (no bug), 004 blocked, 005 not automated
+    assert "<b>5</b><span>checks in the QA checklist</span>" in page
+    assert "<b>4</b><span>automated · 80%</span>" in page
+    assert "<div class='kpi pass'><b>2</b>" in page
+    assert "<div class='kpi fail'><b>1</b><span>failed, no defect yet" in page
+    assert "<div class='kpi block'><b>1</b>" in page
+    assert '<span class="pill fail">Failed</span>' in page  # a failure nobody explained
+    row = "<td class='num'>5</td><td class='num'>4</td><td class='num'>2</td><td class='num'>1</td><td class='num'>1</td><td class='num'>1</td>"
+    assert row in page
 
 
-def test_attention_list_and_run_context(run_dir: Path) -> None:
+def test_known_defect_holds_its_check_red(run_dir: Path) -> None:
+    _file_bug(run_dir, "BUG-AUTH-009", BUG_MD)
+    _, page, out = _build(run_dir)
+    assert '<span class="pill known">No unexpected failures</span>' in page
+    assert "<div class='kpi known'><b>1</b><span>held red by 1 known defect" in page
+    assert "<a href='bugs/BUG-AUTH-009.html'>BUG-AUTH-009</a>" in page
+    assert "<td class='mono'>AUTH-003</td>" in page  # the check it holds red
+    assert "P3 <span class='muted'>proposed</span>" in page
+    assert "Held red" in _module(out)
+
+
+def test_bug_page_renders_the_report(run_dir: Path) -> None:
+    _file_bug(run_dir, "BUG-AUTH-009", BUG_MD)
+    evidence = run_dir / "qa/mobile/02-authentication/bugs/evidence/BUG-AUTH-009"
+    evidence.mkdir(parents=True)
+    (evidence / "shot.png").write_bytes(b"x")
+    _, _, out = _build(run_dir)
+    bug = (out / "bugs" / "BUG-AUTH-009.html").read_text(encoding="utf-8")
+    assert "<h2>Layer</h2>" in bug and "<li>☑ App (UI)</li>" in bug and "<li>☐ Backend</li>" in bug
+    assert "<a class='shot' href='evidence/BUG-AUTH-009/shot.png'>" in bug
+    assert (out / "bugs" / "evidence" / "BUG-AUTH-009" / "shot.png").exists()
+    assert "../authentication-test-cases.md" not in bug  # the repository is not published
+    assert "the test cases" in bug
+
+
+def test_a_draft_not_filed_is_not_an_open_defect(run_dir: Path) -> None:
+    _file_bug(run_dir, "BUG-AUTH-009", "> **Status: NOT FILED — owner's decision**\n" + BUG_MD)
+    _, page, out = _build(run_dir)
+    assert "Open defects · 0" in page
+    assert not (out / "bugs" / "BUG-AUTH-009.html").exists()
+
+
+def test_module_page_shows_every_check_with_its_reason(run_dir: Path) -> None:
+    _, page, out = _build(run_dir)
+    module = _module(out)
+    for chk in ("CHK-AUTH-001", "CHK-AUTH-002", "CHK-AUTH-003", "CHK-AUTH-004", "CHK-AUTH-005"):
+        assert f"<tr id='{chk}'>" in module
+    assert "<b>A person&#x27;s check:</b> Layout is visual (02 plan)" in module
+    # the blocked reason next to the verdict, without the harness prefixes
+    assert "<div class='why'>no signed-out Welcome after clear data" in module
+    assert "<a href='02-authentication.html'>02 · Authentication</a>" in page
+
+
+def test_a_check_without_a_reason_is_reported(run_dir: Path) -> None:
+    (run_dir / "reasons.md").write_text(REASONS_MD.replace("CHK-AUTH-005", "CHK-AUTH-099"))
     _, page, _ = _build(run_dir)
-    assert "AssertionError: expected &#x27;Log in&#x27;" in page
-    assert "Blocked: no signed-out Welcome" in page
-    assert "<dd>abc1234</dd>" in page
-    assert "<dd>pytest --platform=ios</dd>" in page
-    assert "waiting for the team's estimate of minutes per check" in page
+    assert "Reason missing" in page
+    assert "check without a test and without a written reason: CHK-AUTH-005" in page
 
 
-def test_manual_estimate_only_when_given(run_dir: Path) -> None:
-    _, page, _ = _build(run_dir, "--manual-minutes-per-check", "20")
-    assert "≈ 1.0 h</b>the same 3 checks by hand" in page  # 2 passed + 1 failed
+def test_expand_ids() -> None:
+    assert bs.expand_ids("CHK-AUTH-081…-083, -090") == [
+        "CHK-AUTH-081", "CHK-AUTH-082", "CHK-AUTH-083", "CHK-AUTH-090"
+    ]
+    assert bs.expand_ids("CHK-ORDD-023, -025 and CHK-PRF-030") == [
+        "CHK-ORDD-023", "CHK-ORDD-025", "CHK-PRF-030"
+    ]
+
+
+def test_history_and_stability(run_dir: Path) -> None:
+    runs = str(run_dir / "allure-results")
+    _, page, _ = _build(run_dir, "--history-dir", runs, "--history-dir", runs)
+    assert "The last <b>2</b> full runs gave the same verdict for every one of <b>3</b> tests" in page
+    assert page.count("<td class='mono nowrap'>allure-results</td>") == 2
 
 
 def test_titles_are_escaped(run_dir: Path) -> None:
-    _, page, _ = _build(run_dir)
-    assert "<script>alert(1)</script>" not in page
-    assert "&lt;script&gt;" in page
+    _, page, out = _build(run_dir)
+    for html_text in (page, _module(out)):
+        assert "<script>alert(1)</script>" not in html_text
+    assert "&lt;script&gt;" in _module(out)
 
 
 def test_evidence_is_copied_and_old_output_replaced(run_dir: Path) -> None:
@@ -157,8 +261,24 @@ def test_evidence_is_copied_and_old_output_replaced(run_dir: Path) -> None:
     copied = sorted(p.name for p in assets.iterdir() if p.name != bs.MARKER)
     assert len(copied) == 4  # 2 checkpoints (one from a step) + failure shot + video
     assert not stale.exists()
-    assert "01 · welcome" in page and "02 · jobs-list" in page
-    assert "<video controls" in page
+    module = _module(out)
+    assert "01 · welcome" in module and "02 · jobs-list" in module
+    assert "<video controls" in module
+    assert "<a class='shot' href='assets/t001-0-attachment.png'>" in page  # the strip
+
+
+def test_public_copy_leaves_out_text_and_video(run_dir: Path) -> None:
+    results = run_dir / "allure-results"
+    data = json.loads((results / "t001-result.json").read_text(encoding="utf-8"))
+    (results / "api-attachment.txt").write_text('{"jobs": ["someone else\'s job"]}')
+    data["attachments"].append({"name": "GET /job → 200", "source": "api-attachment.txt"})
+    (results / "t001-result.json").write_text(json.dumps(data), encoding="utf-8")
+    _, _, out = _build(run_dir, "--public")
+    module = _module(out)
+    assert "someone else" not in module
+    assert "GET /job → 200 — text, not in the shared copy" in module
+    assert "<video" not in module
+    assert not list((out / "assets").glob("*.mp4"))
 
 
 def test_video_attached_in_a_fixture_teardown_is_found(run_dir: Path) -> None:
@@ -171,12 +291,9 @@ def test_video_attached_in_a_fixture_teardown_is_found(run_dir: Path) -> None:
         ], "steps": []}],
     }
     (results / "c1-container.json").write_text(json.dumps(container), encoding="utf-8")
-    data = json.loads((results / "t010-result.json").read_text(encoding="utf-8"))
-    data["uuid"] = "t010"
-    (results / "t010-result.json").write_text(json.dumps(data), encoding="utf-8")
-    _, page, out = _build(run_dir)
+    _, _, out = _build(run_dir)
     assert (out / "assets" / "v-1-attachment.mp4").exists()
-    assert "1 video" in page
+    assert "teardown · _screen_video" in _module(out)
 
 
 def test_foreign_assets_folder_is_never_deleted(tmp_path: Path) -> None:
@@ -201,28 +318,14 @@ def test_empty_run_is_blocked(tmp_path: Path) -> None:
 def test_artifact_fragment_has_no_document_skeleton(run_dir: Path) -> None:
     _, _, out = _build(run_dir)
     fragment = (out / "page.html").read_text(encoding="utf-8")
-    assert fragment.startswith("<title>Field Services Regression</title>")
+    assert fragment.startswith("<title>Concert Mobile QA Report</title>")
     for tag in ("<!doctype", "<html", "<head>", "<body"):
         assert tag not in fragment.lower()
     # the three theme states: system dark, explicit dark, explicit light
     assert ':root:not([data-theme="light"])' in fragment
     assert ':root[data-theme="dark"]' in fragment
-
-
-def test_failed_test_is_linked_to_the_bug_that_cites_it(
-    run_dir: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    bugs = run_dir / "qa" / "mobile" / "02-authentication" / "bugs"
-    bugs.mkdir()
-    (bugs / "BUG-AUTH-009.md").write_text(
-        "# BUG-AUTH-009 — Login content is wrong\n\n- **Severity:** S3 (minor)\n\n"
-        "Regression check: `test_auth.py::t004`\n",
-        encoding="utf-8",
-    )
-    real = bs.load_bugs
-    monkeypatch.setattr(bs, "load_bugs", lambda: real(run_dir / "qa" / "mobile"))
-    _, page, _ = _build(run_dir)
-    assert "BUG-AUTH-009</span> (S3) — Login content is wrong" in page
+    # the other pages are whole documents
+    assert _module(out).lower().startswith("<!doctype html>")
 
 
 def test_test_account_is_hidden_in_text(run_dir: Path) -> None:
@@ -253,6 +356,7 @@ def test_redaction_box_pixelates_only_the_page_copy(tmp_path: Path) -> None:
 
 
 def test_every_test_has_expandable_details(run_dir: Path) -> None:
-    _, page, _ = _build(run_dir)
-    assert page.count("<details class='test'>") == 3
-    assert "<p class='phase'>test</p>" in page
+    _, _, out = _build(run_dir)
+    module = _module(out)
+    assert module.count("<details class='test' id='t-") == 3
+    assert "<p class='phase'>test</p>" in module

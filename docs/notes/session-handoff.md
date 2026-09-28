@@ -573,16 +573,23 @@ happy flow → валідації); які пункти чеклісту кож�
   - зведена сторінка — `automation/mobile/reports/summary/index.html` (**локально, повна: з відео й текстовими
     вкладеннями**).
 - **Опубліковано (власник, 2026-09-28): https://claude.ai/artifact/EdTpeAfr1wAGm4fxsYBm15** — приватна, поділитися може
-  лише власник (Share). Це **публічна копія** `automation/mobile/reports/summary-public/` (gitignored):
-  `build_summary.py --allure-dir ../mobile/allure-results-stable-3 <12 чеклістів> --public --redact-boxes <зони>
-  --redact-text-env QA_FIRST --redact-text-env QA_LAST --out-dir ../mobile/reports/summary-public --run-label "…"`
-  (QA_FIRST / QA_LAST — ім'я та прізвище акаунта з `GET /user/{id}`, експортовані без друку). У ній немає текстових
-  вкладень (відповіді API з чужими джобами, дерева екранів з іменем акаунта) і відео (запис починається до входу);
-  email / телефон / ім'я в тексті приховано, на скриншотах — зони (картка профілю, поля редагування, логін, OTP).
-  Оновлювати ТУ САМУ сторінку: Artifact publish з `url` цього посилання, `file_path` = `…/summary-public/page.html`,
-  `root` = `automation/mobile/reports/summary-public`, `files` = `assets/*`. Сторінка пілоту Auth від 2026-09-23 (§3д)
-  — окрема, зібрана до режиму `--public`.
-- **Пуш:** `0034782` (6c) і `ced00e0` (`--public`) — 2026-09-28.
+  лише власник (Share). **Версія 2 (того ж дня, на прохання власника «по аналогії» зі звітом адмін-панелі
+  https://claude.ai/artifact/88jqFKQyhs1iWtsKLWHAnj):** сайт із кількох сторінок —
+  - головна: вердикт («No unexpected failures» лише коли кожен червоний тест — регресійна перевірка заведеного бага),
+    KPI, по екрану на модуль, покриття по модулях, «What needs a decision», відкриті баги з перевірками, які вони
+    тримають червоними, «Could not run», чому 183 перевірки не автоматизовані (групи з `qa/mobile/not-automated-ios.md`),
+    стабільність (5 повних прогонів, 3 останні однакові), темп з git, технічні деталі;
+  - `NN-module.html` — кожна перевірка: вердикт, тест і рядок коду, знімки (натиснути — на весь екран); кожен тест із кроками;
+  - `bugs/BUG-*.html` — 6 заведених багів із доказами (чернетки NOT FILED не показуються).
+- **Як перезібрати й оновити:** `zsh automation/mobile/reports/build-public.sh` (gitignored, як і
+  `redactions-stable-3.json` — зони маскування). Ім'я акаунта скрипт читає з API в пам'ять, не друкує й не зберігає.
+  Копія — `automation/mobile/reports/summary-public/`: без текстових вкладень (відповіді API з чужими джобами, дерева
+  екранів) і відео; email / телефон / ім'я приховано в тексті, на знімках — зони. Перевірка перед публікацією:
+  0 збігів з даними акаунта, 0 S3 / токенів / mp4. Оновлювати ТУ САМУ сторінку: Artifact publish з `url` цього
+  посилання, `file_path` = `…/summary-public/page.html`, `root` = `automation/mobile/reports/summary-public`,
+  `files` = усі файли копії, крім `page.html` та `index.html` (128: сторінки модулів, `bugs/**`, `assets/*`).
+  Сторінка пілоту Auth від 2026-09-23 (§3д) — окрема, зібрана до режиму `--public`; що з нею робити — питання власнику.
+- **Пуш:** `0034782` (6c) і `ced00e0` (`--public`) — 2026-09-28. Звіт v2 і `4bf41fd` — локально, пуш за командою.
 - **Далі — лише за командою власника:** Android (крок 7).
 
 ## 4. Ключові факти (деталі — у файлах за посиланнями)
