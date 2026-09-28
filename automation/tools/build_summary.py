@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import os
 import re
 import shutil
 import sys
@@ -157,8 +158,10 @@ class Redactor:
 
     MASK = "‹test account›"
 
-    def __init__(self, env_file: Path | None, boxes_file: Path | None):
-        self.values: list[str] = []
+    def __init__(
+        self, env_file: Path | None, boxes_file: Path | None, extra: list[str] | None = None
+    ):
+        self.values: list[str] = [v for v in (extra or []) if v]
         if env_file and env_file.exists():
             from dotenv import dotenv_values
 
@@ -169,7 +172,8 @@ class Redactor:
             forms = [email, email.lower(), phone]
             if len(digits) == 10:
                 forms += [f"+1{digits}", f"({digits[:3]}) {digits[3:6]}-{digits[6:]}", digits]
-            self.values = sorted({v for v in forms if v}, key=len, reverse=True)
+            self.values += [v for v in forms if v]
+        self.values = sorted(set(self.values), key=len, reverse=True)
         self.boxes: dict[str, list[list[float]]] = {}
         self.points_width = 402.0
         if boxes_file and boxes_file.exists():
@@ -367,6 +371,11 @@ def _duration(node: dict) -> str:
     return _minutes(max(int(stop) - int(start), 0) / 1000)
 
 
+# --public: the copy that leaves this machine. Text attachments (API response bodies, page
+# sources) are left out — they carry other users' job data and the test account's name.
+PUBLIC = False
+
+
 def attachments_html(node: dict, t, copy: AssetCopier, root: Path) -> str:
     out: list[str] = []
     for att in node.get("attachments") or []:
@@ -380,11 +389,18 @@ def attachments_html(node: dict, t, copy: AssetCopier, root: Path) -> str:
                 f"<figure class='att'><img loading='lazy' src='{t(copy(source))}' alt='{t(name)}'>"
                 f"<figcaption>{t(name)}</figcaption></figure>"
             )
+        elif suffix == ".mp4" and PUBLIC:
+            out.append(
+                f"<p class='att-omitted'>{t(name)} — video, not in the shared copy "
+                "(the recording starts before sign-in and may show the test account)</p>"
+            )
         elif suffix == ".mp4":
             out.append(
                 f"<figure class='att'><video controls preload='none' src='{t(copy(source))}'>"
                 f"</video><figcaption>{t(name)}</figcaption></figure>"
             )
+        elif PUBLIC:
+            out.append(f"<p class='att-omitted'>{t(name)} — text, not in the shared copy</p>")
         else:
             text = source.read_text(encoding="utf-8", errors="replace")
             cut = " …(truncated)" if len(text) > TEXT_LIMIT else ""
@@ -550,7 +566,7 @@ def render(
         )
     w("</table></div>")
 
-    shown = [r for r in runs if r.checkpoints or r.failure_shots or r.videos]
+    shown = [r for r in runs if r.checkpoints or r.failure_shots or (r.videos and not PUBLIC)]
     if shown:
         w("<h2>Key screens</h2>")
     for r in shown:
@@ -562,6 +578,9 @@ def render(
                 f"<figcaption>{t(name)}</figcaption></figure>"
             )
         for video in r.videos:
+            if PUBLIC:  # the recording starts before sign-in and may show the test account
+                w("<p class='att-omitted'>video — not in the shared copy</p>")
+                continue
             w(f"<video controls preload='none' src='{t(copy(video))}'></video>")
         w("</div>")
 
@@ -617,6 +636,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="dotenv whose APP_USER_EMAIL / APP_USER_PHONE are hidden on the page (values never printed)",
     )
     p.add_argument(
+        "--redact-text-env",
+        action="append",
+        default=[],
+        help="name of an environment variable whose value is hidden on the page like the test "
+        "account's email (e.g. its first / last name); values never printed",
+    )
+    p.add_argument(
+        "--public",
+        action="store_true",
+        help="the copy to share: text attachments (API bodies, page sources) left out",
+    )
+    p.add_argument(
         "--redact-boxes",
         type=Path,
         default=None,
@@ -627,6 +658,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    global PUBLIC
+    PUBLIC = args.public
     if not args.allure_dir.is_dir():
         tr.log("ERROR", f"Blocked: no allure results at {args.allure_dir}")
         return 2
@@ -642,7 +675,8 @@ def main(argv: list[str] | None = None) -> int:
     rows, _orphans = tr.build_rows(items, results)
     summary = tr.summarize(rows)
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    redactor = Redactor(args.redact_env, args.redact_boxes)
+    extra = [os.environ.get(name, "").strip() for name in args.redact_text_env]
+    redactor = Redactor(args.redact_env, args.redact_boxes, extra)
     head, body = render(
         runs=load_test_runs(args.allure_dir),
         rows=rows,
