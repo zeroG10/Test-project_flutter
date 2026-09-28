@@ -570,9 +570,20 @@ happy flow → валідації); які пункти чеклісту кож�
   - матриця по всіх модулях — `qa/mobile/final-traceability-ios.md`: 645 перевірок, 462 автоматизовано → **449 Passed,
     6 Failed** (= 5 заведених багів), **7 Blocked** (= 4 погоджені обмеження); таблиця по модулях;
   - Allure з трендом 3 прогонів — `automation/mobile/allure-report` (gitignored; `allure open automation/mobile/allure-report`);
-  - зведена сторінка — `automation/mobile/reports/summary/index.html` (**локально, зі знімками апки замовника; публікувати
-    лише за командою власника**).
-- **Далі — лише за командою власника:** пуш; публікація зведеної сторінки; Android (крок 7).
+  - зведена сторінка — `automation/mobile/reports/summary/index.html` (**локально, повна: з відео й текстовими
+    вкладеннями**).
+- **Опубліковано (власник, 2026-09-28): https://claude.ai/artifact/EdTpeAfr1wAGm4fxsYBm15** — приватна, поділитися може
+  лише власник (Share). Це **публічна копія** `automation/mobile/reports/summary-public/` (gitignored):
+  `build_summary.py --allure-dir ../mobile/allure-results-stable-3 <12 чеклістів> --public --redact-boxes <зони>
+  --redact-text-env QA_FIRST --redact-text-env QA_LAST --out-dir ../mobile/reports/summary-public --run-label "…"`
+  (QA_FIRST / QA_LAST — ім'я та прізвище акаунта з `GET /user/{id}`, експортовані без друку). У ній немає текстових
+  вкладень (відповіді API з чужими джобами, дерева екранів з іменем акаунта) і відео (запис починається до входу);
+  email / телефон / ім'я в тексті приховано, на скриншотах — зони (картка профілю, поля редагування, логін, OTP).
+  Оновлювати ТУ САМУ сторінку: Artifact publish з `url` цього посилання, `file_path` = `…/summary-public/page.html`,
+  `root` = `automation/mobile/reports/summary-public`, `files` = `assets/*`. Сторінка пілоту Auth від 2026-09-23 (§3д)
+  — окрема, зібрана до режиму `--public`.
+- **Пуш:** `0034782` (6c) і `ced00e0` (`--public`) — 2026-09-28.
+- **Далі — лише за командою власника:** Android (крок 7).
 
 ## 4. Ключові факти (деталі — у файлах за посиланнями)
 
