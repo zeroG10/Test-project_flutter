@@ -171,7 +171,7 @@ happy flow → валідації); які пункти чеклісту кож�
     → http://127.0.0.1:5252 (Suites → iOS → «02 · Authentication»; Behaviors → модуль → TC).
   - Зведена сторінка для ліда: `automation/mobile/reports/summary/index.html` (генерує `automation/tools/build_summary.py`).
   - Матриця трасування: `qa/mobile/<NN-module>/<module>-traceability.md` (генерує `automation/tools/trace_results.py`).
-  - **Опубліковано (власник, 2026-09-23): https://claude.ai/artifact/NvRzuhzr418nLAYMZfaf15** — приватна сторінка
+  - **Опубліковано (власник, 2026-09-23; з 2026-09-28 показує повний звіт iOS — §3т): https://claude.ai/artifact/NvRzuhzr418nLAYMZfaf15** — приватна сторінка
     (відкривається лише власнику, поки він сам не поділиться через Share). Оновлювати ТУ САМУ сторінку: у новій сесії —
     Artifact publish з `url` цього посилання, файл `automation/mobile/reports/summary/page.html` (+ `assets/*` через
     `files`, `root` = `automation/mobile/reports/summary`). Сторінка має два рівні: зверху для ПМ, нижче **Test details** —
@@ -588,8 +588,11 @@ happy flow → валідації); які пункти чеклісту кож�
   0 збігів з даними акаунта, 0 S3 / токенів / mp4. Оновлювати ТУ САМУ сторінку: Artifact publish з `url` цього
   посилання, `file_path` = `…/summary-public/page.html`, `root` = `automation/mobile/reports/summary-public`,
   `files` = усі файли копії, крім `page.html` та `index.html` (128: сторінки модулів, `bugs/**`, `assets/*`).
-  Сторінка пілоту Auth від 2026-09-23 (§3д) — окрема, зібрана до режиму `--public`; що з нею робити — питання власнику.
-- **Пуш:** `0034782` (6c) і `ced00e0` (`--public`) — 2026-09-28. Звіт v2 і `4bf41fd` — локально, пуш за командою.
+  **Стара сторінка пілоту Auth https://claude.ai/artifact/NvRzuhzr418nLAYMZfaf15 — замінена (власник, 2026-09-28):**
+  той самий звіт із приміткою зверху («тут був пілот Auth від 23.09»), головна сторінка — `summary-public/page-auth-link.html`
+  (робить `build-public.sh`), 16 старих файлів (з двома відео) прибрано. Оновлювати ОБИДВА посилання: основне — з
+  `page.html`, старе — з `page-auth-link.html`, `files` однакові.
+- **Пуш:** `0034782` (6c), `ced00e0` (`--public`), звіт v2 і записи — 2026-09-28 (власник).
 - **Далі — лише за командою власника:** Android (крок 7).
 
 ## 4. Ключові факти (деталі — у файлах за посиланнями)
