@@ -11,7 +11,7 @@ from typing import TypeVar
 
 from appium.webdriver.webdriver import WebDriver
 from appium.webdriver.webelement import WebElement
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -119,3 +119,17 @@ def is_visible(driver: WebDriver, locator: Locator, timeout: float | None = None
     except TimeoutException:
         return False
     return True
+
+
+def focused(driver: WebDriver, timeout: float = 5.0):
+    """The focused element, waiting while WebDriverAgent cannot name it yet — right after a tap
+    on a Flutter field it may answer "unable to find an element using '(null)'" (stable run on
+    7673885, TC-SRV-002)."""
+
+    def probe(d):
+        try:
+            return d.switch_to.active_element
+        except WebDriverException:
+            return False
+
+    return wait_until(driver, probe, timeout, "no focused element")

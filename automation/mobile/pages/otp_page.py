@@ -11,6 +11,7 @@ import re
 import allure
 from selenium.common.exceptions import WebDriverException
 
+from helpers import waits
 from pages.base_page import BasePage, normalized
 from screens.otp_map import OTP
 
@@ -34,7 +35,7 @@ class OtpPage(BasePage):
             except WebDriverException:
                 # The hidden field may refuse a direct type; it already holds the focus.
                 with allure.step("code field refused direct input → typing into the focused field"):
-                    self.driver.switch_to.active_element.send_keys(code)
+                    waits.focused(self.driver).send_keys(code)
 
     def expect_error_shown(self, shown: bool = True, timeout: float | None = None) -> None:
         """``Incorrect code.`` really drawn (or not) — by pixels; the tree always says visible."""

@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 import allure
 
+from helpers import waits
 from pages.base_page import BasePage
 from screens.notes_map import (
     NOTE_DELETE_DIALOG,
@@ -62,7 +63,7 @@ class NoteEditor(BasePage):
         with allure.step(f"fill note-editor.field: {text[:40]!r}{'…' if len(text) > 40 else ''}"):
             self.tap("field")
             time.sleep(0.6)  # the field re-renders on focus: type into the focused one
-            self.driver.switch_to.active_element.send_keys(text)
+            waits.focused(self.driver).send_keys(text)
 
     def counter(self) -> str:
         return self.find("counter").get_attribute("name") or ""

@@ -208,7 +208,7 @@ class SurveyPage(BasePage):
         h = int(a["height"])
         self._tap_attrs(a, h - 70 if h > 200 else h / 2)  # a loose card's field: its input area
         time.sleep(0.8)  # the field re-renders on focus: type into the focused one (recon 8)
-        return self.driver.switch_to.active_element
+        return waits.focused(self.driver)
 
     def fill_text(self, n: int, text: str) -> None:
         with allure.step(
@@ -244,7 +244,7 @@ class SurveyPage(BasePage):
                 waits.wait_until(self.driver, lambda _d, a=alias: picker.is_visible(a, 0), 5)
                 time.sleep(0.5)  # the field is rebuilt once after the mode switch (recon 8: stale)
                 picker.tap(alias)
-                field = self.driver.switch_to.active_element
+                field = waits.focused(self.driver)
                 field.clear()
                 field.send_keys(f"{value:02d}")
             picker.tap("ok")
@@ -279,7 +279,7 @@ class SurveyPage(BasePage):
             if description:
                 meta.tap("description")
                 time.sleep(0.5)
-                self.driver.switch_to.active_element.send_keys(description)
+                waits.focused(self.driver).send_keys(description)
             meta.tap("save")
             self.assert_open(15)
             if description:

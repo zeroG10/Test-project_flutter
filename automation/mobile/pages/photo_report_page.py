@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 
 import allure
 
+from helpers import waits
 from pages.base_page import BasePage
 from screens.photo_report_map import (
     PHOTO_ADD_SHEET,
@@ -63,7 +64,7 @@ class PhotoMetadata(BasePage):
         with allure.step(f"fill photo-metadata.description: {text[:40]!r}"):
             self.tap("description")
             time.sleep(0.6)  # the field re-renders on focus: type into the focused one
-            self.driver.switch_to.active_element.send_keys(text)
+            waits.focused(self.driver).send_keys(text)
             self.hide_keyboard()
 
     def description(self) -> str:

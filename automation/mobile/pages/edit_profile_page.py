@@ -2,6 +2,7 @@
 
 import allure
 
+from helpers import waits
 from pages.base_page import BasePage
 from screens.edit_profile_map import DELETE_DIALOG, EDIT_PROFILE, UNSAVED_DIALOG
 
@@ -33,7 +34,7 @@ class EditProfilePage(BasePage):
             self.clear(alias, 5)
             if text:
                 self.tap(alias)
-                self.driver.switch_to.active_element.send_keys(text)
+                waits.focused(self.driver).send_keys(text)
 
     def save(self) -> None:
         with allure.step("tap edit-profile.save → back on Profile"):
