@@ -41,3 +41,5 @@ candidates (prompt 06) → test cases (`prompts/mobile/03`) → screen maps
 
 Defects go to `<NN-module>/bugs/BUG-<CODE>-NNN.md` (template `qa/_templates/bug-mobile.md`) with
 evidence in `bugs/evidence/BUG-<CODE>-NNN/`.
+
+**Final iOS run (step 6c, 2026-09-28):** [final-traceability-ios.md](final-traceability-ios.md) — 3 identical runs on harness `7015c46`: 645 checks, 462 automated → 449 Passed, 6 Failed (the 5 filed bugs), 7 Blocked (the 4 accepted limits).
