@@ -10,6 +10,23 @@ does not:
 - Yes / No and single-choice options are Buttons named by the option (selected: ``value 1``, trait
   ``Selected``); checkboxes are Switches (``value 0/1``);
 - a card of loose questions with one text field is itself the ``TextField`` (TD-SRV-002).
+
+Android (recon A1, qa/shared/recon-dumps/android-2026-09-29/survey_*.xml, 2026-09-29):
+- labels live in ``content-desc``; question titles are MERGED into ONE View's desc
+  (``"1. \\nWas the job completed successfully?\\n3. \\n…"``, MO3 — question "2." can stand in its
+  own View too) — in the short survey (a single-field card) the titles sit in the HINT of the
+  only EditText instead (``TD-SRV-001`` extends: on Android a title can be unreachable by any
+  allowed locator — ``SurveyPage.titles_in()`` needs Android logic, see the handoff report);
+- Yes / No are Buttons that become ImageViews once selected (``selected="true"``) — do not filter
+  by className for them; radio options are RadioButtons, checkboxes are CheckBoxes, both named by
+  the option and carrying ``checked``;
+- EVERY EditText (description / date / time / number) is unlabelled and named only by its
+  ``hint``, which UiSelector cannot match (``TD-A1``): a bare ``className("...EditText")`` cannot
+  tell a text answer from a date/time field the way the iOS ``name`` filter does — per-field
+  disambiguation needs page-level order/hint reading directly from ``page_source``
+  (``SurveyPage.matches`` / ``nth`` / ``FORM_ORDER``), not a static locator; see the handoff report;
+- "Repeat section", a section's delete dialog and "This field is required" were NOT reached in
+  recon A1 (``ANDROID_UNVERIFIED`` below) — same Flutter text expected on both platforms.
 """
 
 from appium.webdriver.common.appiumby import AppiumBy
@@ -21,67 +38,147 @@ _BUTTON = "type == 'XCUIElementTypeButton' AND "
 _TEXT = "type == 'XCUIElementTypeStaticText' AND "
 _FIELD = "type == 'XCUIElementTypeTextField' AND "
 
+_AID = AppiumBy.ACCESSIBILITY_ID
+_UI = AppiumBy.ANDROID_UIAUTOMATOR
+
 SURVEY = Screen(
     id="survey",
     anchor="header",
     elements={
         "header": El(
+            android=(_AID, "Survey"),
             ios=(
                 _P,
                 "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Survey'",
-            )
+            ),
         ),  # fmt: skip
-        "back": El(ios=(_P, _BUTTON + "name == 'Back'")),
+        "back": El(android=(_AID, "Back"), ios=(_P, _BUTTON + "name == 'Back'")),
         "survey-name": El(
-            ios=(_P, _TEXT + "name == {text}"), note="the survey's title, first line"
+            android=(_UI, "new UiSelector().descriptionStartsWith({text})"),
+            ios=(_P, _TEXT + "name == {text}"),
+            note="the survey's title, first line. Android: a survey with a section has "
+            "'<survey name>_<section title>' in one content-desc (survey_mo3_1.xml) — pass just "
+            "the survey title with descriptionStartsWith, not an exact match",
         ),
         "titles": El(
+            android=(
+                _UI,
+                'new UiSelector().className("android.view.View").descriptionContains(". ")',
+            ),
             ios=(_P, "name CONTAINS '. ' AND rect.width > 300"),
-            note="labels of the cards: 'N. \\nTitle' pairs (TD-SRV-001) — parsed by the page",
+            note="labels of the cards: 'N. \\nTitle' pairs (TD-SRV-001) — parsed by the page. "
+            "Android: titles are merged into one (or a few) View content-desc, but a single-field "
+            "card (survey_short.xml) puts them in the EditText's hint instead, unreachable by any "
+            "allowed locator — SurveyPage.titles_in() needs Android-specific parsing",
         ),
-        "save": El(ios=(_P, _BUTTON + "name == 'Save'")),
-        "yes": El(ios=(_P, _BUTTON + "name == 'Yes'"), note="n-th in form order (radio 'Yes' too)"),
-        "no": El(ios=(_P, _BUTTON + "name == 'No'"), note="n-th in form order (radio 'No' too)"),
-        "option": El(ios=(_P, _BUTTON + "name == {text}"), note="a single-choice option"),
+        "save": El(android=(_AID, "Save"), ios=(_P, _BUTTON + "name == 'Save'")),
+        "yes": El(
+            android=(_AID, "Yes"),
+            ios=(_P, _BUTTON + "name == 'Yes'"),
+            note="n-th in form order (radio 'Yes' too). Android: a Button that becomes an "
+            'ImageView once selected (selected="true") — content-desc is unaffected, do not '
+            "filter by className",
+        ),
+        "no": El(
+            android=(_AID, "No"),
+            ios=(_P, _BUTTON + "name == 'No'"),
+            note="n-th in form order (radio 'No' too). Android: same class change as 'yes'",
+        ),
+        "option": El(
+            android=(_AID, "{text}"),
+            ios=(_P, _BUTTON + "name == {text}"),
+            note="a single-choice option. Android: a RadioButton named by the option, 'checked' "
+            "reflects state",
+        ),
         "checkbox": El(
+            android=(_AID, "{text}"),
             ios=(_P, "type == 'XCUIElementTypeSwitch' AND name == {text}"),
-            note="a multi-choice option (value 0 / 1)",
+            note="a multi-choice option (value 0 / 1). Android: a CheckBox named by the option, "
+            "'checked' reflects state",
         ),
         "text": El(
+            android=(_UI, 'new UiSelector().className("android.widget.EditText")'),
             ios=(
                 _P,
                 _FIELD + "name != 'Select date' AND name != 'Select time' AND name != 'Hour' "
                 "AND name != 'Minute' AND name != '0'",
             ),  # fmt: skip
             note="a text answer (incl. an 'Other' option's text), n-th in form order; a FILLED "
-            "date or time field loses its hint and would count too — tests fill text first",
+            "date or time field loses its hint and would count too — tests fill text first. "
+            "Android (TD-A1): every EditText (text / date / time) is unlabelled, named only by "
+            "its hint, which UiSelector cannot match — this locator cannot exclude date/time "
+            "fields the way the iOS 'name' filter does; per-field kind needs page-level hint "
+            "reading from page_source. A single-field card's EditText also refuses "
+            "Appium set_text — only IME 'mobile: type' works (TD-SRV-002 extends)",
         ),
         "counter": El(
+            android=(_UI, 'new UiSelector().descriptionMatches(".*characters remaining")'),
             ios=(_P, "name ENDSWITH 'characters remaining'"),
-            note="'N characters remaining' / 'No characters remaining'",
+            note="'N characters remaining' / 'No characters remaining'. Android: UiSelector has "
+            "no …EndsWith matcher, descriptionMatches(regex) instead",
         ),  # fmt: skip
-        "required-error": El(ios=(_P, "name == 'This field is required'")),
-        "date": El(ios=(_P, _FIELD + "name == 'Select date'"), note="an empty date field"),
-        "time": El(ios=(_P, _FIELD + "name == 'Select time'"), note="an empty time field"),
-        "upload-photo": El(ios=(_P, _BUTTON + "name == 'Upload photo'")),
+        "required-error": El(
+            android=(_AID, "This field is required"), ios=(_P, "name == 'This field is required'")
+        ),
+        "date": El(
+            android=(_UI, 'new UiSelector().className("android.widget.EditText")'),
+            ios=(_P, _FIELD + "name == 'Select date'"),
+            note="an empty date field. Android (TD-A1): hint 'Select date', not matchable by "
+            "UiSelector — same className("
+            '"android.widget.EditText")'
+            " as 'text'; see that note",
+        ),
+        "time": El(
+            android=(_UI, 'new UiSelector().className("android.widget.EditText")'),
+            ios=(_P, _FIELD + "name == 'Select time'"),
+            note="an empty time field. Android (TD-A1): hint 'Select time', not matchable by "
+            "UiSelector — same className("
+            '"android.widget.EditText")'
+            " as 'text'; see that note",
+        ),
+        "upload-photo": El(
+            android=(_AID, "Upload photo"), ios=(_P, _BUTTON + "name == 'Upload photo'")
+        ),
         "thumbnail": El(
+            android=(_AID, "{text}"),
             ios=(_P, "type == 'XCUIElementTypeImage' AND name == {text}"),
             note="a photo's thumbnail, named by its description (TD-SRV-003)",
         ),
         "section": El(
+            android=(
+                _UI,
+                'new UiSelector().className("android.widget.ImageView")'
+                ".descriptionStartsWith({text})",
+            ),
             ios=(_P, "type == 'XCUIElementTypeImage' AND name BEGINSWITH {text}"),
-            note="a section card's header (an Image named by the section / entry title)",
+            note="a section card's header (an Image named by the section / entry title). Android: "
+            "an ImageView (survey_mo3_1.xml: 'On-Site Work Details')",
         ),
         "entry-headers": El(
+            android=(
+                _UI,
+                'new UiSelector().className("android.widget.ImageView")'
+                ".descriptionStartsWith({text})",
+            ),
             ios=(_P, "type == 'XCUIElementTypeImage' AND name BEGINSWITH {text}"),
-            note="headers of a repeatable section's entries: '<section>', '<section> 2', …",
+            note="headers of a repeatable section's entries: '<section>', '<section> 2', … "
+            "(only a single, non-repeated entry was reached in recon A1 — '<section> 2' unproven)",
         ),
-        "repeat": El(ios=(_P, _BUTTON + "name == 'Repeat section'")),
+        "repeat": El(
+            android=(_AID, "Repeat section"), ios=(_P, _BUTTON + "name == 'Repeat section'")
+        ),
         "delete-entry": El(
+            android=(_AID, "Delete"),
             ios=(_P, _BUTTON + "name == 'Delete' AND rect.width < 60"),
-            note="the trash icon of an added entry (the first has none)",
+            note="the trash icon of an added entry (the first has none). Android: not reached in "
+            "recon A1 — same Flutter text 'Delete' as iOS; iOS needed a width filter against the "
+            "dialog's own Delete, confirm whether Android needs the same in step 4",
         ),  # fmt: skip
-        "saved": El(ios=(_P, "name == 'Survey saved'"), note="snackbar after Save"),
+        "saved": El(
+            android=(_AID, "Survey saved"),
+            ios=(_P, "name == 'Survey saved'"),
+            note="snackbar after Save",
+        ),
     },
 )
 
@@ -90,11 +187,12 @@ SURVEY_DATE_PICKER = Screen(
     anchor="ok",
     elements={
         "day": El(
+            android=(_UI, "new UiSelector().descriptionStartsWith({text})"),
             ios=(_P, _BUTTON + "name BEGINSWITH {text}"),
-            note="'15, Tuesday, September 15, 2026' — pass '15, '",
+            note="'15, Tuesday, September 15, 2026' — pass '15, ' (today: '…2026, Today')",
         ),  # fmt: skip
-        "ok": El(ios=(_P, _BUTTON + "name == 'OK'")),
-        "cancel": El(ios=(_P, _BUTTON + "name == 'Cancel'")),
+        "ok": El(android=(_AID, "OK"), ios=(_P, _BUTTON + "name == 'OK'")),
+        "cancel": El(android=(_AID, "Cancel"), ios=(_P, _BUTTON + "name == 'Cancel'")),
     },
 )
 
@@ -103,12 +201,23 @@ SURVEY_TIME_PICKER = Screen(
     anchor="ok",
     elements={
         "text-mode": El(
+            android=(_AID, "Switch to text input mode"),
             ios=(_P, _BUTTON + "name == 'Switch to text input mode'"),
             note="the dial is not in the tree — text input is",
         ),  # fmt: skip
-        "hour": El(ios=(_P, _FIELD + "name == 'Hour'")),
-        "minute": El(ios=(_P, _FIELD + "name == 'Minute'")),
-        "ok": El(ios=(_P, _BUTTON + "name == 'OK'")),
+        "hour": El(
+            android=(_UI, 'new UiSelector().className("android.widget.EditText").instance(0)'),
+            ios=(_P, _FIELD + "name == 'Hour'"),
+            note="hint 'Hour' — the first of the two EditTexts of the text-input picker "
+            "(survey_time_picker_text.xml); TD-A1, UiSelector cannot match hint",
+        ),
+        "minute": El(
+            android=(_UI, 'new UiSelector().className("android.widget.EditText").instance(1)'),
+            ios=(_P, _FIELD + "name == 'Minute'"),
+            note="hint 'Minute' — the second EditText of the text-input picker "
+            "(survey_time_picker_text.xml); TD-A1, UiSelector cannot match hint",
+        ),
+        "ok": El(android=(_AID, "OK"), ios=(_P, _BUTTON + "name == 'OK'")),
     },
 )
 
@@ -116,15 +225,41 @@ SURVEY_DELETE_DIALOG = Screen(
     id="survey-delete-dialog",
     anchor="title",
     elements={
-        "title": El(ios=(_P, _TEXT + "name == 'Delete section'")),
-        "message": El(ios=(_P, _TEXT + "name == {text}"), note="the dialog's question"),
-        "cancel": El(ios=(_P, _BUTTON + "name == 'Cancel'")),
+        "title": El(android=(_AID, "Delete section"), ios=(_P, _TEXT + "name == 'Delete section'")),
+        "message": El(
+            android=(_AID, "{text}"),
+            ios=(_P, _TEXT + "name == {text}"),
+            note="the dialog's question",
+        ),
+        "cancel": El(android=(_AID, "Cancel"), ios=(_P, _BUTTON + "name == 'Cancel'")),
         "delete": El(
+            android=(_AID, "Delete"),
             ios=(_P, _BUTTON + "name == 'Delete' AND rect.width > 60"),
-            note="the dialog's button (the entry's trash icon is 48 wide)",
+            note="the dialog's button (the entry's trash icon is 48 wide on iOS). Android: not "
+            "reached in recon A1 — same Flutter text 'Delete'; confirm width/position "
+            "disambiguation against survey.delete-entry in step 4",
         ),  # fmt: skip
     },
 )
+
+# Not reached in recon A1 (qa/shared/recon-dumps/android-2026-09-29): same Flutter text as iOS,
+# to confirm in step 4 (docs/notes/android-plan.md).
+ANDROID_UNVERIFIED: dict[str, str] = {
+    "survey.required-error": "not reached in recon A1 — same Flutter text as iOS; confirm in "
+    "step 4",
+    "survey.thumbnail": "not reached in recon A1 (no photo was carried through to a saved survey "
+    "field in the dumps) — same Flutter naming (photo description) as iOS; confirm in step 4",
+    "survey.repeat": "not reached in recon A1 — same Flutter text as iOS; confirm in step 4",
+    "survey.delete-entry": "not reached in recon A1 — same Flutter text as iOS; confirm in step 4",
+    "survey-delete-dialog.title": "not reached in recon A1 — same Flutter text as iOS; confirm in "
+    "step 4",
+    "survey-delete-dialog.message": "not reached in recon A1 — same Flutter text as iOS; confirm "
+    "in step 4",
+    "survey-delete-dialog.cancel": "not reached in recon A1 — same Flutter text as iOS; confirm in "
+    "step 4",
+    "survey-delete-dialog.delete": "not reached in recon A1 — same Flutter text as iOS; confirm in "
+    "step 4",
+}
 
 # Document-order twins of the aliases the page takes "n-th in form order" (module 08 run 1):
 # XCUITest's find_elements returns the off-screen matches FIRST (their rect is empty), so the n-th
