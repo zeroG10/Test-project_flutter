@@ -83,10 +83,11 @@ REGISTRATION_FIELDS = ("first-name", "last-name", "phone", "email")
 
 
 def all_screens() -> dict[str, Screen]:
+    """Every screen map, ``screens/android/`` included (importing validates the strategies)."""
     found: dict[str, Screen] = {}
-    for info in pkgutil.iter_modules(screens.__path__):
+    for info in pkgutil.walk_packages(screens.__path__, prefix="screens."):
         if info.name.endswith("_map"):
-            module = importlib.import_module(f"screens.{info.name}")  # validates strategies
+            module = importlib.import_module(info.name)
             for value in vars(module).values():
                 if isinstance(value, Screen):
                     found[value.id] = value
@@ -144,15 +145,21 @@ class MapHealth(unittest.TestCase):
         self.assertEqual(stale, set(), "stale PAGE_RESOLVED entries")
 
     def test_every_screen_has_an_anchor_and_ios_locators(self):
+        # Android-only elements and screens (Android stage) are marked "Android only: …" and
+        # checked by unit_tests/test_android_maps.py.
         for screen in self.screens.values():
             self.assertIsNotNone(screen.anchor, screen.id)
             for alias, el in screen.elements.items():
+                if el.ios is None and el.note.startswith("Android only"):
+                    continue
                 self.assertIsNotNone(el.ios, f"{screen.id}.{alias}: no iOS locator")
 
     def test_static_locators_have_no_stray_braces(self):
         # A "{" outside a declared {text} placeholder would break str.format at run time.
         for screen in self.screens.values():
             for alias, el in screen.elements.items():
+                if el.ios is None:
+                    continue
                 fields = template_fields(el.ios)
                 self.assertLessEqual(fields, {"text"}, f"{screen.id}.{alias}: {fields}")
                 if fields:
