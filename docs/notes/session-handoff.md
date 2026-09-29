@@ -728,6 +728,23 @@ happy flow → валідації); які пункти чеклісту кож�
 - **Prove-red:** 31 з 31 червоні, усі — на навмисно зламаному очікуванні (26:46).
 - **Трасованість:** `qa/mobile/02-authentication/android/authentication-traceability.md` — 126 пунктів, 81 автоматизовано,
   80 Passed, 1 Failed (CHK-AUTH-122 → BUG-AUTH-001), 45 not run. Сирота CHK-ORDL-001 — пункт модуля 03 (трасується в 01+03).
+- **Модулі 01+03 ⏳** (прогони 1–5 + точкові, 2026-09-29). Виправлення харнесу: зупинка апки — `force-stop` + очікування
+  `pidof` (фантомний запис процесу з pid 0 у ActivityManager ламав перевірку драйвера); локатори без підпису — не
+  `description("")` (null content-desc на пристрої не збігається; офлайн-оцінювач виправлено; 6 локаторів у 5 картах);
+  heads-up сповіщення вимкнено на час сесії (push «New job assigned» перекривав кнопку календаря); бордовий сплеш — чекати
+  до 60 с (заміри 4–32 с системного сплешу). **Прогін 5:** 15 passed, 4 failed — усі 4 = баги iOS, відтворені на Android:
+  BUG-SPL-001 (3 з 3: прогони 3–5), BUG-ORDL-002 (3 з 3), BUG-ORDL-003 (2 з 2: прогони 4–5), BUG-ORDL-001 (прогін 5;
+  recon A1); TC-ORDL-012 (mismatch) на Android — Passed (на iOS був Blocked). 1 skipped — TC-SPL-001 (timing).
+  **Нова знахідка D-SPL-A2 / Q-SPL-A2** (відкрите, рішення власника): системна «Назад» на сплеші закриває апку —
+  CHK-SPL-007; докази `qa/mobile/01-splash/android/evidence/Q-SPL-A2/`, ручне відтворення. Доказ BUG-SPL-001 Android —
+  у `bugs/evidence/BUG-SPL-001/android/`.
+  **Далі (зупинились тут):** бордовий сплеш на Android після системного триває < 1–3 с — TC-SPL-001 на Android
+  перебудувати: старт 1 — логотип на першому бордовому кадрі → тап → читання дерева, де саме дерево доводить «ще сплеш»
+  (немає тексту / Welcome; Welcome у дереві → Blocked timing), без знімка після; старт 2 — «Назад» одразу після
+  бордового кадру → `expect_stays_in_front` (вікно 1,5 с) → Welcome. Правка — `SplashPage.expect_no_interactive_elements`
+  (Android) і гілка Android у `test_cold_start_splash_then_welcome`. Потім: повний прогін 6 для звіту → «Android ✓» +
+  докази в BUG-SPL-001 / BUG-ORDL-002 / BUG-ORDL-003 (і прогін у BUG-ORDL-001) → prove-red 01+03 → трасованість
+  `qa/mobile/01-splash/android/`, `qa/mobile/03-order-list/android/` → модуль 04.
 - **Середовище:** хост перевантажений (load 6–9: «Сховище» в System Settings, mediaanalysisd, падає PenTabletDriver Wacom
   → ReportCrash) — прогони вдвічі довші (10:24 → 22:38). Уроки: не вбивати pytest без закриття сесії; ручні скрипти —
   лише між прогонами і з `quit()`.
