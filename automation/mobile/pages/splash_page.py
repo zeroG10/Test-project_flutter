@@ -22,6 +22,10 @@ from screens.splash_map import SPLASH
 SPLASH_SHARE = 0.9  # recon 4: 0.998 of the screen is the brand colour on every splash frame
 LOGO_TOLERANCE = 0.02  # test-case convention: centred within 2 % of the screen
 LOGO_TIMEOUT = 20.0  # debug build: the logo appears ~8 s after launch (recon 4)
+# Android: the system splash lasts until Flutter draws — the first brand frame came after 4.0 s,
+# 5.6 s, over 10 s (module 01+03 Android runs 1–3, 2026-09-29); a cold debug start takes over 30 s
+# on this host (LANDING_TIMEOUT_ANDROID). The wait ends at the first brand frame.
+SYSTEM_SPLASH_TIMEOUT_ANDROID = 60.0
 
 
 class SplashMissed(RuntimeError):
@@ -48,7 +52,9 @@ class SplashPage(BasePage):
             raise SplashMissed(f"{label}: brand colour covers {share:.3f} of the screen")
         return png
 
-    def expect_shown_after_system_splash(self, timeout: float = 10.0) -> bytes:
+    def expect_shown_after_system_splash(
+        self, timeout: float = SYSTEM_SPLASH_TIMEOUT_ANDROID
+    ) -> bytes:
         """Android 12+ first shows the SYSTEM splash (white, the app icon, ~3 s — recon A1), then
         the app's own brand-colour splash (owner, Q-SPL-A1: the check is the brand splash after
         the system one). Waits for the first brand frame; iOS: the first captured frame."""
