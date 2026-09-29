@@ -5,6 +5,8 @@ import subprocess
 from appium.webdriver.webdriver import WebDriver
 
 from config.settings import normalize_platform
+from helpers import waits
+from helpers.android.device import Adb
 
 
 def adb(*args: str) -> str:
@@ -28,19 +30,25 @@ def platform_of(driver: WebDriver) -> str:
     return normalize_platform(str(driver.capabilities.get("platformName", "")))
 
 
-# Android: after ``am force-stop`` the driver waits only 500 ms by default for the process to go.
-# Measured on the Pixel 7 emulator (2026-09-29): gone after 0.3 s from the foreground and 0.64 s
-# from the background, adb round-trips included — over the default on a busy host (module 01+03
-# Android run 1: 16 set-ups errored with "still running after 500ms timeout"). The wait ends as
-# soon as the process is gone, so a high ceiling costs nothing on a healthy device.
-TERMINATE_TIMEOUT_MS_ANDROID = 10_000
+# Android: the driver's own check after ``am force-stop`` lists the app's processes from
+# ActivityManager — and a stale record with pid 0 (``ProcessRecord{… 0:<package>/u0a219}``, seen
+# after the module 01+03 runs on 2026-09-29) never goes away, so it waits in vain ("[12799,0] ->
+# [0]", even with 10 s; run 2). So: force-stop without the driver's check, then wait until ``pidof``
+# finds no process (it ignores pid 0). Measured: gone 0.3 s (foreground) / 0.64 s (background)
+# after force-stop, adb included; the ceiling below only matters on a stuck device.
+TERMINATE_TIMEOUT_ANDROID = 10.0
 
 
 def terminate_app(driver: WebDriver, app_id: str) -> None:
     """Stop ``app_id`` and wait until its process is gone (iOS: the driver's own wait)."""
-    if platform_of(driver) == "android":
-        driver.execute_script(
-            "mobile: terminateApp", {"appId": app_id, "timeout": TERMINATE_TIMEOUT_MS_ANDROID}
-        )
+    if platform_of(driver) != "android":
+        driver.terminate_app(app_id)
         return
-    driver.terminate_app(app_id)
+    driver.execute_script("mobile: terminateApp", {"appId": app_id, "timeout": 0})
+    adb = Adb.of(driver)
+    waits.wait_until(
+        driver,
+        lambda _d: not adb.shell(f"pidof {app_id}", check=False, timeout=20).strip(),
+        TERMINATE_TIMEOUT_ANDROID,
+        f"{app_id} still has a process {TERMINATE_TIMEOUT_ANDROID:.0f} s after force-stop",
+    )

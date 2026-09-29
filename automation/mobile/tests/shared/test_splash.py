@@ -67,6 +67,8 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
         shown = splash.expect_shown("splash after a tap and an edge swipe")
         splash.expect_logo_centred(shown)
     except SplashMissed as exc:
+        # Gone because the Back left the app (Android, Q-SPL-A2) is a verdict, not timing
+        app.expect_stays_in_front("a back on the splash changes nothing", hold=0)
         pytest.skip(f"Blocked: timing — {exc}; the splash could not be observed in time")
     finally:
         if idle is not None:
