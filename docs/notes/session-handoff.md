@@ -53,7 +53,7 @@ recon Registration/SMS Terms зроблено (recon 3c; Q-A1…A4 закрит�
 | 6a | Auth: RTM (prompt 04) + рев'ю покриття (prompt 05) | ✅ `authentication-rtm.md`, `authentication-coverage-review.md` (§3е) |
 | **6b** | **Решта модулів на iOS** (01, 03–12) — по одному: імпорт чекліста → план → тест-кейси (власник валідує) → recon → карти → тести → доведений червоний → трасування | ✅ **01, 03–12 протрасовано на iOS** (§3з…§3с); далі — фінальний прогін iOS (6c) |
 | 6c | Фінальний прогін усієї апки на iOS + фінальні звіти (Allure, матриця по всіх модулях, зведена сторінка), 3 стабільні прогони | ✅ §3т — 3 однакові прогони на `7015c46`; `qa/mobile/ios/final-traceability.md` |
-| 7 | Android (після всього iOS — рішення власника 2026-09-23) | ⏳ план і рішення — `docs/notes/android-plan.md` (§3у); старт у новій сесії |
+| 7 | Android (після всього iOS — рішення власника 2026-09-23) | ⏳ план — `docs/notes/android-plan.md`; **кроки 0–1 ✅ 2026-09-29** (§3ф): структура `ios/` / `android/`, емулятор Pixel 7 · Android 16, debug-APK; далі — крок 2 (recon) за командою |
 | 8 | Регресійний прогін + звіт (Allure + матриця трасування) | — |
 
 **Що принести на крок 4:** розкладку ~55–65 тестів по рівнях (досяжність екранів → переходи →
@@ -606,6 +606,45 @@ happy flow → валідації); які пункти чеклісту кож�
   дозволу, повідомляти; DEV повільний — таймаути лише із замірів, жодних повторів «до зеленого».
 - Власник вирішив вести Android у **новій сесії** (2026-09-29).
 
+## 3ф. Android — кроки 0 і 1 (2026-09-29, гілка `qa/android`)
+
+- **Команда власника:** «Виконуй кроки 0 і 1 плану … потім коротко звітуй і чекай команди на крок 2. Пуш — лише за моєю командою».
+- **Крок 0 — структура (коміт `e2bb12e`):**
+  - тег `ios-final-2026-09-28` на `577d6b0` (локальний, не запушено); гілка `qa/android` від `d925ca7`;
+  - `git mv` (27 перенесень, історія збережена): `qa/mobile/ios/{final-traceability,not-automated}.md`,
+    `qa/mobile/<NN>/ios/<module>-traceability.md`, докази багів — `bugs/evidence/BUG-…/ios/`; у звітах 6 заведених багів —
+    рядок «Platforms checked: iOS ✓ · Android — not checked yet»;
+  - локально (gitignored): `allure-results-*` → `automation/mobile/results/ios/<назва>/` (безіменна `allure-results` —
+    прогін 2 пілоту Auth → `results/ios/02-auth-run2`); `allure-report`, `summary`, `summary-public`, зони маскування і
+    `build-public.sh` → `automation/mobile/reports/ios/`. Перевірено: генератор на `results/ios/stable-3` дає ті самі
+    645 / 462 / 449 / 6 / 7;
+  - `scripts/run.sh <ios|android> <назва> [pytest args]` → `results/<платформа>/<дата>-<назва>/` + `RUN_INFO.txt`;
+    відмовляє, якщо папка є, дерево незакомічене (`ALLOW_DIRTY=1` — лише для налагодження) або вже йде інший прогін;
+    стандартна папка pytest — `results/_scratch`;
+  - `build_summary.py --platform ios|android` (типово ios): причини, матриці й Allure — з папок платформи; докази — з підпапок;
+  - захисний тест `unit_tests/test_ios_locator_guard.py` + `ios_locators.snapshot.json` (47 екранів, 284 iOS-локатори,
+    знято з карт, ідентичних тегу); доведено червоним на зміненому локаторі. Перезапис знімка — лише зі слова власника;
+  - таблиця «модулі × iOS / Android» у `qa/mobile/README.md`; матриця пристроїв — Pixel 7 · Android 16 (API 36);
+  - самотести: `automation/tools` 72 passed, `automation/mobile/unit_tests` 62 OK (map-health + захисний), ruff чистий,
+    0 битих посилань; iOS-код (карти, сторінки, тести, `app.py`, `conftest.py`) ідентичний тегу.
+- **Крок 1 — емулятор і збірка:**
+  - образ `system-images;android-36;google_apis;arm64-v8a` + `platforms;android-36`; AVD **`Pixel_7_API_36`**
+    (pixel_7, 4 ГБ, GPU host); завантаження ~30 с; `emulator-5554`, Android 16 / API 36;
+  - **debug-APK** (моє рішення без окремого питання — власнику на підтвердження): release потребує ключа підпису
+    замовника, а з мініфікацією плагін Crashlytics відправив би файл мапінгу у Firebase замовника; iOS теж Debug.
+    Команда: `fvm flutter build apk --debug --flavor development -t lib/main_development.dart --dart-define=CLIENT_BUILD=true`
+    (~10 хв, перша збірка Gradle; Gradle сам доставив CMake 3.22.1 у SDK). Клон апки після збірки чистий;
+  - `automation/mobile/builds/android/app-development-debug.apk` + `BUILD_INFO.txt`: `com.concerttechnologies.app.dev`,
+    1.1.1 (178), targetSdk 36, activity `com.concerttechnologies.app.MainActivity`;
+  - `.env`: `ANDROID_DEVICE_NAME=Pixel_7_API_36`, `ANDROID_PLATFORM_VERSION=16`, `ANDROID_APP_PATH` — на APK;
+    `.env.example` — те саме для пристрою;
+  - апка встановлена й відкривається на **Welcome** (холодний старт debug > 15 с); стрічка DEBUG — як на iOS;
+    системного запиту на сповіщення на першому старті не було (перевірити на recon);
+  - `doctor.sh android` — RESULT OK.
+- **Для кроку 2:** простий `adb shell uiautomator dump` дерева Flutter НЕ бачить (Flutter вмикає семантику лише для
+  сервісу доступності) — дампи знімати через Appium (`scripts/recon/dump_screen.py`). Вільно на диску ~19 ГБ
+  (Gradle-кеш, NDK, CMake, образ API 36).
+
 ## 4. Ключові факти (деталі — у файлах за посиланнями)
 
 | Що | Значення | Де детальніше |
@@ -614,7 +653,7 @@ happy flow → валідації); які пункти чеклісту кож�
 | Репо апки | `git@gitlab.triare.net:concert-technologies/flutter.git` → `~/Projects/concert-app` (симлінк `app/`, gitignored), гілка **`development`** 1.1.1+178 | аудит §1 |
 | Збірка | fvm Flutter 3.41.9; генерація `tools/generate_localization.sh`, `tools/generate_assets.sh`, `build_runner`; flavor `development`, `--dart-define=CLIENT_BUILD=true`; шим `flutterfire` у PATH | аудит §2, «Рецепт збірки» |
 | Bundle id / package | `com.concerttechnologies.app.dev` | `setup/project.yaml`, `.env` |
-| Цільові пристрої | iPhone 17 / iOS 26.5 (симулятор); Pixel 7 / API 35 (емулятор) | `qa/shared/device-matrix/device-matrix.md` |
+| Цільові пристрої | iPhone 17 / iOS 26.5 (симулятор); Pixel 7 / Android 16 (API 36) (емулятор `Pixel_7_API_36`, 4 ГБ) | `qa/shared/device-matrix/device-matrix.md` |
 | Тестовий акаунт | змінні `APP_USER_PHONE`, `APP_USER_EMAIL`, `APP_USER_OTP` (код на DEV однаковий для всіх) | `automation/mobile/.env` (gitignored) |
 | API для даних | Field Services API, `API_BASE_URL` + `API_ADMIN_*` у `.env`; спека `docs/api/openapi.json` | `docs/api/dev-test-data.md` |
 | Рецепт даних | `POST /job` з `userId` техніка + `surveyId` (наявні опитування, read-only) → тест → `DELETE /job/{id}`. `assign/{phone}` НЕ прив'язує джобу | `docs/api/dev-test-data.md` |
@@ -625,6 +664,9 @@ happy flow → валідації); які пункти чеклісту кож�
 
 ## 5. Стан машини (може не пережити перезавантаження)
 
+- **2026-09-29, Android:** емулятор `Pixel_7_API_36` запущений (`emulator-5554`), апка встановлена, відкрита на Welcome,
+  не залогінена; iOS-симулятор вимкнено. Запуск після перезавантаження: `emulator -avd Pixel_7_API_36 &`,
+  `adb install -r automation/mobile/builds/android/app-development-debug.apk`. Рядки нижче — стан на кінець iOS.
 - Симулятор iPhone 17 піднятий, апка **щойно перевстановлена — чистий стан, не залогінена**; локація симулятора
   40.748440,-73.985664; у бібліотеці фото — тестове фото; перемикач mock-локації = NO.
 - Appium 3.4.2 працює у фоні на `127.0.0.1:4723` (після перезавантаження: `bash automation/mobile/scripts/start_appium.sh`).
