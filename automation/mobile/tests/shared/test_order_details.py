@@ -209,11 +209,11 @@ def test_on_map_opens_browser(details_seed, ui_login, pages, expected, evidence)
     job = details_seed["full"]
     open_job(pages, job, expected)
     pages.details.tap("on-map")
-    pages.browser.expect_host(expected("maps.apple.com"), SERVER)
     street = job.address.split(", ")[1]  # "QA test site, 350 5th Ave, …" → "350 5th Ave"
-    pages.browser.visible("place", MAPS_PAGE, text=expected(street))
+    # iOS: the in-app browser on maps.apple.com; Android: Google Maps (D-ORDD-A1)
+    pages.browser.expect_map(expected("maps.apple.com"), expected(street), SERVER, MAPS_PAGE)
     evidence.checkpoint("on-map-browser")
-    pages.browser.close()
+    pages.browser.close_map()
     pages.details.expect_header(expected(job.title_line), SERVER)
 
 

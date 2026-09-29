@@ -40,7 +40,7 @@ class JobDetailsPage(BasePage):
         """The description shows ``text`` — every line, in order (one element, recon 5)."""
         first = text.split("\n")[0]
         with allure.step("expect job-details.description = the whole description"):
-            shown = self.visible("description", timeout, text=first).get_attribute("name") or ""
+            shown = self.label_of(self.visible("description", timeout, text=first))
             assert normalized(shown) == normalized(text), f"description is {shown!r}"
 
     def timer_seconds(self, timeout: float = TIMER_READ) -> int:
@@ -51,7 +51,7 @@ class JobDetailsPage(BasePage):
 
         def clean(_driver) -> tuple[int, int, int] | None:
             found = self.driver.find_elements(*self.locator("timer"))
-            name = (found[0].get_attribute("name") or "") if found else ""
+            name = self.label_of(found[0]) if found else ""
             seen.append(name)
             match = TIMER.fullmatch(name.replace("\n", ""))
             return tuple(int(g) for g in match.groups()) if match else None

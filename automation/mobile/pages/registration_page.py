@@ -49,7 +49,7 @@ class RegistrationPage(BasePage):
 
         The button's name is "United States + 1\\n+ 1": the spoken label, then what is drawn.
         """
-        name = self.visible("phone-prefix").get_attribute("name") or ""
+        name = self.label_of(self.visible("phone-prefix"))
         return name.splitlines()[-1].replace(" ", "")
 
     # --- notification channel -----------------------------------------------------------
@@ -83,7 +83,7 @@ class RegistrationPage(BasePage):
     def selected_channel(self) -> str | None:
         self.scroll_to("channel-options")
         for channel, element in self._radios().items():
-            if str(element.get_attribute("value") or "") == "1":
+            if self.is_on(element):
                 return channel
         return None
 

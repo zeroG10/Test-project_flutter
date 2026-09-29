@@ -36,13 +36,13 @@ class ProfilePage(BasePage):
     screen = PROFILE
 
     def card(self, timeout: float | None = None) -> Card:
-        lines = (self.visible("card", timeout).get_attribute("name") or "").split("\n")
+        lines = self.label_of(self.visible("card", timeout)).split("\n")
         lines += [""] * (3 - len(lines))
         return Card(*lines[:3])
 
     def theme(self) -> str:
         """'Auto' / 'Light' / 'Dark' from 'App theme (<mode>)'."""
-        label = self.visible("theme", 5).get_attribute("name") or ""
+        label = self.label_of(self.visible("theme", 5))
         return label.removeprefix("App theme (").removesuffix(")")
 
     def set_theme(self, mode: str) -> None:

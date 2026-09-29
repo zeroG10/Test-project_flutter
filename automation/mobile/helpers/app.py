@@ -15,14 +15,56 @@ Clearing data = signing out, on both OSes:
 
 import contextlib
 import subprocess
+import tempfile
+import threading
 import time
 from collections.abc import Iterator
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import allure
 from appium.webdriver.webdriver import WebDriver
 
 from config.settings import normalize_platform, settings
+from helpers.android.device import Adb
+
+# Android runtime permissions a fresh install gets from autoGrantPermissions; ``pm clear`` revokes
+# them, and the app then asks after sign-in (notifications) and at check-in (location) — prompts
+# the iOS path answers with autoAcceptAlerts. Tests of a prompt revoke it themselves.
+ANDROID_GRANTS = (
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.ACCESS_FINE_LOCATION",
+    "android.permission.ACCESS_COARSE_LOCATION",
+)
+
+
+class _GpsFeed:
+    """Keeps the emulator's GPS at the last ``set_location`` point: one ``geo fix`` is a single
+    reading, and the app asks for a FRESH fix at check-in — without one in time it offers manual
+    entry (recon A1). A daemon thread repeats the point every second for the whole run."""
+
+    def __init__(self, adb: Adb):
+        self.adb, self.point, self.lock = adb, None, threading.Lock()
+        self.thread = threading.Thread(target=self._run, name="gps-feed", daemon=True)
+        self.thread.start()
+
+    def set(self, point: tuple[float, float] | None) -> None:
+        with self.lock:
+            self.point = point
+        if point is not None:
+            self.adb.geo_fix(*point)
+
+    def _run(self) -> None:
+        while True:
+            with self.lock:
+                point = self.point
+            if point is not None:
+                with contextlib.suppress(Exception):
+                    self.adb.geo_fix(*point)
+            time.sleep(1.0)
+
+
+_FEEDS: dict[str, _GpsFeed] = {}
 
 
 class AppControl:
@@ -68,6 +110,12 @@ class AppControl:
                 self._first_launch()
                 return
             self.driver.execute_script("mobile: clearApp", {"appId": self.app_id})
+            # pm clear revokes the runtime permissions — grant them again, as a fresh install
+            # with autoGrantPermissions has them (the iOS path accepts its prompts instead).
+            adb = Adb.of(self.driver)
+            for permission in ANDROID_GRANTS:
+                with contextlib.suppress(Exception):
+                    adb.grant(self.app_id, permission)
 
     FIRST_LAUNCH_WAIT = 10.0  # seconds for the notification prompt of a fresh install
 
@@ -133,7 +181,9 @@ class AppControl:
         """The device's location (iOS simulator: ``simctl location set``; Android: geo fix)."""
         with allure.step(f"device location → {latitude:.6f}, {longitude:.6f}"):
             if self.platform == "android":
-                self.driver.set_location(latitude, longitude, 0)
+                adb = Adb.of(self.driver)
+                feed = _FEEDS.setdefault(adb.udid or "default", _GpsFeed(adb))
+                feed.set((latitude, longitude))
                 return
             self._simctl("location", "{udid}", "set", f"{latitude},{longitude}")
 
@@ -167,10 +217,39 @@ class AppControl:
             if read.stdout.strip() != ("1" if allowed else "0"):
                 raise RuntimeError(f"mock-location switch not written: {read.stdout!r}")
 
+    def mock_location(self, latitude: float, longitude: float):
+        """Android: a MOCKED location for the block (Appium Settings as the mock provider) — the
+        app's guard must refuse it (owner, Q-CHIO-A1). The GPS feed pauses meanwhile."""
+        adb = Adb.of(self.driver)
+        feed = _FEEDS.get(adb.udid or "default")
+
+        @contextlib.contextmanager
+        def block() -> Iterator[None]:
+            if feed is not None:
+                feed.set(None)
+            try:
+                with adb.mock_location(latitude, longitude):
+                    yield
+            finally:
+                if feed is not None:
+                    feed.set((latitude, longitude))
+
+        return block()
+
+    ANDROID_PREFS = "shared_prefs/FlutterSharedPreferences.xml"
+
     def reset_theme(self) -> None:
         """App theme back to Auto (the app's ``theme_mode`` preference = 'system'), written while
-        the app is closed — the undo of a theme test that failed half way (module 12). iOS only
-        for now: the Android stage adds its own."""
+        the app is closed — the undo of a theme test that failed half way (module 12). Android:
+        the same key in the app's shared preferences, edited with ``run-as`` (debug build)."""
+        if self.platform == "android":
+            with allure.step("app: theme preference → Auto (system)"):
+                self.terminate()
+                adb = Adb.of(self.driver)
+                with contextlib.suppress(Exception):  # no file yet = the default (Auto)
+                    adb.run_as(self.app_id, f"sed -i -E 's#(<string name=\"{self.THEME_KEY}\">)"
+                                            f"[^<]*#\\1system#' {self.ANDROID_PREFS}")  # fmt: skip
+            return
         if self.platform != "ios":
             return
         with allure.step("app: theme preference → Auto (system)"):
@@ -182,9 +261,27 @@ class AppControl:
 
     def add_media(self, *paths: Path) -> None:
         """Put photos into the device gallery; the last one becomes the newest (iOS simulator:
-        ``simctl addmedia``). Android: the Android stage adds its own (adb push + media scan)."""
+        ``simctl addmedia``). Android: adb push + media scan; the Photo picker orders by the
+        EXIF date taken, so each copy is stamped now + its position (the last one newest)."""
+        if self.platform == "android":
+            from PIL import Image
+
+            with allure.step(f"device gallery: add {', '.join(p.name for p in paths)}"):
+                now, tmp = datetime.now(), Path(tempfile.mkdtemp(prefix="qa-media-"))
+                stamped = []
+                for i, path in enumerate(paths):
+                    image = Image.open(path)
+                    exif = image.getexif()
+                    taken = (now + timedelta(seconds=i)).strftime("%Y:%m:%d %H:%M:%S")
+                    exif[0x0132] = taken  # DateTime
+                    exif.get_ifd(0x8769)[0x9003] = taken  # DateTimeOriginal
+                    target = tmp / f"qa-{now:%H%M%S}-{i}-{path.name}"
+                    image.save(target, exif=exif, quality=95)
+                    stamped.append(target)
+                Adb.of(self.driver).push_media(*stamped)
+            return
         if self.platform != "ios":
-            raise NotImplementedError("add_media: iOS simulator only for now")
+            raise NotImplementedError(f"add_media: {self.platform}")
         with allure.step(f"device gallery: add {', '.join(p.name for p in paths)}"):
             self._simctl("addmedia", "{udid}", *(str(p) for p in paths))
 

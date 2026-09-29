@@ -304,6 +304,13 @@ class BasePage:
             return element.get_attribute("content-desc") or element.get_attribute("text") or ""
         return element.get_attribute("name") or ""
 
+    def is_on(self, element: WebElement) -> bool:
+        """A switch / radio / checkbox / chip is on: iOS ``value == "1"``; Android ``checked``
+        (checkable elements) or ``selected``."""
+        if self.platform == "android":
+            return "true" in (element.get_attribute("checked"), element.get_attribute("selected"))
+        return str(element.get_attribute("value") or "") == "1"
+
     def field_value(self, element: WebElement) -> str:
         """Typed text of an input: iOS ``value``; Android ``text`` (``value`` does not exist
         there — UiAutomator2 raises UnknownMethodException)."""

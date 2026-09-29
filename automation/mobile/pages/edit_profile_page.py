@@ -22,7 +22,7 @@ class EditProfilePage(BasePage):
 
     def field(self, alias: str) -> str:
         """The text of a name field (``value``) or of a disabled field."""
-        return str(self.visible(alias, 5).get_attribute("value") or "")
+        return self.field_value(self.visible(alias, 5))
 
     def is_enabled(self, alias: str) -> bool:
         return self.visible(alias, 5).get_attribute("enabled") == "true"

@@ -38,9 +38,15 @@ def grid_cells(window_width: int, top: int, columns: int = 2, gap: int = 16) -> 
 class AttachmentsPage(BasePage):
     screen = ATTACHMENTS
 
+    @property
+    def _gap(self) -> int:
+        """The grid's spacing: 16 pt on iOS, 42 px on Android (tiles [42,451]–[519,1087] of a
+        1080-px screen, recon A1 — the same 3:4 cells)."""
+        return 42 if self.platform == "android" else 16
+
     def selected_tab(self) -> str:
         """'Documents' or 'Photos' — the label of the tab whose traits contain 'Selected'."""
-        return (self.find("selected-tab").get_attribute("name") or "").split("\n")[0]
+        return self.label_of(self.find("selected-tab")).split("\n")[0]
 
     def expect_selected_tab(self, label: str, timeout: float | None = None) -> None:
         with allure.step(f"expect the selected tab to be {label!r}"):
@@ -54,7 +60,7 @@ class AttachmentsPage(BasePage):
     def tab_names(self) -> list[str]:
         """Names of the tabs, left → right: '<label>\nTab N of M' (recon 5b)."""
         tabs = [e for e in self.driver.find_elements(*self.locator("tabs")) if e.is_displayed()]
-        return [e.get_attribute("name") or "" for e in sorted(tabs, key=lambda e: e.rect["x"])]
+        return [self.label_of(e) for e in sorted(tabs, key=lambda e: e.rect["x"])]
 
     def open_tab(self, label: str) -> None:
         self.tap("tab", text=label)
@@ -66,7 +72,7 @@ class AttachmentsPage(BasePage):
         scale = pixels.Image.open(io.BytesIO(png)).width / width
         tabs = self.find("tab", text="Photos").rect
         top = tabs["y"] + tabs["height"]
-        inks = [pixels.ink_ratio(png, box, scale) for box in grid_cells(width, top)]
+        inks = [pixels.ink_ratio(png, box, scale) for box in grid_cells(width, top, gap=self._gap)]
         allure.attach(png, name=f"photos grid (cell ink {[round(i, 3) for i in inks]})",
                       attachment_type=allure.attachment_type.PNG)  # fmt: skip
         return inks
@@ -86,7 +92,7 @@ class AttachmentsPage(BasePage):
         """Tap the ``index``-th (0-based) cell of the first grid row — cells have no element."""
         width = self.driver.get_window_size()["width"]
         tabs = self.find("tab", text="Photos").rect
-        box = grid_cells(width, tabs["y"] + tabs["height"])[index]
+        box = grid_cells(width, tabs["y"] + tabs["height"], gap=self._gap)[index]
         x, y = round(box["x"] + box["width"] / 2), round(box["y"] + box["height"] / 2)
         with allure.step(f"tap photo cell {index + 1} at ({x}, {y})"):
             self.driver.tap([(x, y)])
