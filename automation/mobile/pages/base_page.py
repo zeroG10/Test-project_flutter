@@ -177,9 +177,13 @@ class BasePage:
     def _send(self, element: WebElement, text: str, per_char: bool) -> None:
         """Type ``text`` into the focused ``element``. ``per_char`` on Android: real key presses
         through the IME — there every ``send_keys`` REPLACES the field's text (ACTION_SET_TEXT),
-        so key-by-key ``send_keys`` would leave only the last character (module 02 run 1)."""
+        so key-by-key ``send_keys`` would leave only the last character (module 02 run 1). One
+        ``mobile: type`` per character: the whole number in one call is a burst the phone
+        formatter drops keys from on a busy emulator ('(20450' for 2025550450, TC-AUTH-014
+        re-run) — the iOS recon 3d problem."""
         if per_char and self.platform == "android":
-            self.driver.execute_script("mobile: type", {"text": text})
+            for char in text:
+                self.driver.execute_script("mobile: type", {"text": char})
             return
         for chunk in text if per_char else (text,):
             element.send_keys(chunk)
