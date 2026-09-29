@@ -159,6 +159,26 @@ class Adb:
                     f"pm set-app-links-user-selection --user 0 --package {package} false {domain}"
                 )
 
+    # --- system notifications ---------------------------------------------------------------
+
+    @contextlib.contextmanager
+    def heads_up_off(self) -> Iterator[None]:
+        """No heads-up pop-ups for the block (notifications still land in the shade); the old
+        value comes back afterwards. A job created through the API pushes "New job assigned",
+        and its pop-up lies over the app bar for seconds — a tap on the calendar toggle landed on
+        it (module 01+03 Android run 4, TC-ORDL-015). The iOS simulator shows no such pop-up."""
+        key = "heads_up_notifications_enabled"
+        before = self.shell(f"settings get global {key}", check=False).strip()
+        self.shell(f"settings put global {key} 0")
+        try:
+            yield
+        finally:
+            with contextlib.suppress(Exception):
+                if before in ("0", "1"):
+                    self.shell(f"settings put global {key} {before}")
+                else:
+                    self.shell(f"settings delete global {key}")
+
     # --- app state ------------------------------------------------------------------------
 
     def run_as(self, package: str, command: str) -> str:

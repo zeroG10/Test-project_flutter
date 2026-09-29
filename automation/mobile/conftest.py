@@ -34,6 +34,7 @@ from appium import webdriver
 
 from config.capabilities import get_capabilities
 from config.settings import normalize_platform, settings
+from helpers.android.device import Adb
 from helpers.evidence import ScreenRecorder
 from helpers.reporting import PLATFORM_TITLE, env_label, module_for, write_allure_run_files
 
@@ -176,7 +177,10 @@ def driver(platform):
             pytrace=False,
         )
     # No implicit wait on purpose: it silently stacks on explicit waits. Use helpers/waits.py.
-    yield drv
+    with contextlib.ExitStack() as device:
+        if platform == "android":  # a pushed "New job assigned" pop-up covers the app bar
+            device.enter_context(Adb.of(drv).heads_up_off())
+        yield drv
     with contextlib.suppress(Exception):
         drv.quit()
 
