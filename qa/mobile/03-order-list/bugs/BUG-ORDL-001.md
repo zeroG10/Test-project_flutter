@@ -27,7 +27,7 @@ Jobs assigned while the app is open appear in the Jobs list after a pull-to-refr
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
-| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
+| Platforms checked | iOS ✓ reproduced · Android ✓ reproduced (Pixel 7 emulator · Android 16, recon A1 2026-09-29; added on the owner's go) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -72,6 +72,8 @@ the jobs refreshes both views.
 
 - [x] Always — **2 of 2 attempts** (recon 4, 2026-09-24, two separate sets of 8 jobs; today and the other day both
   empty each time; the calendar's own pull-to-refresh fixed it in the attempt where it was tried).
+- Android: **1 of 1** (recon A1, 2026-09-29, 5 jobs `QA-AUTO-RA-*` created after login): the Jobs list showed all 5 after
+  its pull-to-refresh, the calendar showed "No jobs" for today; the calendar's own pull-to-refresh brought all 5.
 
 ## Crash? ANR?
 
@@ -84,6 +86,10 @@ the jobs refreshes both views.
 - Screen trees: `qa/shared/recon-dumps/ios-2026-09-24/recon4_calendar_today.xml`, `recon4b_calendar_after_list_refresh.xml`,
   `recon4b_calendar_after_calendar_refresh.xml`.
 - Recon report: [qa/shared/recon-2026-09-24-ios.md](../../../shared/recon-2026-09-24-ios.md), section Order list.
+- Android: [evidence/BUG-ORDL-001/android/](evidence/BUG-ORDL-001/android/) — 1 list after refresh (5 jobs), 2 calendar
+  today "No jobs", 3 calendar after its own refresh (5 jobs). Screen trees:
+  `qa/shared/recon-dumps/android-2026-09-29/jobs_list.xml`, `jobs_calendar.xml`, `jobs_calendar_after_refresh.xml`;
+  recon report [qa/shared/recon-2026-09-29-android.md](../../../shared/recon-2026-09-29-android.md).
 
 ## Workaround
 

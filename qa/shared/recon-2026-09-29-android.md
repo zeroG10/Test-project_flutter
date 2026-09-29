@@ -107,3 +107,12 @@ is required», перехідні «Checking in» і «Successful» (на DEV з
 - Рекомендації до прогонів (крок 4): перед повним прогоном — навантаження Mac < кількості ядер; закрити Системні
   параметри → Сховище, важкі застосунки; за бажанням власника — виключити `~/.gradle` і `~/Library/Android` з
   індексування Spotlight. Збірка profile / release — лише від команди розробки (ключ замовника); лишаємо debug.
+
+## Доповнення: SMS із посиланням на емуляторі (після відповіді власника, 2026-09-29)
+
+`adb emu sms send 5550199 "… <посилання>"` → SMS у Google Messages (перший запуск — «Use Messages without an account»);
+`pm set-app-links-user-selection --user 0 --package com.concerttechnologies.app.dev true copsfieldservices.dev.concerttech.com`
+(так користувач дозволяє апці відкривати посилання) → тап по посиланню в SMS → **апка** → «Link expired» (невалідний ключ,
+17 с разом зі стартом апки). Дозвіл після проби повернуто. Для тестів посилань на Android (крок 5): посилання з
+`POST /job/assign/{phone}` → SMS на емуляторі → тап у Messages. Перевірка App Links (домен ↔ підпис) — лише на збірці
+замовника (на проді працює, власник).
