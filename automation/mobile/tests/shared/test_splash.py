@@ -60,7 +60,7 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
     driver.update_settings({"waitForIdleTimeout": 0})  # return from launch before the app idles
     try:
         app.launch()
-        splash.expect_shown("first frame after launch")
+        splash.expect_shown_after_system_splash()  # iOS: the first frame (unchanged)
         splash.expect_no_interactive_elements()
         splash.tap_centre()
         pages.welcome.go_back()  # iOS: edge swipe

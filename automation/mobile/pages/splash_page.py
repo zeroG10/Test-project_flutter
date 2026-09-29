@@ -9,6 +9,7 @@ A check that can no longer be observed because the splash has already gone raise
 ``SplashMissed`` — the test turns it into Blocked (timing), never into Passed.
 """
 
+import time
 import xml.etree.ElementTree as ET
 
 import allure
@@ -46,6 +47,28 @@ class SplashPage(BasePage):
         if share < SPLASH_SHARE:
             raise SplashMissed(f"{label}: brand colour covers {share:.3f} of the screen")
         return png
+
+    def expect_shown_after_system_splash(self, timeout: float = 10.0) -> bytes:
+        """Android 12+ first shows the SYSTEM splash (white, the app icon, ~3 s — recon A1), then
+        the app's own brand-colour splash (owner, Q-SPL-A1: the check is the brand splash after
+        the system one). Waits for the first brand frame; iOS: the first captured frame."""
+        if self.platform != "android":
+            return self.expect_shown("first frame after launch")
+        start = time.monotonic()
+        while True:
+            png, share = self._frame()
+            if share >= SPLASH_SHARE:
+                waited = time.monotonic() - start
+                allure.attach(png, name=f"first brand-colour frame after {waited:.1f}s of the "
+                              f"system splash (brand colour {share:.3f})",
+                              attachment_type=allure.attachment_type.PNG)  # fmt: skip
+                return png
+            if time.monotonic() - start > timeout:
+                allure.attach(png, name=f"no brand-colour frame within {timeout:.0f}s "
+                              f"(brand colour {share:.3f})",
+                              attachment_type=allure.attachment_type.PNG)  # fmt: skip
+                raise SplashMissed(f"no brand-colour frame within {timeout:.0f}s of the launch")
+            time.sleep(0.2)
 
     def expect_no_interactive_elements(self) -> None:
         """No text, button, link, field or switch in the tree — and the splash still on screen
