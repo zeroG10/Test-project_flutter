@@ -5,6 +5,12 @@ splash is up the tree holds **no** text, button or field at all — there is not
 locator to. The splash is decided by pixels (brand colour #782A2A of Figma `Spalsh` 2451:82537,
 the white logo) in pages/splash_page.py; the only entries here are the application itself and
 the element kinds that must be absent (CHK-SPL-005).
+
+Android (recon A1, 2026-09-29, D-SPL-A1): a **system** splash (Android 12+, white, ≈ 3 s) shows
+first, then the same Flutter brand splash. No dump exists for either — both are transient and,
+like on iOS, the tree is unreadable/empty while they are up; no Android recon dumps directory
+holds a splash tree. SplashPage decides "shown" by pixels on both platforms (unchanged), so
+no locator is needed here — see ANDROID_WITHOUT below.
 """
 
 from appium.webdriver.common.appiumby import AppiumBy
@@ -33,3 +39,12 @@ SPLASH = Screen(
         ),
     },
 )
+
+ANDROID_WITHOUT = {
+    "splash.root": "no Android recon dump of the splash exists (system splash + brief Flutter "
+    "brand splash, both transient); SplashPage decides 'shown' by pixels on both platforms, "
+    "same as iOS — no locator needed (D-SPL-A1, owner 2026-09-29)",
+    "splash.interactive": "same as splash.root — 'no interactive element' is decided by pixels "
+    "(brand-colour share), not by counting tree nodes, on Android too; no dump to verify a "
+    "structural locator against",
+}
