@@ -64,9 +64,9 @@ still holds it. The deletion never reaches the server.
 
 ## Actual result
 
-- The app shows "No photos have been added yet" // [screenshot](evidence/BUG-PHR-001/app-photo-report-empty.png).
+- The app shows "No photos have been added yet" // [screenshot](evidence/BUG-PHR-001/ios/app-photo-report-empty.png).
 - The job on the server still has the deleted photo in `photos` (id, file location)
-  // [server log](evidence/BUG-PHR-001/server-job-photos.md), step 5.
+  // [server log](evidence/BUG-PHR-001/ios/server-job-photos.md), step 5.
 
 ## Expected result
 

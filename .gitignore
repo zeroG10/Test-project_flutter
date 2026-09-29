@@ -35,6 +35,8 @@ allure-results-*/
 allure-report/
 # local summary page — shows the client's app, published only on the owner's command
 automation/mobile/reports/
+# Allure results of every run, per platform: results/<ios|android>/<date>-<name>/ (scripts/run.sh)
+automation/mobile/results/
 automation/mobile/results.xml
 automation/mobile/builds/*
 !automation/mobile/builds/.gitkeep

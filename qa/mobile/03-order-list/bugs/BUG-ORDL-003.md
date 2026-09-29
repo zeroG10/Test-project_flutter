@@ -32,6 +32,7 @@ after the calendar itself is refreshed or the app is restarted.
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
+| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -65,7 +66,7 @@ after the calendar itself is refreshed or the app is restarted.
 After step 5 the card still shows the red "Updated" banner, although the server reports the job as viewed
 (`GET /job/{id}`: `isViewed=True`, `updatedAt=2026-09-24T07:45:23.953Z` — the moment of step 3; the list refresh in
 step 5 started at 07:45:26, UTC).
-// [1-list-after-viewing-still-updated.png](evidence/BUG-ORDL-003/1-list-after-viewing-still-updated.png)
+// [1-list-after-viewing-still-updated.png](evidence/BUG-ORDL-003/ios/1-list-after-viewing-still-updated.png)
 
 ## Expected result
 
@@ -85,7 +86,7 @@ longer "Updated": the card in the list (and in the calendar) shows no banner.
 
 ## Evidence
 
-1. Screenshot after step 5: [evidence/BUG-ORDL-003/1-list-after-viewing-still-updated.png](evidence/BUG-ORDL-003/1-list-after-viewing-still-updated.png)
+1. Screenshot after step 5: [evidence/BUG-ORDL-003/ios/1-list-after-viewing-still-updated.png](evidence/BUG-ORDL-003/ios/1-list-after-viewing-still-updated.png)
    (test jobs only, no personal data).
 2. Server state after step 5 (attached to the run report): `isViewed=True updatedAt=2026-09-24T07:45:23.953Z`.
 3. Step timeline from the run report (UTC): details opened 07:45:23.25–24.31; back 07:45:24.31; list refresh

@@ -79,7 +79,7 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 
 - **The CHK-ORDP rows above are not stale.** CHK-ORDP-019…028, -038, -039 and -041 belong to the module 06 checklist; module 06
   handed them over here. Their verdicts are traced in
-  [order-progress-traceability.md](../06-order-progress/order-progress-traceability.md), built from module 06 run 3 plus
+  [order-progress-traceability.md](../../06-order-progress/ios/order-progress-traceability.md), built from module 06 run 3 plus
   this run.
 - **Blocked: CHK-DLV-020** (and CHK-ORDP-026, -027), from TC-DLV-004.
   - Why: DEV answers `POST /job/{id}/submit` with 500, although the submission is recorded. The cause is COPS; the owner,

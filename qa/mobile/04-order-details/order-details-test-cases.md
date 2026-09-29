@@ -19,7 +19,7 @@
 | Owner | @mykola.zhuchenko |
 | Last updated | 2026-09-24 |
 
-Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — results go to `order-details-traceability.md`
+Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — results go to `ios/` / `android/order-details-traceability.md`
 (via `trace_results.py`), never into this file.
 
 **Conventions used in this file** (as modules 01–03)

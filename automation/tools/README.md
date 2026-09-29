@@ -7,8 +7,8 @@ chain described in [`automation/README.md`](../README.md):
 |---|---|---|---|
 | `sync_checklist_to_sheets.py` | 0 → Sheet | checklist `.md` → Google Sheet | the team Sheet (**the only Sheets writer in this repo**) |
 | `import_checklist_from_sheets.py` | Sheet → 0 (one-time) | Google Sheet → per-feature checklist `.md` | markdown under `qa/web/<NN-slug>/` — **reads** Sheets, never writes them |
-| `trace_results.py` | 4 (closure) | run results → checklist IDs | one markdown report, by convention `qa/{web,mobile}/<NN-module>/<module>-traceability.md` — never Sheets |
-| `build_summary.py` | 4 (report) | one mobile run → report site: summary, a page per module and per defect | local `automation/mobile/reports/summary/` (gitignored) — publishing is an owner call |
+| `trace_results.py` | 4 (closure) | run results → checklist IDs | one markdown report, by convention `qa/web/<NN-module>/<module>-traceability.md`, mobile per platform `qa/mobile/<NN-module>/{ios,android}/<module>-traceability.md` — never Sheets |
+| `build_summary.py` | 4 (report) | one mobile run → report site: summary, a page per module and per defect | local `automation/mobile/reports/<platform>/summary/` (gitignored) — publishing is an owner call |
 
 All of them honour the QA Doctrine in `CLAUDE.md`: no result is ever upgraded to
 Passed by a tool, a skip is Blocked, an empty run is not a passing run.
@@ -259,7 +259,7 @@ product) so the two read alike:
 - `index.html` — the verdict (*No unexpected failures* only when every red test is a filed
   defect's regression check), KPIs, one phone screen per module, coverage by module, what needs
   a decision, open defects with the checks each holds red, what could not run and why, why
-  checks are not automated (kinds from `qa/mobile/not-automated-ios.md`), stability over the
+  checks are not automated (kinds from `qa/mobile/<platform>/not-automated.md`), stability over the
   history runs, delivery pace from git, technical detail;
 - `<NN-module>.html` — every check with its verdict, the test that proved it
   (`test_x.py:line`) and the screens that test saved; every test with its steps;
@@ -273,12 +273,12 @@ over the results; writes only `--out-dir`.
 
 ```bash
 uv run python build_summary.py \
-  --allure-dir ../mobile/allure-results-stable-3 \
+  --platform ios --allure-dir ../mobile/results/ios/stable-3 \
   --checklist ../../qa/mobile/01-splash/splash-checklist.md ...        # one per module \
-  --history-dir ../mobile/allure-results-stable-1 ...                  # earlier full runs, oldest first \
+  --history-dir ../mobile/results/ios/stable-1 ...                       # earlier full runs, oldest first \
   --target "iOS simulator · iPhone 17 · iOS 26.5" --run-label "…" \
   [--note "…"] [--decision "…"] [--history-note "…"] \
-  [--public --redact-boxes boxes.json --redact-text-env QA_FIRST] [--out-dir ../mobile/reports/summary]
+  [--public --redact-boxes boxes.json --redact-text-env QA_FIRST] [--out-dir ../mobile/reports/ios/summary]
 ```
 
 | Option | Meaning |
@@ -286,14 +286,15 @@ uv run python build_summary.py \
 | `--allure-dir DIR` | allure `*-result.json` of **one clean run** (required); empty → exit 2, Blocked |
 | `--checklist MD` | repeat per module (required); a module page per `qa/mobile/<NN-module>/` folder |
 | `--history-dir DIR` | earlier full runs, oldest first — the run history table and the "same verdicts N runs in a row" line |
-| `--reasons MD` | why checks have no test (default `qa/mobile/not-automated-ios.md`); a check with no row shows "reason missing" |
+| `--platform ios\|android` | whose records the page cites and the defaults below (default `ios`); results of each platform live in `automation/mobile/results/<platform>/<run>/` |
+| `--reasons MD` | why checks have no test (default `qa/mobile/<platform>/not-automated.md`); a check with no row shows "reason missing" |
 | `--target`, `--run-label` | the device and what was run, as the page names them |
 | `--note` / `--decision` / `--history-note` | lines under *Scope of this run* / *What needs a decision* / the history table |
 | `--manual-minutes-per-check N` | owner's estimate; omitted → not shown |
 | `--public` | the copy that may leave this machine: no text attachments (API bodies, page sources), no videos |
 | `--redact-env`, `--redact-text-env NAME`, `--redact-boxes JSON` | hide the test account in text (values never printed) and pixelate boxes on the screens |
 | `--no-git` | skip the delivery-pace chart |
-| `--out-dir DIR` | default `automation/mobile/reports/summary/` (gitignored) |
+| `--out-dir DIR` | default `automation/mobile/reports/<platform>/summary/` (gitignored) |
 
 The pages show screenshots of the client's app — they stay local; publishing is an owner
 call, and only the `--public` build is published. For an artifact publish the main page is
@@ -364,8 +365,9 @@ report and makes the exit code `1` (report still written); `2` is a usage
 error.
 
 The report lands next to the checklist it closes, by convention
-`qa/{web,mobile}/<NN-module>/<module>-traceability.md` (for `api` / shared
-checklists pick a path under `qa/shared/checklists/`). `--out` is always
+`qa/web/<NN-module>/<module>-traceability.md`; mobile keeps one per platform in
+`qa/mobile/<NN-module>/{ios,android}/` (for `api` / shared checklists pick a path under
+`qa/shared/checklists/`). `--out` is always
 explicit and the file is overwritten on every run. Automated verdicts are
 copied into the team Sheet by a human, if at all — this script will not do it.
 

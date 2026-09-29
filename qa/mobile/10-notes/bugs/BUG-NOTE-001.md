@@ -71,8 +71,8 @@ The Notes screen shows the technician's notes correctly, but the job on the serv
 
 - After step 3 the server holds only "Note two".
 - After step 4 the server still holds "Note two", not the edited text.
-- After step 6 the app shows "No notes have been added yet" // [screenshot](evidence/BUG-NOTE-001/app-notes-empty.png), and the
-  server still holds "Note two" // [server log](evidence/BUG-NOTE-001/server-job-notes.md).
+- After step 6 the app shows "No notes have been added yet" // [screenshot](evidence/BUG-NOTE-001/ios/app-notes-empty.png), and the
+  server still holds "Note two" // [server log](evidence/BUG-NOTE-001/ios/server-job-notes.md).
 
 ## Expected result
 

@@ -18,7 +18,7 @@
 | Owner | @mykola.zhuchenko |
 | Last updated | 2026-09-23 |
 
-Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — results go to `order-list-traceability.md`
+Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — results go to `ios/` / `android/order-list-traceability.md`
 (via `trace_results.py`), never into this file.
 
 **Conventions used in this file** (as in the Auth test cases)

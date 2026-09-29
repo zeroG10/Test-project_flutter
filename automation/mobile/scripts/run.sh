@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# One named test run per platform, its results kept apart from every other run.
+#
+#   scripts/run.sh <ios|android> <name> [pytest args...]
+#   scripts/run.sh android 02-auth tests/shared/test_authentication.py
+#   EVIDENCE_VIDEO=auto scripts/run.sh ios final-1
+#
+# Writes Allure results to results/<platform>/<YYYY-MM-DD>-<name>/ (gitignored) plus RUN_INFO.txt
+# (harness commit, command, start / end, exit code) — the run context trace_results.py and
+# build_summary.py report. Refuses:
+#   - a results folder that already exists (a run is never overwritten or mixed with another);
+#   - uncommitted changes to tracked files (owner rule: commit before every run) — ALLOW_DIRTY=1
+#     overrides for a throwaway debug run, and RUN_INFO.txt then says the tree was dirty;
+#   - a second run while one is going (one device, one shared DEV test account — never two runs,
+#     never iOS and Android side by side).
+# A plain `uv run pytest` without this script writes to results/_scratch/ (pyproject.toml).
+set -euo pipefail
+
+MOBILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+usage() { echo "usage: $0 <ios|android> <name> [pytest args...]" >&2; exit 2; }
+
+[ $# -ge 2 ] || usage
+PLATFORM="$1"
+NAME="$2"
+shift 2
+case "$PLATFORM" in ios|android) ;; *) usage ;; esac
+[[ "$NAME" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo "name: lower-case letters, digits and '-' only" >&2; exit 2; }
+
+cd "$MOBILE_DIR"
+OUT="results/$PLATFORM/$(date +%Y-%m-%d)-$NAME"
+if [ -e "$OUT" ]; then
+  echo "refused: $OUT already exists — pick another name; a run is never overwritten" >&2
+  exit 3
+fi
+
+DIRTY="no"
+if ! git diff --quiet HEAD -- 2>/dev/null; then
+  if [ "${ALLOW_DIRTY:-0}" != "1" ]; then
+    echo "refused: uncommitted changes to tracked files — commit before the run (or ALLOW_DIRTY=1 for a debug run)" >&2
+    git status --short --untracked-files=no >&2
+    exit 3
+  fi
+  DIRTY="yes (ALLOW_DIRTY=1)"
+fi
+
+LOCK="results/.run.lock"
+mkdir -p "results/$PLATFORM"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  echo "refused: another run holds $LOCK ($(cat "$LOCK/owner" 2>/dev/null || echo unknown)) — runs go one at a time" >&2
+  exit 3
+fi
+echo "$PLATFORM $NAME pid $$" > "$LOCK/owner"
+
+# RUN_INFO.txt is written when the run ends (also on Ctrl-C): pytest's --clean-alluredir
+# (pyproject.toml) empties the results folder when the run starts.
+STARTED="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+CODE="interrupted"
+finish() {
+  if [ -d "$OUT" ]; then
+    {
+      echo "platform:  $PLATFORM"
+      echo "name:      $NAME"
+      echo "harness:   $(git rev-parse --short HEAD) on $(git rev-parse --abbrev-ref HEAD)"
+      echo "dirty:     $DIRTY"
+      echo "command:   uv run pytest --platform=$PLATFORM --alluredir=$OUT $ARGS"
+      echo "video:     EVIDENCE_VIDEO=${EVIDENCE_VIDEO:-<default>}"
+      echo "started:   $STARTED"
+      echo "finished:  $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      echo "exit code: $CODE"
+    } > "$OUT/RUN_INFO.txt"
+  fi
+  rm -rf "$LOCK"
+}
+ARGS="$*"
+trap finish EXIT
+mkdir -p "$OUT"
+
+set +e
+uv run pytest --platform="$PLATFORM" --alluredir="$OUT" "$@"
+CODE=$?
+set -e
+echo "results: $OUT (exit $CODE)"
+exit "$CODE"

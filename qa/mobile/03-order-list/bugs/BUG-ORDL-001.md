@@ -27,6 +27,7 @@ Jobs assigned while the app is open appear in the Jobs list after a pull-to-refr
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
+| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -58,9 +59,9 @@ Jobs assigned while the app is open appear in the Jobs list after a pull-to-refr
 
 After step 1 the list shows the new jobs. In the calendar, today and the other day both show "No jobs". Only a
 pull-to-refresh inside the calendar (or a restart) brings the jobs into the calendar.
-// [1-list-after-refresh-shows-jobs.png](evidence/BUG-ORDL-001/1-list-after-refresh-shows-jobs.png),
-[2-calendar-today-no-jobs.png](evidence/BUG-ORDL-001/2-calendar-today-no-jobs.png),
-[3-calendar-after-its-own-refresh.png](evidence/BUG-ORDL-001/3-calendar-after-its-own-refresh.png)
+// [1-list-after-refresh-shows-jobs.png](evidence/BUG-ORDL-001/ios/1-list-after-refresh-shows-jobs.png),
+[2-calendar-today-no-jobs.png](evidence/BUG-ORDL-001/ios/2-calendar-today-no-jobs.png),
+[3-calendar-after-its-own-refresh.png](evidence/BUG-ORDL-001/ios/3-calendar-after-its-own-refresh.png)
 
 ## Expected result
 
@@ -78,7 +79,7 @@ the jobs refreshes both views.
 
 ## Evidence
 
-- Screenshots: [evidence/BUG-ORDL-001/](evidence/BUG-ORDL-001/) — 1 and 2 from the first attempt, 3 from the second
+- Screenshots: [evidence/BUG-ORDL-001/ios/](evidence/BUG-ORDL-001/ios/) — 1 and 2 from the first attempt, 3 from the second
   (different job ids, same steps). Test jobs only (`QA-AUTO-R4-*`).
 - Screen trees: `qa/shared/recon-dumps/ios-2026-09-24/recon4_calendar_today.xml`, `recon4b_calendar_after_list_refresh.xml`,
   `recon4b_calendar_after_calendar_refresh.xml`.

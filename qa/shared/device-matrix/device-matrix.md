@@ -15,8 +15,10 @@ What we **actually test on**, with priorities. Derived from [docs/platform-specs
 
 ---
 
-> **Concert Technologies, демо (рішення 2026-09-23):** автоматизація ганяється на двох
-> конфігураціях — **iPhone 17 / iOS 26.5** (симулятор) і **Pixel 7 / API 35** (емулятор).
+> **Concert Technologies, демо (рішення 2026-09-23; Android уточнено 2026-09-29):** автоматизація ганяється на двох
+> конфігураціях — **iPhone 17 / iOS 26.5** (симулятор) і **Pixel 7 / Android 16 (API 36)** (емулятор, Google APIs arm64,
+> 4 ГБ пам'яті; апка зібрана під targetSdk 36). `Pixel_7_API_35` — лише коротка перевірка сумісності наприкінці, за
+> бажанням власника.
 > Решта рядків нижче — шаблонні орієнтири, у демо не проганяються. Планшети поза скоупом.
 
 ## iOS
@@ -34,7 +36,8 @@ What we **actually test on**, with priorities. Derived from [docs/platform-specs
 
 | Device | OS | API | Screen | Form factor | Priority | Where tested | Notes |
 |---|---|---|---|---|---|---|---|
-| **Pixel 7** | **15** | **35** | 6.3" | Standard | **P0** | Emulator | **Ціль автоматизації (демо)** |
+| **Pixel 7** | **16** | **36** | 6.3" | Standard | **P0** | Emulator (AVD `Pixel_7_API_36`, Google APIs arm64, 4 GB) | **Ціль автоматизації (демо)** |
+| Pixel 7 | 15 | 35 | 6.3" | Standard | P2 | Emulator (AVD `Pixel_7_API_35`) | Сумісність наприкінці — за бажанням власника |
 | Samsung Galaxy S23 | 14 | 34 | 6.1" | Standard | P0 | Real device | OneUI quirks |
 | Pixel 6a | 13 | 33 | 6.1" | Mid-range | P1 | Emulator | Mid-range perf |
 | Pixel 4a | 13 | 33 | 5.8" | Small + older | P1 | Emulator | Lowest supported screen + OS |

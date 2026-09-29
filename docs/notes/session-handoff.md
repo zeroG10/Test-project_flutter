@@ -52,7 +52,7 @@ recon Registration/SMS Terms зроблено (recon 3c; Q-A1…A4 закрит�
 | 6 | Тести Auth (`tests/shared/test_authentication.py`) + доведений червоний + рев'ю | ✅ 31 тест (14 TC); прогін 2: 30 passed, 1 failed (D-15); матриця `authentication-traceability.md`; рев'ю `_bmad-output/test-artifacts/test-reviews/mobile/` (§3г) |
 | 6a | Auth: RTM (prompt 04) + рев'ю покриття (prompt 05) | ✅ `authentication-rtm.md`, `authentication-coverage-review.md` (§3е) |
 | **6b** | **Решта модулів на iOS** (01, 03–12) — по одному: імпорт чекліста → план → тест-кейси (власник валідує) → recon → карти → тести → доведений червоний → трасування | ✅ **01, 03–12 протрасовано на iOS** (§3з…§3с); далі — фінальний прогін iOS (6c) |
-| 6c | Фінальний прогін усієї апки на iOS + фінальні звіти (Allure, матриця по всіх модулях, зведена сторінка), 3 стабільні прогони | ✅ §3т — 3 однакові прогони на `7015c46`; `qa/mobile/final-traceability-ios.md` |
+| 6c | Фінальний прогін усієї апки на iOS + фінальні звіти (Allure, матриця по всіх модулях, зведена сторінка), 3 стабільні прогони | ✅ §3т — 3 однакові прогони на `7015c46`; `qa/mobile/ios/final-traceability.md` |
 | 7 | Android (після всього iOS — рішення власника 2026-09-23) | ⏳ план і рішення — `docs/notes/android-plan.md` (§3у); старт у новій сесії |
 | 8 | Регресійний прогін + звіт (Allure + матриця трасування) | — |
 
@@ -147,7 +147,7 @@ happy flow → валідації); які пункти чеклісту кож�
   виправлено до прогону 2.
 - **Матриця:** `qa/mobile/02-authentication/authentication-traceability.md` — 126 пунктів, 81 автоматизовано, **80 Passed,
   1 Failed (CHK-AUTH-122 → D-15)**, 45 not run (відкладені / ручні / не рекомендовані за планом; CHK-112 — Skipped D-12).
-- **Зведена сторінка:** `automation/mobile/reports/summary/index.html` (локально, gitignored; публікація — лише за командою).
+- **Зведена сторінка:** `automation/mobile/reports/ios/summary/index.html` (локально, gitignored; публікація — лише за командою).
 - **Рев'ю тестів** (`/bmad-testarch-test-review`): **B, 88/100** — детермінізм 79, ізоляція 94, підтримуваність 89,
   швидкодія 91; критичних дефектів у тестах немає; рекомендації — розділити TC-011 за типом рядка, прибрати умовний
   повтор введення після 3 стабільних прогонів.
@@ -167,18 +167,18 @@ happy flow → валідації); які пункти чеклісту кож�
   незареєстрований телефон → загальна помилка, бекенд; хто фіксить — вирішимо), BUG-AUTH-002 (S4, імена обрізаються
   на 50 проти 100 у SRS; ПМ або SRS, або код). Тест BUG-AUTH-001 навмисно лишається червоним — регресійна перевірка.
 - **Як дивитися звіти (локально, на цьому Mac):**
-  - Allure по модулях: `cd automation/mobile && allure generate allure-results -o allure-report --clean && allure open -h 127.0.0.1 -p 5252 allure-report`
+  - Allure по модулях: `cd automation/mobile && allure generate results/ios/<run> -o reports/ios/allure-report --clean && allure open -h 127.0.0.1 -p 5252 reports/ios/allure-report`
     → http://127.0.0.1:5252 (Suites → iOS → «02 · Authentication»; Behaviors → модуль → TC).
-  - Зведена сторінка для ліда: `automation/mobile/reports/summary/index.html` (генерує `automation/tools/build_summary.py`).
+  - Зведена сторінка для ліда: `automation/mobile/reports/ios/summary/index.html` (генерує `automation/tools/build_summary.py`).
   - Матриця трасування: `qa/mobile/<NN-module>/<module>-traceability.md` (генерує `automation/tools/trace_results.py`).
   - **Опубліковано (власник, 2026-09-23; з 2026-09-28 показує повний звіт iOS — §3т): https://claude.ai/artifact/NvRzuhzr418nLAYMZfaf15** — приватна сторінка
     (відкривається лише власнику, поки він сам не поділиться через Share). Оновлювати ТУ САМУ сторінку: у новій сесії —
-    Artifact publish з `url` цього посилання, файл `automation/mobile/reports/summary/page.html` (+ `assets/*` через
-    `files`, `root` = `automation/mobile/reports/summary`). Сторінка має два рівні: зверху для ПМ, нижче **Test details** —
+    Artifact publish з `url` цього посилання, файл `automation/mobile/reports/ios/summary/page.html` (+ `assets/*` через
+    `files`, `root` = `automation/mobile/reports/ios/summary`). Сторінка має два рівні: зверху для ПМ, нижче **Test details** —
     кожен тест розгортається до кроків (setup / test / teardown), скріншотів, відео, відповідей API (замість «сирого» Allure:
     його мініфікований переглядач не публікуємо — не можемо переглянути). Генерація:
     `cd automation/tools && uv run python build_summary.py --allure-dir ../mobile/allure-results --checklist <усі чеклісти>
-    --run-label "…" --redact-boxes ../mobile/reports/redactions-<run>.json` — email/телефон акаунта в тексті ховаються
+    --run-label "…" --redact-boxes ../mobile/reports/ios/redactions-<run>.json` — email/телефон акаунта в тексті ховаються
     автоматично (з `.env`), на скріншотах — за файлом зон. Перед кожною публікацією: email тестового акаунта на
     скріншотах замазати (кадри логіну та OTP) — у харнесі поки немає автоматичного маскування (зробити:
     `evidence.checkpoint(..., hide=[елементи])`); кадри «jobs-list» робити після завантаження списку, не на спінері.
@@ -567,26 +567,26 @@ happy flow → валідації); які пункти чеклісту кож�
   після прогону (лапки в повідомленні зламали команду), проіндексоване дерево було те саме.
   **2 і 3 — такі самі. Серію зараховано: 3 прогони поспіль, 0 тестів з різним вердиктом.**
 - **Підсумкові звіти:**
-  - матриця по всіх модулях — `qa/mobile/final-traceability-ios.md`: 645 перевірок, 462 автоматизовано → **449 Passed,
+  - матриця по всіх модулях — `qa/mobile/ios/final-traceability.md`: 645 перевірок, 462 автоматизовано → **449 Passed,
     6 Failed** (= 5 заведених багів), **7 Blocked** (= 4 погоджені обмеження); таблиця по модулях;
-  - Allure з трендом 3 прогонів — `automation/mobile/allure-report` (gitignored; `allure open automation/mobile/allure-report`);
-  - зведена сторінка — `automation/mobile/reports/summary/index.html` (**локально, повна: з відео й текстовими
+  - Allure з трендом 3 прогонів — `automation/mobile/reports/ios/allure-report` (gitignored; `allure open automation/mobile/reports/ios/allure-report`);
+  - зведена сторінка — `automation/mobile/reports/ios/summary/index.html` (**локально, повна: з відео й текстовими
     вкладеннями**).
 - **Опубліковано (власник, 2026-09-28): https://claude.ai/artifact/EdTpeAfr1wAGm4fxsYBm15** — приватна, поділитися може
   лише власник (Share). **Версія 2 (того ж дня, на прохання власника «по аналогії» зі звітом адмін-панелі
   https://claude.ai/artifact/88jqFKQyhs1iWtsKLWHAnj):** сайт із кількох сторінок —
   - головна: вердикт («No unexpected failures» лише коли кожен червоний тест — регресійна перевірка заведеного бага),
     KPI, по екрану на модуль, покриття по модулях, «What needs a decision», відкриті баги з перевірками, які вони
-    тримають червоними, «Could not run», чому 183 перевірки не автоматизовані (групи з `qa/mobile/not-automated-ios.md`),
+    тримають червоними, «Could not run», чому 183 перевірки не автоматизовані (групи з `qa/mobile/ios/not-automated.md`),
     стабільність (5 повних прогонів, 3 останні однакові), темп з git, технічні деталі;
   - `NN-module.html` — кожна перевірка: вердикт, тест і рядок коду, знімки (натиснути — на весь екран); кожен тест із кроками;
   - `bugs/BUG-*.html` — 6 заведених багів із доказами (чернетки NOT FILED не показуються).
-- **Як перезібрати й оновити:** `zsh automation/mobile/reports/build-public.sh` (gitignored, як і
+- **Як перезібрати й оновити:** `zsh automation/mobile/reports/ios/build-public.sh` (gitignored, як і
   `redactions-stable-3.json` — зони маскування). Ім'я акаунта скрипт читає з API в пам'ять, не друкує й не зберігає.
-  Копія — `automation/mobile/reports/summary-public/`: без текстових вкладень (відповіді API з чужими джобами, дерева
+  Копія — `automation/mobile/reports/ios/summary-public/`: без текстових вкладень (відповіді API з чужими джобами, дерева
   екранів) і відео; email / телефон / ім'я приховано в тексті, на знімках — зони. Перевірка перед публікацією:
   0 збігів з даними акаунта, 0 S3 / токенів / mp4. Оновлювати ТУ САМУ сторінку: Artifact publish з `url` цього
-  посилання, `file_path` = `…/summary-public/page.html`, `root` = `automation/mobile/reports/summary-public`,
+  посилання, `file_path` = `…/summary-public/page.html`, `root` = `automation/mobile/reports/ios/summary-public`,
   `files` = усі файли копії, крім `page.html` та `index.html` (128: сторінки модулів, `bugs/**`, `assets/*`).
   **Стара сторінка пілоту Auth https://claude.ai/artifact/NvRzuhzr418nLAYMZfaf15 — замінена (власник, 2026-09-28):**
   той самий звіт із приміткою зверху («тут був пілот Auth від 23.09»), головна сторінка — `summary-public/page-auth-link.html`

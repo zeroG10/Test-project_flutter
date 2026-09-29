@@ -1,0 +1,1373 @@
+{
+ "attachments": {
+  "anchor": "title",
+  "ios": {
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "document": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == {text}"
+   ],
+   "selected-tab": [
+    "-ios predicate string",
+    "traits CONTAINS 'Selected' AND name CONTAINS 'Tab '"
+   ],
+   "tab": [
+    "-ios predicate string",
+    "name BEGINSWITH {text} AND name CONTAINS 'Tab '"
+   ],
+   "tabs": [
+    "-ios predicate string",
+    "name CONTAINS 'Tab ' AND rect.y < 200"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Attachments'"
+   ]
+  }
+ },
+ "confirm-check": {
+  "anchor": "confirm",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "close": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND (name == nil OR name == '') AND rect.y < 140"
+   ],
+   "confirm": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Confirm'"
+   ],
+   "primary": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "supporting": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == {text}"
+   ]
+  }
+ },
+ "delete-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "delete": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Delete'"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'Are you sure you want to delete account?'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Delete account'"
+   ]
+  }
+ },
+ "deliverable-screen": {
+  "anchor": "back",
+  "ios": {
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "survey-name": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == {text}"
+   ]
+  }
+ },
+ "edit-profile": {
+  "anchor": "title",
+  "ios": {
+   "any-text-field": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField'"
+   ],
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "delete-account": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Delete account'"
+   ],
+   "email": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Email'"
+   ],
+   "first-name": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'First name'"
+   ],
+   "last-name": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Last name'"
+   ],
+   "phone": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Phone number'"
+   ],
+   "save": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Save'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Edit profile'"
+   ]
+  }
+ },
+ "in-app-browser": {
+  "anchor": "close",
+  "ios": {
+   "close": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Close' AND rect.y < 120"
+   ],
+   "loaded": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name CONTAINS 'IsPageLoaded=true'"
+   ],
+   "place": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "url": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'URL'"
+   ]
+  }
+ },
+ "job-details": {
+  "anchor": "root",
+  "ios": {
+   "address": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "any-editable": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' OR type == 'XCUIElementTypeTextView' OR type == 'XCUIElementTypeSecureTextField'"
+   ],
+   "attachments": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Attachments ('"
+   ],
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "check-in": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Check in'"
+   ],
+   "check-out": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Check out'"
+   ],
+   "checking-in": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Checking in'"
+   ],
+   "date": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "deliverable": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == {text}"
+   ],
+   "description": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH {text}"
+   ],
+   "header": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == {text}"
+   ],
+   "images": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage'"
+   ],
+   "location-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Location'"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == {text} AND rect.y > 600"
+   ],
+   "on-map": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'On map'"
+   ],
+   "pf-name": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "pf-phone": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == {text}"
+   ],
+   "pf-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'PF info'"
+   ],
+   "retry": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Retry'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Attachments ('"
+   ],
+   "schedule-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Scheduled date & time'"
+   ],
+   "status": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text} AND rect.y < 160"
+   ],
+   "submit-deliverables": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Submit deliverables'"
+   ],
+   "submitting": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Submitting deliverables'"
+   ],
+   "successful": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Successful'"
+   ],
+   "time": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "timer": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name CONTAINS ':' AND rect.x > 200 AND rect.y < 200"
+   ],
+   "title-line": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ]
+  }
+ },
+ "jobs-calendar": {
+  "anchor": "root",
+  "ios": {
+   "card": [
+    "-ios predicate string",
+    "name CONTAINS {text} AND (type == 'XCUIElementTypeStaticText' OR type == 'XCUIElementTypeImage')"
+   ],
+   "day": [
+    "accessibility id",
+    "{text}"
+   ],
+   "empty-message": [
+    "accessibility id",
+    "Your list of jobs is currently empty. New jobs from your Project Facilitator will appear here."
+   ],
+   "empty-state": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'No jobs'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name MATCHES '^[A-Za-z]+day, [A-Za-z]+ [0-9]+, [0-9]+$'"
+   ],
+   "selected-day-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name MATCHES '^[A-Za-z]+day, [0-9]+ [A-Za-z]+$'"
+   ],
+   "week": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name MATCHES '^[A-Za-z]+day, [A-Za-z]+ [0-9]+, [0-9]+$'"
+   ]
+  }
+ },
+ "jobs-list": {
+  "anchor": "root",
+  "ios": {
+   "card": [
+    "-ios predicate string",
+    "name CONTAINS {text} AND (type == 'XCUIElementTypeStaticText' OR type == 'XCUIElementTypeImage')"
+   ],
+   "empty-image": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND (name == nil OR name == '')"
+   ],
+   "empty-message": [
+    "accessibility id",
+    "Your list of jobs is currently empty. New jobs from your Project Facilitator will appear here."
+   ],
+   "empty-state": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'No jobs'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Jobs list'"
+   ],
+   "view-toggle": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND (name == nil OR name == '') AND rect.y < 140"
+   ]
+  }
+ },
+ "link-expired": {
+  "anchor": "title",
+  "ios": {
+   "message": [
+    "accessibility id",
+    "This link is no longer valid."
+   ],
+   "ok": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'OK'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Link expired'"
+   ]
+  }
+ },
+ "location-disabled": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "go-to-settings": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Go to settings'"
+   ],
+   "message": [
+    "accessibility id",
+    "To use GPS check-in, please enable location services in your device settings. You can still check in manually if you prefer."
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Location disabled'"
+   ]
+  }
+ },
+ "location-prompt": {
+  "anchor": "title",
+  "ios": {
+   "allow-while-using": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Allow While Using App'"
+   ],
+   "dont-allow": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Don' AND name ENDSWITH 'Allow'"
+   ],
+   "message": [
+    "accessibility id",
+    "This app needs your location to verify you are on site when checking in or out of a job."
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name CONTAINS 'to use your location'"
+   ]
+  }
+ },
+ "login": {
+  "anchor": "root",
+  "ios": {
+   "continue": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Continue'"
+   ],
+   "error": [
+    "-ios predicate string",
+    "name == {text}"
+   ],
+   "format-hint": [
+    "accessibility id",
+    "Format: +1234567890 or name@example.com"
+   ],
+   "helper": [
+    "accessibility id",
+    "Enter the email or phone number you used during registration"
+   ],
+   "identifier": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Phone number / Email'"
+   ],
+   "privacy-link": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeLink' AND name == 'Privacy Policy'"
+   ],
+   "root": [
+    "accessibility id",
+    "Good to see you! Let's get you logged in."
+   ],
+   "sign-up-link": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Sign up'"
+   ],
+   "subtitle": [
+    "accessibility id",
+    "Good to see you! Let's get you logged in."
+   ],
+   "terms-link": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeLink' AND name == 'Terms & Conditions'"
+   ],
+   "text-fields": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Log in'"
+   ]
+  }
+ },
+ "logout-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "confirm": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Log out'"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'Are you sure you want to log out?'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Log out'"
+   ]
+  }
+ },
+ "mock-location": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "got-it": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Got it'"
+   ],
+   "message": [
+    "accessibility id",
+    "Your device is reporting a simulated (mock) location, so it cannot be used to verify you are on site. Turn off any mock-location app and try again."
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Location could not be trusted'"
+   ]
+  }
+ },
+ "not-at-site": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "got-it": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Got it'"
+   ],
+   "message": [
+    "accessibility id",
+    "Your GPS location is accurate, but you don't appear to be at the registered job site. Please move to the site to check in."
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'You are not at the job site'"
+   ]
+  }
+ },
+ "note-delete-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "delete": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Delete' AND rect.width < 100"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'Are you sure you want delete this note.'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Delete note'"
+   ]
+  }
+ },
+ "note-editor": {
+  "anchor": "field",
+  "ios": {
+   "add-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Add note'"
+   ],
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "counter": [
+    "-ios predicate string",
+    "name MATCHES '^[0-9]+/500$'"
+   ],
+   "delete-note": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Delete note'"
+   ],
+   "edit-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Edit note'"
+   ],
+   "field": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField'"
+   ],
+   "save": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Save'"
+   ]
+  }
+ },
+ "note-menu": {
+  "anchor": "edit",
+  "ios": {
+   "delete": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Delete' AND rect.width > 100"
+   ],
+   "edit": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Edit'"
+   ]
+  }
+ },
+ "note-unsaved-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "leave": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Leave'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Unsaved Changes'"
+   ]
+  }
+ },
+ "notes": {
+  "anchor": "header",
+  "ios": {
+   "add-note": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Add note'"
+   ],
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "empty-text": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Add note to the report to get started.'"
+   ],
+   "empty-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'No notes have been added yet'"
+   ],
+   "header": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Notes'"
+   ],
+   "row": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND name ENDSWITH 'Show menu'"
+   ],
+   "toast": [
+    "-ios predicate string",
+    "name == 'Note added successfully' OR name == 'Note saved successfully' OR name == 'Note deleted successfully'"
+   ]
+  }
+ },
+ "notifications": {
+  "anchor": "root",
+  "ios": {
+   "banner": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND name BEGINSWITH 'Turn on push'"
+   ],
+   "chevron": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND rect.x > 340 AND rect.width < 30"
+   ],
+   "empty-text": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'You' AND name ENDSWITH 'about your jobs here.'"
+   ],
+   "empty-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'No notifications yet'"
+   ],
+   "go-to-settings": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND name ENDSWITH 'Go to Settings'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Notification list'"
+   ],
+   "row": [
+    "-ios predicate string",
+    "(type == 'XCUIElementTypeOther' OR type == 'XCUIElementTypeImage') AND name CONTAINS {text}"
+   ]
+  }
+ },
+ "otp": {
+  "anchor": "root",
+  "ios": {
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "code": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField'"
+   ],
+   "destination": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name CONTAINS {text}"
+   ],
+   "error": [
+    "accessibility id",
+    "Incorrect code."
+   ],
+   "instruction": [
+    "accessibility id",
+    "Enter the 4-digit code sent to your email address"
+   ],
+   "resend": [
+    "-ios predicate string",
+    "name CONTAINS 'You can request a new code in'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND (name == 'Email address verification' OR name == 'Phone number verification')"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND (name == 'Email address verification' OR name == 'Phone number verification')"
+   ],
+   "verify": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Verify'"
+   ]
+  }
+ },
+ "pdf-viewer": {
+  "anchor": "close",
+  "ios": {
+   "any-editable": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' OR type == 'XCUIElementTypeTextView' OR type == 'XCUIElementTypeSecureTextField'"
+   ],
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "close": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND (name == nil OR name == '') AND rect.y < 140"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == {text}"
+   ]
+  }
+ },
+ "phone-mismatch": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "log-out": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Log out'"
+   ],
+   "message": [
+    "accessibility id",
+    "The jobs you are trying to access are assigned to a different phone number. To continue, please log out and sign in with the phone number linked to this job."
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Assigned to a different phone number'"
+   ]
+  }
+ },
+ "photo-add-sheet": {
+  "anchor": "title",
+  "ios": {
+   "camera": [
+    "-ios predicate string",
+    "name == 'Camera'"
+   ],
+   "gallery": [
+    "-ios predicate string",
+    "name == 'Gallery'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Add photo'"
+   ]
+  }
+ },
+ "photo-delete-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "delete": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Delete'"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'Are you sure you want to delete this photo.'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Delete photo'"
+   ]
+  }
+ },
+ "photo-editor": {
+  "anchor": "crop",
+  "ios": {
+   "crop": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Crop'"
+   ],
+   "done": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND (name == nil OR name == '') AND rect.x > 330 AND rect.y < 140"
+   ],
+   "markup": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Markup'"
+   ]
+  }
+ },
+ "photo-metadata": {
+  "anchor": "title",
+  "ios": {
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "counter": [
+    "-ios predicate string",
+    "name MATCHES '^[0-9]+ / 500$'"
+   ],
+   "description": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField'"
+   ],
+   "edit-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Edit photo'"
+   ],
+   "label": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Description'"
+   ],
+   "save": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Save'"
+   ],
+   "tag": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == {text}"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Add photo'"
+   ]
+  }
+ },
+ "photo-picker": {
+  "anchor": "root",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "grid": [
+    "-ios predicate string",
+    "name == 'photos_sectioned_layout'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeNavigationBar' AND name == 'Photos'"
+   ]
+  }
+ },
+ "photo-report": {
+  "anchor": "header",
+  "ios": {
+   "add-photo": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Add photo'"
+   ],
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "delete": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND (name == nil OR name == '') AND rect.width < 50"
+   ],
+   "empty-text": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Add photos to the report to get started.'"
+   ],
+   "empty-title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'No photos have been added yet'"
+   ],
+   "header": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Photo report'"
+   ],
+   "photo": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND rect.width > 150 AND name BEGINSWITH {text}"
+   ],
+   "photos": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND rect.width > 150"
+   ],
+   "toast": [
+    "-ios predicate string",
+    "name == 'Photo added successfully' OR name == 'Changes saved successfully'"
+   ]
+  }
+ },
+ "photo-unsaved-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "leave": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Leave'"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'You have unsaved changes.'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Unsaved Changes'"
+   ]
+  }
+ },
+ "photo-viewer": {
+  "anchor": "back",
+  "ios": {
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ]
+  }
+ },
+ "profile": {
+  "anchor": "root",
+  "ios": {
+   "card": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name CONTAINS '@' AND rect.y < 200"
+   ],
+   "edit": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND rect.x > 330 AND rect.y < 200 AND rect.width < 40"
+   ],
+   "logout": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND name == 'Log out'"
+   ],
+   "privacy": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Privacy Policy'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Profile'"
+   ],
+   "terms": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Terms & Conditions'"
+   ],
+   "theme": [
+    "-ios predicate string",
+    "name BEGINSWITH 'App theme ('"
+   ],
+   "theme-menu": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Show menu'"
+   ],
+   "version": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'v'"
+   ]
+  }
+ },
+ "registration": {
+  "anchor": "root",
+  "ios": {
+   "channel-options": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name BEGINSWITH 'SMS' AND name ENDSWITH 'Email'"
+   ],
+   "channel-radios": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND (name == nil OR name == '')"
+   ],
+   "channel-section": [
+    "accessibility id",
+    "Preferred channel for job notifications"
+   ],
+   "continue": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Continue'"
+   ],
+   "email": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Email'"
+   ],
+   "first-name": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'First name'"
+   ],
+   "form-error": [
+    "-ios predicate string",
+    "name == {text}"
+   ],
+   "last-name": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Last name'"
+   ],
+   "log-in-link": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Log in'"
+   ],
+   "logo": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage'"
+   ],
+   "phone": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Phone number'"
+   ],
+   "phone-prefix": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'United States'"
+   ],
+   "privacy-link": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeLink' AND name == 'Privacy Policy'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Already have an account?'"
+   ],
+   "sms-consent": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeSwitch'"
+   ],
+   "sms-consent-label": [
+    "-ios predicate string",
+    "name BEGINSWITH 'I agree to receive automated SMS messages'"
+   ],
+   "sms-consent-text": [
+    "-ios predicate string",
+    "name BEGINSWITH 'Checking this box you agree to receive SMS'"
+   ],
+   "subtitle": [
+    "accessibility id",
+    "Good to see you! Let's get you registered."
+   ],
+   "terms-link": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeLink' AND name == 'Terms & Conditions'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Registration'"
+   ]
+  }
+ },
+ "settings": {
+  "anchor": "root",
+  "ios": {
+   "allow-notifications": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeSwitch' AND name == 'ALLOW_NOTIFICATIONS_ID'"
+   ],
+   "app-row": [
+    "-ios predicate string",
+    "name CONTAINS 'CT Mobile'"
+   ],
+   "apps": [
+    "-ios predicate string",
+    "name == 'com.apple.settings.apps'"
+   ],
+   "notifications": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'NOTIFICATIONS'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeNavigationBar'"
+   ]
+  }
+ },
+ "sms-terms": {
+  "anchor": "root",
+  "ios": {
+   "accept": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'I Accept SMS Terms & Conditions'"
+   ],
+   "close": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND (name == nil OR name == '')"
+   ],
+   "root": [
+    "accessibility id",
+    "SMS Messaging Terms & Conditions"
+   ],
+   "title": [
+    "accessibility id",
+    "SMS Messaging Terms & Conditions"
+   ]
+  }
+ },
+ "splash": {
+  "anchor": "root",
+  "ios": {
+   "interactive": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' OR type == 'XCUIElementTypeButton' OR type == 'XCUIElementTypeTextField' OR type == 'XCUIElementTypeLink' OR type == 'XCUIElementTypeSwitch'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeApplication'"
+   ]
+  }
+ },
+ "submit-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "layer": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND name == 'Dismiss'"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'You won'"
+   ],
+   "submit": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Submit'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Submit deliverables'"
+   ]
+  }
+ },
+ "survey": {
+  "anchor": "header",
+  "ios": {
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Back'"
+   ],
+   "checkbox": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeSwitch' AND name == {text}"
+   ],
+   "counter": [
+    "-ios predicate string",
+    "name ENDSWITH 'characters remaining'"
+   ],
+   "date": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Select date'"
+   ],
+   "delete-entry": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Delete' AND rect.width < 60"
+   ],
+   "entry-headers": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND name BEGINSWITH {text}"
+   ],
+   "header": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Survey'"
+   ],
+   "no": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'No'"
+   ],
+   "option": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == {text}"
+   ],
+   "repeat": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Repeat section'"
+   ],
+   "required-error": [
+    "-ios predicate string",
+    "name == 'This field is required'"
+   ],
+   "save": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Save'"
+   ],
+   "saved": [
+    "-ios predicate string",
+    "name == 'Survey saved'"
+   ],
+   "section": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND name BEGINSWITH {text}"
+   ],
+   "survey-name": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "text": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name != 'Select date' AND name != 'Select time' AND name != 'Hour' AND name != 'Minute' AND name != '0'"
+   ],
+   "thumbnail": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage' AND name == {text}"
+   ],
+   "time": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Select time'"
+   ],
+   "titles": [
+    "-ios predicate string",
+    "name CONTAINS '. ' AND rect.width > 300"
+   ],
+   "upload-photo": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Upload photo'"
+   ],
+   "yes": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Yes'"
+   ]
+  }
+ },
+ "survey-date-picker": {
+  "anchor": "ok",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "day": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name BEGINSWITH {text}"
+   ],
+   "ok": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'OK'"
+   ]
+  }
+ },
+ "survey-delete-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "delete": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Delete' AND rect.width > 60"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == {text}"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Delete section'"
+   ]
+  }
+ },
+ "survey-time-picker": {
+  "anchor": "ok",
+  "ios": {
+   "hour": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Hour'"
+   ],
+   "minute": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeTextField' AND name == 'Minute'"
+   ],
+   "ok": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'OK'"
+   ],
+   "text-mode": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Switch to text input mode'"
+   ]
+  }
+ },
+ "tabbar": {
+  "anchor": "jobs",
+  "ios": {
+   "jobs": [
+    "-ios predicate string",
+    "name ENDSWITH 'Tab 1 of 3'"
+   ],
+   "notifications": [
+    "-ios predicate string",
+    "name ENDSWITH 'Tab 2 of 3'"
+   ],
+   "profile": [
+    "-ios predicate string",
+    "name ENDSWITH 'Tab 3 of 3'"
+   ]
+  }
+ },
+ "theme-menu": {
+  "anchor": "auto",
+  "ios": {
+   "auto": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Auto'"
+   ],
+   "dark": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Dark'"
+   ],
+   "light": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Light'"
+   ]
+  }
+ },
+ "unsaved-dialog": {
+  "anchor": "title",
+  "ios": {
+   "cancel": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Cancel'"
+   ],
+   "leave": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Leave'"
+   ],
+   "message": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'You have unsaved changes.'"
+   ],
+   "title": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeStaticText' AND name == 'Unsaved Changes'"
+   ]
+  }
+ },
+ "welcome": {
+  "anchor": "root",
+  "ios": {
+   "back": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND (name == 'Back' OR name == nil OR name == '')"
+   ],
+   "login": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Login'"
+   ],
+   "logo": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeImage'"
+   ],
+   "root": [
+    "-ios predicate string",
+    "name BEGINSWITH 'Welcome to Concert'"
+   ],
+   "sign-up": [
+    "-ios predicate string",
+    "type == 'XCUIElementTypeButton' AND name == 'Sign up'"
+   ],
+   "subtitle": [
+    "accessibility id",
+    "Create an account or log in to get started."
+   ],
+   "title": [
+    "-ios predicate string",
+    "name BEGINSWITH 'Welcome to Concert'"
+   ]
+  }
+ }
+}

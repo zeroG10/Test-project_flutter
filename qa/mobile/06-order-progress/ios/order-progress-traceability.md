@@ -111,4 +111,4 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 - **CHK-ORDP-028** is checked on the job opened again after the submission (TC-DLV-003). The owner decided this on
   2026-09-26.
 - **CHK-DLV-* rows under "tagged tests with no checklist item"** belong to module 07 — see
-  [submit-deliverables-traceability.md](../07-submit-deliverables/submit-deliverables-traceability.md).
+  [submit-deliverables-traceability.md](../../07-submit-deliverables/ios/submit-deliverables-traceability.md).

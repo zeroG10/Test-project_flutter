@@ -34,6 +34,7 @@ start opens the Jobs list ("No jobs") and the Profile still shows the deleted ac
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
+| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -67,9 +68,9 @@ start opens the Jobs list ("No jobs") and the Profile still shows the deleted ac
 
 The splash is followed by the Jobs list with "No jobs"; the app stays there for the whole minute and never returns to
 Welcome. Profile shows the deleted account's name, phone and email. The next launch opens the Jobs list again.
-// [jobs-list-60s-after-account-deleted.png](evidence/BUG-SPL-001/jobs-list-60s-after-account-deleted.png),
-[profile-of-deleted-account.png](evidence/BUG-SPL-001/profile-of-deleted-account.png),
-[next-launch-still-signed-in.png](evidence/BUG-SPL-001/next-launch-still-signed-in.png)
+// [jobs-list-60s-after-account-deleted.png](evidence/BUG-SPL-001/ios/jobs-list-60s-after-account-deleted.png),
+[profile-of-deleted-account.png](evidence/BUG-SPL-001/ios/profile-of-deleted-account.png),
+[next-launch-still-signed-in.png](evidence/BUG-SPL-001/ios/next-launch-still-signed-in.png)
 
 ## Expected result
 
@@ -87,7 +88,7 @@ is signed out and sees Welcome, and no data of the deleted account stays on scre
 
 ## Evidence
 
-- Screenshots: [evidence/BUG-SPL-001/](evidence/BUG-SPL-001/) (generated test account data only).
+- Screenshots: [evidence/BUG-SPL-001/ios/](evidence/BUG-SPL-001/ios/) (generated test account data only).
 - Screen trees: `qa/shared/recon-dumps/ios-2026-09-24/recon4b_revoked_{after_60s,profile,next_launch}.xml`.
 - Recon report: [qa/shared/recon-2026-09-24-ios.md](../../../shared/recon-2026-09-24-ios.md), section Splash.
 - Script: `automation/mobile/scripts/recon/recon_4.py`, passes `revoked`, `revoked2`.

@@ -32,6 +32,7 @@ phone request was not captured (no network capture in the run).
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
+| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -61,7 +62,7 @@ phone request was not captured (no network capture in the run).
 ## Actual result
 
 A red banner at the bottom for ~4 s: "An unexpected error occurred. Please try logging in again."; the app stays on Login
-with the number kept in the field. // [evidence/BUG-AUTH-001/unregistered-phone-banner.png](evidence/BUG-AUTH-001/unregistered-phone-banner.png)
+with the number kept in the field. // [evidence/BUG-AUTH-001/ios/unregistered-phone-banner.png](evidence/BUG-AUTH-001/ios/unregistered-phone-banner.png)
 
 ## Expected result
 
@@ -80,7 +81,7 @@ over the SRS wording — D-8).
 
 ## Evidence
 
-- Screenshot: [evidence/BUG-AUTH-001/unregistered-phone-banner.png](evidence/BUG-AUTH-001/unregistered-phone-banner.png)
+- Screenshot: [evidence/BUG-AUTH-001/ios/unregistered-phone-banner.png](evidence/BUG-AUTH-001/ios/unregistered-phone-banner.png)
 - Screen recording: Allure result of run 2 (`automation/mobile/allure-results`, test
   `test_login_rejects_unregistered_phone`, attachment "video · test_login_rejects_unregistered_phone") — local only.
 - Automated test: `automation/mobile/tests/shared/test_authentication.py::test_login_rejects_unregistered_phone` — red,

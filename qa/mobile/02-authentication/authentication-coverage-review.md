@@ -8,7 +8,7 @@
 **Inputs:** [authentication-checklist.md](authentication-checklist.md) (126) ·
 [authentication-test-cases.md](authentication-test-cases.md) (14 TCs) ·
 [authentication-automation-plan.md](authentication-automation-plan.md) · [authentication-rtm.md](authentication-rtm.md) ·
-[authentication-traceability.md](authentication-traceability.md) (run 2: 30 passed / 1 failed) ·
+[ios/authentication-traceability.md](ios/authentication-traceability.md) (run 2: 30 passed / 1 failed) ·
 [authentication-questions.md](authentication-questions.md) (D-1…D-15) · bugs BUG-AUTH-001/002 · SRS 1.0.2 §3.1.1, CR-1,
 §5 · Figma frames in `docs/designs/mobile/figma-sources.md` · `docs/api/openapi.json` (auth operations) ·
 `docs/requirements/shared/testability-contract.md` §5 · test review `_bmad-output/test-artifacts/test-reviews/mobile/test-review-authentication-2026-09-23.md`.

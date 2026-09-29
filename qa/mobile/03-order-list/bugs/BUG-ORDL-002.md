@@ -28,6 +28,7 @@ scheduled date, so a job for tomorrow can sit below a job for yesterday.
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
+| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -57,7 +58,7 @@ scheduled date, so a job for tomorrow can sit below a job for yesterday.
 ## Actual result
 
 Top to bottom: 24 Sep (today) → 23 Sep (yesterday) → 25 Sep (tomorrow) — the reverse of the creation order; the dates
-are in no order. // [list-order-follows-creation-not-date.png](evidence/BUG-ORDL-002/list-order-follows-creation-not-date.png)
+are in no order. // [list-order-follows-creation-not-date.png](evidence/BUG-ORDL-002/ios/list-order-follows-creation-not-date.png)
 
 ## Expected result
 
@@ -74,7 +75,7 @@ Jobs are listed by scheduled date, earliest first (the time within one date is n
 
 ## Evidence
 
-- Screenshot: [evidence/BUG-ORDL-002/list-order-follows-creation-not-date.png](evidence/BUG-ORDL-002/list-order-follows-creation-not-date.png)
+- Screenshot: [evidence/BUG-ORDL-002/ios/list-order-follows-creation-not-date.png](evidence/BUG-ORDL-002/ios/list-order-follows-creation-not-date.png)
   (test jobs only).
 - Screen tree: `qa/shared/recon-dumps/ios-2026-09-24/recon4f_sort_probe.xml`.
 - Probe: `automation/mobile/scripts/recon/recon_4.py`, pass `sort`; report

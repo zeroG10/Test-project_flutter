@@ -45,7 +45,9 @@ addopts = [
     "-v",
     "--strict-markers",
     "--tb=short",
-    "--alluredir=allure-results",
+    # A run worth keeping goes through scripts/run.sh (results/<platform>/<date>-<name>/); a plain
+    # `pytest` lands here and is wiped by the next one.
+    "--alluredir=results/_scratch",
     "--clean-alluredir",
 ]
 markers = [

@@ -204,6 +204,17 @@ def test_bug_page_renders_the_report(run_dir: Path) -> None:
     assert "the test cases" in bug
 
 
+def test_bug_evidence_per_platform_keeps_its_subfolder(run_dir: Path) -> None:
+    _file_bug(run_dir, "BUG-AUTH-009", BUG_MD.replace("BUG-AUTH-009/shot", "BUG-AUTH-009/ios/shot"))
+    evidence = run_dir / "qa/mobile/02-authentication/bugs/evidence/BUG-AUTH-009/ios"
+    evidence.mkdir(parents=True)
+    (evidence / "shot.png").write_bytes(b"x")
+    _, _, out = _build(run_dir)
+    bug = (out / "bugs" / "BUG-AUTH-009.html").read_text(encoding="utf-8")
+    assert "<a class='shot' href='evidence/BUG-AUTH-009/ios/shot.png'>" in bug
+    assert (out / "bugs" / "evidence" / "BUG-AUTH-009" / "ios" / "shot.png").exists()
+
+
 def test_a_draft_not_filed_is_not_an_open_defect(run_dir: Path) -> None:
     _file_bug(run_dir, "BUG-AUTH-009", "> **Status: NOT FILED — owner's decision**\n" + BUG_MD)
     _, page, out = _build(run_dir)

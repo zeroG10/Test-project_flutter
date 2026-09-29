@@ -40,6 +40,35 @@ candidates (prompt 06) → test cases (`prompts/mobile/03`) → screen maps
 (`automation/mobile/screens/<screen>_map.py`) → specs (prompt 07) → run → `trace_results.py`.
 
 Defects go to `<NN-module>/bugs/BUG-<CODE>-NNN.md` (template `qa/_templates/bug-mobile.md`) with
-evidence in `bugs/evidence/BUG-<CODE>-NNN/`.
+evidence in `bugs/evidence/BUG-<CODE>-NNN/ios/` and `…/android/`. **One report per defect** (the
+app code and the backend are shared): its *Platforms checked* row says iOS ✓/✗ · Android ✓/✗/not
+checked; a defect seen only on Android gets its own id with the platform in the report.
 
-**Final iOS run (step 6c, 2026-09-28):** [final-traceability-ios.md](final-traceability-ios.md) — 3 identical runs on harness `7015c46`: 645 checks, 462 automated → 449 Passed, 6 Failed (the 5 filed bugs), 7 Blocked (the 4 accepted limits).
+## Platforms — iOS and Android side by side (Android stage, `docs/notes/android-plan.md`)
+
+Shared by both platforms and kept in the module folder: checklist, automation plan, test cases,
+questions (the iOS history of decisions), bugs. Per platform, in `ios/` / `android/`: the
+traceability matrix (`<NN-module>/<platform>/<module>-traceability.md`), and for Android also its
+own D/Q (`android/<module>-questions.md`) and Android-only test cases (offline). Whole-app records:
+[ios/](ios/) and `android/` — `final-traceability.md`, `not-automated.md`.
+
+A check is **Passed for the app** only when it passed on both platforms; until then the two
+verdicts are shown apart, never summed into one green number.
+
+| # | Module | Checks | iOS — automated · Passed / Failed / Blocked | iOS matrix | Android | Android matrix |
+|---|---|---|---|---|---|---|
+| 01 | `splash` | 15 | 9 · 8 / 1 / 0 | [ios/splash-traceability.md](01-splash/ios/splash-traceability.md) | not run yet | — |
+| 02 | `authentication` | 126 | 81 · 80 / 1 / 0 | [ios/authentication-traceability.md](02-authentication/ios/authentication-traceability.md) | not run yet | — |
+| 03 | `order-list` | 70 | 52 · 46 / 4 / 2 | [ios/order-list-traceability.md](03-order-list/ios/order-list-traceability.md) | not run yet | — |
+| 04 | `order-details` | 89 | 56 · 55 / 0 / 1 | [ios/order-details-traceability.md](04-order-details/ios/order-details-traceability.md) | not run yet | — |
+| 05 | `check-in-out` | 41 | 25 · 25 / 0 / 0 | [ios/check-in-out-traceability.md](05-check-in-out/ios/check-in-out-traceability.md) | not run yet | — |
+| 06 | `order-progress` | 42 | 31 · 28 / 0 / 3 | [ios/order-progress-traceability.md](06-order-progress/ios/order-progress-traceability.md) | not run yet | — |
+| 07 | `submit-deliverables` | 33 | 28 · 27 / 0 / 1 | [ios/submit-deliverables-traceability.md](07-submit-deliverables/ios/submit-deliverables-traceability.md) | not run yet | — |
+| 08 | `survey` | 57 | 46 · 46 / 0 / 0 | [ios/survey-traceability.md](08-survey/ios/survey-traceability.md) | not run yet | — |
+| 09 | `photo-report` | 54 | 34 · 34 / 0 / 0 | [ios/photo-report-traceability.md](09-photo-report/ios/photo-report-traceability.md) | not run yet | — |
+| 10 | `notes` | 52 | 41 · 41 / 0 / 0 | [ios/notes-traceability.md](10-notes/ios/notes-traceability.md) | not run yet | — |
+| 11 | `notifications` | 31 | 26 · 26 / 0 / 0 | [ios/notifications-traceability.md](11-notifications/ios/notifications-traceability.md) | not run yet | — |
+| 12 | `profile` | 35 | 33 · 33 / 0 / 0 | [ios/profile-traceability.md](12-profile/ios/profile-traceability.md) | not run yet | — |
+| | **all** | **645** | **462 · 449 / 6 / 7** | [ios/final-traceability.md](ios/final-traceability.md) | not run yet | — |
+
+**Final iOS run (step 6c, 2026-09-28; tag `ios-final-2026-09-28`):** [ios/final-traceability.md](ios/final-traceability.md) — 3 identical runs on harness `7015c46`: 645 checks, 462 automated → 449 Passed, 6 Failed (the 5 filed bugs), 7 Blocked (the 4 accepted limits). Why 183 checks have no test: [ios/not-automated.md](ios/not-automated.md).

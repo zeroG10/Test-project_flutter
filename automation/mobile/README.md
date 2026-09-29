@@ -30,6 +30,7 @@ automation/mobile/
 │   ├── __init__.py        # El, Screen, resolve(), parametrised locators ({text})
 │   ├── welcome_map.py, login_map.py, otp_map.py, registration_map.py,
 │   │   sms_terms_map.py, jobs_list_map.py   # module 02 (iOS; Android in step 7)
+│   ├── android/           # screens that exist only on Android (system dialogs, Custom Tabs, settings)
 │   └── README.md          # format, alias rules, Flutter note
 ├── pages/                 # page objects: behaviour over a screen map, explicit waits only
 │   ├── base_page.py       # tap / type / visible / wait_gone / expect_text / scroll_to /
@@ -44,6 +45,7 @@ automation/mobile/
 │   ├── app.py             # AppControl: launch / relaunch / clear data / reinstall
 │   ├── evidence.py        # checkpoint screenshots, screen recorder
 │   ├── reporting.py       # module labels, run context, Allure environment + categories
+│   ├── android/           # adb-only helpers: network on/off, dial intent, permissions
 │   └── field_services_api.py  # API client for test-data setup / cleanup only
 ├── fixtures/
 │   ├── test_data.py       # {{tech.*}}, {{new_user.*}}, {{unregistered.*}} placeholders resolve here
@@ -55,11 +57,13 @@ automation/mobile/
 │   └── flutter/           # tests specific to a Flutter build (marker flutter)
 ├── builds/{android,ios,flutter}/   # .apk / .app / .ipa — gitignored, see builds/README.md
 ├── scripts/
+│   ├── run.sh             # one named run: results/<platform>/<date>-<name>/ + RUN_INFO.txt
 │   ├── doctor.sh          # prerequisites table, exit 1 on a missing required item
 │   ├── start_appium.sh    # Appium server
 │   └── reset_simulator.sh # erase + boot an iOS simulator
-├── allure-results/        # run output (gitignored) — input for automation/tools/trace_results.py
-├── reports/               # local summary page (gitignored — shows the client's app)
+├── results/{ios,android}/<run>/  # Allure results per run (gitignored) — input for trace_results.py;
+│                          # results/_scratch/ = a plain `pytest` without run.sh, wiped every time
+├── reports/{ios,android,combined}/  # Allure report, summary pages (gitignored — the client's app)
 └── pyproject.toml         # deps + pytest markers
 ```
 
@@ -137,7 +141,16 @@ uv run pytest --platform=ios -m smoke
 uv run pytest --platform=android tests/android/          # one folder
 uv run pytest --platform=android -m "smoke and not flutter"
 uv run pytest --collect-only -q --platform=android        # what would run, no device needed
-allure serve allure-results                               # report
+allure serve results/_scratch                             # report
+```
+
+A run worth keeping goes through `scripts/run.sh <ios|android> <name> [pytest args]`: results land
+in `results/<platform>/<YYYY-MM-DD>-<name>/` with `RUN_INFO.txt` (harness commit, command, times,
+exit code). It refuses an existing folder, uncommitted changes to tracked files (commit before
+every run; `ALLOW_DIRTY=1` for a throwaway debug run) and a second run while one is going.
+
+```bash
+EVIDENCE_VIDEO=auto bash scripts/run.sh android 02-auth tests/shared/test_authentication.py
 ```
 
 Every run prints its matrix in the header
@@ -298,15 +311,15 @@ Not everything is captured (owner decision 2026-09-23):
   and the `qa/mobile/<NN-module>/` folder) › tests titled `TC-… <title>`.
 - **Behaviors:** Module › TC id.
 - **Environment widget:** device, OS, build (from `builds/<platform>/BUILD_INFO.txt`), app
-  source commit, harness commit, Appium URL — `allure-results/environment.properties`.
+  source commit, harness commit, Appium URL — `<results dir>/environment.properties`.
 - **Categories:** Blocked (not a product verdict) · expected element not shown in time · assertion
-  failed · harness error — `allure-results/categories.json`.
+  failed · harness error — `<results dir>/categories.json`.
 - Every result carries an `env` label (`iOS · iPhone 17 · iOS 26.5 · build 1.1.1 (178)`) that
   `trace_results.py` prints in the run context.
 
 ```bash
-allure serve allure-results                       # interactive
-allure generate allure-results -o allure-report --clean   # static folder
+allure serve results/ios/stable-3                 # interactive
+allure generate results/ios/stable-3 -o reports/ios/allure-report --clean   # static folder
 ```
 
 ## Summary page for the lead
@@ -315,7 +328,7 @@ allure generate allure-results -o allure-report --clean   # static folder
 items verified, what failed, what was blocked and why, run time vs an optional manual estimate)
 and an engineering half (per-module coverage, per-test results, key screens, run context).
 CHK verdicts come from `trace_results.py` itself, so the page and the traceability matrix agree.
-Output goes to `reports/summary/` (gitignored: it shows the client's app); publishing it is an
+Output goes to `reports/<platform>/summary/` (gitignored: it shows the client's app); publishing it is an
 owner call. Usage: [`automation/tools/README.md`](../tools/README.md).
 
 ## Prove red (GATES rule 6)
@@ -326,7 +339,7 @@ every one of them wrong on purpose:
 
 ```bash
 uv run pytest --platform=ios tests/shared/test_authentication.py --prove-red \
-    --alluredir=allure-results-prove-red          # never trace this run
+    --alluredir=results/ios/prove-red-02          # never trace this run
 ```
 
 The run must be all red; the summary lists any test that stayed green as **NOT PROVEN**.
@@ -342,6 +355,9 @@ uv run python -m unittest discover -s unit_tests    # no device, no Appium, no n
 It includes **map-health** (`unit_tests/test_screen_maps.py`): every alias used in the module's
 test cases resolves in a screen map, or is listed as resolved by a page method (unnamed controls,
 per-field messages — testability defects in `docs/requirements/shared/testability-contract.md` §5).
+And the **iOS locator guard** (`unit_tests/test_ios_locator_guard.py`): during the Android stage it
+fails when any iOS locator or screen anchor differs from `unit_tests/ios_locators.snapshot.json`
+(recorded at tag `ios-final-2026-09-28`); re-record only on the owner's word (`--update`).
 Whether a locator finds its element is proven only on a device.
 
 ## Builds folder
@@ -356,7 +372,7 @@ build commands in [`builds/README.md`](builds/README.md).
 run output, extracts the CHK ids from the tags and writes the automated verdict per CHK id into
 `qa/mobile/<NN-module>/<module>-traceability.md`. This stack produces two machine-readable sources for it:
 
-- `allure-results/*-result.json` — `labels: [{"name": "tag", "value": "CHK-AUTH-001"}]` + status
+- `<results dir>/*-result.json` — `labels: [{"name": "tag", "value": "CHK-AUTH-001"}]` + status
   (from `@allure.tag`).
 - `--junitxml=results.xml` — `<property name="chk" value="CHK-AUTH-001"/>` per test (from
   `@pytest.mark.chk`, written by `conftest.py`).
