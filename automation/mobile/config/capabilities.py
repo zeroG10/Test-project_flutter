@@ -64,6 +64,10 @@ def android_caps() -> UiAutomator2Options:
     # longer than the default 30 s to start the UiAutomator2 server.
     opts.set_capability("appium:settings[waitForIdleTimeout]", 100)
     opts.set_capability("appium:uiautomator2ServerLaunchTimeout", 90000)
+    # The debug APK is 195 MB: its install (re-dexing) and `pm clear` take long on a busy
+    # emulator (module 02 run 1: install -r timed out after 60 s, pm clear failed after it).
+    opts.set_capability("appium:androidInstallTimeout", 240000)
+    opts.set_capability("appium:adbExecTimeout", 120000)
     return opts
 
 

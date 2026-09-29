@@ -25,6 +25,25 @@ def _seconds(timeout: float | None) -> float:
     return settings.default_timeout if timeout is None else timeout
 
 
+# UiAutomator2 cannot read the tree while the app's main thread is busy (a debug Flutter build's
+# cold start, a starved emulator): "Timed out … waiting for the root AccessibilityNodeInfo in the
+# active window". Inside a wait that is "not yet", like a missing element — the wait's own timeout
+# still decides (Android stage, module 02 run 1: TC-AUTH-004 errored at its first probe).
+_TREE_NOT_READY = ("waiting for the root AccessibilityNodeInfo",)
+
+
+def _not_yet_when_tree_busy(condition: Callable[[WebDriver], T]) -> Callable[[WebDriver], T]:
+    def probe(driver: WebDriver):
+        try:
+            return condition(driver)
+        except WebDriverException as exc:
+            if any(marker in str(exc) for marker in _TREE_NOT_READY):
+                return False
+            raise
+
+    return probe
+
+
 def wait_until(
     driver: WebDriver,
     condition: Callable[[WebDriver], T],
@@ -36,7 +55,7 @@ def wait_until(
     value."""
     secs = _seconds(timeout)
     return WebDriverWait(driver, secs, poll_frequency=poll).until(
-        condition, message=message or f"condition not met within {secs}s"
+        _not_yet_when_tree_busy(condition), message=message or f"condition not met within {secs}s"
     )
 
 

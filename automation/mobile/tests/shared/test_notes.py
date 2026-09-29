@@ -97,7 +97,7 @@ def test_add_note(survey_job, ui_login, field_services_api, driver, pages, expec
     evidence.checkpoint("notes-empty")
     n.start_add()
     with allure.step("expect 'Add note': the placeholder, 0/500, Save disabled"):
-        assert e.find("field").get_attribute("name") == expected("Add note"), "no placeholder"
+        assert e.placeholder_of(e.find("field")) == expected("Add note"), "no placeholder"
         assert e.counter() == expected("0/500"), e.counter()
     e.expect_disabled("save")
     e.type_text(text)

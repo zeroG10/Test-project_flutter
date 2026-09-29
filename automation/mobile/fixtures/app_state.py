@@ -107,6 +107,13 @@ def logged_out_app(app, driver, platform) -> AppControl:
         app.clear_data()
         app.launch()
         landed = _landing(driver, platform)
+        if landed == "unknown" and platform == "android":
+            # pm clear always signs out on Android; "unknown" is a cold start the tree could not
+            # be read in yet (a busy debug build). Look again after a relaunch before the heavy
+            # 195-MB reinstall (module 02 run 1: the reinstall timed out and left no app).
+            with allure.step("landing not read yet → relaunch and look again"):
+                app.relaunch()
+                landed = _landing(driver, platform)
         if landed != "welcome":
             # iOS: clearApp empties the data container but not the keychain; the app wipes
             # keychain tokens on a first-launch start. If that did not happen, reinstall.

@@ -64,7 +64,7 @@ def test_tab_and_empty_state(no_notifications, ui_login, pages, expected, eviden
     n = pages.notes
     open_tab(pages)
     with allure.step("expect the title 'Notification list'"):
-        assert n.find("root").get_attribute("name") == expected("Notification list")
+        assert n.label_of(n.find("root")) == expected("Notification list")
     pages.tabs.expect_selected(expected("notifications"))
     n.expect_text("empty-title", expected("No notifications yet"))
     n.expect_text("empty-text", expected("You'll see updates about your jobs here."))

@@ -430,7 +430,7 @@ def test_registration_field_validation(
     if message is CAPPED:
         reg.expect_no_field_error(field)
         with allure.step("expect the input capped at 50 characters (D-14)"):
-            assert len(reg.find(field).get_attribute("value") or "") == 50
+            assert len(reg.field_value(reg.find(field))) == 50
         return
 
     reg.expect_field_error(field, expected(message))
@@ -491,7 +491,7 @@ def test_registration_duplicate_phone(new_user, logged_out_app, pages, tech, exp
     reg.visible("form-error", SERVER, text=expected(DUPLICATE_PHONE))  # red banner (D-7)
     reg.scroll_to("phone")
     with allure.step("expect the phone value preserved"):
-        assert digits(reg.find("phone").get_attribute("value")) == tech.phone_national
+        assert digits(reg.field_value(reg.find("phone"))) == tech.phone_national
     reg.fill("phone", new_user.phone_national)  # retry without reopening the screen
     reg.scroll_to("continue")
     reg.expect_enabled("continue")

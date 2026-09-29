@@ -174,8 +174,13 @@ class BasePage:
                     element = waits.wait_present(self.driver, self.locator(alias), timeout)
                     self._send(element, text, per_char)
 
-    @staticmethod
-    def _send(element: WebElement, text: str, per_char: bool) -> None:
+    def _send(self, element: WebElement, text: str, per_char: bool) -> None:
+        """Type ``text`` into the focused ``element``. ``per_char`` on Android: real key presses
+        through the IME — there every ``send_keys`` REPLACES the field's text (ACTION_SET_TEXT),
+        so key-by-key ``send_keys`` would leave only the last character (module 02 run 1)."""
+        if per_char and self.platform == "android":
+            self.driver.execute_script("mobile: type", {"text": text})
+            return
         for chunk in text if per_char else (text,):
             element.send_keys(chunk)
 
@@ -310,6 +315,11 @@ class BasePage:
         if self.platform == "android":
             return "true" in (element.get_attribute("checked"), element.get_attribute("selected"))
         return str(element.get_attribute("value") or "") == "1"
+
+    def placeholder_of(self, element: WebElement) -> str:
+        """An empty input's placeholder: iOS ``name``; Android ``hint``."""
+        attr = "hint" if self.platform == "android" else "name"
+        return element.get_attribute(attr) or ""
 
     def field_value(self, element: WebElement) -> str:
         """Typed text of an input: iOS ``value``; Android ``text`` (``value`` does not exist
