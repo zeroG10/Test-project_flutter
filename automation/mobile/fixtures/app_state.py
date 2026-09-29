@@ -39,6 +39,14 @@ from helpers.waits import wait_any
 
 # Cold start of a DEV debug build on the simulator: splash + first frame + session check.
 LANDING_TIMEOUT = 30.0
+# Android emulator (measured 2026-09-29): a debug build's cold start after pm clear took > 30 s
+# under load — tree lookups took 2–12 s each (module 02 runs 1 and 3); warm start 7–28.6 s (recon
+# A1). The landing is only an upper bound: a fast start returns at once.
+LANDING_TIMEOUT_ANDROID = 60.0
+
+
+def landing_timeout(platform: str) -> float:
+    return LANDING_TIMEOUT_ANDROID if platform == "android" else LANDING_TIMEOUT
 
 
 def _pages(driver, platform):
@@ -56,7 +64,7 @@ def _landing(driver, platform) -> str:
         return wait_any(
             driver,
             {"welcome": lambda: welcome.is_open(0), "jobs-list": lambda: jobs.is_open(0)},
-            LANDING_TIMEOUT,
+            landing_timeout(platform),
         )
     except TimeoutException:
         return "unknown"
@@ -73,7 +81,7 @@ def _allow_notification_prompt(driver, platform, jobs) -> None:
         found = wait_any(
             driver,
             {"prompt": lambda: prompt.is_visible("allow", 0), "jobs": lambda: jobs.is_open(0)},
-            LANDING_TIMEOUT,
+            landing_timeout(platform),
         )
         if found == "prompt":
             prompt.answer_if_shown(allow=True, timeout=1)
@@ -155,7 +163,7 @@ def ui_login(app, driver, platform, tech) -> AppControl:
                 OtpPage(driver, platform).enter_code(tech.otp)
                 if platform == "android":
                     _allow_notification_prompt(driver, platform, jobs)
-                jobs.assert_open(LANDING_TIMEOUT)
+                jobs.assert_open(landing_timeout(platform))
 
         try:
             sign_in()
