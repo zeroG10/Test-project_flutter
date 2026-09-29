@@ -75,8 +75,9 @@ its centre does not move, so step 3 holds at any moment of the animation.
 **Android (step 4 of the Android stage, 2026-09-29):** step 2 is the first brand frame **after** the system splash
 (Q-SPL-A1); step 5 is the **system Back**, and "nothing happens" also means "the app stays in the foreground" — checked
 over a 1.5 s window after step 7, because the frame right after Back still shows the splash while Android is already
-leaving the app (Q-SPL-A2); step 7 judges the frame of step 6 first (the logo is drawn from the first brand frame, and
-the splash may end a moment later).
+leaving the app (Q-SPL-A2). After a system splash of 4–32 s the brand splash is up for only ~3 s and one tree read
+takes up to 2 s on the test host, so on Android the steps run over two cold starts: start 1 — steps 2, 7 (on the first
+brand frame: the logo is drawn from it) and 3; start 2 — steps 2, 4, 5, 6, then 8–10.
 
 ---
 
