@@ -27,6 +27,7 @@ from appium.webdriver.webdriver import WebDriver
 
 from config.settings import normalize_platform, settings
 from helpers.android.device import Adb
+from helpers.device import terminate_app
 
 # Android runtime permissions a fresh install gets from autoGrantPermissions; ``pm clear`` revokes
 # them, and the app then asks after sign-in (notifications) and at check-in (location) — prompts
@@ -80,7 +81,7 @@ class AppControl:
 
     def terminate(self) -> None:
         with allure.step(f"app: terminate {self.app_id}"):
-            self.driver.terminate_app(self.app_id)
+            terminate_app(self.driver, self.app_id)
 
     def relaunch(self) -> None:
         """Terminate, then launch — the ``open app: terminate, then cold start`` step."""
@@ -105,7 +106,7 @@ class AppControl:
         with allure.step("app: clear data"):
             if self.platform == "ios":
                 with contextlib.suppress(Exception):
-                    self.driver.terminate_app(self.app_id)
+                    terminate_app(self.driver, self.app_id)
                 self.reinstall()
                 self._first_launch()
                 return
@@ -133,7 +134,7 @@ class AppControl:
                 if "Welcome to Concert" in self.driver.page_source:
                     break  # no prompt (already accepted by autoAcceptAlerts)
                 time.sleep(0.5)
-            self.driver.terminate_app(self.app_id)
+            terminate_app(self.driver, self.app_id)
 
     def reinstall(self) -> None:
         """Remove and install the build from .env — slower than clear_data, always clean."""
@@ -287,6 +288,30 @@ class AppControl:
     def in_foreground(self, bundle_or_package: str) -> bool:
         """Whether another app (e.g. Settings) is in the foreground now (state 4)."""
         return self.driver.query_app_state(bundle_or_package) == 4
+
+    STAYS_IN_FRONT_HOLD = 1.5  # s; a system Back left the app within 0.5 s (manual, 2026-09-29)
+
+    def expect_stays_in_front(self, why: str, hold: float = STAYS_IN_FRONT_HOLD) -> None:
+        """The app under test is still in the foreground throughout ``hold`` seconds — a negative
+        expectation needs a window: right after a system Back the screen still shows the app
+        while Android is already leaving it (module 01+03 Android run 1: the frame after Back
+        was the splash, the next one the previous app)."""
+        with allure.step(f"expect the app to stay in the foreground ({why})"):
+            end = time.monotonic() + hold
+            while True:
+                state = self.driver.query_app_state(self.app_id)
+                if state != 4:
+                    allure.attach(
+                        self.driver.get_screenshot_as_png(),
+                        name="the app is not in front",
+                        attachment_type=allure.attachment_type.PNG,
+                    )
+                    raise AssertionError(
+                        f"{why}: the app left the foreground (app state {state}, 4 = foreground)"
+                    )
+                if time.monotonic() >= end:
+                    return
+                time.sleep(0.25)
 
     # --- job links (module 03; recon 4, 2026-09-24) -----------------------------------------
 

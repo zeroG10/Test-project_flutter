@@ -17,6 +17,7 @@ import allure
 from selenium.common.exceptions import WebDriverException
 
 from helpers import waits
+from helpers.device import terminate_app
 from pages.base_page import BasePage
 from screens.settings_map import SETTINGS
 
@@ -68,7 +69,7 @@ class SystemSettingsPage(BasePage):
             )
             if allowed:  # D-NOTIF-A1: the app sees the new permission only after a restart
                 with contextlib.suppress(WebDriverException):
-                    self.driver.terminate_app(app_id)
+                    terminate_app(self.driver, app_id)
             self.driver.activate_app(app_id)
 
     def set_app_notifications(self, allowed: bool, app_id: str) -> None:

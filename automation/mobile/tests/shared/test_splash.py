@@ -63,14 +63,17 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
         splash.expect_shown_after_system_splash()  # iOS: the first frame (unchanged)
         splash.expect_no_interactive_elements()
         splash.tap_centre()
-        pages.welcome.go_back()  # iOS: edge swipe
-        splash.expect_shown("splash after a tap and an edge swipe")
-        splash.expect_logo_centred()
+        pages.welcome.go_back()  # iOS: edge swipe; Android: the system Back
+        shown = splash.expect_shown("splash after a tap and an edge swipe")
+        splash.expect_logo_centred(shown)
     except SplashMissed as exc:
         pytest.skip(f"Blocked: timing — {exc}; the splash could not be observed in time")
     finally:
         if idle is not None:
             driver.update_settings({"waitForIdleTimeout": idle})
+    # CHK-SPL-007: the back changed nothing — on Android the frame right after the system Back
+    # still shows the splash while the app is already being left (Q-SPL-A2), so: over a window
+    app.expect_stays_in_front("a back on the splash changes nothing")
     pages.welcome.expect_text("title", expected(WELCOME_TITLE), LANDING)  # Welcome, not Login
     pages.login.wait_gone("root", 2)
 

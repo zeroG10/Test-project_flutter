@@ -92,16 +92,23 @@ class SplashPage(BasePage):
         with allure.step("tap the centre of the splash"):
             self.driver.tap([(size["width"] // 2, size["height"] // 2)])
 
-    def expect_logo_centred(self, tolerance: float = LOGO_TOLERANCE) -> None:
-        """Wait for the logo (light pixels on the brand colour), then check its centre."""
+    def expect_logo_centred(
+        self, frame: bytes | None = None, tolerance: float = LOGO_TOLERANCE
+    ) -> None:
+        """Wait for the logo (light pixels on the brand colour), then check its centre.
+
+        ``frame``: a screenshot already proven to be the splash (``expect_shown``) — judged first,
+        so a splash that ends a moment later is still judged (Android: the logo is drawn from the
+        first brand frame; module 01+03 Android run 1 took a new screenshot after the splash had
+        gone). Without a logo in it, the page waits for one as before (iOS draws it late)."""
         width = self.driver.get_window_size()["width"]
         seen: list[tuple[float, float]] = []
+        # Android works in pixels: skip the status bar with the DEBUG ribbon (~150 px) and the
+        # gesture bar (last ~65 px) — their glyphs are light too (recon A1 frames).
+        skips = (300, 100) if self.platform == "android" else ()
 
-        def logo_drawn(_driver) -> bool:
-            png, share = self._frame()
-            if share < SPLASH_SHARE - 0.1:  # the logo itself takes ~2 % of the screen
-                raise SplashMissed(f"splash gone before the logo appeared (brand {share:.3f})")
-            offset = pixels.light_blob_offset(png, width)
+        def logo_in(png: bytes) -> bool:
+            offset = pixels.light_blob_offset(png, width, *skips)
             if offset is None:
                 return False
             seen.append(offset)
@@ -109,8 +116,15 @@ class SplashPage(BasePage):
                           attachment_type=allure.attachment_type.PNG)  # fmt: skip
             return True
 
+        def logo_drawn(_driver) -> bool:
+            png, share = self._frame()
+            if share < SPLASH_SHARE - 0.1:  # the logo itself takes ~2 % of the screen
+                raise SplashMissed(f"splash gone before the logo appeared (brand {share:.3f})")
+            return logo_in(png)
+
         with allure.step("expect the logo centred on the splash"):
-            waits.wait_until(self.driver, logo_drawn, LOGO_TIMEOUT, "the logo never appeared")
+            if frame is None or not logo_in(frame):
+                waits.wait_until(self.driver, logo_drawn, LOGO_TIMEOUT, "the logo never appeared")
             dx, dy = seen[-1]
             assert abs(dx) <= tolerance and abs(dy) <= tolerance, (
                 f"logo centre off by {dx:+.1%} / {dy:+.1%} of the screen "

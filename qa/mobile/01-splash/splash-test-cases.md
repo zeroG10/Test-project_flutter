@@ -72,6 +72,11 @@ If a step cannot be observed inside the splash, the TC is **Blocked (timing)**, 
 after the interactions because in the debug build the logo is drawn only at the end of the splash (recon 4). The long press on the logo is **not** used: in the `development`
 flavour it opens the debug screen by design (D-SPL-4). The logo animates while it grows (fade, scale, a half turn);
 its centre does not move, so step 3 holds at any moment of the animation.
+**Android (step 4 of the Android stage, 2026-09-29):** step 2 is the first brand frame **after** the system splash
+(Q-SPL-A1); step 5 is the **system Back**, and "nothing happens" also means "the app stays in the foreground" — checked
+over a 1.5 s window after step 7, because the frame right after Back still shows the splash while Android is already
+leaving the app (Q-SPL-A2); step 7 judges the frame of step 6 first (the logo is drawn from the first brand frame, and
+the splash may end a moment later).
 
 ---
 
