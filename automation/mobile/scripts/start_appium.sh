@@ -4,4 +4,8 @@
 #   appium driver install xcuitest
 #   appium driver install --source=npm appium-flutter-integration-driver   # only for FLUTTER_DRIVER=integration
 set -euo pipefail
-appium --address "${APPIUM_HOST:-127.0.0.1}" --port "${APPIUM_PORT:-4723}" --log-level info
+# session_discovery (local server only): scripts/run.sh lists and closes sessions a killed run left
+# behind — such a session, when its newCommandTimeout expires, stops the UiAutomator2 server under the
+# NEXT run (Android stage, module 02 run 4: seven tests errored).
+appium --address "${APPIUM_HOST:-127.0.0.1}" --port "${APPIUM_PORT:-4723}" --log-level info \
+  --allow-insecure "*:session_discovery"

@@ -502,7 +502,11 @@ class BasePage:
                 int(a.get("width", 0)),
                 int(a.get("height", 0)),
             )
-        if a.get("displayed") == "false" or not a.get("bounds"):
+        # Android twin of iOS StaticText: plain, non-interactive text. The phone field holds the
+        # country-code Button ('United States + 1\n+ 1') inside its bounds (recon A1).
+        if a.get("displayed") == "false" or not a.get("bounds") or a.get("clickable") == "true":
+            return "", None
+        if a.get("class") in ("android.widget.Button", "android.widget.EditText"):
             return "", None
         left, top, right, bottom = (
             int(n) for n in a["bounds"].replace("][", ",").strip("[]").split(",")

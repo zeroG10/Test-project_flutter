@@ -8,6 +8,7 @@ recon saw. Device behaviour (gestures, timing) is proven by the module runs (ste
 """
 
 import unittest
+import xml.etree.ElementTree as ET
 from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -19,6 +20,7 @@ from pages.link_dialogs_page import _visible_texts
 from pages.notes_page import rows_in as note_rows
 from pages.notifications_page import rows_in as notification_rows
 from pages.photo_report_page import PhotoReportPage
+from pages.registration_page import RegistrationPage
 from pages.submit_dialog_page import Submission, observe, snackbars
 from pages.tabbar_page import TabBarPage
 
@@ -92,6 +94,18 @@ class AndroidReaders(unittest.TestCase):
         self.assertEqual(photos[0]["name"], "QA recon photo A1\nUndamaged")
         self.assertIsNotNone(photos[0]["delete"])
         self.assertEqual(page.descriptions(), ["QA recon photo A1"])
+
+    def test_field_message_reader_skips_controls(self):
+        # the phone field holds the country-code Button inside its bounds; only plain text counts
+        page = RegistrationPage(FakeDriver(), "android")
+        texts = [
+            page._text_and_bounds(n)[0]
+            for n in ET.fromstring(tree("registration")).iter()
+            if page._text_and_bounds(n)[1] is not None
+        ]
+        self.assertNotIn("United States + 1\n+ 1", texts)
+        self.assertNotIn("Log in", texts)
+        self.assertIn("Registration", texts)
 
 
 if __name__ == "__main__":

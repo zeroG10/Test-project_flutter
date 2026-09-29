@@ -75,6 +75,17 @@ ARGS="$*"
 trap finish EXIT
 mkdir -p "$OUT"
 
+# Close every Appium session a killed run left behind (we hold the run lock: no other run is
+# live). A leftover session stops the device's UiAutomator2 server when its newCommandTimeout
+# expires — under THIS run (module 02 run 4). Needs start_appium.sh's session_discovery.
+APPIUM="http://${APPIUM_HOST:-127.0.0.1}:${APPIUM_PORT:-4723}"
+for sid in $(curl -s -m 10 "$APPIUM/appium/sessions" | python3 -c \
+    'import json,sys; print(" ".join(s["id"] for s in json.load(sys.stdin).get("value") or [] if isinstance(s, dict)))' \
+    2>/dev/null); do
+  echo "closing a leftover Appium session $sid"
+  curl -s -m 60 -X DELETE "$APPIUM/session/$sid" >/dev/null || true
+done
+
 set +e
 uv run pytest --platform="$PLATFORM" --alluredir="$OUT" "$@"
 CODE=$?
