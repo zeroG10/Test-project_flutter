@@ -43,6 +43,7 @@ VIEW_MARGIN = 50  # points kept clear at the top (status bar) and bottom (home i
 # Android works in pixels (Pixel 7: 1080 x 2400): the status bar is 136 px, the app bar ends
 # at 283 px, the gesture bar takes the last ~65 px (recon A1).
 VIEW_MARGIN_ANDROID = 150
+KEYCODE_0 = 7  # Android KeyEvent.KEYCODE_0; KEYCODE_1..9 follow
 
 
 def normalized(text: str | None) -> str:
@@ -175,15 +176,19 @@ class BasePage:
                     self._send(element, text, per_char)
 
     def _send(self, element: WebElement, text: str, per_char: bool) -> None:
-        """Type ``text`` into the focused ``element``. ``per_char`` on Android: real key presses
-        through the IME — there every ``send_keys`` REPLACES the field's text (ACTION_SET_TEXT),
-        so key-by-key ``send_keys`` would leave only the last character (module 02 run 1). One
-        ``mobile: type`` per character: the whole number in one call is a burst the phone
-        formatter drops keys from on a busy emulator ('(20450' for 2025550450, TC-AUTH-014
-        re-run) — the iOS recon 3d problem."""
+        """Type ``text`` into the focused ``element``.
+
+        ``per_char`` on Android (the masked phone input — digits only): one key press per digit,
+        ``mobile: pressKey``, injected by the UiAutomator2 server like a hardware key. Not
+        ``send_keys`` — every call REPLACES the text there (ACTION_SET_TEXT, module 02 run 1) —
+        and not ``mobile: type``: it switches to Appium's invisible IME and back for every call
+        (~2.4 s here), sent as one burst the formatter dropped keys ('(20450' for 2025550450),
+        and Gboard popped up seconds later over Continue (TC-AUTH-014 re-runs)."""
         if per_char and self.platform == "android":
-            for char in text:
-                self.driver.execute_script("mobile: type", {"text": char})
+            if not text.isdigit():
+                raise ValueError(f"per-char typing on Android takes digits only, got {text!r}")
+            for digit in text:
+                self.driver.execute_script("mobile: pressKey", {"keycode": KEYCODE_0 + int(digit)})
             return
         for chunk in text if per_char else (text,):
             element.send_keys(chunk)
