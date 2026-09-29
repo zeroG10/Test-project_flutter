@@ -346,6 +346,27 @@ The run must be all red; the summary lists any test that stayed green as **NOT P
 A test fails at its first text expectation, which is placed before any server call where
 possible, so a prove-red run costs the DEV server little.
 
+## Android (Android stage — docs/notes/android-plan.md)
+
+- Emulator `Pixel_7_API_36` (Pixel 7 · Android 16 · Google APIs arm64 · 4 GB), debug APK in
+  `builds/android/` (`BUILD_INFO.txt`). Run: `bash scripts/run.sh android <name> [pytest args]`.
+- One-time device setup a fresh AVD needs (recon A1): Chrome first run → "Use without an
+  account"; Google Maps → "Skip"; Google Messages → "Use Messages without an account"; the
+  Google "Location Accuracy" dialog → "Turn on"; `adb shell settings put secure
+  stylus_handwriting_enabled 0` (Gboard's stylus tutorial covered the screen).
+- The session sets `waitForIdleTimeout` = 100 ms (Flutter redraws never let UiAutomator see
+  "idle") and a 90-s UiAutomator2 server start.
+- Flutter hands Android only the on-screen part of a scrolled form: the survey page walks the
+  form (`pages/survey_page.py`); a whole-card text field takes text only through the IME
+  (`mobile: type`).
+- `AppControl.clear_data` = `pm clear` + the runtime permissions granted again; `set_location` keeps
+  the emulator GPS at the point (a fix per second — not reported as mocked, so check-in needs no
+  debug switch); `mock_location` makes Appium Settings the mock provider for the guard test.
+- An ANR dialog ("… isn't responding") on a failure turns the test into **Blocked** (a starved
+  emulator, not an app verdict — `conftest.py` `AnrBlocked`). Keep the Mac idle during runs.
+- Offline: `unit_tests/test_android_maps.py` (the Android column on the recon trees),
+  `unit_tests/test_android_pages.py` (the pages' Android readers on the same trees).
+
 ## Offline self-test
 
 ```bash

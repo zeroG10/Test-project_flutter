@@ -65,3 +65,6 @@ automation/web/playwright/scripts/recon-out/
 # Код клієнта живе ЗОВНІ цього репозиторію: читаємо, збираємо, НЕ змінюємо
 # (QA-доктрина, правило 4 — app under test is read-only).
 /app
+
+# Claude Code subagent worktrees (local copies of this repo)
+.claude/worktrees/

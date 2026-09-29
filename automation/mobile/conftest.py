@@ -75,6 +75,8 @@ PROVE_RED_SUFFIX = " «prove-red: deliberately wrong»"
 
 
 def pytest_configure(config):
+    if not config.pluginmanager.has_plugin("anr-blocked"):
+        config.pluginmanager.register(AnrBlocked(), "anr-blocked")
     raw = config.getoption("--platform") or settings.platform
     try:
         config.stash[PLATFORM_KEY] = normalize_platform(raw)
@@ -261,6 +263,38 @@ def pytest_runtest_makereport(item, call):
         _attach_screen_evidence(item, f"on-failure-{report.when}")
     elif report.when == "setup" and report.skipped and "Blocked:" in _skip_reason(report):
         _attach_screen_evidence(item, "blocked-setup")
+
+
+ANR_REASON = (
+    "Blocked: the emulator showed '… isn't responding' (ANR) — the emulator was starved of CPU; "
+    "not an app verdict (recon A1, Fable's analysis: docs/notes/session-handoff.md §3х). Re-run "
+    "on an idle host."
+)
+
+
+class AnrBlocked:
+    """Android: a failure with the system ANR dialog on screen is Blocked, never Failed. The
+    frozen app is closed so the next test starts it again (no "Wait" loop: every ANR dump
+    freezes the app longer). Registered as its own plugin in ``pytest_configure`` — a module
+    holds one function per hook name — and innermost, so Allure already records the skip."""
+
+    @pytest.hookimpl(hookwrapper=True, trylast=True)
+    def pytest_runtest_makereport(self, item, call):
+        outcome = yield
+        report = outcome.get_result()
+        if report.when not in ("setup", "call") or not report.failed:
+            return
+        drv, platform = item.funcargs.get("driver"), item.funcargs.get("platform")
+        if drv is None or platform != "android":
+            return
+        with contextlib.suppress(Exception):
+            if "android:id/aerr_wait" not in drv.page_source:
+                return
+            _attach_screen_evidence(item, "anr")
+            with contextlib.suppress(Exception):
+                drv.find_element("id", "android:id/aerr_close").click()
+            report.outcome = "skipped"
+            report.longrepr = (str(item.path), item.location[1] or 0, ANR_REASON)
 
 
 # --------------------------------------------------------------------------- #

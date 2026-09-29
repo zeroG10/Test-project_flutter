@@ -116,3 +116,29 @@ Write what you observed; leave what you did not as a placeholder. An element nob
 keeps a `<...>` value so it fails loudly instead of matching something by accident — the same
 rule as the web maps. Missing stable ids are a testability defect, filed against the contract,
 never worked around with a coordinate tap or an XPath over the widget tree.
+
+## The Android column (Android stage, step 3 — 2026-09-29)
+
+Filled from the recon A1 trees (`qa/shared/recon-dumps/android-2026-09-29/`), never by guessing;
+checked offline by `unit_tests/test_android_maps.py` (every Android locator is evaluated on the
+trees the way UiAutomator2 would — `unit_tests/android_dumps.py`, CLI:
+`PYTHONPATH=. uv run python -m unit_tests.android_dumps <screen-id>`). Rules learnt on the device:
+
+- Flutter labels are in `content-desc`; `AppiumBy.ACCESSIBILITY_ID` is an exact match and works
+  with the `\n` of multi-line labels (`"Jobs\nTab 1 of 3"`).
+- A UiSelector string does NOT unescape `\n`, and `…Matches` is Java's `Pattern.matches` — the
+  whole value, `.` does not cross a newline: use `descriptionContains` / `descriptionStartsWith`
+  for a part of a multi-line label.
+- A text field is an `EditText` whose name is only its `hint`, which UiSelector cannot match:
+  `className("android.widget.EditText").instance(n)` with `hint '<hint>'` in the note (TD-A1).
+- Flutter may change a node's class with its state (a survey Yes/No is a Button, an ImageView when
+  selected) — no class for toggles. Selected tab / chip: `.selected(true)`; checkbox / radio:
+  `.checked(true)`.
+- Other apps (permission controller, Chrome Custom Tabs, Settings, Photo picker, Dialer, Maps):
+  their stable `resource-id` (`AppiumBy.ID`, full `package:id/name`).
+- Nothing on Android for an alias → `ANDROID_WITHOUT = {"screen.alias": "why"}` in the map module;
+  a screen not reached in recon → `ANDROID_UNVERIFIED = {…}` (confirmed on the module runs).
+  An element with no iOS locator is `note="Android only: …"`; Android-only screens live in
+  `screens/android/`.
+- The iOS column is guarded: `unit_tests/test_ios_locator_guard.py` fails on any iOS change.
+

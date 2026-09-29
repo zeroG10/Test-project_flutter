@@ -9,8 +9,11 @@ A check that can no longer be observed because the splash has already gone raise
 ``SplashMissed`` — the test turns it into Blocked (timing), never into Passed.
 """
 
+import xml.etree.ElementTree as ET
+
 import allure
 
+from config.settings import settings
 from helpers import pixels, waits
 from pages.base_page import BasePage
 from screens.splash_map import SPLASH
@@ -48,7 +51,16 @@ class SplashPage(BasePage):
         """No text, button, link, field or switch in the tree — and the splash still on screen
         afterwards, so the tree was read during the splash."""
         with allure.step("expect no interactive element in the tree during the splash"):
-            count = self.count_visible("interactive")
+            if self.platform == "android":  # no alias: the app's clickable nodes in the tree
+                source = self.driver.page_source
+                package = settings.app_id("android")
+                count = sum(
+                    1
+                    for el in ET.fromstring(source).iter()
+                    if el.attrib.get("package") == package and el.attrib.get("clickable") == "true"
+                )
+            else:
+                count = self.count_visible("interactive")
             self.expect_shown("splash after the tree read")
             assert count == 0, f"{count} text / button / field element(s) during the splash"
 

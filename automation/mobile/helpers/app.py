@@ -112,10 +112,9 @@ class AppControl:
             self.driver.execute_script("mobile: clearApp", {"appId": self.app_id})
             # pm clear revokes the runtime permissions — grant them again, as a fresh install
             # with autoGrantPermissions has them (the iOS path accepts its prompts instead).
-            adb = Adb.of(self.driver)
-            for permission in ANDROID_GRANTS:
-                with contextlib.suppress(Exception):
-                    adb.grant(self.app_id, permission)
+            self.driver.execute_script("mobile: changePermissions", {
+                "permissions": list(ANDROID_GRANTS), "appPackage": self.app_id,
+                "action": "grant"})  # fmt: skip
 
     FIRST_LAUNCH_WAIT = 10.0  # seconds for the notification prompt of a fresh install
 

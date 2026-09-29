@@ -34,7 +34,7 @@ from screens.location_dialogs_map import MOCK_LOCATION_MESSAGE, NOT_AT_SITE_MESS
 
 SERVER = 20.0
 RECORD_WINDOW = 60  # seconds between the tap on Confirm and the stored date (recon 6c: 0.6–0.7 s)
-SETTINGS_APP = "com.apple.Preferences"
+SETTINGS_APPS = {"ios": "com.apple.Preferences", "android": "com.android.settings"}
 
 CHECK_IN = ("Confirm check in", "Check in and start", "Confirm you are on site to begin the job.")
 CHECK_OUT = (
@@ -138,7 +138,8 @@ def test_go_to_settings(check_seed, guarded, ui_login, driver, platform, pages, 
         pages.disabled.expect_text("title", expected("Location disabled"), SERVER)
         pages.disabled.tap("go-to-settings")
     with allure.step("expect the Settings app in the foreground"):
-        waits.wait_until(driver, lambda _d: ui_login.in_foreground(expected(SETTINGS_APP)), SERVER,
+        settings_app = expected(SETTINGS_APPS[platform])
+        waits.wait_until(driver, lambda _d: ui_login.in_foreground(settings_app), SERVER,
                          "the Settings app did not open")  # fmt: skip
     ui_login.launch()
     ui_login.grant_location_permission()

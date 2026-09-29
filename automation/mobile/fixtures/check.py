@@ -93,6 +93,13 @@ def away(app):
 
 @pytest.fixture
 def guarded(app):
-    """Location granted, device at the job site, mock switch OFF — the app's guard is active."""
+    """Location granted, device at the job site, mock switch OFF — the app's guard is active.
+
+    Android: the emulator's GPS is NOT reported as mocked (recon A1), so the guard is exercised
+    with a real mock provider for the test (owner, Q-CHIO-A1); restored afterwards."""
     _device(app, SITE, mock_allowed=False)
-    return SITE
+    if app.platform == "android":
+        with app.mock_location(*SITE):
+            yield SITE
+        return
+    yield SITE

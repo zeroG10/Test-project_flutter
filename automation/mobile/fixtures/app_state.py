@@ -22,6 +22,7 @@ Pages the fixtures drive (step 5 implements them, aliases from the Auth test cas
 ``OtpPage.enter_code(code)``, ``JobsListPage`` / ``WelcomePage`` anchors.
 """
 
+import contextlib
 import dataclasses
 import re
 import time
@@ -59,6 +60,23 @@ def _landing(driver, platform) -> str:
         )
     except TimeoutException:
         return "unknown"
+
+
+def _allow_notification_prompt(driver, platform, jobs) -> None:
+    """Android 13+: the app asks for notifications after the first sign-in unless the permission
+    is already granted (``AppControl.clear_data`` grants it). If the system prompt comes anyway,
+    allow it — iOS answers its prompt with autoAcceptAlerts (recon A1)."""
+    from pages.android.system_pages import NotificationPermissionDialog
+
+    prompt = NotificationPermissionDialog(driver, platform)
+    with contextlib.suppress(TimeoutException):
+        found = wait_any(
+            driver,
+            {"prompt": lambda: prompt.is_visible("allow", 0), "jobs": lambda: jobs.is_open(0)},
+            LANDING_TIMEOUT,
+        )
+        if found == "prompt":
+            prompt.answer_if_shown(allow=True, timeout=1)
 
 
 @pytest.fixture
@@ -128,6 +146,8 @@ def ui_login(app, driver, platform, tech) -> AppControl:
                 welcome.open_login()
                 LoginPage(driver, platform).request_code(tech.email)
                 OtpPage(driver, platform).enter_code(tech.otp)
+                if platform == "android":
+                    _allow_notification_prompt(driver, platform, jobs)
                 jobs.assert_open(LANDING_TIMEOUT)
 
         try:

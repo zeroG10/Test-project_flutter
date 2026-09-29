@@ -200,7 +200,11 @@ class AppAndEvidence(unittest.TestCase):
         # metadata and iOS later resets the container (final runs 1–2, 2026-09-27).
         drv = FakeDriver()
         AppControl(drv, "android").clear_data()
-        self.assertEqual(drv.calls, [("execute_script", "mobile: clearApp", {"appId": mock.ANY})])
+        # pm clear revokes the runtime permissions: they are granted again (Android stage)
+        self.assertEqual(drv.calls[0], ("execute_script", "mobile: clearApp", {"appId": mock.ANY}))
+        self.assertEqual(drv.calls[1][:2], ("execute_script", "mobile: changePermissions"))
+        self.assertEqual(drv.calls[1][2]["action"], "grant")
+        self.assertIn("android.permission.POST_NOTIFICATIONS", drv.calls[1][2]["permissions"])
         drv = FakeDriver()
         with (
             mock.patch.object(AppControl, "reinstall") as reinstall,

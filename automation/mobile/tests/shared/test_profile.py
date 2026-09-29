@@ -28,7 +28,7 @@ from pages.tabbar_page import TabBarPage
 from pages.welcome_page import WelcomePage
 
 SERVER = 30.0
-BUILD_INFO = Path(__file__).resolve().parents[2] / "builds" / "ios" / "BUILD_INFO.txt"
+BUILDS = Path(__file__).resolve().parents[2] / "builds"  # builds/<platform>/BUILD_INFO.txt
 UNREGISTERED_EMAIL = "This email is not registered yet. Create an account to get started."
 
 
@@ -60,13 +60,15 @@ def open_edit(pages) -> None:
     pages.edit.assert_open(10)
 
 
-def build_version() -> str:
-    """'1.1.1 (178)' from the build under test (builds/ios/BUILD_INFO.txt); Blocked without it."""
-    if not BUILD_INFO.exists():
-        pytest.skip("Blocked: builds/ios/BUILD_INFO.txt missing — the build's version is unknown")
-    found = re.search(r"^version:\s*(.+)$", BUILD_INFO.read_text(encoding="utf-8"), re.M)
+def build_version(platform: str) -> str:
+    """'1.1.1 (178)' from the build under test (builds/<platform>/BUILD_INFO.txt); Blocked
+    without it."""
+    info = BUILDS / platform / "BUILD_INFO.txt"
+    if not info.exists():
+        pytest.skip(f"Blocked: {info.relative_to(BUILDS.parent)} missing — the version is unknown")
+    found = re.search(r"^version:\s*(.+)$", info.read_text(encoding="utf-8"), re.M)
     if not found:
-        pytest.skip("Blocked: no 'version:' line in builds/ios/BUILD_INFO.txt")
+        pytest.skip(f"Blocked: no 'version:' line in {info.relative_to(BUILDS.parent)}")
     return found.group(1).strip()
 
 
@@ -103,7 +105,7 @@ CARD_CHKS = ("CHK-PRF-001", "CHK-PRF-002", "CHK-PRF-003", "CHK-PRF-004", "CHK-PR
     "settings and the footer; the same after a restart"
 )
 def test_profile_card(ui_login, app, account, tech, pages, expected, evidence):
-    p, version = pages.profile, build_version()
+    p, version = pages.profile, build_version(app.platform)
     for attempt in ("first open", "after a restart"):
         with allure.step(f"Profile — {attempt}"):
             if attempt == "after a restart":

@@ -81,6 +81,7 @@ class Cards(unittest.TestCase):
         )
 
         class Frozen(JobsViewMixin):
+            platform = "ios"
             driver = mock.Mock(page_source=hidden, get_window_size=lambda: {"height": 874})
             wait_content = _drag_at = lambda *_a, **_k: None
 
