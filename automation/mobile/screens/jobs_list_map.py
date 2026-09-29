@@ -38,15 +38,16 @@ JOBS_LIST = Screen(
         "view-toggle": El(
             android=(
                 _U,
-                'new UiSelector().className("android.widget.ImageView").clickable(true)'
-                '.description("").instance(0)',
+                'new UiSelector().className("android.widget.ImageView")'
+                ".clickable(true).instance(0)",
             ),
             ios=(
                 _P,
                 "type == 'XCUIElementTypeButton' AND (name == nil OR name == '') AND rect.y < 140",
             ),
-            note="unnamed icon button in the app bar (y ≈ 66) — TD-JOBS-001. Android: the only "
-            "unlabelled clickable ImageView in the app bar (recon A1)",
+            note="unnamed icon button in the app bar (y ≈ 66) — TD-JOBS-001. Android: the first "
+            "clickable ImageView — the app bar comes before the tabs (recon A1); it has no "
+            "content-desc at all, which no description selector matches (01+03 run 3)",
         ),
         "card": El(
             android=(_U, "new UiSelector().descriptionContains({text})"),
@@ -66,8 +67,8 @@ JOBS_LIST = Screen(
         "empty-image": El(
             android=(
                 _U,
-                'new UiSelector().className("android.widget.ImageView").clickable(false)'
-                '.description("").instance(0)',
+                'new UiSelector().className("android.widget.ImageView")'
+                ".clickable(false).instance(0)",
             ),
             ios=(_P, "type == 'XCUIElementTypeImage' AND (name == nil OR name == '')"),
             note="unlabelled picture above 'No jobs'; the tree reports it visible=false in list "

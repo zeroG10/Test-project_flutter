@@ -11,7 +11,8 @@ Android (recon A1, qa/shared/recon-dumps/android-2026-09-29/photo_report*.xml, 2
   SIBLING unlabelled ImageView, clickable=true (TD-PHR-001 extends: distinguished from the tile by
   having no content-desc at all, not just by size); the "Add photo" buttons are ImageViews too
   (clickable=true, desc 'Add photo') so a bare className+clickable filter would also catch them —
-  the delete-icon locator adds ``description("")``.
+  the delete-icon locator counts by position (``instance(n)``; "Add photo" comes last) —
+  a node without content-desc matches no description selector on the device, not even ``""``.
 """
 
 from appium.webdriver.common.appiumby import AppiumBy
@@ -90,12 +91,13 @@ PHOTO_REPORT = Screen(
             android=(
                 _UI,
                 'new UiSelector().className("android.widget.ImageView").clickable(true)'
-                '.description("").instance({text})',
+                ".instance({text})",
             ),
             ios=(_P, _BUTTON + "(name == nil OR name == '') AND rect.width < 50"),
             note="a photo's delete icon — unnamed, top-right of the photo (TD-PHR-001). Android: "
-            "no content-desc at all (unlike 'Add photo', which has one) — position-based "
-            "instance(n), pass the tile's index as {text}",
+            "the n-th clickable ImageView — pass the tile's index as {text}; 'Add photo' comes "
+            "after every tile (recon A1). No content-desc at all, which no description selector "
+            "matches (01+03 run 3); the page reads the icons from the page source",
         ),
     },
 )

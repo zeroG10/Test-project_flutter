@@ -40,12 +40,13 @@ PROFILE = Screen(
         "edit": El(
             android=(
                 _U,
-                'new UiSelector().className("android.widget.ImageView").clickable(true)'
-                '.description("").instance(0)',
+                'new UiSelector().className("android.widget.ImageView")'
+                ".clickable(true).instance(0)",
             ),
             ios=(_P, _BUTTON + "rect.x > 330 AND rect.y < 200 AND rect.width < 40"),
             note="unnamed, at the card's top right (@346,142 32x32) — testability defect. "
-            "Android: the first unlabelled clickable ImageView, same position (recon A1)",
+            "Android: the first clickable ImageView (the tabs come after it, recon A1); it has no "
+            "content-desc at all, which no description selector matches (01+03 run 3)",
         ),
         "theme": El(
             android=(_U, 'new UiSelector().descriptionStartsWith("App theme (")'),

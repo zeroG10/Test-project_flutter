@@ -139,6 +139,14 @@ class Evaluator(unittest.TestCase):
         )
         self.assertEqual(inst, 1)
 
+    def test_missing_content_desc_is_null(self):
+        # UiAutomator: a node without content-desc has a NULL description — description("")
+        # does not match it (the calendar toggle, module 01+03 Android run 3)
+        match = ad._STRING["description"]
+        self.assertFalse(match({"class": "android.widget.ImageView"}, ""))
+        self.assertTrue(match({"content-desc": ""}, ""))
+        self.assertFalse(ad._STRING["descriptionContains"]({}, ""))
+
     def test_unknown_method_is_reported(self):
         with self.assertRaises(ad.Unsupported):
             ad.parse_selector('new UiSelector().fromParent(new UiSelector().text("x"))')

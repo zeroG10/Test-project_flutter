@@ -73,13 +73,13 @@ PDF_VIEWER = Screen(
             ios=(_P, _BUTTON + "(name == nil OR name == '') AND rect.y < 140"),
             android=(
                 _U,
-                'new UiSelector().className("android.widget.Button")'
-                '.description("").clickable(true)',
+                'new UiSelector().className("android.widget.Button").clickable(true)',
             ),
             note="TD-ORDD-001: the X icon has no label; once the PDF loads the download icon is a "
-            "second unnamed button to its left — the page taps the right-most one. Android: same "
-            "two unlabelled Buttons (empty content-desc, position-based), 'Back' is excluded since "
-            "its content-desc is not empty (recon A1)",
+            "second unnamed button to its left — the page taps the right-most one. Android: every "
+            "clickable Button — 'Back' (left) and the two unlabelled ones; the right-most is X "
+            "(recon A1). They have no content-desc at all, which no description selector "
+            "matches (01+03 run 3)",
         ),
         "any-editable": El(
             ios=(

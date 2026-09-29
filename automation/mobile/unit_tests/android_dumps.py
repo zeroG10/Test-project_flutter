@@ -34,10 +34,14 @@ _STRING = {
     "textStartsWith": lambda a, v: a.get("text", "").startswith(v),
     # Java's Pattern.matches: whole value, and "." does NOT cross a newline (no DOTALL)
     "textMatches": lambda a, v: re.fullmatch(v, a.get("text", "")) is not None,
-    "description": lambda a, v: a.get("content-desc", "") == v,
-    "descriptionContains": lambda a, v: v in a.get("content-desc", ""),
-    "descriptionStartsWith": lambda a, v: a.get("content-desc", "").startswith(v),
-    "descriptionMatches": lambda a, v: re.fullmatch(v, a.get("content-desc", "")) is not None,
+    # A node without content-desc has a NULL description on the device: no description selector
+    # matches it, not even description("") (module 01+03 Android run 3: the calendar toggle)
+    "description": lambda a, v: a.get("content-desc") == v,
+    "descriptionContains": lambda a, v: "content-desc" in a and v in a["content-desc"],
+    "descriptionStartsWith": lambda a, v: "content-desc" in a and a["content-desc"].startswith(v),
+    "descriptionMatches": lambda a, v: (
+        "content-desc" in a and re.fullmatch(v, a["content-desc"]) is not None
+    ),
     "className": lambda a, v: a.get("class", "") == v,
     "classNameMatches": lambda a, v: re.fullmatch(v, a.get("class", "")) is not None,
     "resourceId": lambda a, v: a.get("resource-id", "") == v,

@@ -60,12 +60,13 @@ NOTIFICATIONS = Screen(
         "chevron": El(
             android=(
                 _U,
-                'new UiSelector().className("android.widget.ImageView").description("")',
+                'new UiSelector().className("android.widget.ImageView").clickable(false)',
             ),
             ios=(_P, "type == 'XCUIElementTypeImage' AND rect.x > 340 AND rect.width < 30"),
             note="unnamed, at the row's right end (x 366, 20x20) — paired with its row by the "
-            "page. Android: matches every unlabelled ImageView in a row (icon + chevron, not "
-            "distinguishable by attributes alone) — same structural caveat as iOS (recon A1)",
+            "page. Android: every non-clickable ImageView — a row's icon and chevron (no "
+            "content-desc at all, which no description selector matches; 01+03 run 3); the page "
+            "tells them apart by x (recon A1)",
         ),
         "banner": El(
             android=(
