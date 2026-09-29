@@ -32,7 +32,7 @@ phone request was not captured (no network capture in the run).
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
-| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
+| Platforms checked | iOS ✓ reproduced · Android ✓ reproduced (Pixel 7 emulator · Android 16, debug APK 1.1.1 (178); module 02 Android runs, 2026-09-29; added under the Android plan rule: a repeating iOS bug goes into the same report) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -64,6 +64,9 @@ phone request was not captured (no network capture in the run).
 A red banner at the bottom for ~4 s: "An unexpected error occurred. Please try logging in again."; the app stays on Login
 with the number kept in the field. // [evidence/BUG-AUTH-001/ios/unregistered-phone-banner.png](evidence/BUG-AUTH-001/ios/unregistered-phone-banner.png)
 
+Android: the same banner, same wording, above the keyboard; the number stays in the field.
+// [evidence/BUG-AUTH-001/android/unregistered-phone-banner.png](evidence/BUG-AUTH-001/android/unregistered-phone-banner.png)
+
 ## Expected result
 
 When the entered phone number is not associated with an account, the app tells the user so and points to registration:
@@ -72,8 +75,9 @@ over the SRS wording — D-8).
 
 ## Frequency
 
-- [x] Always — **3 of 3 attempts**, three different numbers from `+1 202 555 01xx` (run 1, targeted re-run, run 2 —
-  2026-09-23). Not tried with a real, unregistered, non-fictional number (would send an SMS to a real person).
+- [x] Always — iOS: **3 of 3 attempts**, three different numbers from `+1 202 555 01xx` (run 1, targeted re-run, run 2 —
+  2026-09-23). Android: **3 of 3 attempts** (module 02 Android runs 4, 5 and 6, 2026-09-29), each with a number from the same
+  range checked free through the API before the attempt. Not tried with a real, unregistered, non-fictional number (would send an SMS to a real person).
 
 ## Crash? ANR?
 
@@ -82,8 +86,12 @@ over the SRS wording — D-8).
 ## Evidence
 
 - Screenshot: [evidence/BUG-AUTH-001/ios/unregistered-phone-banner.png](evidence/BUG-AUTH-001/ios/unregistered-phone-banner.png)
+- Android screenshot: [evidence/BUG-AUTH-001/android/unregistered-phone-banner.png](evidence/BUG-AUTH-001/android/unregistered-phone-banner.png)
+  — a frame of the run-4 screen recording (`+12025550177`).
 - Screen recording: Allure result of run 2 (`automation/mobile/allure-results`, test
   `test_login_rejects_unregistered_phone`, attachment "video · test_login_rejects_unregistered_phone") — local only.
+  Android: the same attachment in `automation/mobile/results/android/2026-09-29-02-auth-r4/` (and the later module 02
+  Android runs) — local only.
 - Automated test: `automation/mobile/tests/shared/test_authentication.py::test_login_rejects_unregistered_phone` — red,
   kept red against the checklist (not edited, not quarantined).
 - Contrast: `test_login_rejects_invalid_and_unregistered_email` — the email path shows "This email is not registered yet.
