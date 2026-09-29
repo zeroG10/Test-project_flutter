@@ -142,7 +142,8 @@ class JobDetailsPage(BasePage):
         first — the button itself reads as visible under it."""
         with allure.step("tap job-details.submit-deliverables → submit-dialog"):
             self.visible("submit-deliverables", SNACKBAR)
-            waits.wait_until(self.driver, lambda d: not snackbars(d.page_source), SNACKBAR)
+            gone = lambda d: not snackbars(d.page_source, self.platform)  # noqa: E731
+            waits.wait_until(self.driver, gone, SNACKBAR)
             self.tap("submit-deliverables")
             dialog = SubmitDialog(self.driver, self.platform)
             dialog.assert_open(10)

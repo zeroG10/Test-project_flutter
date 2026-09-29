@@ -35,6 +35,9 @@ class JobsCalendarPage(JobsViewMixin, BasePage):
 
     def week_days(self) -> list[str]:
         """Names of the day cells, left → right (one page-source read)."""
+        if self.platform == "android":
+            shown = [(n.x, n.label) for n in self.nodes() if n.visible and _DAY_CELL.match(n.label)]
+            return [name for _, name in sorted(shown)]
         cells = []
         for node in ET.fromstring(self.driver.page_source).iter():
             a = node.attrib

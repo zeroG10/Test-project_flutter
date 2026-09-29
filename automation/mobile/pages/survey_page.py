@@ -11,15 +11,18 @@ What the tree does not give is resolved here, each with its testability defect:
 """
 
 import re
+import statistics
 import time
 import xml.etree.ElementTree as ET
+from collections import Counter
+from collections.abc import Callable
 
 import allure
 from appium.webdriver.webelement import WebElement
 from selenium.common.exceptions import TimeoutException
 
 from helpers import waits
-from pages.base_page import BasePage
+from pages.base_page import BasePage, Node
 from screens.survey_map import (
     FORM_ORDER,
     SURVEY,
@@ -36,6 +39,74 @@ PICKER_WAIT = 10.0  # the system photo picker takes a few seconds to appear (rec
 SNACKBAR = 10.0  # a snackbar stays ~4 s
 STILL_WAIT = 4.0  # the form's own scroll animation lasts 300 ms; a drag settles within a second
 LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only absorbs the redraw
+
+# --- Android (step 3; recon A1) -------------------------------------------------------------
+# Flutter hands Android only the ON-SCREEN part of the form (allowInvisibleElements changes
+# nothing, checked 2026-09-29), so "the n-th of a kind" cannot be read from one tree as on iOS.
+# The page walks the form from the top with drags that stop where the finger stops, measures each
+# drag's real travel on nodes seen before and after it, and keeps every match at its position in
+# the whole form (two matches of one kind are never within DEDUP px of each other).
+TOP_A, BOTTOM_A = 290, 2170  # px: below the app bar, above the Save button (Pixel 7)
+DEDUP = 40
+DATE_TEXT = re.compile(r"^[A-Z][a-z]{2} \d{1,2}, \d{4}$")  # 'Sep 15, 2026' once picked
+TIME_TEXT = re.compile(r"^\d{1,2}:\d{2}\s?[AP]M$")  # '9:30 AM' once picked
+_NOT_TEXT_HINTS = ("Select date", "Select time", "Hour", "Minute")
+TEXT_FOCUS_FROM_BOTTOM_A = 184  # px (70 pt): a whole-card text field's input area (TD-SRV-002)
+
+
+def _android_form_order(alias: str, text: str | None) -> Callable[[Node], bool]:
+    """The Android twin of FORM_ORDER: which nodes are ``alias`` (recon A1 trees)."""
+    toggles = ("Button", "ImageView")  # Yes / No turn from Button into ImageView when selected
+
+    def is_text(n: Node) -> bool:
+        return (
+            n.kind == "EditText"
+            and n.hint not in _NOT_TEXT_HINTS
+            and not DATE_TEXT.match(n.value)
+            and not TIME_TEXT.match(n.value)
+        )
+
+    specs: dict[str, Callable[[Node], bool]] = {
+        "yes": lambda n: n.kind in toggles and n.label == "Yes",
+        "no": lambda n: n.kind in toggles and n.label == "No",
+        "option": lambda n: n.kind in ("RadioButton", *toggles) and n.label == text,
+        "checkbox": lambda n: n.kind == "CheckBox" and n.label == text,
+        "text": is_text,
+        "date": lambda n: (
+            n.kind == "EditText" and (n.hint == "Select date" or bool(DATE_TEXT.match(n.value)))
+        ),
+        "time": lambda n: (
+            n.kind == "EditText" and (n.hint == "Select time" or bool(TIME_TEXT.match(n.value)))
+        ),
+        "upload-photo": lambda n: n.label == "Upload photo",
+        "repeat": lambda n: n.label == "Repeat section",
+        "delete-entry": lambda n: n.kind == "Button" and n.label == "Delete" and n.width < 160,
+        "entry-headers": lambda n: bool(text) and n.label.startswith(text or ""),
+    }
+    return specs[alias]
+
+
+def _travel(before: list[Node], after: list[Node]) -> float | None:
+    """How far the form moved up between two reads (px) — the median shift of the nodes that are
+    in both reads once and whole, inside the scroll band; None when nothing tells."""
+
+    def key(n: Node) -> tuple:
+        return (n.kind, n.label, n.hint, n.value, n.x, n.width, n.height)
+
+    def unique(nodes: list[Node]) -> dict[tuple, int]:
+        counts = Counter(key(n) for n in nodes)
+        return {key(n): n.y for n in nodes if counts[key(n)] == 1 and TOP_A <= n.y < BOTTOM_A}
+
+    b, a = unique(before), unique(after)
+    shifts = [b[k] - a[k] for k in b.keys() & a.keys()]
+    return statistics.median(shifts) if shifts else None
+
+
+def _attrs(n: Node) -> dict:
+    """A node in the shape ``matches`` gives on iOS (rect, ``value``: "1" = selected / checked)."""
+    selected = n.checked or n.selected
+    return {"name": n.label, "value": "1" if selected else n.value, "visible": "true",
+            "x": n.x, "y": n.y, "width": n.width, "height": n.height}  # fmt: skip
 
 
 class SurveyDatePicker(BasePage):
@@ -77,11 +148,21 @@ class SurveyPage(BasePage):
     # --- what is on the form -----------------------------------------------------------
 
     def titles(self) -> list[str]:
+        if self.platform == "android":
+            return self._titles_android()
         return titles_in(self.driver.page_source)
 
     def expect_titles(self, expected: list[str], timeout: float = LOGIC_WAIT) -> None:
         """The form renders exactly ``expected`` questions, in this order (a logic-table row)."""
         with allure.step(f"expect the visible questions: {expected}"):
+            if self.platform == "android":  # a walk of the form per read: two reads, not a poll
+                time.sleep(1.0)
+                shown = self.titles()
+                if shown != expected:
+                    time.sleep(timeout / 2)
+                    shown = self.titles()
+                assert shown == expected, f"visible questions {shown}, expected {expected}"
+                return
             try:
                 waits.wait_until(self.driver, lambda _d: self.titles() == expected, timeout)
             except TimeoutException:
@@ -91,16 +172,26 @@ class SurveyPage(BasePage):
 
     def labels(self) -> list[str]:
         """The raw card labels that carry question titles (for "no required marker")."""
+        if self.platform == "android":
+            seen: list[str] = []
+            for nodes in self._viewports():
+                for n in nodes:
+                    for raw in (n.label, n.hint):
+                        if TITLE.search(raw) and raw not in seen:
+                            seen.append(raw)
+            return seen
         return [el.attrib.get("name") or "" for el in ET.fromstring(self.driver.page_source).iter()
                 if TITLE.search(el.attrib.get("name") or "")]  # fmt: skip
 
     def count(self, alias: str, **params: object) -> int:
         """How many ``alias`` the form renders now (on screen or not)."""
+        if self.platform == "android":
+            return self._count_android(alias, **params)
         return len(self.driver.find_elements(*self.locator(alias, **params)))
 
     def names(self, alias: str, **params: object) -> list[str]:
         return [
-            e.get_attribute("name") or ""
+            self.label_of(e) if self.platform == "android" else e.get_attribute("name") or ""
             for e in self.driver.find_elements(*self.locator(alias, **params))
         ]
 
@@ -132,6 +223,8 @@ class SurveyPage(BasePage):
         returns its page-source attributes (rect, value). Off-screen elements carry no position,
         so the direction comes from the ones on screen; at an end of the form (nothing moved) it
         turns round."""
+        if self.platform == "android":
+            return self._nth_android(alias, n, text)
         height = self.driver.get_window_size()["height"]
         direction, previous = None, None
         name = f"survey.{alias}[{text or ''}]"
@@ -177,7 +270,7 @@ class SurveyPage(BasePage):
     def _tap_attrs(self, a: dict, y_offset: float | None = None) -> None:
         x = int(a["x"]) + int(a["width"]) / 2
         y = int(a["y"]) + (y_offset if y_offset is not None else int(a["height"]) / 2)
-        self.driver.execute_script("mobile: tap", {"x": x, "y": y})
+        self.tap_xy(x, y)
 
     def tap_nth(self, alias: str, n: int = 0, text: str | None = None) -> None:
         with allure.step(f"tap survey.{alias}[{text or ''}] #{n + 1}"):
@@ -196,6 +289,98 @@ class SurveyPage(BasePage):
                 f"survey.{alias}[{text or ''}] #{n + 1} is not {state}"
             )
 
+    # --- Android: walking the form (see TOP_A … above) ---------------------------------
+
+    def _to_top(self) -> None:
+        height = self.driver.get_window_size()["height"]
+        previous = None
+        for _ in range(12):
+            source = self._still_source()
+            if source == previous:
+                return
+            previous = source
+            self._drag(int(height * 0.3), int(height * 0.8))
+
+    def _scan(self):
+        """(nodes, offset) per screen of the form from the top to its end (Android): ``offset``
+        is how far the form has moved up so far — a node's form position is ``y + offset``. The
+        end is a drag after which the tree is the same; a drag whose travel cannot be measured
+        (no node whole in both reads) counts its nominal length."""
+        height = self.driver.get_window_size()["height"]
+        self._to_top()
+        source = self._still_source()
+        before, offset = self.nodes(source), 0.0
+        for _ in range(NTH_DRAGS):
+            yield before, offset
+            self._drag(int(height * 0.7), int(height * 0.35))
+            after_source = self._still_source()
+            if after_source == source:
+                return
+            after = self.nodes(after_source)
+            moved = _travel(before, after)
+            offset += moved if moved is not None else height * 0.35 - 21
+            source, before = after_source, after
+
+    def _viewports(self):
+        """The form's screens from the top to the end (Android)."""
+        for nodes, _ in self._scan():
+            yield nodes
+
+    def _walk(
+        self, match: Callable[[Node], bool], stop_after: int | None = None
+    ) -> tuple[list[tuple[float, Node]], float, list[Node]]:
+        """Matches of the whole form at their form positions, top to bottom (Android). With
+        ``stop_after`` it stops on the screen where match #stop_after (0-based) is whole."""
+        found: list[tuple[float, Node]] = []
+        offset, screen = 0.0, []
+        for screen, offset in self._scan():
+            for node in screen:
+                if not (node.visible and node.height and match(node)):
+                    continue
+                if node.y < TOP_A or node.y + node.height > BOTTOM_A:
+                    continue  # only whole ones: a cut one is counted once it is whole
+                at = node.y + offset
+                same = (node.kind, node.label, node.hint)
+                if not any(abs(at - y) < DEDUP and (f.kind, f.label, f.hint) == same
+                           for y, f in found):  # fmt: skip
+                    found.append((at, node))
+            found.sort(key=lambda pair: pair[0])
+            if stop_after is not None and len(found) > stop_after:
+                break
+        return found, offset, screen
+
+    def _nth_android(self, alias: str, n: int, text: str | None) -> dict:
+        name = f"survey.{alias}[{text or ''}]"
+        match = _android_form_order(alias, text)
+        found, offset, screen = self._walk(match, stop_after=n)
+        if len(found) <= n:
+            raise AssertionError(f"{name}: {len(found)} on the form, wanted #{n + 1}")
+        at = found[n][0] - offset
+        here = [m for m in screen if match(m) and abs(m.y - at) < DEDUP]
+        if not here:
+            raise AssertionError(f"{name} #{n + 1} not on the screen it was found on")
+        return _attrs(here[0])
+
+    def _titles_android(self) -> list[str]:
+        by_number: dict[int, str] = {}
+        for nodes in self._viewports():
+            for node in nodes:
+                for raw in (node.label, node.hint):
+                    for number, title in TITLE.findall(raw):
+                        by_number.setdefault(int(number), title)
+        return [by_number[k] for k in sorted(by_number)]
+
+    def _count_android(self, alias: str, **params: object) -> int:
+        """Distinct ``alias`` elements over the whole form (Android walks it)."""
+        locator = self.locator(alias, **params)
+        seen: list[tuple[float, str]] = []
+        for _, offset in self._scan():
+            for el in self.driver.find_elements(*locator):
+                at, label = el.rect["y"] + offset, self.label_of(el)
+                if not any(abs(at - y) < DEDUP and lab == label for y, lab in seen):
+                    seen.append((at, label))
+        return len(seen)
+
     # --- text, date, time -------------------------------------------------------------
 
     def hide_keyboard(self) -> None:
@@ -206,6 +391,11 @@ class SurveyPage(BasePage):
     def _focus_text(self, n: int) -> WebElement:
         a = self.nth("text", n)
         h = int(a["height"])
+        if self.platform == "android":
+            below = TEXT_FOCUS_FROM_BOTTOM_A
+            self._tap_attrs(a, h - below if h > 525 else h / 2)
+            time.sleep(0.8)
+            return waits.focused(self.driver)
         self._tap_attrs(a, h - 70 if h > 200 else h / 2)  # a loose card's field: its input area
         time.sleep(0.8)  # the field re-renders on focus: type into the focused one (recon 8)
         return waits.focused(self.driver)
@@ -214,12 +404,23 @@ class SurveyPage(BasePage):
         with allure.step(
             f"fill survey.text #{n + 1}: {text[:40]!r}{'…' if len(text) > 40 else ''}"
         ):
-            self._focus_text(n).send_keys(text)
+            field = self._focus_text(n)
+            if self.platform == "android":
+                # A whole-card field is ONE merged node that refuses set_text ("Cannot set the
+                # element", recon A1): type key by key through the IME instead.
+                self.driver.execute_script("mobile: type", {"text": text})
+            else:
+                field.send_keys(text)
             self.hide_keyboard()
 
     def clear_text(self, n: int) -> None:
         with allure.step(f"clear survey.text #{n + 1}"):
-            self._focus_text(n).clear()
+            field = self._focus_text(n)
+            if self.platform == "android":
+                for _ in range(len(self.field_value(field)) + 2):  # end of text, then delete
+                    self.driver.execute_script("mobile: pressKey", {"keycode": 67})
+            else:
+                field.clear()
             self.hide_keyboard()
 
     def text_value(self, n: int) -> str:
@@ -268,11 +469,20 @@ class SurveyPage(BasePage):
                 # the first tap after a keyboard can go to the keyboard's dismissal (recon 8)
                 self.tap_nth("upload-photo", n)
                 picker.assert_open(PICKER_WAIT)
-            grid = picker.visible("grid", 5).rect
-            size = grid["width"] / 3
-            x = grid["x"] + size * (cell % 3 + 0.5)
-            y = grid["y"] + size * (cell // 3 + 0.5)
-            self.driver.execute_script("mobile: tap", {"x": x, "y": y})
+            if self.platform == "android":  # the Android Photo picker lists its cells
+                cells = sorted(
+                    (c for c in self.nodes() if c.label.startswith("Photo taken on")),
+                    key=lambda c: (c.y, c.x),
+                )
+                assert len(cells) > cell, f"the picker shows {len(cells)} photo(s), need #{cell}"
+                c = cells[cell]
+                self.tap_xy(c.x + c.width / 2, c.y + c.height / 2)
+            else:
+                grid = picker.visible("grid", 5).rect
+                size = grid["width"] / 3
+                x = grid["x"] + size * (cell % 3 + 0.5)
+                y = grid["y"] + size * (cell // 3 + 0.5)
+                self.tap_xy(x, y)
             editor.assert_open(15)
             editor.tap("done")
             meta.assert_open(15)
@@ -289,6 +499,10 @@ class SurveyPage(BasePage):
 
     def entry_headers(self, section: str) -> list[str]:
         """The headers of a repeatable section's entries, in order: '<section>', '<section> 2', …"""
+        if self.platform == "android":
+            match = _android_form_order("entry-headers", section)
+            found, _, _ = self._walk(match)
+            return [node.label.split("\n")[0] for _, node in found]
         return [a.get("name", "").split("\n")[0] for a in self.matches("entry-headers", section)]
 
     def delete_entry(self, n: int, confirm: bool | None) -> None:

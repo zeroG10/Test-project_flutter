@@ -13,14 +13,23 @@ import xml.etree.ElementTree as ET
 import allure
 
 from helpers import waits
-from pages.base_page import BasePage, normalized
+from pages.base_page import BasePage, normalized, page_nodes
 from screens.link_dialogs_map import LINK_EXPIRED, PHONE_MISMATCH
 
 DIALOG_TITLES = ("Link expired", "Assigned to a different phone number")
 
 
-def _visible_texts(page_source: str) -> tuple[list[str], list[str]]:
+def _visible_texts(page_source: str, platform: str = "ios") -> tuple[list[str], list[str]]:
     texts, buttons = [], []
+    if platform == "android":  # Flutter texts are Views, buttons Buttons (recon A1)
+        for n in page_nodes(page_source, platform):
+            if not n.visible or not n.label:
+                continue
+            if n.kind == "Button":
+                buttons.append(normalized(n.label))
+            elif n.kind == "View":
+                texts.append(normalized(n.label))
+        return texts, buttons
     for node in ET.fromstring(page_source).iter():
         a = node.attrib
         if a.get("visible") != "true" or not a.get("name"):
@@ -58,7 +67,8 @@ class PhoneMismatchDialog(BasePage):
                     raise DialogMissed(f"the dialog closed after a partial read: {found}")
                 return False
             seen[0] = True
-            for key, values in zip(("texts", "buttons"), _visible_texts(source), strict=True):
+            read = _visible_texts(source, self.platform)
+            for key, values in zip(("texts", "buttons"), read, strict=True):
                 found[key] += [v for v in values if v not in found[key]]
             return len(found["texts"]) >= 2 and len(found["buttons"]) >= 2
 

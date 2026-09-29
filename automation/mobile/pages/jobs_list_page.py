@@ -20,16 +20,19 @@ from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
 
 from helpers import pixels, waits
-from pages.base_page import BasePage
+from pages.base_page import BasePage, page_nodes
 from screens import locator_for
 from screens.jobs_calendar_map import JOBS_CALENDAR
 from screens.jobs_list_map import JOBS_LIST
 
 _CARD_START = re.compile(r"^(Updated\n)?\d{1,2} [A-Z][a-z]{2} \d{4}\n\d{2}:\d{2}\n")
 _CARD_TYPES = ("XCUIElementTypeStaticText", "XCUIElementTypeImage")
+_CARD_KINDS_ANDROID = ("View", "ImageView")  # a card is one clickable View (recon A1)
 REFRESH_SETTLE = 8.0  # a pull-to-refresh against the weak DEV server
 SCAN_LIMIT = 8  # drags while collecting every card of the list
 CARD_BOTTOM_MARGIN = 130  # the bottom tab bar covers the lowest ~125 pt (y 750 of 874, recon 4)
+CARD_BOTTOM_MARGIN_ANDROID = 310  # px: the tab bar starts at y 2101 of 2400 (recon A1)
+EDGE_X = {"ios": 10, "android": 21}  # drags at the left margin, left of every input (x ≥ 42 px)
 UPDATED_RGB = (0xB8, 0x0B, 0x22)  # the "Updated" banner fill: app theme `tertiary`
 UPDATED_SHARE = 0.005  # calibrated 2026-09-24: 0.016–0.027 with a banner in view, 0.000 without
 
@@ -64,8 +67,15 @@ def parse_card(name: str) -> Card:
     return Card(updated, date, time, status, title, "\n".join(lines[4:]))
 
 
-def cards_on_screen(page_source: str) -> list[tuple[Card, int]]:
+def cards_on_screen(page_source: str, platform: str = "ios") -> list[tuple[Card, int]]:
     """Visible cards of one page-source read, with their top y, top → bottom."""
+    if platform == "android":
+        shown = [
+            (parse_card(n.label), n.y)
+            for n in page_nodes(page_source, platform)
+            if n.kind in _CARD_KINDS_ANDROID and n.visible and is_card(n.label)
+        ]
+        return sorted(shown, key=lambda pair: pair[1])
     found = []
     for node in ET.fromstring(page_source).iter():
         a = node.attrib
@@ -74,10 +84,16 @@ def cards_on_screen(page_source: str) -> list[tuple[Card, int]]:
     return sorted(found, key=lambda pair: pair[1])
 
 
-def cards_in_tree(page_source: str) -> list[Card]:
+def cards_in_tree(page_source: str, platform: str = "ios") -> list[Card]:
     """Every card node of one page-source read, visible or not. After a back navigation the tree
     reports drawn cards ``visible=false`` (run 2, 2026-09-24: TD-JOBS-003) — presence is what a
     count can rely on; a short list (≤ ~8 cards) is built completely, so no scrolling is needed."""
+    if platform == "android":
+        return [
+            parse_card(n.label)
+            for n in page_nodes(page_source, platform)
+            if n.kind in _CARD_KINDS_ANDROID and is_card(n.label)
+        ]
     return [
         parse_card(node.attrib["name"])
         for node in ET.fromstring(page_source).iter()
@@ -142,7 +158,7 @@ class JobsViewMixin:
     def card(self, job_id: str) -> Card:
         """The card of ``job_id``, scrolled into view and parsed."""
         self.scroll_to("card", text=job_id)
-        return parse_card(self.find("card", text=job_id).get_attribute("name"))
+        return parse_card(self.label_of(self.find("card", text=job_id)))
 
     def open_card(self, job_id: str) -> None:
         """Tap a job's card only once it is still and wholly above the bottom tab bar: a tap on a
@@ -150,7 +166,8 @@ class JobsViewMixin:
         open the job (module 05 run 1, the 5th of 8 cards)."""
         self.scroll_to("card", text=job_id)
         self._settle(3.0)
-        limit = self.driver.get_window_size()["height"] - CARD_BOTTOM_MARGIN
+        margin = CARD_BOTTOM_MARGIN_ANDROID if self.platform == "android" else CARD_BOTTOM_MARGIN
+        limit = self.driver.get_window_size()["height"] - margin
         rect = self.find("card", text=job_id).rect
         if rect["y"] + rect["height"] > limit:
             width = self.driver.get_window_size()["width"]
@@ -190,7 +207,7 @@ class JobsViewMixin:
             assert job_id not in titles, f"{job_id} is shown ({titles})"
 
     def visible_cards(self) -> list[Card]:
-        return [card for card, _ in cards_on_screen(self.driver.page_source)]
+        return [card for card, _ in cards_on_screen(self.driver.page_source, self.platform)]
 
     def expect_no_cards(self) -> None:
         with allure.step(f"expect no job card in {self.screen.id}"):
@@ -202,7 +219,7 @@ class JobsViewMixin:
 
         def shown(driver) -> bool:
             source = driver.page_source
-            return "No jobs" in source or bool(cards_in_tree(source))
+            return "No jobs" in source or bool(cards_in_tree(source, self.platform))
 
         waits.wait_until(self.driver, shown, timeout, "neither job cards nor 'No jobs' on screen")
 
@@ -215,7 +232,7 @@ class JobsViewMixin:
         up, down = int(height * 0.75), int(height * 0.35)
         for _ in range(SCAN_LIMIT):  # to the top: drag the content down until it stops moving
             first = self.visible_cards()[:1]
-            self._drag_at(10, down, up)
+            self._drag_at(EDGE_X[self.platform], down, up)
             if self.visible_cards()[:1] == first:
                 break
         self.wait_content()
@@ -225,9 +242,9 @@ class JobsViewMixin:
             if not fresh:
                 break
             seen += fresh
-            self._drag_at(10, up, down)
+            self._drag_at(EDGE_X[self.platform], up, down)
         # a "no such card" built on a tree that hides every card would pass vacuously
-        assert seen or not cards_in_tree(self.driver.page_source), (
+        assert seen or not cards_in_tree(self.driver.page_source, self.platform), (
             "the tree holds job cards but reports none visible (TD-JOBS-003) — cannot decide"
         )
         return seen
@@ -236,7 +253,8 @@ class JobsViewMixin:
         """How many cards of ``job_id`` the view holds — one page-source read, visibility ignored
         (see ``cards_in_tree``)."""
         self.wait_content()
-        return sum(1 for c in cards_in_tree(self.driver.page_source) if c.job_id == job_id)
+        source = self.driver.page_source
+        return sum(1 for c in cards_in_tree(source, self.platform) if c.job_id == job_id)
 
 
 class JobsListPage(JobsViewMixin, BasePage):

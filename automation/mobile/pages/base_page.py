@@ -17,6 +17,7 @@ expect_below / expect_centred / expect_in_bottom_area, from element bounds.
 import contextlib
 import io
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 
 import allure
 from appium.webdriver.webdriver import WebDriver
@@ -39,11 +40,74 @@ CENTRE_TOLERANCE = 0.02
 BOTTOM_AREA = 1 / 3
 SCROLL_ATTEMPTS = 6
 VIEW_MARGIN = 50  # points kept clear at the top (status bar) and bottom (home indicator)
+# Android works in pixels (Pixel 7: 1080 x 2400): the status bar is 136 px, the app bar ends
+# at 283 px, the gesture bar takes the last ~65 px (recon A1).
+VIEW_MARGIN_ANDROID = 150
 
 
 def normalized(text: str | None) -> str:
     """Collapse whitespace: Flutter wraps long labels with ``\\n`` in the accessibility tree."""
     return " ".join((text or "").split())
+
+
+@dataclass(frozen=True)
+class Node:
+    """One element of a page source, the same shape on both platforms.
+
+    ``kind``: iOS type without ``XCUIElementType`` (``StaticText``, ``Image``, ``Button``…);
+    Android class without the package (``View``, ``ImageView``, ``Button``, ``EditText``…).
+    ``label``: iOS ``name``; Android ``content-desc``, else ``text`` (Flutter puts labels in
+    ``content-desc``). ``value``: iOS ``value``; Android ``text`` (typed text of a field).
+    ``visible``: iOS ``visible``; Android ``displayed``. Rect in the platform's units (iOS
+    points, Android pixels) — compare only with other rects / window sizes of the same session.
+    """
+
+    kind: str
+    label: str
+    value: str
+    x: int
+    y: int
+    width: int
+    height: int
+    visible: bool
+    selected: bool = False
+    checked: bool = False
+    enabled: bool = True
+    hint: str = ""
+
+
+def _android_bounds(bounds: str) -> tuple[int, int, int, int]:
+    left, top, right, bottom = (int(n) for n in bounds.replace("][", ",").strip("[]").split(","))
+    return left, top, right - left, bottom - top
+
+
+def page_nodes(source: str, platform: str) -> list[Node]:
+    """Every element of ``source`` as a ``Node``, in document order (off-screen ones included)."""
+    nodes: list[Node] = []
+    for el in ET.fromstring(source).iter():
+        a = el.attrib
+        if platform == "ios":
+            if not el.tag.startswith("XCUIElementType"):
+                continue
+            nodes.append(Node(
+                kind=el.tag.removeprefix("XCUIElementType"), label=a.get("name") or "",
+                value=a.get("value") or "", x=int(a.get("x", 0)), y=int(a.get("y", 0)),
+                width=int(a.get("width", 0)), height=int(a.get("height", 0)),
+                visible=a.get("visible") == "true", selected=a.get("selected") == "true",
+                enabled=a.get("enabled") != "false",
+            ))  # fmt: skip
+            continue
+        if not a.get("class") or not a.get("bounds"):
+            continue
+        x, y, w, h = _android_bounds(a["bounds"])
+        nodes.append(Node(
+            kind=a["class"].rsplit(".", 1)[-1], label=a.get("content-desc") or a.get("text") or "",
+            value=a.get("text") or "", x=x, y=y, width=w, height=h,
+            visible=a.get("displayed") != "false", selected=a.get("selected") == "true",
+            checked=a.get("checked") == "true", enabled=a.get("enabled") != "false",
+            hint=a.get("hint") or "",
+        ))  # fmt: skip
+    return nodes
 
 
 class BasePage:
@@ -102,7 +166,7 @@ class BasePage:
             element.clear()
             self._send(element, text, per_char)
             element = waits.wait_present(self.driver, self.locator(alias), timeout)
-            if text and not element.get_attribute("value"):
+            if text and not self.field_value(element):
                 # Not one character landed (the view was still settling after a scroll,
                 # recon 3d). Input plumbing, not a verdict — logged, then typed once more.
                 with allure.step("no input landed → tap the field and type again"):
@@ -145,13 +209,14 @@ class BasePage:
     def _settle_in_view(self, alias: str, height: int, **params: object) -> None:
         """A partly visible element is 'visible' too, and a tap on its centre can miss (run 1:
         the SMS Terms Accept button cut by the screen edge). Nudge it fully into view."""
+        margin = VIEW_MARGIN_ANDROID if self.platform == "android" else VIEW_MARGIN
         for _ in range(3):
             rect = waits.wait_visible(self.driver, self.locator(alias, **params), 2).rect
             top, bottom = rect["y"], rect["y"] + rect["height"]
-            if bottom > height - VIEW_MARGIN:
-                shift = -(bottom - (height - VIEW_MARGIN) + 20)
-            elif top < VIEW_MARGIN:
-                shift = VIEW_MARGIN - top + 20
+            if bottom > height - margin:
+                shift = -(bottom - (height - margin) + 20)
+            elif top < margin:
+                shift = margin - top + 20
             else:
                 return
             middle = height // 2
@@ -166,8 +231,9 @@ class BasePage:
             self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "finger"), duration=400
         )
         pointer = actions.w3c_actions.pointer_action
-        pointer.move_to_location(10, from_y).pointer_down()
-        pointer.move_to_location(10, to_y).pause(0.3).release()
+        x = 21 if self.platform == "android" else 10  # Android: left of every input (x ≥ 42 px)
+        pointer.move_to_location(x, from_y).pointer_down()
+        pointer.move_to_location(x, to_y).pause(0.3).release()
         actions.perform()
 
     def tap_at(self, alias: str, fx: float, fy: float, **params: object) -> None:
@@ -182,6 +248,30 @@ class BasePage:
         y = round(rect["y"] + rect["height"] * fy)
         with allure.step(f"tap {self._name(alias, params)} at ({fx:.2f}, {fy:.2f}) → ({x}, {y})"):
             self.driver.tap([(x, y)])
+
+    def tap_xy(self, x: float, y: float) -> None:
+        """A tap at a screen point (session units). iOS: ``mobile: tap`` as proven on the
+        simulator; Android: ``mobile: clickGesture`` (``mobile: tap`` is XCUITest-only)."""
+        if self.platform == "android":
+            self.driver.execute_script("mobile: clickGesture", {"x": int(x), "y": int(y)})
+            return
+        self.driver.execute_script("mobile: tap", {"x": x, "y": y})
+
+    def drag_xy(self, x1: float, y1: float, x2: float, y2: float, duration: float = 0.3) -> None:
+        """A drag between two screen points. iOS: ``mobile: dragFromToForDuration`` (as proven);
+        Android: ``mobile: dragGesture`` with a speed that covers the distance in ``duration``."""
+        if self.platform == "android":
+            distance = max(1.0, ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5)
+            self.driver.execute_script("mobile: dragGesture", {
+                "startX": int(x1), "startY": int(y1), "endX": int(x2), "endY": int(y2),
+                "speed": int(distance / max(duration, 0.05))})  # fmt: skip
+            return
+        self.driver.execute_script("mobile: dragFromToForDuration", {
+            "duration": duration, "fromX": x1, "fromY": y1, "toX": x2, "toY": y2})  # fmt: skip
+
+    def nodes(self, source: str | None = None) -> list[Node]:
+        """The page source as ``Node`` rows (``page_nodes``) — one read of the tree."""
+        return page_nodes(source if source is not None else self.driver.page_source, self.platform)
 
     def go_back(self) -> None:
         """The ``back`` step: system back on Android, edge swipe on iOS (no system button)."""
@@ -204,7 +294,21 @@ class BasePage:
     # --- expectations -----------------------------------------------------------------
 
     def text(self, alias: str, timeout: float | None = None, **params: object) -> str:
-        return waits.wait_visible(self.driver, self.locator(alias, **params), timeout).text
+        element = waits.wait_visible(self.driver, self.locator(alias, **params), timeout)
+        return self.label_of(element) if self.platform == "android" else element.text
+
+    def label_of(self, element: WebElement) -> str:
+        """What the element says: iOS ``name``; Android ``content-desc``, else ``text`` — a
+        Flutter label is in ``content-desc`` and ``.text`` is empty there (recon A1)."""
+        if self.platform == "android":
+            return element.get_attribute("content-desc") or element.get_attribute("text") or ""
+        return element.get_attribute("name") or ""
+
+    def field_value(self, element: WebElement) -> str:
+        """Typed text of an input: iOS ``value``; Android ``text`` (``value`` does not exist
+        there — UiAutomator2 raises UnknownMethodException)."""
+        attr = "text" if self.platform == "android" else "value"
+        return element.get_attribute(attr) or ""
 
     def expect_text(
         self, alias: str, text: str, timeout: float | None = None, **params: object
@@ -216,7 +320,8 @@ class BasePage:
         def contains(driver: WebDriver) -> bool:
             with contextlib.suppress(WebDriverException):
                 element = driver.find_element(*locator)
-                return element.is_displayed() and wanted in normalized(element.text)
+                shown = self.label_of(element) if self.platform == "android" else element.text
+                return element.is_displayed() and wanted in normalized(shown)
             return False
 
         with allure.step(f"expect {self._name(alias, params)} contains {text!r}"):
@@ -242,8 +347,18 @@ class BasePage:
         self.expect_enabled(alias, enabled=False, timeout=timeout)
 
     def value(self, alias: str, **params: object) -> str:
-        """``value`` attribute (switch / radio state on iOS: ``"1"`` = on / selected)."""
-        return str(self.find(alias, **params).get_attribute("value") or "")
+        """``value`` attribute (switch / radio state on iOS: ``"1"`` = on / selected).
+
+        Android has no ``value``: a checkable element answers ``"1"`` / ``"0"`` from ``checked``
+        (or ``selected``), any other element its ``text`` — the same contract for the callers."""
+        element = self.find(alias, **params)
+        if self.platform != "android":
+            return str(element.get_attribute("value") or "")
+        if element.get_attribute("checkable") == "true":
+            return "1" if element.get_attribute("checked") == "true" else "0"
+        if element.get_attribute("selected") == "true":
+            return "1"
+        return str(element.get_attribute("text") or "")
 
     def is_visible(self, alias: str, timeout: float | None = None, **params: object) -> bool:
         """Non-raising probe for branching. For assertions use ``visible`` / ``wait_gone``."""
@@ -342,7 +457,7 @@ class BasePage:
         text element without an id (recon 3c). The field's own label is excluded.
         """
         box = self.rect(alias, **params)
-        own = normalized(self.find(alias, **params).get_attribute("name"))
+        own = normalized(self.label_of(self.find(alias, **params)))
         found: list[str] = []
         for node in ET.fromstring(self.driver.page_source).iter():
             text, bounds = self._text_and_bounds(node)

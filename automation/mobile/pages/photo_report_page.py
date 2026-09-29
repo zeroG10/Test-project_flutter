@@ -25,6 +25,11 @@ PICKER_WAIT = 10.0  # the system photo picker takes a few seconds to appear (rec
 TOAST = 8.0  # the save toast stays 3 s
 SAVE_WAIT = 30.0  # Save uploads the photo before it returns (D-PHR-5)
 GRID_MIN_WIDTH = 150  # grid photos are ~189 pt wide; the preview on the metadata page is 156
+# Android (px, recon A1): a grid tile is ~509 px wide, its delete icon a 105-px unlabelled
+# ImageView at the tile's top right; picker cells are labelled "Photo taken on <date>".
+GRID_MIN_WIDTH_ANDROID = 400
+DELETE_MAX_WIDTH_ANDROID = 150
+PICKER_CELL_PREFIX = "Photo taken on"
 
 
 class PhotoAddSheet(BasePage):
@@ -57,7 +62,7 @@ class PhotoMetadata(BasePage):
         """Tap the page's left margin: the page drops the focus on a tap outside the field. (The
         field's label scrolls away under a long description — module 09 run 1.)"""
         height = self.driver.get_window_size()["height"]
-        self.driver.execute_script("mobile: tap", {"x": 6, "y": int(height * 0.3)})
+        self.tap_xy(6, int(height * 0.3))
         time.sleep(0.5)
 
     def fill_description(self, text: str) -> None:
@@ -68,13 +73,13 @@ class PhotoMetadata(BasePage):
             self.hide_keyboard()
 
     def description(self) -> str:
-        return self.find("description").get_attribute("value") or ""
+        return self.field_value(self.find("description"))
 
     def counter(self) -> str:
-        return self.find("counter").get_attribute("name") or ""
+        return self.label_of(self.find("counter"))
 
     def is_tag_selected(self, tag: str) -> bool:
-        return (self.find("tag", text=tag).get_attribute("value") or "") == "1"
+        return self.value("tag", text=tag) == "1"
 
     def expect_tag(self, tag: str, selected: bool = True) -> None:
         state = "selected" if selected else "not selected"
@@ -88,6 +93,8 @@ class PhotoReportPage(BasePage):
     def photos(self) -> list[dict]:
         """The grid's photos in grid order (rows, then columns), as page-source attributes, each
         with ``delete``: the rect of its delete icon (TD-PHR-001)."""
+        if self.platform == "android":
+            return self._photos_android()
         root = ET.fromstring(self.driver.page_source)
         images, buttons = [], []
         for el in root.iter():
@@ -113,6 +120,31 @@ class PhotoReportPage(BasePage):
             )
         return images
 
+    def _photos_android(self) -> list[dict]:
+        """The same shape as on iOS (``name``, ``x``/``y``/``width``/``height``, ``delete``)."""
+        nodes = self.nodes()
+
+        def attrs(n) -> dict:
+            return {"name": n.label, "x": n.x, "y": n.y, "width": n.width, "height": n.height}
+
+        tiles = [
+            attrs(n)
+            for n in nodes
+            if n.kind == "ImageView" and n.label and n.width > GRID_MIN_WIDTH_ANDROID
+        ]
+        icons = [
+            attrs(n)
+            for n in nodes
+            if n.kind == "ImageView" and not n.label and 0 < n.width < DELETE_MAX_WIDTH_ANDROID
+        ]
+        tiles.sort(key=lambda a: (a["y"], a["x"]))
+        for t in tiles:
+            x, y, w = t["x"], t["y"], t["width"]
+            t["delete"] = next(
+                (i for i in icons if x + w / 2 < i["x"] < x + w and y <= i["y"] < y + 200), None
+            )
+        return tiles
+
     def descriptions(self) -> list[str]:
         """Each grid photo's description (the first line of its name; '' without one)."""
         return [(p.get("name") or "").split("\n")[0] for p in self.photos()]
@@ -127,7 +159,7 @@ class PhotoReportPage(BasePage):
     def _tap_rect(self, a: dict) -> None:
         x = int(a["x"]) + int(a["width"]) / 2
         y = int(a["y"]) + int(a["height"]) / 2
-        self.driver.execute_script("mobile: tap", {"x": x, "y": y})
+        self.tap_xy(x, y)
 
     def open_photo(self, n: int) -> None:
         """Tap the n-th (0-based) grid photo → "Edit photo"."""
@@ -168,11 +200,21 @@ class PhotoReportPage(BasePage):
         with allure.step(f"Gallery → photo #{cell} of the gallery"):
             sheet.tap("gallery")
             picker.assert_open(PICKER_WAIT)
+            if self.platform == "android":  # Android Photo picker: cells are in the tree
+                cells = sorted(
+                    (n for n in self.nodes() if n.label.startswith(PICKER_CELL_PREFIX)),
+                    key=lambda n: (n.y, n.x),
+                )
+                assert len(cells) > cell, f"the picker shows {len(cells)} photo(s), need #{cell}"
+                c = cells[cell]
+                self.tap_xy(c.x + c.width / 2, c.y + c.height / 2)
+                PhotoEditor(self.driver, self.platform).assert_open(15)
+                return
             grid = picker.visible("grid", 5).rect
             size = grid["width"] / 3
             x = grid["x"] + size * (cell % 3 + 0.5)
             y = grid["y"] + size * (cell // 3 + 0.5)
-            self.driver.execute_script("mobile: tap", {"x": x, "y": y})
+            self.tap_xy(x, y)
             PhotoEditor(self.driver, self.platform).assert_open(15)
 
     def add_photo(self, cell: int = 1, description: str = "", tags: tuple[str, ...] = ()) -> None:

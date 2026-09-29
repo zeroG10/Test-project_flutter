@@ -5,6 +5,7 @@ page parses the rows from the page source in list order and opens the ⋮ menu w
 right end.
 """
 
+import re
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -12,7 +13,7 @@ from dataclasses import dataclass
 import allure
 
 from helpers import waits
-from pages.base_page import BasePage
+from pages.base_page import BasePage, page_nodes
 from screens.notes_map import (
     NOTE_DELETE_DIALOG,
     NOTE_EDITOR,
@@ -24,6 +25,9 @@ from screens.notes_map import (
 TOAST = 8.0  # a toast stays ~3 s
 SAVE_WAIT = 20.0
 MENU_X_FROM_RIGHT = 28  # the ⋮ sits at the row's right end (recon 10: 374 of 402)
+MENU_X_FROM_RIGHT_ANDROID = 60  # px (recon A1: a tap at x 1020 of 1080 opened the menu)
+# Android row label: "<d MMM yyyy H:mm>\n<text>" — no "Show menu" line (recon A1)
+_ANDROID_ROW = re.compile(r"^\d{1,2} [A-Z][a-z]{2} \d{4} \d{1,2}:\d{2}$")
 
 
 @dataclass(frozen=True)
@@ -36,9 +40,15 @@ class NoteRow:
     height: int
 
 
-def rows_in(source: str) -> list[NoteRow]:
+def rows_in(source: str, platform: str = "ios") -> list[NoteRow]:
     """The note rows of a page source, top to bottom."""
     rows = []
+    if platform == "android":
+        for n in page_nodes(source, platform):
+            parts = n.label.split("\n")
+            if n.kind == "ImageView" and len(parts) >= 2 and _ANDROID_ROW.match(parts[0]):
+                rows.append(NoteRow(parts[0], "\n".join(parts[1:]), n.x, n.y, n.width, n.height))
+        return sorted(rows, key=lambda r: r.y)
     for el in ET.fromstring(source).iter("XCUIElementTypeImage"):
         a = el.attrib
         parts = (a.get("name") or "").split("\n")
@@ -57,7 +67,7 @@ class NoteEditor(BasePage):
 
     def text(self) -> str:
         """The field's current text."""
-        return self.find("field").get_attribute("value") or ""
+        return self.field_value(self.find("field"))
 
     def type_text(self, text: str) -> None:
         with allure.step(f"fill note-editor.field: {text[:40]!r}{'…' if len(text) > 40 else ''}"):
@@ -66,7 +76,7 @@ class NoteEditor(BasePage):
             waits.focused(self.driver).send_keys(text)
 
     def counter(self) -> str:
-        return self.find("counter").get_attribute("name") or ""
+        return self.label_of(self.find("counter"))
 
 
 class NoteDeleteDialog(BasePage):
@@ -81,7 +91,7 @@ class NotesPage(BasePage):
     screen = NOTES
 
     def rows(self) -> list[NoteRow]:
-        return rows_in(self.driver.page_source)
+        return rows_in(self.driver.page_source, self.platform)
 
     def texts(self) -> list[str]:
         return [r.text for r in self.rows()]
@@ -118,8 +128,8 @@ class NotesPage(BasePage):
         with allure.step(f"tap notes.menu #{n + 1}"):
             self.wait_toast_gone()
             row = self.rows()[n]
-            x = row.x + row.width - MENU_X_FROM_RIGHT
-            self.driver.execute_script("mobile: tap", {"x": x, "y": row.y + row.height / 2})
+            margin = MENU_X_FROM_RIGHT_ANDROID if self.platform == "android" else MENU_X_FROM_RIGHT
+            self.tap_xy(row.x + row.width - margin, row.y + row.height / 2)
             menu = NoteMenu(self.driver, self.platform)
             menu.assert_open(5)
             return menu

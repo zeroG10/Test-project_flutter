@@ -1,4 +1,10 @@
-"""The iOS Settings app — the app's notification permission (module 11, TC-NOTIF-005; recon 12).
+"""The system Settings — the app's notification permission (module 11, TC-NOTIF-005; recon 12).
+
+Android (recon A1): "Go to Settings" opens the app's own notification page directly
+(``Settings$AppNotificationSettingsActivity``); the page is reached the same way here — the
+system intent for the app's notification settings — and the switch is ``android:id/switch_widget``.
+The app reads the permission only when it starts (D-NOTIF-A1, owner 2026-09-29: a note, not a
+bug), so after allowing push again the app is restarted before the test looks at the banner.
 
 Settings is started fresh (terminated first) so every run walks the same path from its root:
 Apps → the app → NOTIFICATIONS → the switch. Switching the permission may restart the app under
@@ -15,6 +21,8 @@ from pages.base_page import BasePage
 from screens.settings_map import SETTINGS
 
 SETTINGS_APP = "com.apple.Preferences"
+SETTINGS_APP_ANDROID = "com.android.settings"
+ANDROID_SWITCH = ("id", "android:id/switch_widget")
 SWITCH_FROM_RIGHT = 30  # the switch itself — a tap on its label does not toggle it (recon 12)
 SCROLLS = 15  # the app sits at the end of Settings → Apps ('[DEV] …' sorts after the letters)
 
@@ -37,10 +45,37 @@ class SystemSettingsPage(BasePage):
         raise AssertionError(f"settings.{alias} not found after {SCROLLS} scrolls")
 
     def is_foreground(self) -> bool:
-        return self.driver.query_app_state(SETTINGS_APP) == 4
+        package = SETTINGS_APP_ANDROID if self.platform == "android" else SETTINGS_APP
+        return self.driver.query_app_state(package) == 4
+
+    def _set_android(self, allowed: bool, app_id: str) -> None:
+        state = "on" if allowed else "off"
+        with allure.step(f"Settings: the app's notifications → {state}"):
+            self.driver.execute_script("mobile: startActivity", {
+                "action": "android.settings.APP_NOTIFICATION_SETTINGS",
+                "extras": [["s", "android.provider.extra.APP_PACKAGE", app_id]],
+            })  # fmt: skip
+            switch = waits.wait_visible(self.driver, ANDROID_SWITCH, 15)
+            if (switch.get_attribute("checked") == "true") != allowed:
+                switch.click()
+            waits.wait_until(
+                self.driver,
+                lambda d: (
+                    (d.find_element(*ANDROID_SWITCH).get_attribute("checked") == "true") == allowed
+                ),
+                10,
+                f"the app's notifications did not turn {state}",
+            )
+            if allowed:  # D-NOTIF-A1: the app sees the new permission only after a restart
+                with contextlib.suppress(WebDriverException):
+                    self.driver.terminate_app(app_id)
+            self.driver.activate_app(app_id)
 
     def set_app_notifications(self, allowed: bool, app_id: str) -> None:
         """Allow Notifications on / off for the app under test, then bring the app back."""
+        if self.platform == "android":
+            self._set_android(allowed, app_id)
+            return
         state = "on" if allowed else "off"
         with allure.step(f"Settings: Apps → the app → Notifications → Allow Notifications {state}"):
             with contextlib.suppress(WebDriverException):

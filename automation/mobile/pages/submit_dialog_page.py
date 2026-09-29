@@ -12,12 +12,16 @@ from datetime import UTC, datetime
 
 import allure
 
-from pages.base_page import BasePage
+from helpers.device import platform_of
+from pages.base_page import BasePage, page_nodes
 from screens.job_details_map import MESSAGE_MIN_Y, SUBMIT_STATES
 from screens.submit_dialog_map import SUBMIT_DIALOG
 
 SUBMIT_WAIT = 30.0  # seconds a submission may take to show its result (recon 11: 0.5–3 s)
 SETTLE = 2.0  # seconds watched after the first message ("Successful" follows a success message)
+# Android: the snackbar is a View at the bottom — y 2127 px of 2400 in recon A1 (details scroll
+# area ends there); MESSAGE_MIN_Y of the map is in iOS points.
+MESSAGE_MIN_Y_ANDROID = 2100
 
 
 @dataclass
@@ -41,8 +45,35 @@ class Submission:
         )
 
 
-def observe(source: str, seen: Submission) -> None:
+def _observe_android(source: str, seen: Submission) -> None:
+    for n in page_nodes(source, "android"):
+        if not n.visible:
+            continue
+        if n.kind == "Button" and n.label == SUBMIT_STATES["submitting"]:
+            if n.enabled:
+                seen.submitting_enabled = True
+            else:
+                seen.submitting_disabled = True
+        elif n.kind == "Button" and n.label == SUBMIT_STATES["successful"]:
+            seen.successful = True
+        elif n.kind == "Button" and n.label == SUBMIT_STATES["check-out"]:
+            seen.check_out = True
+        elif n.kind == "Button" and n.label == SUBMIT_STATES["retry"]:
+            seen.retry = True
+        elif (
+            n.kind == "View"
+            and n.label
+            and n.y > MESSAGE_MIN_Y_ANDROID
+            and n.label not in seen.messages
+        ):
+            seen.messages.append(n.label)
+
+
+def observe(source: str, seen: Submission, platform: str = "ios") -> None:
     """Add what one page source shows to ``seen``."""
+    if platform == "android":
+        _observe_android(source, seen)
+        return
     for node in ET.fromstring(source).iter():
         attrs = node.attrib
         if attrs.get("visible") != "true":
@@ -68,8 +99,14 @@ def observe(source: str, seen: Submission) -> None:
             seen.messages.append(name)
 
 
-def snackbars(source: str) -> list[str]:
+def snackbars(source: str, platform: str = "ios") -> list[str]:
     """The names of the snackbars on screen (a visible Other at the bottom)."""
+    if platform == "android":
+        return [
+            n.label
+            for n in page_nodes(source, platform)
+            if n.kind == "View" and n.visible and n.label and n.y > MESSAGE_MIN_Y_ANDROID
+        ]
     return [
         node.attrib.get("name", "")
         for node in ET.fromstring(source).iter()
@@ -91,11 +128,7 @@ class SubmitDialog(BasePage):
             assert layer["width"] >= size["width"] and layer["height"] >= size["height"], (
                 f"layer {layer}, window {size}"
             )
-            shown = [
-                n.attrib.get("name")
-                for n in ET.fromstring(self.driver.page_source).iter()
-                if n.attrib.get("visible") == "true"
-            ]
+            shown = [n.label for n in self.nodes() if n.visible]
             assert hidden_name not in shown, f"{hidden_name!r} still reachable under the dialog"
 
     def submit(self, settle: float = SETTLE) -> Submission:
@@ -114,8 +147,9 @@ def watch_submission(driver, seen: Submission, timeout: float = SUBMIT_WAIT,
                      settle: float = SETTLE) -> Submission:  # fmt: skip
     """Read the page source until a message has been on screen for ``settle`` seconds."""
     end, first_message = time.monotonic() + timeout, None
+    platform = platform_of(driver)
     while time.monotonic() < end:
-        observe(driver.page_source, seen)
+        observe(driver.page_source, seen, platform)
         if seen.messages and first_message is None:
             first_message = time.monotonic()
         if first_message is not None and time.monotonic() - first_message >= settle:
