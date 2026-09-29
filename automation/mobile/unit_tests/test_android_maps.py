@@ -103,6 +103,8 @@ class AndroidMapHealth(unittest.TestCase):
                 hints = {a.get("hint") for _, found in ad.where(el.android) for a in found}
                 if m.group(1) not in hints:
                     problems.append(f"{key}: hint {m.group(1)!r} not at that position ({hints})")
+                if getattr(el.android, "hint", m.group(1)) != m.group(1):
+                    problems.append(f"{key}: EditTextByHint({el.android.hint!r}) ≠ note hint")
         self.assertEqual(problems, [])
 
     def test_android_only_elements_are_marked_and_templates_are_text_only(self):

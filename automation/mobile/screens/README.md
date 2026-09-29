@@ -131,6 +131,9 @@ trees the way UiAutomator2 would — `unit_tests/android_dumps.py`, CLI:
   for a part of a multi-line label.
 - A text field is an `EditText` whose name is only its `hint`, which UiSelector cannot match:
   `className("android.widget.EditText").instance(n)` with `hint '<hint>'` in the note (TD-A1).
+  On a form with several fields use `EditTextByHint(n, "<hint>")`: Flutter hands Android only the
+  on-screen fields, so after a scroll `instance(n)` is another field; `helpers.waits` finds it by
+  its hint instead (module 02 run 5, TC-AUTH-014 read Email as Phone).
 - Flutter may change a node's class with its state (a survey Yes/No is a Button, an ImageView when
   selected) — no class for toggles. Selected tab / chip: `.selected(true)`; checkbox / radio:
   `.checked(true)`.

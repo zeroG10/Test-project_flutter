@@ -15,7 +15,7 @@ name are EditTexts (label only in ``hint``, TD-A1); phone/email are disabled, un
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from screens import El, Screen
+from screens import EditTextByHint, El, Screen
 
 _A = AppiumBy.ACCESSIBILITY_ID
 _P = AppiumBy.IOS_PREDICATE
@@ -38,20 +38,14 @@ EDIT_PROFILE = Screen(
             note="Android: an ImageView, not a Button (recon A1)",
         ),
         "first-name": El(
-            android=(
-                _U,
-                'new UiSelector().className("android.widget.EditText").instance(0)',
-            ),
+            android=EditTextByHint(0, "First name"),
             ios=(_P, "type == 'XCUIElementTypeTextField' AND name == 'First name'"),
-            note="Android: EditText instance(0), hint 'First name' — TD-A1",
+            note="Android: EditText instance(0), hint 'First name' — TD-A1 (found by hint)",
         ),
         "last-name": El(
-            android=(
-                _U,
-                'new UiSelector().className("android.widget.EditText").instance(1)',
-            ),
+            android=EditTextByHint(1, "Last name"),
             ios=(_P, "type == 'XCUIElementTypeTextField' AND name == 'Last name'"),
-            note="Android: EditText instance(1), hint 'Last name' — TD-A1",
+            note="Android: EditText instance(1), hint 'Last name' — TD-A1 (found by hint)",
         ),
         "phone": El(
             android=(

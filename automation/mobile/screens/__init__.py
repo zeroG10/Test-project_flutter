@@ -20,6 +20,7 @@ from helpers.waits import Locator
 
 __all__ = [
     "ALLOWED_STRATEGIES",
+    "EditTextByHint",
     "El",
     "Locator",
     "Screen",
@@ -49,6 +50,30 @@ ALLOWED_STRATEGIES: frozenset[str] = frozenset(
         AppiumBy.FLUTTER_INTEGRATION_TYPE,
     }
 )
+
+
+class EditTextByHint(tuple):
+    """Android text field of a multi-field form, named only by its ``hint`` (TD-A1).
+
+    As a locator it is ``className("android.widget.EditText").instance(n)`` — the field's
+    position in the recon tree, checked offline by map-health. Flutter hands Android only the
+    on-screen fields, so once the form scrolls, ``instance(n)`` points at another field (module
+    02 run 5: TC-AUTH-014 read Email as Phone). ``helpers.waits`` therefore resolves it by
+    ``hint`` among the on-screen EditTexts, on every poll.
+    """
+
+    hint: str
+
+    def __new__(cls, instance: int, hint: str) -> "EditTextByHint":
+        self = super().__new__(
+            cls,
+            (
+                AppiumBy.ANDROID_UIAUTOMATOR,
+                f'new UiSelector().className("android.widget.EditText").instance({instance})',
+            ),
+        )
+        self.hint = hint
+        return self
 
 
 def _check_locator(owner: str, locator: object) -> None:

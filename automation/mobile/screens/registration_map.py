@@ -11,7 +11,7 @@ EditTexts with the label only in ``hint`` (TD-A1); the two channel controls are
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from screens import El, Screen
+from screens import EditTextByHint, El, Screen
 
 _A = AppiumBy.ACCESSIBILITY_ID
 _P = AppiumBy.IOS_PREDICATE
@@ -20,10 +20,6 @@ _U = AppiumBy.ANDROID_UIAUTOMATOR
 
 def _field(label: str) -> El:
     return El(ios=(_P, f"type == 'XCUIElementTypeTextField' AND name == '{label}'"))
-
-
-def _android_field(instance: int) -> tuple[str, str]:
-    return (_U, f'new UiSelector().className("android.widget.EditText").instance({instance})')
 
 
 REGISTRATION = Screen(
@@ -45,24 +41,24 @@ REGISTRATION = Screen(
             ios=(_A, "Good to see you! Let's get you registered."),
         ),
         "first-name": El(
-            android=_android_field(0),
+            android=EditTextByHint(0, "First name"),
             ios=(_P, "type == 'XCUIElementTypeTextField' AND name == 'First name'"),
-            note="Android: EditText instance(0), hint 'First name' — TD-A1",
+            note="Android: EditText instance(0), hint 'First name' — TD-A1 (found by hint)",
         ),
         "last-name": El(
-            android=_android_field(1),
+            android=EditTextByHint(1, "Last name"),
             ios=(_P, "type == 'XCUIElementTypeTextField' AND name == 'Last name'"),
-            note="Android: EditText instance(1), hint 'Last name' — TD-A1",
+            note="Android: EditText instance(1), hint 'Last name' — TD-A1 (found by hint)",
         ),
         "phone": El(
-            android=_android_field(2),
+            android=EditTextByHint(2, "Phone number"),
             ios=(_P, "type == 'XCUIElementTypeTextField' AND name == 'Phone number'"),
-            note="Android: EditText instance(2), hint 'Phone number' — TD-A1",
+            note="Android: EditText instance(2), hint 'Phone number' — TD-A1 (found by hint)",
         ),
         "email": El(
-            android=_android_field(3),
+            android=EditTextByHint(3, "Email"),
             ios=(_P, "type == 'XCUIElementTypeTextField' AND name == 'Email'"),
-            note="Android: EditText instance(3), hint 'Email' — TD-A1",
+            note="Android: EditText instance(3), hint 'Email' — TD-A1 (found by hint)",
         ),
         # Country picker: name "United States + 1\n+ 1" (spoken label + the visible "+ 1").
         "phone-prefix": El(

@@ -9,9 +9,15 @@ The driver fixture sets NO implicit wait, so these are the only waits in play.
 from collections.abc import Callable
 from typing import TypeVar
 
+from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.webdriver import WebDriver
 from appium.webdriver.webelement import WebElement
-from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    StaleElementReferenceException,
+    TimeoutException,
+    WebDriverException,
+)
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -44,6 +50,61 @@ def _not_yet_when_tree_busy(condition: Callable[[WebDriver], T]) -> Callable[[We
     return probe
 
 
+# --- finding (one place; a hinted Android field is looked up by its hint) ------------------
+
+_EDIT_TEXTS = (
+    AppiumBy.ANDROID_UIAUTOMATOR,
+    'new UiSelector().className("android.widget.EditText")',
+)
+_GONE_OR_STALE = (NoSuchElementException, StaleElementReferenceException)
+
+
+def _hint(locator: Locator) -> str | None:
+    """The hint of a ``screens.EditTextByHint`` locator; None for every other locator."""
+    return getattr(locator, "hint", None)
+
+
+def find_all(driver: WebDriver, locator: Locator) -> list[WebElement]:
+    """All matches of ``locator``. A hinted field: the on-screen EditTexts with that hint."""
+    hint = _hint(locator)
+    if hint is None:
+        return driver.find_elements(*locator)
+    return [el for el in driver.find_elements(*_EDIT_TEXTS) if el.get_attribute("hint") == hint]
+
+
+def find(driver: WebDriver, locator: Locator) -> WebElement:
+    """The first match of ``locator``; raises NoSuchElementException like ``find_element``."""
+    if _hint(locator) is None:
+        return driver.find_element(*locator)
+    found = find_all(driver, locator)
+    if not found:
+        raise NoSuchElementException(f"no on-screen EditText with hint {_hint(locator)!r}")
+    return found[0]
+
+
+def _hinted(locator: Locator, check: Callable[[WebElement], bool]) -> Callable[[WebDriver], object]:
+    """A wait condition for a hinted field: the element when ``check`` holds, else False."""
+
+    def probe(driver: WebDriver):
+        try:
+            element = find(driver, locator)
+            return element if check(element) else False
+        except _GONE_OR_STALE:
+            return False
+
+    return probe
+
+
+def _gone(locator: Locator) -> Callable[[WebDriver], bool]:
+    def probe(driver: WebDriver) -> bool:
+        try:
+            return not find(driver, locator).is_displayed()
+        except _GONE_OR_STALE:
+            return True
+
+    return probe
+
+
 def wait_until(
     driver: WebDriver,
     condition: Callable[[WebDriver], T],
@@ -63,7 +124,9 @@ def wait_present(driver: WebDriver, locator: Locator, timeout: float | None = No
     """Element exists in the hierarchy (may be off-screen or hidden)."""
     return wait_until(
         driver,
-        EC.presence_of_element_located(locator),
+        EC.presence_of_element_located(locator)
+        if _hint(locator) is None
+        else _hinted(locator, lambda _el: True),
         timeout,
         f"{locator} not present within {_seconds(timeout)}s",
     )
@@ -73,7 +136,9 @@ def wait_visible(driver: WebDriver, locator: Locator, timeout: float | None = No
     """Element exists and is displayed."""
     return wait_until(
         driver,
-        EC.visibility_of_element_located(locator),
+        EC.visibility_of_element_located(locator)
+        if _hint(locator) is None
+        else _hinted(locator, lambda el: el.is_displayed()),
         timeout,
         f"{locator} not visible within {_seconds(timeout)}s",
     )
@@ -83,7 +148,9 @@ def wait_clickable(driver: WebDriver, locator: Locator, timeout: float | None = 
     """Element is displayed and enabled — use before every tap."""
     return wait_until(
         driver,
-        EC.element_to_be_clickable(locator),
+        EC.element_to_be_clickable(locator)
+        if _hint(locator) is None
+        else _hinted(locator, lambda el: el.is_displayed() and el.is_enabled()),
         timeout,
         f"{locator} not clickable within {_seconds(timeout)}s",
     )
@@ -93,7 +160,7 @@ def wait_gone(driver: WebDriver, locator: Locator, timeout: float | None = None)
     """Element is absent or hidden (the ``expect-hidden`` step). Raises if it stays visible."""
     wait_until(
         driver,
-        EC.invisibility_of_element_located(locator),
+        EC.invisibility_of_element_located(locator) if _hint(locator) is None else _gone(locator),
         timeout,
         f"{locator} still visible after {_seconds(timeout)}s",
     )
@@ -105,11 +172,13 @@ def wait_text(
     """Element's text contains ``text`` (the ``expect-text`` step)."""
     wait_until(
         driver,
-        EC.text_to_be_present_in_element(locator, text),
+        EC.text_to_be_present_in_element(locator, text)
+        if _hint(locator) is None
+        else _hinted(locator, lambda el: text in (el.text or "")),
         timeout,
         f"{locator} does not contain {text!r} within {_seconds(timeout)}s",
     )
-    return driver.find_element(*locator)
+    return find(driver, locator)
 
 
 def wait_any(

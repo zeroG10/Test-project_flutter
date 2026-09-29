@@ -139,7 +139,7 @@ class BasePage:
 
     def count_visible(self, alias: str, **params: object) -> int:
         """How many displayed elements match (e.g. "the only input on the screen")."""
-        elements = self.driver.find_elements(*self.locator(alias, **params))
+        elements = waits.find_all(self.driver, self.locator(alias, **params))
         return sum(1 for el in elements if el.is_displayed())
 
     # --- actions ----------------------------------------------------------------------
@@ -336,7 +336,7 @@ class BasePage:
 
         def contains(driver: WebDriver) -> bool:
             with contextlib.suppress(WebDriverException):
-                element = driver.find_element(*locator)
+                element = waits.find(driver, locator)
                 shown = self.label_of(element) if self.platform == "android" else element.text
                 return element.is_displayed() and wanted in normalized(shown)
             return False
@@ -353,7 +353,7 @@ class BasePage:
 
         def in_state(driver: WebDriver) -> bool:
             with contextlib.suppress(WebDriverException):
-                element = driver.find_element(*locator)
+                element = waits.find(driver, locator)
                 return element.is_displayed() and element.is_enabled() == enabled
             return False
 

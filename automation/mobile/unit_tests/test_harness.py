@@ -21,7 +21,8 @@ from fixtures import test_data
 from helpers import evidence, reporting
 from helpers.app import AppControl
 from helpers.field_services_api import ApiBlocked, FieldServicesApi, safe_body
-from helpers.waits import wait_any
+from helpers.waits import find, wait_any, wait_visible
+from screens import EditTextByHint
 
 
 class FakeDriver:
@@ -257,6 +258,46 @@ class WaitAny(unittest.TestCase):
     def test_times_out_when_nothing_shows(self):
         with self.assertRaises(TimeoutException):
             wait_any(object(), {"welcome": lambda: False}, 0.3)
+
+
+class _Field:
+    def __init__(self, hint: str):
+        self.hint = hint
+
+    def get_attribute(self, name: str):
+        return self.hint if name == "hint" else None
+
+    def is_displayed(self) -> bool:
+        return True
+
+
+class HintedField(unittest.TestCase):
+    """A multi-field form scrolled on Android: 'First name' is off-screen, so the phone field is
+    the 2nd on-screen EditText, not instance(2) (module 02 run 5, TC-AUTH-014)."""
+
+    class Driver:
+        def __init__(self, hints):
+            self.fields = [_Field(h) for h in hints]
+            self.asked = []
+
+        def find_elements(self, strategy, value):
+            self.asked.append(value)
+            return self.fields if value.endswith('"android.widget.EditText")') else []
+
+    def test_found_by_hint_not_by_position(self):
+        driver = self.Driver(["Last name", "Phone number", "Email"])
+        phone = EditTextByHint(2, "Phone number")
+        self.assertEqual(
+            phone[1], 'new UiSelector().className("android.widget.EditText").instance(2)'
+        )
+        self.assertEqual(find(driver, phone).hint, "Phone number")
+        self.assertEqual(wait_visible(driver, phone, 1).hint, "Phone number")
+        self.assertNotIn(phone[1], driver.asked)  # the static position is never used on a device
+
+    def test_missing_field_is_no_such_element(self):
+        driver = self.Driver(["Last name"])
+        with self.assertRaises(TimeoutException):
+            wait_visible(driver, EditTextByHint(2, "Phone number"), 0.3)
 
 
 class PixelOracle(unittest.TestCase):
