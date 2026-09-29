@@ -25,7 +25,7 @@ TABBAR = Screen(
     elements={
         "jobs": El(android=(_A, "Jobs\nTab 1 of 3"), ios=(_P, "name ENDSWITH 'Tab 1 of 3'")),
         "notifications": El(
-            android=(_U, 'new UiSelector().descriptionMatches(".*Tab 2 of 3")'),
+            android=(_U, 'new UiSelector().descriptionContains("Tab 2 of 3")'),
             ios=(_P, "name ENDSWITH 'Tab 2 of 3'"),
             note="Android: descriptionMatches (no descriptionEndsWith in UiAutomator) — matches "
             "with or without the unread-count prefix (recon A1)",

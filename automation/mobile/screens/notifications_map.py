@@ -81,7 +81,7 @@ NOTIFICATIONS = Screen(
             android=(
                 _U,
                 'new UiSelector().className("android.widget.ImageView")'
-                '.descriptionMatches(".*Go to Settings")',
+                '.descriptionContains("Go to Settings")',
             ),
             ios=(_P, "type == 'XCUIElementTypeImage' AND name ENDSWITH 'Go to Settings'"),
             note="the banner itself: 'Go to Settings' is its last line, tapped by position. "
