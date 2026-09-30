@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-30 07:59 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-09-30 11:30 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/04-order-details/order-details-checklist.md` — 89 items
-- Results (allure): `automation/mobile/results/android/2026-09-30-04-05-merged` — 20 tests (18 passed, 2 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-09-30-04-05-r3-merged` — 20 tests (20 passed, 0 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `b5ae4b4`
+- Harness commit (this repo): `9d43c00`
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `MERGED: module 04 run 2 (harness b5e65ab: test_order_details.py + TC-ORDL-008) + module 05 run 2 (harness b5ae4b4: test_check_in_out.py + TC-ORDD-005), 2026-09-30`
+- Run label (suite / filter): `MERGED: module 04 run 3 (test_order_details.py + TC-ORDL-008) + module 05 run 3 (test_check_in_out.py + TC-ORDD-005), harness 9d43c00, 2026-09-30; CHK-ORDD-024 Skipped on Android (owner, Q-ORDD-A4)`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -40,12 +40,12 @@ Generated: 2026-09-30 07:59 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDD-019 | Check that tapping the Attachments section navigates the user to the Order Atta… | 1 — `tests.shared.test_order_details#test_attachments_screen (TC-ORDD-006 Attachments opens with Documents selected and lists the job's documents; Photos switches the tab)` | Passed | allure: passed |
 | CHK-ORDD-020 | Check that the Check In button is displayed at the bottom of the screen when th… | 1 — `tests.shared.test_order_details#test_new_job_details (TC-ORDD-001 A New job shows every part of its details and the Check in button; back returns to the list)` | Passed | allure: passed |
 | CHK-ORDD-021 | Check that the Check In button is always visible and accessible without scrolli… | 1 — `tests.shared.test_order_details#test_new_job_details (TC-ORDD-001 A New job shows every part of its details and the Check in button; back returns to the list)` | Passed | allure: passed |
-| CHK-ORDD-022 | Check that tapping the Check In button initiates the check-in workflow. | 2 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Failed | allure: failed — AssertionError: the location prompt shows 'Allow [DEV] CT Mobile to access this device’s location?', without the explanation 'This app needs your location to v…<br>allure: failed — AssertionError: the location prompt shows 'Allow [DEV] CT Mobile to access this device’s location?', without the explanation 'This app needs your location to v… |
+| CHK-ORDD-022 | Check that tapping the Check In button initiates the check-in workflow. | 2 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Passed | allure: passed<br>allure: passed |
 | CHK-ORDD-023 | Check that the Enable Location Services prompt is displayed before requesting O… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-024 | Check that the prompt clearly explains why location access is required. | 2 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Failed | allure: failed — AssertionError: the location prompt shows 'Allow [DEV] CT Mobile to access this device’s location?', without the explanation 'This app needs your location to v…<br>allure: failed — AssertionError: the location prompt shows 'Allow [DEV] CT Mobile to access this device’s location?', without the explanation 'This app needs your location to v… |
+| CHK-ORDD-024 | Check that the prompt clearly explains why location access is required. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-025 | Check that tapping Enable triggers the operating system location permission dia… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-026 | Check that tapping Cancel dismisses the prompt and continues the check-in flow… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-027 | Check that the Location Disabled prompt is displayed when device-level location… | 2 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Failed | allure: failed — AssertionError: the location prompt shows 'Allow [DEV] CT Mobile to access this device’s location?', without the explanation 'This app needs your location to v…<br>allure: failed — AssertionError: the location prompt shows 'Allow [DEV] CT Mobile to access this device’s location?', without the explanation 'This app needs your location to v… |
+| CHK-ORDD-027 | Check that the Location Disabled prompt is displayed when device-level location… | 2 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Passed | allure: passed<br>allure: passed |
 | CHK-ORDD-028 | Check that tapping Go to settings opens the device location settings screen. | 1 — `tests.shared.test_check_in_out#test_go_to_settings (TC-CHIO-009 After refusing location, 'Go to settings' opens the device settings)` | Passed | allure: passed |
 | CHK-ORDD-029 | Check that tapping Cancel returns the user to the check-in flow without GPS val… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-030 | Check that the system captures the user’s GPS location when GPS is enabled duri… | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | Passed | allure: passed |
@@ -105,11 +105,11 @@ Generated: 2026-09-30 07:59 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDD-084 | Check that the Attachments screen displays an appropriate message when attachme… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-085 | Check that the user is able to retry loading attachments after a network failur… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-086 | Check that switching between Documents and Photos tabs does not cause UI flicke… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDD-087 | Check that opening and closing attachments does not reset the selected tab unex… | 2 — `tests.shared.test_order_details#test_pdf_viewer (TC-ORDD-007 A PDF opens in the in-app viewer with its first page drawn, read-only, and X returns to Documents)`; `tests.shared.test_order_details#test_photos_grid_and_viewer (TC-ORDD-008 Photos shows a grid of thumbnails; a thumbnail opens the photo full screen; back returns to Photos)` | Passed | allure: passed<br>allure: passed |
+| CHK-ORDD-087 | Check that opening and closing attachments does not reset the selected tab unex… | 2 — `tests.shared.test_order_details#test_photos_grid_and_viewer (TC-ORDD-008 Photos shows a grid of thumbnails; a thumbnail opens the photo full screen; back returns to Photos)`; `tests.shared.test_order_details#test_pdf_viewer (TC-ORDD-007 A PDF opens in the in-app viewer with its first page drawn, read-only, and X returns to Documents)` | Passed | allure: passed<br>allure: passed |
 | CHK-ORDD-088 | Check that the Attachments screen remains responsive when a large number of doc… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDD-089 | Check that attachment content is cached for subsequent access according to offl… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 
-**Summary:** total 89 · automated 56 · Passed 53 · Failed 3 · Blocked 0 · Not run 33 (= total − Passed − Failed − Blocked)
+**Summary:** total 89 · automated 55 · Passed 55 · Failed 0 · Blocked 0 · Not run 34 (= total − Passed − Failed − Blocked)
 
 ## Tagged tests with no checklist item
 
@@ -134,7 +134,7 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 | CHK-CHIO-017 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
 | CHK-CHIO-018 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
 | CHK-CHIO-020 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
-| CHK-CHIO-022 | 3 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | failed, passed, failed |
+| CHK-CHIO-022 | 3 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed, passed, passed |
 | CHK-CHIO-023 | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | passed |
 | CHK-CHIO-035 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
 | CHK-CHIO-036 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
@@ -145,17 +145,15 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 | CHK-ORDL-058 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
 | CHK-ORDL-068 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
 
-> **Resolved (2026-09-30) — every Failed row and the orphans:**
-> - **TC-ORDD-005 carries four items and failed at its LAST step**, so the tool marks CHK-ORDD-022, -024, -027 (and
->   CHK-CHIO-022) Failed. In this run the steps behind **CHK-ORDD-022 / CHK-CHIO-022** (after Check in the system location
->   prompt appears — the flow started) and **CHK-ORDD-027** (after a refusal the app's "Location access required"
->   dialog, D-CHIO-A3 accepted; Cancel leaves the job New, on the server too) **passed** (Allure steps of TC-ORDD-005,
->   run 2). The failing step is **CHK-ORDD-024 → [Q-ORDD-A4](order-details-questions.md)**: the Android prompt shows
->   only the system's text, without the app's explanation of why the location is needed (owner's decision pending).
->   The verdicts above are the tool's and are not edited.
+> **Resolved (2026-09-30):**
+> - **CHK-ORDD-024 — Skipped on Android** by the owner's decision (Q-ORDD-A4, [order-details-questions.md](order-details-questions.md)):
+>   Android's system location prompt carries no text of the app; the item is not checked on Android. TC-ORDD-005 does not
+>   carry it there (`chk_skipped_on`, the reason is an Allure label), so it shows as not run — never Passed, never Failed.
+>   All other steps of TC-ORDD-005 passed (CHK-ORDD-022, -027, CHK-CHIO-022).
 > - **Blocked 0:** TC-ORDD-004 (the PF phone opens the dialer, CHK-ORDD-017) was Blocked on iOS (no Phone app on the
 >   simulator) and **passes on Android** — the dialer's own number field shows the PF number; no call is placed.
 > - **Merged as on iOS:** the module 04 run and the module 05 run together — the check-in / check-out tests of module 05
 >   also prove module 04 items (CHK-ORDD-028, -030…035, -044…047), all Passed on Android.
 > - Orphans: CHK-CHIO-* belong to module 05 (`05-check-in-out/android/`), CHK-ORDL-058 / -068 to module 03
 >   (`03-order-list/android/`) — the same shared tests as on iOS.
+

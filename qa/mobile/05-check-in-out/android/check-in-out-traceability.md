@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-30 07:58 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-09-30 11:30 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/05-check-in-out/check-in-out-checklist.md` — 41 items
-- Results (allure): `automation/mobile/results/android/2026-09-30-05-r2` — 10 tests (9 passed, 1 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-09-30-05-r3` — 10 tests (10 passed, 0 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `b5ae4b4`
+- Harness commit (this repo): `9d43c00`
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `pytest --platform=android tests/shared/test_check_in_out.py tests/shared/test_order_details.py::test_check_in_starts_flow (module 05 run 2, 2026-09-30; real emulator GPS, no mock switch — Q-CHIO-A1)`
+- Run label (suite / filter): `pytest --platform=android tests/shared/test_check_in_out.py tests/shared/test_order_details.py::test_check_in_starts_flow (module 05 run 3, 2026-09-30; real emulator GPS, no mock switch — Q-CHIO-A1)`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -40,7 +40,7 @@ Generated: 2026-09-30 07:58 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-CHIO-019 | Check that the check-out method is flagged as Manual when GPS is unavailable or… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-CHIO-020 | Check that the order status is updated to Completed or the next workflow status… | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | Passed | allure: passed |
 | CHK-CHIO-021 | Check that an email notification is triggered to the Project Facilitator after… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-CHIO-022 | Check that initiating Check-In triggers the location permission and validation… | 2 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)`; `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | Failed | allure: passed<br>allure: failed — AssertionError: the location prompt shows 'Allow [DEV] CT Mobile to access this device’s location?', without the explanation 'This app needs your location to v… |
+| CHK-CHIO-022 | Check that initiating Check-In triggers the location permission and validation… | 2 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)`; `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | Passed | allure: passed<br>allure: passed |
 | CHK-CHIO-023 | Check that initiating Check-Out triggers the location permission and validation… | 1 — `tests.shared.test_check_in_out#test_check_out_on_site (TC-CHIO-004 On site, check-out from a Submitted job shows its confirmation, and Confirm completes the job with a GPS record)` | Passed | allure: passed |
 | CHK-CHIO-024 | Check that manual Check-In or Check-Out is allowed when GPS permission is denie… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-CHIO-025 | Check that manual Check-In action іs clearly flagged in the recorded data. | 0 |  | no tagged test — not run (manual / exploratory), never green |
@@ -61,7 +61,7 @@ Generated: 2026-09-30 07:58 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-CHIO-040 | Check that the user cannot initiate Check-In or Check-Out actions that are inva… | 1 — `tests.shared.test_check_in_out#test_actions_per_status (TC-CHIO-006 Each status offers only its own action: New → Check in, In progress → none, Submitted → Check out)` | Passed | allure: passed |
 | CHK-CHIO-041 | Check that check-in is refused with the "Location could not be trusted" message… | 1 — `tests.shared.test_check_in_out#test_mock_location_refused (TC-CHIO-008 Without the switch, a simulated location is refused with 'Location could not be trusted' and the job stays New)` | Passed | allure: passed |
 
-**Summary:** total 41 · automated 25 · Passed 24 · Failed 1 · Blocked 0 · Not run 16 (= total − Passed − Failed − Blocked)
+**Summary:** total 41 · automated 25 · Passed 25 · Failed 0 · Blocked 0 · Not run 16 (= total − Passed − Failed − Blocked)
 
 ## Tagged tests with no checklist item
 
@@ -69,9 +69,8 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 
 | CHK ID | Tests | Statuses |
 |---|---|---|
-| CHK-ORDD-022 | 1 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | failed |
-| CHK-ORDD-024 | 1 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | failed |
-| CHK-ORDD-027 | 1 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | failed |
+| CHK-ORDD-022 | 1 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | passed |
+| CHK-ORDD-027 | 1 — `tests.shared.test_order_details#test_check_in_starts_flow (TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves the job New)` | passed |
 | CHK-ORDD-028 | 1 — `tests.shared.test_check_in_out#test_go_to_settings (TC-CHIO-009 After refusing location, 'Go to settings' opens the device settings)` | passed |
 | CHK-ORDD-030 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
 | CHK-ORDD-031 | 1 — `tests.shared.test_check_in_out#test_check_in_away (TC-CHIO-003 Away from the site, check-in is stopped with 'You are not at the job site'; Got it and Cancel leave the job New)` | passed |
@@ -85,14 +84,11 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 | CHK-ORDD-047 | 1 — `tests.shared.test_check_in_out#test_check_in_on_site (TC-CHIO-001 On site, check-in shows the confirmation screen, and Confirm starts the job with a GPS record)` | passed |
 
 > **Resolved (2026-09-30):**
-> - **CHK-CHIO-022 is Failed only because it is tagged on TC-ORDD-005**, which fails at its last step, CHK-ORDD-024
->   ([Q-ORDD-A4](../../04-order-details/android/order-details-questions.md): the Android prompt carries no explanation
->   from the app). The CHK-CHIO-022 step itself — after Check in the location permission flow starts (the system
->   prompt appears) — **passed** in this run. The verdict above is the tool's and is not edited.
 > - Every check-in / check-out test passes on Android with the emulator's real GPS fixes and **without** the app's
->   mock-location switch (Q-CHIO-A1); the mock-location guard (TC-CHIO-008) is proven with a real mock provider.
->   TC-CHIO-009 reaches "Go to settings" after two refusals on Android (the first one may still be asked again —
->   "Location access required", D-CHIO-A3).
+>   mock-location switch (Q-CHIO-A1); the mock-location guard (TC-CHIO-008) is proven with a real mock provider (removed
+>   again after the test). TC-CHIO-009 reaches "Go to settings" after two refusals on Android (the first one may still be
+>   asked again — "Location access required", D-CHIO-A3).
+> - TC-ORDD-005 (tagged CHK-CHIO-022) passes on Android since the owner's decision to skip CHK-ORDD-024 there (Q-ORDD-A4).
 > - Orphans: CHK-ORDD-* belong to module 04 (`04-order-details/android/`, traced from the module 04 and 05 runs
 >   together, as on iOS).
 
