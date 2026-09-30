@@ -45,6 +45,17 @@ if ! git diff --quiet HEAD -- 2>/dev/null; then
   DIRTY="yes (ALLOW_DIRTY=1)"
 fi
 
+# Android: the emulator keeps the DNS server of the network it booted on (netsimd --host-dns).
+# Once the Mac moves to another network, no name resolves on the device and every test ends
+# Blocked at the UI login (module 09 Android run 4, after the Mac slept). Restart the emulator.
+if [ "$PLATFORM" = "android" ]; then
+  API_HOST="$(sed -n 's|^API_BASE_URL=https\{0,1\}://\([^/:]*\).*|\1|p' .env 2>/dev/null | head -1)"
+  if [ -n "$API_HOST" ] && adb shell "ping -c 1 -W 5 $API_HOST" 2>&1 | grep -q "unknown host"; then
+    echo "refused: the device cannot resolve $API_HOST (DNS) — the emulator keeps the DNS of the network it booted on; restart it" >&2
+    exit 3
+  fi
+fi
+
 LOCK="results/.run.lock"
 mkdir -p "results/$PLATFORM"
 if ! mkdir "$LOCK" 2>/dev/null; then
