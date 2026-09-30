@@ -53,7 +53,7 @@ recon Registration/SMS Terms зроблено (recon 3c; Q-A1…A4 закрит�
 | 6a | Auth: RTM (prompt 04) + рев'ю покриття (prompt 05) | ✅ `authentication-rtm.md`, `authentication-coverage-review.md` (§3е) |
 | **6b** | **Решта модулів на iOS** (01, 03–12) — по одному: імпорт чекліста → план → тест-кейси (власник валідує) → recon → карти → тести → доведений червоний → трасування | ✅ **01, 03–12 протрасовано на iOS** (§3з…§3с); далі — фінальний прогін iOS (6c) |
 | 6c | Фінальний прогін усієї апки на iOS + фінальні звіти (Allure, матриця по всіх модулях, зведена сторінка), 3 стабільні прогони | ✅ §3т — 3 однакові прогони на `7015c46`; `qa/mobile/ios/final-traceability.md` |
-| 7 | Android (після всього iOS — рішення власника 2026-09-23) | ⏳ план — `docs/notes/android-plan.md`; кроки 0–2 ✅ (§3ф, §3х); **крок 3 ✅ 2026-09-29** (§3ц): Android-колонка в 25 картах + `screens/android/`, Android-гілки сторінок і харнесу, map-health Android зелений; **крок 4 ⏳** (§3ч): модулі 02, 01+03 ✅, далі 04 → 05 → 06 → 08 → 09 → 10 → 07 → 11 → 12 |
+| 7 | Android (після всього iOS — рішення власника 2026-09-23) | ⏳ план — `docs/notes/android-plan.md`; кроки 0–2 ✅ (§3ф, §3х); **крок 3 ✅ 2026-09-29** (§3ц): Android-колонка в 25 картах + `screens/android/`, Android-гілки сторінок і харнесу, map-health Android зелений; **крок 4 ⏳** (§3ч): модулі 02, 01+03, 04 ✅, далі 05 → 06 → 08 → 09 → 10 → 07 → 11 → 12 |
 | 8 | Регресійний прогін + звіт (Allure + матриця трасування) | — |
 
 **Що принести на крок 4:** розкладку ~55–65 тестів по рівнях (досяжність екранів → переходи →
@@ -741,6 +741,15 @@ happy flow → валідації); які пункти чеклісту кож�
   Трасованість: `qa/mobile/01-splash/android/splash-traceability.md` (15: Passed 2 / Failed 7 / not run 6 — пояснено під
   таблицею), `qa/mobile/03-order-list/android/order-list-traceability.md` (70: Passed 48 / Failed 4 / Blocked 0 / not run
   18). Звіти BUG-SPL-001, BUG-ORDL-001/002/003 — «Android ✓» + кадри в `bugs/evidence/…/android/`.
+- **Модуль 04 ✅** (2026-09-30; прогони 1–2 + 3 точкові). Виправлення харнесу: номер у набирачі — з поля
+  `dialer:id/digits` (не всі цифри дерева); під системним запитом геолокації вікно апки взагалі не в дереві доступності
+  (навіть з `enableMultiWindows`) — «Checking in» на Android лише знімок, вердикт дає сам запит; UiAutomator2 віддає
+  відсутній атрибут рядком `'null'` → `BasePage._attr` (label_of / placeholder_of / field_value / value).
+  **Прогін 2 (4:27):** 9 passed, 1 failed — TC-ORDD-005 червоний лише на останньому кроці CHK-ORDD-024 →
+  **нове питання Q-ORDD-A4** (D-ORDD-A6: на Android апка не пояснює, навіщо їй геолокація — системний запит тексту апки
+  не показує); кроки CHK-ORDD-022 / -027 / CHK-CHIO-022 пройшли. TC-ORDD-004 (телефон PF → набирач) на Android Passed
+  (на iOS Blocked). **Prove-red:** 10 з 10. Трасованість: `qa/mobile/04-order-details/android/` (89: Passed 42 /
+  Failed 3 (усі з TC-ORDD-005, пояснено) / Blocked 0 / not run 44).
 - **Середовище 2026-09-30:** власник перезавантажив Mac і вимкнув драйвер Wacom (падав кожні ~10 с → ReportCrash);
   після прогріву load < 8 — прогони вдвічі швидші (01+03: 15–19 хв → 9,5 хв). Уроки: після перезавантаження чекати, поки
   Spotlight / simdiskimaged / GoogleUpdater вщухнуть (load < 12).
