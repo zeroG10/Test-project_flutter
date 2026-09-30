@@ -46,6 +46,7 @@ LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only a
 # The page walks the form from the top with drags that stop where the finger stops, measures each
 # drag's real travel on nodes seen before and after it, and keeps every match at its position in
 # the whole form (two matches of one kind are never within DEDUP px of each other).
+TYPE_CHUNK_ANDROID = 50  # characters per mobile: type call (68 landed from one 501 call)
 TOP_A, BOTTOM_A = 290, 2170  # px: below the app bar, above the Save button (Pixel 7)
 DEDUP = 40
 DATE_TEXT = re.compile(r"^[A-Z][a-z]{2} \d{1,2}, \d{4}$")  # 'Sep 15, 2026' once picked
@@ -67,8 +68,11 @@ def _android_form_order(alias: str, text: str | None) -> Callable[[Node], bool]:
         )
 
     specs: dict[str, Callable[[Node], bool]] = {
-        "yes": lambda n: n.kind in toggles and n.label == "Yes",
-        "no": lambda n: n.kind in toggles and n.label == "No",
+        # a radio 'Yes' / 'No' counts too, as on iOS (FORM_ORDER): Fiber Q1 is a radio question —
+        # without it "the first No" landed on Q7 and "the second Yes" on the (Copy) Q11, which
+        # ends the survey (module 08 Android run 1, TC-SRV-009)
+        "yes": lambda n: n.kind in ("RadioButton", *toggles) and n.label == "Yes",
+        "no": lambda n: n.kind in ("RadioButton", *toggles) and n.label == "No",
         "option": lambda n: n.kind in ("RadioButton", *toggles) and n.label == text,
         "checkbox": lambda n: n.kind == "CheckBox" and n.label == text,
         "text": is_text,
@@ -376,7 +380,13 @@ class SurveyPage(BasePage):
         seen: list[tuple[float, str]] = []
         for _, offset in self._scan():
             for el in self.driver.find_elements(*locator):
-                at, label = el.rect["y"] + offset, self.label_of(el)
+                top = el.rect["y"]
+                if not TOP_A <= top < BOTTOM_A:
+                    # cut by the top of the scroll area: Android reports the visible top, not the
+                    # real one, so its form position is wrong — counted where its top shows
+                    # (module 08 Android run 1, TC-SRV-014 counted one thumbnail twice)
+                    continue
+                at, label = top + offset, self.label_of(el)
                 if not any(abs(at - y) < DEDUP and lab == label for y, lab in seen):
                     seen.append((at, label))
         return len(seen)
@@ -407,8 +417,12 @@ class SurveyPage(BasePage):
             field = self._focus_text(n)
             if self.platform == "android":
                 # A whole-card field is ONE merged node that refuses set_text ("Cannot set the
-                # element", recon A1): type key by key through the IME instead.
-                self.driver.execute_script("mobile: type", {"text": text})
+                # element", recon A1): type key by key through the IME instead — in chunks: one
+                # 501-character call landed only 68 characters (the app's counter said 432
+                # remaining; module 08 Android run 1, TC-SRV-003).
+                for start in range(0, len(text), TYPE_CHUNK_ANDROID):
+                    chunk = text[start : start + TYPE_CHUNK_ANDROID]
+                    self.driver.execute_script("mobile: type", {"text": chunk})
             else:
                 field.send_keys(text)
             self.hide_keyboard()
@@ -500,9 +514,20 @@ class SurveyPage(BasePage):
     def entry_headers(self, section: str) -> list[str]:
         """The headers of a repeatable section's entries, in order: '<section>', '<section> 2', …"""
         if self.platform == "android":
+            # An entry is one merged node, often taller than the scroll band, so "whole" (as
+            # _walk wants) may never happen, and its form position drifts over many drags: a
+            # header counts once its TOP is in the band, and the headers are told apart by their
+            # first line ('<section>', '<section> 2', …), in the order the walk meets them
+            # (module 08 Android run 1, TC-SRV-010 read the 2nd header twice, the 1st never).
             match = _android_form_order("entry-headers", section)
-            found, _, _ = self._walk(match)
-            return [node.label.split("\n")[0] for _, node in found]
+            headers: list[str] = []
+            for nodes, _ in self._scan():
+                for node in nodes:
+                    if node.visible and match(node) and TOP_A <= node.y < BOTTOM_A:
+                        head = node.label.split("\n")[0]
+                        if head not in headers:
+                            headers.append(head)
+            return headers
         return [a.get("name", "").split("\n")[0] for a in self.matches("entry-headers", section)]
 
     def delete_entry(self, n: int, confirm: bool | None) -> None:
