@@ -75,6 +75,7 @@ class Node:
     checked: bool = False
     enabled: bool = True
     hint: str = ""
+    clickable: bool = False  # Android only (iOS page sources carry no such attribute)
 
 
 def _android_bounds(bounds: str) -> tuple[int, int, int, int]:
@@ -106,7 +107,7 @@ def page_nodes(source: str, platform: str) -> list[Node]:
             value=a.get("text") or "", x=x, y=y, width=w, height=h,
             visible=a.get("displayed") != "false", selected=a.get("selected") == "true",
             checked=a.get("checked") == "true", enabled=a.get("enabled") != "false",
-            hint=a.get("hint") or "",
+            hint=a.get("hint") or "", clickable=a.get("clickable") == "true",
         ))  # fmt: skip
     return nodes
 

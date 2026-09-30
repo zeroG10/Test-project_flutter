@@ -78,7 +78,16 @@ class PhotoMetadata(BasePage):
     def counter(self) -> str:
         return self.label_of(self.find("counter"))
 
+    def tap(self, alias: str, timeout: float | None = None, **params: object) -> None:
+        # Android: a 500-character description pushes the tags below the screen, and Android
+        # shows only on-screen nodes (module 09 Android run 1, TC-PHR-002)
+        if alias == "tag" and self.platform == "android":
+            self.scroll_to("tag", **params)
+        super().tap(alias, timeout, **params)
+
     def is_tag_selected(self, tag: str) -> bool:
+        if self.platform == "android":
+            self.scroll_to("tag", text=tag)
         return self.value("tag", text=tag) == "1"
 
     def expect_tag(self, tag: str, selected: bool = True) -> None:
@@ -127,10 +136,15 @@ class PhotoReportPage(BasePage):
         def attrs(n) -> dict:
             return {"name": n.label, "x": n.x, "y": n.y, "width": n.width, "height": n.height}
 
+        # a photo without description and tag is an ImageView with NO label (module 09 Android
+        # run 1, TC-PHR-003: the first of three photos was not counted) — by size, as on iOS
         tiles = [
             attrs(n)
             for n in nodes
-            if n.kind == "ImageView" and n.label and n.width > GRID_MIN_WIDTH_ANDROID
+            if n.kind == "ImageView"
+            and n.width > GRID_MIN_WIDTH_ANDROID
+            and not n.clickable
+            and n.label != "Add photo"
         ]
         icons = [
             attrs(n)
