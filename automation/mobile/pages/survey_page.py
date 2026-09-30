@@ -318,14 +318,19 @@ class SurveyPage(BasePage):
     # --- Android: walking the form (see TOP_A … above) ---------------------------------
 
     def _to_top(self) -> None:
+        """Drag down until the tree no longer changes. It gave up after 12 drags before and the
+        walk then took the middle of a three-entry form for its top ("yes #1" tapped entry 1's
+        'Bad?' — module 08 Android, TC-SRV-010): now NTH_DRAGS, and not reaching the top is an
+        error, never a silent start from the middle."""
         height = self.driver.get_window_size()["height"]
         previous = None
-        for _ in range(12):
+        for _ in range(NTH_DRAGS):
             source = self._still_source()
             if source == previous:
                 return
             previous = source
             self._drag(int(height * 0.3), int(height * 0.8))
+        raise AssertionError(f"the survey form did not reach its top in {NTH_DRAGS} drags")
 
     def _scan(self):
         """(nodes, offset) per screen of the form from the top to its end (Android): ``offset``
@@ -346,6 +351,7 @@ class SurveyPage(BasePage):
             moved = _travel(before, after)
             offset += moved if moved is not None else height * 0.35 - 21
             source, before = after_source, after
+        raise AssertionError(f"the survey form did not end in {NTH_DRAGS} drags")
 
     def _viewports(self):
         """The form's screens from the top to the end (Android)."""
