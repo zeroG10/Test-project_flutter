@@ -180,6 +180,7 @@ def driver(platform):
     with contextlib.ExitStack() as device:
         if platform == "android":  # a pushed "New job assigned" pop-up covers the app bar
             device.enter_context(Adb.of(drv).heads_up_off())
+            Adb.of(drv).remove_test_providers()  # a crashed run may have left mock providers
         yield drv
     with contextlib.suppress(Exception):
         drv.quit()

@@ -108,6 +108,25 @@ class Adb:
                 self.shell(f"am stopservice {APPIUM_SETTINGS}/.LocationService")
             with contextlib.suppress(Exception):
                 self.shell(f"appops set {APPIUM_SETTINGS} android:mock_location default")
+            self.remove_test_providers()
+
+    def remove_test_providers(self) -> None:
+        """Drop the mock providers Appium Settings registered. Stopping its service leaves
+        "gps provider [mock]" / "fused provider [mock]" behind, and while they stay the emulator's
+        real fixes never reach the app — every later check-in ends on "Enter location manually"
+        (module 05 Android run 1). The shell needs the MOCK_LOCATION app-op for the removal; it
+        gets it for these commands only."""
+        with allure.step("device: remove leftover mock location providers"):
+            self.shell("appops set com.android.shell android:mock_location allow", check=False)
+            try:
+                for provider in ("gps", "fused", "network"):
+                    self.shell(
+                        f"cmd location providers remove-test-provider {provider}", check=False
+                    )
+            finally:
+                self.shell(
+                    "appops set com.android.shell android:mock_location default", check=False
+                )
 
     # --- network (offline checks, step 5) -------------------------------------------------
 

@@ -148,14 +148,21 @@ class AppControl:
         (module 04, TC-ORDD-005; recon 5b). The app is terminated first — relaunch it after.
 
         iOS simulator: ``xcrun simctl privacy <udid> reset location <bundle>``. Android:
-        ``mobile: changePermissions`` revoke (a revoked runtime permission is asked again)."""
+        ``mobile: changePermissions`` revoke, and the user-set / user-fixed flags cleared — after
+        a second refusal ("don't ask again", TC-CHIO-009) a revoke alone leaves the system
+        silent, and the next check-in never shows the prompt (module 05 Android run 1)."""
         with allure.step("app: reset the location permission (not determined)"):
             self.terminate()
             if self.platform == "android":
-                self.driver.execute_script("mobile: changePermissions", {
-                    "permissions": ["android.permission.ACCESS_FINE_LOCATION",
-                                    "android.permission.ACCESS_COARSE_LOCATION"],
-                    "appPackage": self.app_id, "action": "revoke"})  # fmt: skip
+                perms = ["android.permission.ACCESS_FINE_LOCATION",
+                         "android.permission.ACCESS_COARSE_LOCATION"]  # fmt: skip
+                self.driver.execute_script(
+                    "mobile: changePermissions",
+                    {"permissions": perms, "appPackage": self.app_id, "action": "revoke"},
+                )
+                adb = Adb.of(self.driver)
+                for perm in perms:
+                    adb.shell(f"pm clear-permission-flags {self.app_id} {perm} user-set user-fixed")
                 return
             udid = self.driver.capabilities.get("udid") or "booted"
             subprocess.run(
