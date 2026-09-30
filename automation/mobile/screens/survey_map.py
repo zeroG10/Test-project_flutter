@@ -218,6 +218,15 @@ SURVEY_TIME_PICKER = Screen(
             "(survey_time_picker_text.xml); TD-A1, UiSelector cannot match hint",
         ),
         "ok": El(android=(_AID, "OK"), ios=(_P, _BUTTON + "name == 'OK'")),
+        "am": El(
+            android=(_AID, "AM"),
+            note="Android only: the 12-hour picker's AM switch, a RadioButton "
+            "(survey_time_picker_text.xml); it starts on the current half of the day",
+        ),
+        "pm": El(
+            android=(_AID, "PM"),
+            note="Android only: the 12-hour picker's PM switch (survey_time_picker_text.xml)",
+        ),
     },
 )
 

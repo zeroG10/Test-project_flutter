@@ -510,13 +510,20 @@ class SurveyPage(BasePage):
         with allure.step(f"set survey.time #{n + 1} to {hour:02d}:{minute:02d}"):
             self.tap_nth("time", n)
             picker.tap("text-mode", 10)
-            for alias, value in (("hour", hour), ("minute", minute)):
+            # Android's picker is 12-hour with an AM / PM switch that starts on the current half of
+            # the day: 09:45 typed in the afternoon was stored as 21:45 (module 08 Android run 3,
+            # TC-SRV-002 — green in the morning runs). The hour goes in 12-hour form, the half is
+            # chosen explicitly.
+            shown = (hour % 12 or 12) if self.platform == "android" else hour
+            for alias, value in (("hour", shown), ("minute", minute)):
                 waits.wait_until(self.driver, lambda _d, a=alias: picker.is_visible(a, 0), 5)
                 time.sleep(0.5)  # the field is rebuilt once after the mode switch (recon 8: stale)
                 picker.tap(alias)
                 field = waits.focused(self.driver)
                 field.clear()
                 field.send_keys(f"{value:02d}")
+            if self.platform == "android":
+                picker.tap("am" if hour < 12 else "pm")
             picker.tap("ok")
             picker.wait_gone("ok", 5)
 
