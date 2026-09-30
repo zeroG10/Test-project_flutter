@@ -48,7 +48,9 @@ LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only a
 # the whole form (two matches of one kind are never within DEDUP px of each other).
 SHIFT_BIN = 4  # px: shifts this close are the same travel (all nodes move together)
 MIN_TRAVEL = 2  # px: a smaller 'shift' is the same node where it was (the form did not move)
-DRAG_SLACK = 40  # px over the finger's travel (0.35 of the height) a shift may still be
+DRAG_SLACK = 1.5  # a shift may be up to 1.5 × the finger's travel (0.35 of the height):
+# 840 + 40 px refused a real drag (module 08 Android run 4); false shifts are refused by the
+# edge alignment itself
 EDGE_GAP = 20  # px: a bottom edge this close to the band's end may be the scroll area's
 CANDIDATES = 12  # the most frequent candidate shifts that are scored
 MIN_ALIGNED = 0.6  # share of the staying nodes the chosen shift must find again
@@ -392,7 +394,7 @@ class SurveyPage(BasePage):
                 if after_source == source:
                     return
                 after = self.nodes(after_source)
-                limit = height * 0.35 + DRAG_SLACK
+                limit = height * 0.35 * DRAG_SLACK
                 moved = _travel(before, after, max_shift=limit)
                 if moved is None:  # a frame caught mid-settle: read it again
                     time.sleep(0.8)
@@ -402,7 +404,11 @@ class SurveyPage(BasePage):
                 if moved is None and _still(before, after):
                     travels.append("0 (end)")  # the tree changed in place: the form did not move
                     return
-                travels.append("?" if moved is None else f"{moved:.0f}")
+                if moved is None:  # for the report: what an unbounded alignment would say
+                    loose = _travel(before, after)
+                    travels.append(f"?(unbounded: {loose if loose is None else round(loose)})")
+                else:
+                    travels.append(f"{moved:.0f}")
                 if moved is None:
                     raise AssertionError(
                         "the survey walk could not measure a drag (no match between two reads)"
