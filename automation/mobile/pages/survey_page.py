@@ -46,6 +46,7 @@ LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only a
 # The page walks the form from the top with drags that stop where the finger stops, measures each
 # drag's real travel on nodes seen before and after it, and keeps every match at its position in
 # the whole form (two matches of one kind are never within DEDUP px of each other).
+SHIFT_BIN = 4  # px: shifts this close are the same travel (all nodes move together)
 TYPE_CHUNK_ANDROID = 50  # characters per mobile: type call (68 landed from one 501 call)
 TOP_A, BOTTOM_A = 290, 2170  # px: below the app bar, above the Save button (Pixel 7)
 DEDUP = 40
@@ -103,7 +104,17 @@ def _travel(before: list[Node], after: list[Node]) -> float | None:
 
     b, a = unique(before), unique(after)
     shifts = [b[k] - a[k] for k in b.keys() & a.keys()]
-    return statistics.median(shifts) if shifts else None
+    if not shifts:
+        return None
+    # A repeated section shows the same controls in every entry ("Splicing", "Yes", …): a key
+    # unique in each read may still pair entry 1 with entry 2, and those pairs give wrong shifts.
+    # The true pairs all moved by the SAME amount — take the most common shift (module 08
+    # Android run 2, TC-SRV-009: the median drifted, "#2" landed in the (Copy) section).
+    bins = Counter(round(shift / SHIFT_BIN) for shift in shifts)
+    best, count = bins.most_common(1)[0]
+    if count >= 2:
+        return statistics.median([x for x in shifts if abs(round(x / SHIFT_BIN) - best) <= 1])
+    return statistics.median(shifts)
 
 
 def _attrs(n: Node) -> dict:

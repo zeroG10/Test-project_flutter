@@ -107,6 +107,31 @@ class AndroidReaders(unittest.TestCase):
         self.assertNotIn("Log in", texts)
         self.assertIn("Registration", texts)
 
+    def test_travel_ignores_pairs_across_repeated_entries(self):
+        # entries of a repeated section hold the same controls: a key unique in each read can pair
+        # entry 1 (before) with entry 2 (after). The true pairs share ONE shift (the drag's 819 px);
+        # here the wrong pairs outnumber them, so a plain median would be wrong.
+        from pages.base_page import Node
+        from pages.survey_page import _travel
+
+        def node(label, y):
+            return Node(
+                kind="CheckBox",
+                label=label,
+                value="",
+                x=84,
+                y=y,
+                width=912,
+                height=126,
+                visible=True,
+            )
+
+        before = [node("A", 1200), node("B", 1326),  # entry 1 — still on screen after the drag
+                  node("P", 1900), node("Q", 1950), node("R", 2000)]  # fmt: skip
+        after = [node("A", 381), node("B", 507),  # moved up 819
+                 node("P", 300), node("Q", 330), node("R", 360)]  # entry 2's copies  # fmt: skip
+        self.assertEqual(_travel(before, after), 819)
+
     def test_null_attribute_is_empty(self):
         # UiAutomator2 answers the string 'null' for a missing attribute of a native view
         class El:
