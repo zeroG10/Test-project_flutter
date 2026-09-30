@@ -99,8 +99,15 @@ for sid in $(curl -s -m 10 "$APPIUM/appium/sessions" | python3 -c \
   curl -s -m 60 -X DELETE "$APPIUM/session/$sid" >/dev/null || true
 done
 
+# No idle sleep while the run goes: on battery the Mac slept 13.8 min a minute into module 09
+# Android run 5 — the gesture in flight hung, the API connection died, one job cleanup failed.
+# (`-i` does not stop a closed lid from sleeping.)
+KEEP_AWAKE=()
+command -v caffeinate >/dev/null && KEEP_AWAKE=(caffeinate -i)
+
 set +e
-uv run pytest --platform="$PLATFORM" --alluredir="$OUT" "$@"
+# (bash 3.2 + set -u: an empty array is "unbound" — hence the ${…+…} form)
+${KEEP_AWAKE[@]+"${KEEP_AWAKE[@]}"} uv run pytest --platform="$PLATFORM" --alluredir="$OUT" "$@"
 CODE=$?
 set -e
 echo "results: $OUT (exit $CODE)"

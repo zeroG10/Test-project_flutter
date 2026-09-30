@@ -1012,6 +1012,11 @@ bash scripts/doctor.sh ios          # має бути RESULT: OK і build: ios O
 # якщо білда немає — рецепт у qa/shared/app-code-audit.md, «Рецепт збірки»
 ```
 
+Android (крок 7): `emulator -avd Pixel_7_API_36 -netdelay none -netspeed full &`, Appium — як вище. **Після сну Mac
+або зміни мережі** (інший Wi-Fi) перезапустити емулятор (`adb emu kill` → запуск): він тримає DNS мережі, в якій
+завантажився (`netsimd --host-dns=…`), і в новій мережі жодне ім'я не знаходиться — усі тести Blocked на вході
+(2026-09-30, прогін 09-r4). `run.sh` тепер перевіряє це до старту й відмовляє.
+
 ## 9. Імпорт наступних модулів чеклісту
 
 ```bash
