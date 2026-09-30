@@ -107,6 +107,20 @@ class AndroidReaders(unittest.TestCase):
         self.assertNotIn("Log in", texts)
         self.assertIn("Registration", texts)
 
+    def test_null_attribute_is_empty(self):
+        # UiAutomator2 answers the string 'null' for a missing attribute of a native view
+        class El:
+            def get_attribute(self, name):
+                return {"text": "Allow [DEV] CT Mobile to access this device’s location?"}.get(
+                    name, "null"
+                )
+
+        page = RegistrationPage(FakeDriver(), "android")
+        self.assertEqual(
+            page.label_of(El()), "Allow [DEV] CT Mobile to access this device’s location?"
+        )
+        self.assertEqual(page.placeholder_of(El()), "")
+
 
 if __name__ == "__main__":
     unittest.main()

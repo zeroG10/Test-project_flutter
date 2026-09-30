@@ -315,8 +315,15 @@ class BasePage:
         """What the element says: iOS ``name``; Android ``content-desc``, else ``text`` — a
         Flutter label is in ``content-desc`` and ``.text`` is empty there (recon A1)."""
         if self.platform == "android":
-            return element.get_attribute("content-desc") or element.get_attribute("text") or ""
+            return self._attr(element, "content-desc") or self._attr(element, "text")
         return element.get_attribute("name") or ""
+
+    def _attr(self, element: WebElement, name: str) -> str:
+        """An attribute as text. UiAutomator2 answers the STRING 'null' for an attribute a native
+        view does not have (a system dialog's TextView has no content-desc — module 04 Android,
+        TC-ORDD-005: label_of read 'null', never the text); Flutter nodes rarely lack one."""
+        value = element.get_attribute(name)
+        return "" if value is None or (self.platform == "android" and value == "null") else value
 
     def is_on(self, element: WebElement) -> bool:
         """A switch / radio / checkbox / chip is on: iOS ``value == "1"``; Android ``checked``
@@ -327,14 +334,12 @@ class BasePage:
 
     def placeholder_of(self, element: WebElement) -> str:
         """An empty input's placeholder: iOS ``name``; Android ``hint``."""
-        attr = "hint" if self.platform == "android" else "name"
-        return element.get_attribute(attr) or ""
+        return self._attr(element, "hint" if self.platform == "android" else "name")
 
     def field_value(self, element: WebElement) -> str:
         """Typed text of an input: iOS ``value``; Android ``text`` (``value`` does not exist
         there — UiAutomator2 raises UnknownMethodException)."""
-        attr = "text" if self.platform == "android" else "value"
-        return element.get_attribute(attr) or ""
+        return self._attr(element, "text" if self.platform == "android" else "value")
 
     def expect_text(
         self, alias: str, text: str, timeout: float | None = None, **params: object
@@ -384,7 +389,7 @@ class BasePage:
             return "1" if element.get_attribute("checked") == "true" else "0"
         if element.get_attribute("selected") == "true":
             return "1"
-        return str(element.get_attribute("text") or "")
+        return self._attr(element, "text")
 
     def is_visible(self, alias: str, timeout: float | None = None, **params: object) -> bool:
         """Non-raising probe for branching. For assertions use ``visible`` / ``wait_gone``."""
