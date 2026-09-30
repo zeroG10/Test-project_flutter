@@ -406,6 +406,12 @@ class SurveyPage(BasePage):
         name = f"survey.{alias}[{text or ''}]"
         match = _android_form_order(alias, text)
         found, offset, screen = self._walk(match, stop_after=n)
+        # the walk's picture of the form, for the report: which match is which, where
+        allure.attach(
+            "\n".join(f"#{i + 1} at {y:.0f}: {node.label[:60]!r}" for i, (y, node) in
+                      enumerate(found)) + f"\nscreen offset {offset:.0f}, wanted #{n + 1}",
+            name=f"walk: {name}", attachment_type=allure.attachment_type.TEXT,
+        )  # fmt: skip
         if len(found) <= n:
             raise AssertionError(f"{name}: {len(found)} on the form, wanted #{n + 1}")
         at = found[n][0] - offset
