@@ -48,9 +48,9 @@ LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only a
 # the whole form (two matches of one kind are never within DEDUP px of each other).
 SHIFT_BIN = 4  # px: shifts this close are the same travel (all nodes move together)
 MIN_TRAVEL = 2  # px: a smaller 'shift' is the same node where it was (the form did not move)
-DRAG_SLACK = 1.5  # a shift may be up to 1.5 × the finger's travel (0.35 of the height):
-# 840 + 40 px refused a real drag (module 08 Android run 4); false shifts are refused by the
-# edge alignment itself
+DRAG_SLACK = 2.2  # a shift may be up to 2.2 × the finger's travel (0.35 of the height), i.e.
+# about the band: a drag does fling now and then (1187 and 1305 px measured for 840 — module 08
+# Android run 5); false shifts are refused by the edge alignment itself
 EDGE_GAP = 20  # px: a bottom edge this close to the band's end may be the scroll area's
 CANDIDATES = 12  # the most frequent candidate shifts that are scored
 MIN_ALIGNED = 0.6  # share of the staying nodes the chosen shift must find again

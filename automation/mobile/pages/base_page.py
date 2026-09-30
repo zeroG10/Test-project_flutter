@@ -246,8 +246,11 @@ class BasePage:
         )
         pointer = actions.w3c_actions.pointer_action
         x = 21 if self.platform == "android" else 10  # Android: left of every input (x ≥ 42 px)
+        # Android: a 0.3-s hold still let Flutter fling now and then (the survey walk measured
+        # 1187 and 1305 px for an 840-px drag — module 08 Android run 5): hold longer there
+        hold = 0.6 if self.platform == "android" else 0.3
         pointer.move_to_location(x, from_y).pointer_down()
-        pointer.move_to_location(x, to_y).pause(0.3).release()
+        pointer.move_to_location(x, to_y).pause(hold).release()
         actions.perform()
 
     def tap_at(self, alias: str, fx: float, fy: float, **params: object) -> None:
