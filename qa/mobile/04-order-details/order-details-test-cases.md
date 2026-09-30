@@ -215,6 +215,13 @@ there (recon 5).
 | 11 | api | `GET /job/{id}` (`JobController_findOne`) | — | `statusType` = `new` — no check-in was recorded |
 
 **Postconditions / cleanup:** the permission stays "denied" until the next reinstall (every run starts with one).
+**Android (step 4 of the Android stage, 2026-09-30):** step 3 is not readable — while the system prompt is up the
+app's window is not in the accessibility tree at all (not even with `enableMultiWindows`), so it is a screenshot only
+and step 4 decides that the flow started; step 4 is the system's own text "Allow [DEV] CT Mobile to access this
+device’s location?" (D-CHIO-A2) and carries no explanation from the app — CHK-ORDD-024 is checked last (Q-ORDD-A4);
+steps 6–7 are the Android dialog "Location access required" / "GPS is required to check in. Enable location services
+to continue." (D-CHIO-A3, accepted).
+
 **Notes:** the rest of the check-in flow (GPS, proximity, manual entry, the record) is module 05 (Q-ORDD-1). The app
 shows no own prompt before the system one, and "Cancel" ends the check-in (D-ORDD-9 — decided in module 05). This TC
 runs **last** on `{{job.full}}`: if the flow ever completed, the job would be In progress.

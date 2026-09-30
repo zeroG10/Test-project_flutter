@@ -4,10 +4,8 @@ What the tree cannot say is decided by pixels: the "Updated" banner (fill #B80B2
 card) is not an element; "Check in fully on screen" is the button's rect inside the window.
 """
 
-import contextlib
 import re
 import time
-from collections.abc import Iterator
 from datetime import UTC, datetime
 
 import allure
@@ -165,10 +163,18 @@ class JobDetailsPage(BasePage):
     def wait_checking_in(self, timeout: float | None = None) -> None:
         """The Check in button turned into the disabled 'Checking in' (the flow started).
 
-        Android: the location prompt opens at once in a window of its own, and UiAutomator2
-        reads only the active window — the button under it is found with ``enableMultiWindows``
-        for this step only (module 04 Android run 1: the prompt over 'Checking in')."""
-        with allure.step("expect 'Checking in' (disabled)"), self._all_windows():
+        Android: the location prompt is a system activity over the app, and while it is up the
+        app's window is not in the accessibility tree at all — not even with
+        ``enableMultiWindows`` (module 04 Android run 1 and a manual probe, 2026-09-30). The
+        button is attached as a screenshot only; that the flow started is decided by the next
+        step, the system prompt itself (TC-ORDD-005 note)."""
+        if self.platform == "android":
+            with allure.step("'Checking in' under the system prompt — not in the Android tree; "
+                             "the prompt (next step) decides that the flow started"):  # fmt: skip
+                allure.attach(self.driver.get_screenshot_as_png(), name="after the Check in tap",
+                              attachment_type=allure.attachment_type.PNG)  # fmt: skip
+            return
+        with allure.step("expect 'Checking in' (disabled)"):
             waits.wait_until(
                 self.driver,
                 lambda _d: self.is_visible("checking-in", 0),
@@ -176,15 +182,3 @@ class JobDetailsPage(BasePage):
                 "the button did not turn into 'Checking in'",
             )
             self.expect_disabled("checking-in")
-
-    @contextlib.contextmanager
-    def _all_windows(self) -> Iterator[None]:
-        if self.platform != "android":
-            yield
-            return
-        self.driver.update_settings({"enableMultiWindows": True})
-        try:
-            yield
-        finally:
-            with contextlib.suppress(Exception):
-                self.driver.update_settings({"enableMultiWindows": False})

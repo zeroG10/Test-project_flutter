@@ -21,11 +21,16 @@ from fixtures.details import moved, schedule_change
 from helpers import waits
 from pages.android.system_pages import DialerPage
 from pages.attachments_page import AttachmentsPage, PdfViewerPage, PhotoViewerPage
+from pages.base_page import normalized
 from pages.in_app_browser_page import InAppBrowserPage
 from pages.job_details_page import JobDetailsPage
 from pages.jobs_list_page import JobsListPage
 from pages.location_dialogs_page import LocationDisabledDialog, LocationPromptPage, system_alerts
-from screens.location_dialogs_map import LOCATION_DISABLED_MESSAGE, LOCATION_PROMPT_MESSAGE
+from screens.location_dialogs_map import (
+    LOCATION_DISABLED_MESSAGE,
+    LOCATION_DISABLED_MESSAGE_ANDROID,
+    LOCATION_PROMPT_MESSAGE,
+)
 
 SERVER = 20.0
 MAPS_PAGE = 40.0  # maps.apple.com loads slowly on the simulator (recon 5: blank at 4 s)
@@ -287,18 +292,34 @@ def test_check_in_starts_flow(
         d.tap("check-in")
         d.wait_checking_in(SERVER)
         with system_alerts(driver, platform):  # the system prompt is readable only inside
-            pages.prompt.expect_text("title", expected("to use your location"), SERVER)
-            pages.prompt.expect_text("message", expected(LOCATION_PROMPT_MESSAGE))
+            if platform == "android":  # one text in the system's own wording (D-CHIO-A2)
+                pages.prompt.expect_text("title", expected("to access this device"), SERVER)
+                shown = pages.prompt.label_of(pages.prompt.visible("title"))
+                explained = normalized(expected(LOCATION_PROMPT_MESSAGE)) in normalized(shown)
+            else:
+                pages.prompt.expect_text("title", expected("to use your location"), SERVER)
+                pages.prompt.expect_text("message", expected(LOCATION_PROMPT_MESSAGE))
+                shown, explained = LOCATION_PROMPT_MESSAGE, True
             evidence.checkpoint("location-prompt")
             pages.prompt.tap("dont-allow")
-        pages.disabled.expect_text("title", expected("Location disabled"), SERVER)
-        pages.disabled.expect_text("message", expected(LOCATION_DISABLED_MESSAGE))
+        if platform == "android":  # the app's dialog after a denial differs (D-CHIO-A3, accepted)
+            pages.disabled.expect_text("title", expected("Location access required"), SERVER)
+            pages.disabled.expect_text("message", expected(LOCATION_DISABLED_MESSAGE_ANDROID))
+        else:
+            pages.disabled.expect_text("title", expected("Location disabled"), SERVER)
+            pages.disabled.expect_text("message", expected(LOCATION_DISABLED_MESSAGE))
         pages.disabled.tap("cancel")
     d.expect_enabled("check-in", timeout=SERVER)
     d.expect_field("status", expected("New"))
     with allure.step("expect no check-in recorded on the server"):
         status = field_services_api.job(job.id).get("statusType")
         assert status == expected("new"), f"job status on the server: {status!r}"
+    # CHK-ORDD-024 last, so that every other step of the flow gets its verdict first
+    with allure.step("expect the prompt to explain why the location is needed (CHK-ORDD-024)"):
+        assert explained, (
+            f"the location prompt shows {shown!r}, without the explanation "
+            f"{LOCATION_PROMPT_MESSAGE!r} (Android, Q-ORDD-A4)"
+        )
 
 
 @pytest.mark.regression
