@@ -34,6 +34,8 @@ if [ -e "$OUT" ]; then
 fi
 
 DIRTY="no"
+# the harness the run STARTS on (a commit made while it runs must not be recorded as its harness)
+HARNESS="$(git rev-parse --short HEAD) on $(git rev-parse --abbrev-ref HEAD)"
 if ! git diff --quiet HEAD -- 2>/dev/null; then
   if [ "${ALLOW_DIRTY:-0}" != "1" ]; then
     echo "refused: uncommitted changes to tracked files — commit before the run (or ALLOW_DIRTY=1 for a debug run)" >&2
@@ -60,7 +62,7 @@ finish() {
     {
       echo "platform:  $PLATFORM"
       echo "name:      $NAME"
-      echo "harness:   $(git rev-parse --short HEAD) on $(git rev-parse --abbrev-ref HEAD)"
+      echo "harness:   $HARNESS"
       echo "dirty:     $DIRTY"
       echo "command:   uv run pytest --platform=$PLATFORM --alluredir=$OUT $ARGS"
       echo "video:     EVIDENCE_VIDEO=${EVIDENCE_VIDEO:-<default>}"
