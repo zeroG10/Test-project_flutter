@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 import allure
 import pytest
 
-from helpers import waits
+from pages.android.system_pages import DialerPage
 from pages.attachments_page import AttachmentsPage
 from pages.deliverable_screen_page import DeliverableScreenPage
 from pages.in_app_browser_page import InAppBrowserPage
@@ -211,8 +211,7 @@ def test_pf_phone_in_progress(progress_seed, request, driver, platform, pages, e
     pages.details.tap("pf-phone", text=phone)
     digits = "".join(ch for ch in expected(phone) if ch.isdigit())
     with allure.step(f"expect the dialer with {digits}"):
-        waits.wait_until(driver, lambda d: "dialer" in (d.current_package or ""), SERVER,
-                         "the dialer did not open")  # fmt: skip
-        shown = "".join(ch for ch in driver.page_source if ch.isdigit())
-        assert digits in shown, f"dialer does not show {digits}"
+        # the dialer's own number field (as TC-ORDD-004) — not every digit of the page source
+        shown = "".join(ch for ch in DialerPage(driver, platform).number(SERVER) if ch.isdigit())
+        assert shown == digits, f"dialer shows {shown!r}, expected {digits!r}"
     driver.back()

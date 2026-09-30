@@ -73,7 +73,16 @@ class NoteEditor(BasePage):
         with allure.step(f"fill note-editor.field: {text[:40]!r}{'…' if len(text) > 40 else ''}"):
             self.tap("field")
             time.sleep(0.6)  # the field re-renders on focus: type into the focused one
-            waits.focused(self.driver).send_keys(text)
+            self.append(text)
+
+    def append(self, text: str) -> None:
+        """Type ``text`` after what the focused field holds. Android: ``send_keys`` REPLACES the
+        text (ACTION_SET_TEXT, module 02 run 1), so the field's text and the new text go in in one
+        call — the same result as typing at the end (static pre-check, TC-NOTE-003 / -004)."""
+        field = waits.focused(self.driver)
+        if self.platform == "android":
+            text = self.field_value(field) + text
+        field.send_keys(text)
 
     def counter(self) -> str:
         return self.label_of(self.find("counter"))
