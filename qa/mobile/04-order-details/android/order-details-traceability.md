@@ -156,4 +156,8 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 >   also prove module 04 items (CHK-ORDD-028, -030…035, -044…047), all Passed on Android.
 > - Orphans: CHK-CHIO-* belong to module 05 (`05-check-in-out/android/`), CHK-ORDL-058 / -068 to module 03
 >   (`03-order-list/android/`) — the same shared tests as on iOS.
-
+> - **CHK-ORDD-015 re-checked (2026-09-30, after module 07):** in run 04-r3 the details' pull-to-refresh on Android
+>   started at y = 250 — iOS points, inside the 283-px app bar — and refreshed nothing; the new schedule showed up anyway
+>   (so the app refreshed the open details by itself — how was not examined). Found in module 07 (TC-DLV-003), fixed (`316b7e2`: the pull starts on the
+>   deliverable rows), and TC-ORDD-002 re-run with a real pull: **Passed** (`results/android/2026-09-30-04-ordd002-check`,
+>   local). The verdict stands; now it rests on the user's refresh as the item asks.
