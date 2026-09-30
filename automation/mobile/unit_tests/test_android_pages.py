@@ -148,6 +148,50 @@ class AndroidReaders(unittest.TestCase):
 
         self.assertEqual(_travel(screen(0), screen(819)), 819)
 
+    def test_travel_among_copies_with_numbered_titles(self):
+        # the finger went 819 px over copies of a section 600 px apart; each copy's title has a
+        # number (unique, as every question's number is) — the same controls alone could not
+        # tell 819 from 219
+        from pages.survey_page import _travel
+
+        labels = ["Yes", "Splicing", "Testing"]
+        form = [
+            (label, 300 + 150 * (k + 1) + 600 * c)
+            for c in range(8)
+            for k, label in enumerate(labels)
+        ]
+        form += [(f"{c + 1}. Overall job status.", 300 + 600 * c) for c in range(8)]
+
+        def screen(top):
+            return [self._node(label, y - top) for label, y in form if 290 <= y - top < 2170]
+
+        self.assertAlmostEqual(_travel(screen(0), screen(819), max_shift=880), 819)
+
+    def test_travel_uses_the_true_bottom_of_blocks_cut_at_the_top(self):
+        # as on the device: every copy has a tall merged question block with unique text, cut by
+        # the top of the scroll area (its reported top is the area's top); the controls repeat
+        from pages.base_page import Node
+        from pages.survey_page import _travel
+
+        area_top, area_bottom = 283, 2190
+        form = []
+        for c in range(8):  # a copy of the section every 700 px
+            base = 300 + 700 * c
+            form.append(("View", f"{c * 4 + 7}. \nWas the job completed?\n…", base, 650))
+            for k, label in enumerate(("Yes", "Splicing", "Testing")):
+                form.append(("CheckBox", label, base + 120 + 150 * k, 126))
+
+        def screen(top):
+            nodes = []
+            for kind, label, y, h in form:
+                y0, y1 = max(y - top, area_top), min(y - top + h, area_bottom)
+                if y1 > y0:  # visible part only, as UiAutomator2 reports it
+                    nodes.append(Node(kind=kind, label=label, value="", x=84, y=y0,
+                                      width=912, height=y1 - y0, visible=True))  # fmt: skip
+            return nodes
+
+        self.assertAlmostEqual(_travel(screen(400), screen(400 + 819), max_shift=880), 819)
+
     def test_null_attribute_is_empty(self):
         # UiAutomator2 answers the string 'null' for a missing attribute of a native view
         class El:

@@ -48,6 +48,8 @@ LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only a
 # the whole form (two matches of one kind are never within DEDUP px of each other).
 SHIFT_BIN = 4  # px: shifts this close are the same travel (all nodes move together)
 MIN_TRAVEL = 20  # px: a drag that moved the form less than this counts as not moved
+DRAG_SLACK = 40  # px over the finger's travel (0.35 of the height) a shift may still be
+EDGE_GAP = 20  # px: a bottom edge this close to the band's end may be the scroll area's
 CANDIDATES = 12  # the most frequent candidate shifts that are scored
 MIN_ALIGNED = 0.6  # share of the staying nodes the chosen shift must find again
 TYPE_CHUNK_ANDROID = 50  # characters per mobile: type call (68 landed from one 501 call)
@@ -97,45 +99,52 @@ def _android_form_order(alias: str, text: str | None) -> Callable[[Node], bool]:
     return specs[alias]
 
 
-def _travel(before: list[Node], after: list[Node]) -> float | None:
+def _travel(before: list[Node], after: list[Node], max_shift: float = BOTTOM_A) -> float | None:
     """How far the form moved up between two reads (px); None when nothing tells.
 
-    An alignment: every shift that pairs two nodes of the same look is a candidate; a candidate
-    scores by the share of the nodes that should still be on screen after that shift and are
-    found there. The true shift aligns everything; a false one aligns only what repeats — the
-    identical Yes / No rows at a fixed pitch, the same controls in every entry of a repeated
-    section. Taking the median of all pairs, or even their most common shift, picked such false
-    shifts (module 08 Android: "#2" landed in the (Copy) section, a trash icon counted twice,
-    only 5 of 15 'No' found on a three-entry form)."""
+    An alignment over edges: each node gives its top edge when the top is inside the band and
+    its bottom edge when the bottom is — a tall merged block cut by the top of the scroll area
+    ("11. …\n12. …\n13. …", unique text) still has a true bottom. Every shift that pairs two
+    edges of the same look is a candidate, scored by the share of the edges that should still
+    be on screen after that shift and are found there. The true shift aligns everything; a false
+    one only what repeats — identical Yes / No rows, the same controls in every entry or copy
+    of a section. The median of all pairs, the most common shift, and top edges alone (the
+    unique merged blocks are nearly always cut at the top) each picked such false shifts
+    (module 08 Android: an answer landed in the "(Copy)" section, a trash icon was counted twice,
+    5 of 15 'No' found on a three-entry form). A shift is at most ``max_shift`` — the finger's
+    travel: the drag does not fling."""
 
-    def key(n: Node) -> tuple:
-        # no height: a node cut by the bottom edge before the drag is whole after it
-        return (n.kind, n.label, n.hint, n.value, n.x, n.width)
+    def edges(nodes: list[Node]) -> list[tuple[tuple, float]]:
+        out = []
+        for n in nodes:
+            look = (n.kind, n.label, n.hint, n.value, n.x, n.width)  # no height: cut nodes
+            if TOP_A <= n.y < BOTTOM_A:
+                out.append(((*look, "top"), n.y))
+            bottom = n.y + n.height
+            if TOP_A < bottom < BOTTOM_A - EDGE_GAP:  # the scroll area's own end is no edge
+                out.append(((*look, "bottom"), bottom))
+        return out
 
-    def in_band(y: float) -> bool:
-        return TOP_A <= y < BOTTOM_A
-
-    old = [n for n in before if in_band(n.y)]
-    new_at: dict[tuple, list[int]] = {}
-    for n in after:
-        if in_band(n.y):
-            new_at.setdefault(key(n), []).append(n.y)
+    old = edges(before)
+    new_at: dict[tuple, list[float]] = {}
+    for look, y in edges(after):
+        new_at.setdefault(look, []).append(y)
     candidates = Counter(
-        round((n.y - y) / SHIFT_BIN)
-        for n in old
-        for y in new_at.get(key(n), ())
-        if MIN_TRAVEL <= n.y - y <= BOTTOM_A  # a drag up moves the form up; 0 = it did not move
+        round((y - y2) / SHIFT_BIN)
+        for look, y in old
+        for y2 in new_at.get(look, ())
+        if MIN_TRAVEL <= y - y2 <= max_shift  # up, not by nothing, not further than the finger
     )
     best: tuple[tuple[float, int], float] | None = None
     for binned, _ in candidates.most_common(CANDIDATES):
         shift = binned * SHIFT_BIN
-        stay = [n for n in old if in_band(n.y - shift)]
+        stay = [(look, y) for look, y in old if TOP_A <= y - shift < BOTTOM_A - EDGE_GAP]
         if len(stay) < 2:
             continue
         hits = sum(
             1
-            for n in stay
-            if any(abs(n.y - shift - y) <= SHIFT_BIN for y in new_at.get(key(n), ()))
+            for look, y in stay
+            if any(abs(y - shift - y2) <= SHIFT_BIN for y2 in new_at.get(look, ()))
         )
         score = (hits / len(stay), hits)
         if best is None or score > best[0]:
@@ -144,7 +153,7 @@ def _travel(before: list[Node], after: list[Node]) -> float | None:
         return None
     shift = best[1]
     exact = [
-        n.y - y for n in old for y in new_at.get(key(n), ()) if abs(n.y - y - shift) <= SHIFT_BIN
+        y - y2 for look, y in old for y2 in new_at.get(look, ()) if abs(y - y2 - shift) <= SHIFT_BIN
     ]
     return statistics.median(exact)
 
@@ -356,23 +365,41 @@ class SurveyPage(BasePage):
     def _scan(self):
         """(nodes, offset) per screen of the form from the top to its end (Android): ``offset``
         is how far the form has moved up so far — a node's form position is ``y + offset``. The
-        end is a drag after which the tree is the same; a drag whose travel cannot be measured
-        (no node whole in both reads) counts its nominal length."""
+        end is a drag after which the tree is the same. A drag whose travel cannot be measured is
+        read once more; still unmeasured, the walk stops with an error — a guessed travel put the
+        (Copy) section's answer before entry 1's (module 08 Android run 3, TC-SRV-009). Every
+        drag's travel goes to the report."""
         height = self.driver.get_window_size()["height"]
         self._to_top()
         source = self._still_source()
         before, offset = self.nodes(source), 0.0
-        for _ in range(NTH_DRAGS):
-            yield before, offset
-            self._drag(int(height * 0.7), int(height * 0.35))
-            after_source = self._still_source()
-            if after_source == source:
-                return
-            after = self.nodes(after_source)
-            moved = _travel(before, after)
-            offset += moved if moved is not None else height * 0.35 - 21
-            source, before = after_source, after
-        raise AssertionError(f"the survey form did not end in {NTH_DRAGS} drags")
+        travels: list[str] = []
+        try:
+            for _ in range(NTH_DRAGS):
+                yield before, offset
+                self._drag(int(height * 0.7), int(height * 0.35))
+                after_source = self._still_source()
+                if after_source == source:
+                    return
+                after = self.nodes(after_source)
+                limit = height * 0.35 + DRAG_SLACK
+                moved = _travel(before, after, max_shift=limit)
+                if moved is None:  # a frame caught mid-settle: read it again
+                    time.sleep(0.8)
+                    after_source = self._still_source()
+                    after = self.nodes(after_source)
+                    moved = _travel(before, after, max_shift=limit)
+                travels.append("?" if moved is None else f"{moved:.0f}")
+                if moved is None:
+                    raise AssertionError(
+                        "the survey walk could not measure a drag (no match between two reads)"
+                    )
+                offset += moved
+                source, before = after_source, after
+            raise AssertionError(f"the survey form did not end in {NTH_DRAGS} drags")
+        finally:
+            allure.attach(" ".join(travels) or "(no drag)", name="walk: travel per drag (px)",
+                          attachment_type=allure.attachment_type.TEXT)  # fmt: skip
 
     def _viewports(self):
         """The form's screens from the top to the end (Android)."""
