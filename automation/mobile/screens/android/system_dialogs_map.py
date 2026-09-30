@@ -24,7 +24,11 @@ NOTIFICATION_PERMISSION = Screen(
             "the first sign-in (Android 13+ POST_NOTIFICATIONS; perm_notifications.xml)",
         ),
         "allow": El(android=(_ID, f"{_PC}permission_allow_button"), note="Android only: Allow"),
-        "deny": El(android=(_ID, f"{_PC}permission_deny_button"), note="Android only: Don't allow"),
+        "deny": El(
+            android=(_U, f'new UiSelector().resourceIdMatches("{_PC}permission_deny.*button")'),
+            note="Android only: Don't allow — permission_deny_button the first time, "
+            "permission_deny_and_dont_ask_again_button after a refusal (as the location prompt)",
+        ),
     },
 )
 

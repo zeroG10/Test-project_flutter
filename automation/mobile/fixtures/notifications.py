@@ -22,6 +22,7 @@ from selenium.common.exceptions import TimeoutException
 
 from fixtures.jobs import ADDRESS, COORDINATES, SHORT_SURVEY, SeedJob, _run_stamp
 from helpers import waits
+from helpers.android.device import Adb
 from helpers.field_services_api import ApiBlocked
 from pages.settings_page import SystemSettingsPage
 
@@ -109,3 +110,10 @@ def push_restored(app, driver) -> Iterator[SystemSettingsPage]:
         yield settings_app
     finally:
         settings_app.set_app_notifications(True, app.app_id)
+        if app.platform == "android":
+            # the "Don't allow" of the test (D-NOTIF-A4) is remembered — a second one would make
+            # Android stop asking; every run starts from the same never-refused state
+            Adb.of(driver).shell(
+                f"pm clear-permission-flags {app.app_id} android.permission.POST_NOTIFICATIONS "
+                "user-set user-fixed"
+            )

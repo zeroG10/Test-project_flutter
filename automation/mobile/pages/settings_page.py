@@ -14,11 +14,12 @@ test (recon 12: it came back on the Jobs list), so callers open the tab they nee
 import contextlib
 
 import allure
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import TimeoutException, WebDriverException
 
 from helpers import waits
 from helpers.device import terminate_app
 from pages.base_page import BasePage
+from screens.android.system_dialogs_map import NOTIFICATION_PERMISSION
 from screens.settings_map import SETTINGS
 
 SETTINGS_APP = "com.apple.Preferences"
@@ -26,6 +27,10 @@ SETTINGS_APP_ANDROID = "com.android.settings"
 ANDROID_SWITCH = ("id", "android:id/switch_widget")
 SWITCH_FROM_RIGHT = 30  # the switch itself — a tap on its label does not toggle it (recon 12)
 SCROLLS = 15  # the app sits at the end of Settings → Apps ('[DEV] …' sorts after the letters)
+# Android: switching the permission off in Settings ends the app's process (as for any revoked
+# runtime permission); at its next start the signed-in app asks again — the system prompt, which
+# iOS never shows twice (module 11 Android run 1, TC-NOTIF-005).
+PROMPT_WAIT_ANDROID = 20.0  # s: a cold start, the splash, the session check, then the prompt
 
 
 class SystemSettingsPage(BasePage):
@@ -71,6 +76,24 @@ class SystemSettingsPage(BasePage):
                 with contextlib.suppress(WebDriverException):
                     terminate_app(self.driver, app_id)
             self.driver.activate_app(app_id)
+        if not allowed:
+            self._deny_prompt_android()
+
+    def _deny_prompt_android(self) -> None:
+        """The user who has just switched push off answers the app's new request "Don't allow"
+        (D-NOTIF-A4). Once Android stops showing the prompt (a second refusal), nothing comes."""
+        with allure.step("the app asks for notifications again → Don't allow (if it asks)"):
+            deny = NOTIFICATION_PERMISSION.locator("android", "deny")
+            try:
+                waits.wait_clickable(self.driver, deny, PROMPT_WAIT_ANDROID).click()
+            except TimeoutException:
+                allure.attach(
+                    f"no prompt within {PROMPT_WAIT_ANDROID:.0f} s",
+                    name="notification prompt",
+                    attachment_type=allure.attachment_type.TEXT,
+                )
+                return
+            waits.wait_gone(self.driver, deny, 10)
 
     def set_app_notifications(self, allowed: bool, app_id: str) -> None:
         """Allow Notifications on / off for the app under test, then bring the app back."""
