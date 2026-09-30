@@ -12,7 +12,7 @@ Generated: 2026-09-30 11:30 UTC by `automation/tools/trace_results.py` (read-onl
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
 - Harness commit (this repo): `9d43c00`
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `MERGED: module 04 run 3 (test_order_details.py + TC-ORDL-008) + module 05 run 3 (test_check_in_out.py + TC-ORDD-005), harness 9d43c00, 2026-09-30; CHK-ORDD-024 Skipped on Android (owner, Q-ORDD-A4)`
+- Run label (suite / filter): `MERGED: module 04 run 3 (test_order_details.py + TC-ORDL-008; harness f9c6e44) + module 05 run 3 (test_check_in_out.py + TC-ORDD-005; harness 9d43c00 — differs from f9c6e44 by the handoff only), 2026-09-30; CHK-ORDD-024 Skipped on Android (owner, Q-ORDD-A4)`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
