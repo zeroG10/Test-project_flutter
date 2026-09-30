@@ -192,6 +192,16 @@ class AndroidReaders(unittest.TestCase):
 
         self.assertAlmostEqual(_travel(screen(400), screen(400 + 819), max_shift=880), 819)
 
+    def test_a_drag_that_did_not_move_the_form_is_its_end(self):
+        from pages.survey_page import _still, _travel
+
+        n = self._node
+        before = [n("Yes", 700), n("No", 700), n("Q1", 500, "View"), n("Save", 2200, "Button")]
+        after = [n("Yes", 700), n("No", 700), n("Q1", 500, "View")]  # a redraw, nothing moved
+        self.assertIsNone(_travel(before, after))
+        self.assertTrue(_still(before, after))
+        self.assertEqual(_travel(before, [n("Yes", 690), n("No", 690), n("Q1", 490, "View")]), 10)
+
     def test_null_attribute_is_empty(self):
         # UiAutomator2 answers the string 'null' for a missing attribute of a native view
         class El:

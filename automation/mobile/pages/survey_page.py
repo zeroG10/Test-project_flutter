@@ -47,7 +47,7 @@ LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only a
 # drag's real travel on nodes seen before and after it, and keeps every match at its position in
 # the whole form (two matches of one kind are never within DEDUP px of each other).
 SHIFT_BIN = 4  # px: shifts this close are the same travel (all nodes move together)
-MIN_TRAVEL = 20  # px: a drag that moved the form less than this counts as not moved
+MIN_TRAVEL = 2  # px: a smaller 'shift' is the same node where it was (the form did not move)
 DRAG_SLACK = 40  # px over the finger's travel (0.35 of the height) a shift may still be
 EDGE_GAP = 20  # px: a bottom edge this close to the band's end may be the scroll area's
 CANDIDATES = 12  # the most frequent candidate shifts that are scored
@@ -156,6 +156,16 @@ def _travel(before: list[Node], after: list[Node], max_shift: float = BOTTOM_A) 
         y - y2 for look, y in old for y2 in new_at.get(look, ()) if abs(y - y2 - shift) <= SHIFT_BIN
     ]
     return statistics.median(exact)
+
+
+def _still(before: list[Node], after: list[Node]) -> bool:
+    """Most nodes are where they were: the drag did not move the form (its end), although the
+    tree changed in place (a redraw) — module 08 Android run 4, TC-SRV-008 on a short form."""
+    where = {(n.kind, n.label, n.x, n.y) for n in after}
+    kept = [n for n in before if TOP_A <= n.y < BOTTOM_A]
+    return bool(kept) and sum((n.kind, n.label, n.x, n.y) in where for n in kept) >= (
+        MIN_ALIGNED * len(kept)
+    )
 
 
 def _attrs(n: Node) -> dict:
@@ -389,6 +399,9 @@ class SurveyPage(BasePage):
                     after_source = self._still_source()
                     after = self.nodes(after_source)
                     moved = _travel(before, after, max_shift=limit)
+                if moved is None and _still(before, after):
+                    travels.append("0 (end)")  # the tree changed in place: the form did not move
+                    return
                 travels.append("?" if moved is None else f"{moved:.0f}")
                 if moved is None:
                     raise AssertionError(
