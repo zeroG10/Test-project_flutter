@@ -132,6 +132,21 @@ class AndroidReaders(unittest.TestCase):
                  node("P", 300), node("Q", 330), node("R", 360)]  # entry 2's copies  # fmt: skip
         self.assertEqual(_travel(before, after), 819)
 
+    def test_travel_near_the_end_among_repeated_entries(self):
+        # two entries with the same controls; the last drag only moves 300 px (end of the form)
+        from pages.base_page import Node
+        from pages.survey_page import _travel
+
+        def node(label, y):
+            return Node(kind="CheckBox", label=label, value="", x=84, y=y, width=912, height=126,
+                        visible=True)  # fmt: skip
+
+        before = [node("Splicing", 600), node("Testing", 726), node("Delete", 1100),
+                  node("Splicing", 1800), node("Testing", 1926)]  # fmt: skip
+        after = [node("Splicing", 300), node("Testing", 426), node("Delete", 800),
+                 node("Splicing", 1500), node("Testing", 1626)]  # fmt: skip
+        self.assertEqual(_travel(before, after), 300)
+
     def test_null_attribute_is_empty(self):
         # UiAutomator2 answers the string 'null' for a missing attribute of a native view
         class El:

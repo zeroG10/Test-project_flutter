@@ -77,44 +77,55 @@ def _android_form_order(alias: str, text: str | None) -> Callable[[Node], bool]:
         "option": lambda n: n.kind in ("RadioButton", *toggles) and n.label == text,
         "checkbox": lambda n: n.kind == "CheckBox" and n.label == text,
         "text": is_text,
-        "date": lambda n: (
-            n.kind == "EditText" and (n.hint == "Select date" or bool(DATE_TEXT.match(n.value)))
-        ),
-        "time": lambda n: (
-            n.kind == "EditText" and (n.hint == "Select time" or bool(TIME_TEXT.match(n.value)))
-        ),
+        # an EMPTY date / time field, as on iOS ('Select date' is the empty field's name there):
+        # on Android the hint stays after a pick, so "the first empty date" found entry 1's
+        # filled date again and entry 2's stayed empty (module 08 Android, TC-SRV-009)
+        "date": lambda n: n.kind == "EditText" and n.hint == "Select date" and not n.value,
+        "time": lambda n: n.kind == "EditText" and n.hint == "Select time" and not n.value,
         "upload-photo": lambda n: n.label == "Upload photo",
         "repeat": lambda n: n.label == "Repeat section",
-        "delete-entry": lambda n: n.kind == "Button" and n.label == "Delete" and n.width < 160,
+        # the entry's trash is an ImageView on Android (module 08 run, [870,1896][996,2022]); the
+        # width still tells it from the dialog's own wide 'Delete'
+        "delete-entry": lambda n: (
+            n.kind in ("Button", "ImageView") and n.label == "Delete" and n.width < 160
+        ),
         "entry-headers": lambda n: bool(text) and n.label.startswith(text or ""),
     }
     return specs[alias]
 
 
 def _travel(before: list[Node], after: list[Node]) -> float | None:
-    """How far the form moved up between two reads (px) — the median shift of the nodes that are
-    in both reads once and whole, inside the scroll band; None when nothing tells."""
+    """How far the form moved up between two reads (px); None when nothing tells.
+
+    Every node in the scroll band is paired with every node of the same look in the other read,
+    and the most common shift wins: everything on screen moved by the SAME amount, while pairs
+    across the entries of a repeated section ("Splicing", "Yes", "Delete" in each entry) scatter.
+    Pairing only keys unique in each read (the first version) left too few pairs among repeated
+    entries — near the end of the form, where a drag travels less than its nominal length, the
+    walk then assumed the full drag and counted a trash icon twice (module 08 Android, TC-SRV-010,
+    TC-SRV-009: "#2" landed in the (Copy) section)."""
 
     def key(n: Node) -> tuple:
         return (n.kind, n.label, n.hint, n.value, n.x, n.width, n.height)
 
-    def unique(nodes: list[Node]) -> dict[tuple, int]:
-        counts = Counter(key(n) for n in nodes)
-        return {key(n): n.y for n in nodes if counts[key(n)] == 1 and TOP_A <= n.y < BOTTOM_A}
-
-    b, a = unique(before), unique(after)
-    shifts = [b[k] - a[k] for k in b.keys() & a.keys()]
+    after_by_key: dict[tuple, list[int]] = {}
+    for n in after:
+        if TOP_A <= n.y < BOTTOM_A:
+            after_by_key.setdefault(key(n), []).append(n.y)
+    shifts = [
+        n.y - y
+        for n in before
+        if TOP_A <= n.y < BOTTOM_A
+        for y in after_by_key.get(key(n), ())
+        if 0 <= n.y - y <= BOTTOM_A  # a drag up moves the form up, never down
+    ]
     if not shifts:
         return None
-    # A repeated section shows the same controls in every entry ("Splicing", "Yes", …): a key
-    # unique in each read may still pair entry 1 with entry 2, and those pairs give wrong shifts.
-    # The true pairs all moved by the SAME amount — take the most common shift (module 08
-    # Android run 2, TC-SRV-009: the median drifted, "#2" landed in the (Copy) section).
     bins = Counter(round(shift / SHIFT_BIN) for shift in shifts)
     best, count = bins.most_common(1)[0]
-    if count >= 2:
-        return statistics.median([x for x in shifts if abs(round(x / SHIFT_BIN) - best) <= 1])
-    return statistics.median(shifts)
+    if count < 2:
+        return None  # one pair proves nothing among repeated entries
+    return statistics.median([x for x in shifts if abs(round(x / SHIFT_BIN) - best) <= 1])
 
 
 def _attrs(n: Node) -> dict:
