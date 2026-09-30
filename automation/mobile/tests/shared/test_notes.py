@@ -161,7 +161,7 @@ def test_note_limit(survey_job, ui_login, pages, expected):
     n.start_add()
     e.type_text("QA-AUTO")
     assert e.counter() == expected("7/500"), e.counter()
-    e.append(rest)  # 7 + 494 = 501
+    e.type_keys(rest)  # 7 + 494 = 501, typed: the 501st key press must be refused
     with allure.step("expect the first 500 characters and '500/500'"):
         assert e.text() == ("QA-AUTO" + rest)[:500], f"{len(e.text())} characters kept"
         assert e.counter() == expected("500/500"), e.counter()

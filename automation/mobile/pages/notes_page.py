@@ -26,6 +26,7 @@ TOAST = 8.0  # a toast stays ~3 s
 SAVE_WAIT = 20.0
 MENU_X_FROM_RIGHT = 28  # the ⋮ sits at the row's right end (recon 10: 374 of 402)
 MENU_X_FROM_RIGHT_ANDROID = 60  # px (recon A1: a tap at x 1020 of 1080 opened the menu)
+TYPE_CHUNK_ANDROID = 50  # characters per mobile: type call, as the survey's text answers
 # Android row label: "<d MMM yyyy H:mm>\n<text>" — no "Show menu" line (recon A1)
 _ANDROID_ROW = re.compile(r"^\d{1,2} [A-Z][a-z]{2} \d{4} \d{1,2}:\d{2}$")
 
@@ -82,6 +83,20 @@ class NoteEditor(BasePage):
         Android run 1, TC-NOTE-003 / -004). The masked phone field of module 02 is another case:
         there every call replaces the text (``BasePage._send``)."""
         waits.focused(self.driver).send_keys(text)
+
+    def type_keys(self, text: str) -> None:
+        """Type ``text`` key by key at the cursor, as a user does — for the length limit.
+        Android: ``send_keys`` sets the whole text at once through accessibility, and an
+        over-limit set is cut its own way (7 + 494 characters → 493 kept, module 10 Android runs
+        1–2, TC-NOTE-003), which is not the 501st TYPED character the check is about. The IME
+        types instead, in chunks (one long call drops characters — the survey, TC-SRV-003)."""
+        with allure.step(f"type {len(text)} characters key by key"):
+            if self.platform != "android":
+                waits.focused(self.driver).send_keys(text)
+                return
+            for start in range(0, len(text), TYPE_CHUNK_ANDROID):
+                chunk = text[start : start + TYPE_CHUNK_ANDROID]
+                self.driver.execute_script("mobile: type", {"text": chunk})
 
     def counter(self) -> str:
         return self.label_of(self.find("counter"))
