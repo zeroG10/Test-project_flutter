@@ -25,10 +25,15 @@ from pages.base_page import normalized
 from pages.in_app_browser_page import InAppBrowserPage
 from pages.job_details_page import JobDetailsPage
 from pages.jobs_list_page import JobsListPage
-from pages.location_dialogs_page import LocationDisabledDialog, LocationPromptPage, system_alerts
+from pages.location_dialogs_page import (
+    LocationAccessRequiredDialog,
+    LocationDisabledDialog,
+    LocationPromptPage,
+    system_alerts,
+)
 from screens.location_dialogs_map import (
+    LOCATION_ACCESS_REQUIRED_MESSAGE,
     LOCATION_DISABLED_MESSAGE,
-    LOCATION_DISABLED_MESSAGE_ANDROID,
     LOCATION_PROMPT_MESSAGE,
 )
 
@@ -47,6 +52,7 @@ def pages(driver, platform):
         browser = InAppBrowserPage(driver, platform)
         prompt = LocationPromptPage(driver, platform)
         disabled = LocationDisabledDialog(driver, platform)
+        access_required = LocationAccessRequiredDialog(driver, platform)  # Android only
 
     return Pages
 
@@ -302,13 +308,15 @@ def test_check_in_starts_flow(
                 shown, explained = LOCATION_PROMPT_MESSAGE, True
             evidence.checkpoint("location-prompt")
             pages.prompt.tap("dont-allow")
-        if platform == "android":  # the app's dialog after a denial differs (D-CHIO-A3, accepted)
-            pages.disabled.expect_text("title", expected("Location access required"), SERVER)
-            pages.disabled.expect_text("message", expected(LOCATION_DISABLED_MESSAGE_ANDROID))
+        # Android may ask again after a first refusal: its app dialog differs (D-CHIO-A3, accepted)
+        dialog = pages.access_required if platform == "android" else pages.disabled
+        if platform == "android":
+            dialog.expect_text("title", expected("Location access required"), SERVER)
+            dialog.expect_text("message", expected(LOCATION_ACCESS_REQUIRED_MESSAGE))
         else:
-            pages.disabled.expect_text("title", expected("Location disabled"), SERVER)
-            pages.disabled.expect_text("message", expected(LOCATION_DISABLED_MESSAGE))
-        pages.disabled.tap("cancel")
+            dialog.expect_text("title", expected("Location disabled"), SERVER)
+            dialog.expect_text("message", expected(LOCATION_DISABLED_MESSAGE))
+        dialog.tap("cancel")
     d.expect_enabled("check-in", timeout=SERVER)
     d.expect_field("status", expected("New"))
     with allure.step("expect no check-in recorded on the server"):

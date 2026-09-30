@@ -16,10 +16,14 @@ perm_location_second.xml, location_disabled.xml, not_at_site.xml, mock_location.
   regex. A third button not modelled on iOS, "Only this time"
   (permission_allow_one_time_button), was seen too — no alias added (unused by any test case).
 - not-at-site and mock-location are the app's own dialogs, same texts as iOS (recon A1).
-- location-disabled: Android shows a DIFFERENT app dialog after a denial (owner-accepted,
-  D-CHIO-A3, recon-2026-09-29-android.md §05): "Location access required" /
-  "GPS is required to check in. Enable location services to continue." / Cancel / "Enable" — mapped
-  under the SAME aliases (go-to-settings ↔ Enable) with LOCATION_DISABLED_MESSAGE_ANDROID.
+- location-access-required (Android only): after a FIRST refusal Android may still ask again, and
+  the app shows "Location access required" / "GPS is required to check in. Enable location
+  services to continue." / Cancel / "Enable" — Enable asks the system again (owner-accepted,
+  D-CHIO-A3). A refusal the system will not ask about again (iOS: the first one; Android: the
+  second, "don't ask again") leads to location-disabled — the SAME app dialog on both platforms
+  (`showLocationDisabledDialog` for `permissionDeniedForever`, app code
+  location_flow_cubit.dart; module 05 Android, 2026-09-30). The map of step 3 had put the Android
+  dialog under the location-disabled aliases; not reached in recon A1, hence listed unverified.
 - Two dialogs still have no alias (task brief: report, do not add screens): the "Enter location
   manually" dialog (location_manual_entry.xml — content-desc "Enter location manually" / "We
   can't detect your location automatically. Please, enter it manually." / an EditText, hint "Job
@@ -54,9 +58,9 @@ LOCATION_DISABLED_MESSAGE = (
     "To use GPS check-in, please enable location services in your device settings. "
     "You can still check in manually if you prefer."
 )
-# Android shows a different app dialog after a location-permission denial (D-CHIO-A3, recon A1
-# location_disabled.xml) — not LOCATION_DISABLED_MESSAGE above, which is iOS-only wording.
-LOCATION_DISABLED_MESSAGE_ANDROID = (
+# Android, after a refusal the system may still ask again (D-CHIO-A3, recon A1
+# location_disabled.xml — the file name is recon's, the dialog is "Location access required").
+LOCATION_ACCESS_REQUIRED_MESSAGE = (
     "GPS is required to check in. Enable location services to continue."
 )
 
@@ -112,20 +116,36 @@ LOCATION_DISABLED = Screen(
     elements={
         "title": El(
             ios=(_P, "type == 'XCUIElementTypeStaticText' AND name == 'Location disabled'"),
-            android=(_A, "Location access required"),
-            note="Android: a different app dialog after a permission denial (D-CHIO-A3, recon A1 "
-            "location_disabled.xml) — 'Location access required', not 'Location disabled'",
+            android=(_A, "Location disabled"),
+            note="the refusal the system will not ask about again — iOS: the first; Android: the "
+            "second ('don't ask again'); the same Dart dialog on both",
         ),
-        "message": El(
-            ios=(_A, LOCATION_DISABLED_MESSAGE),
-            android=(_A, LOCATION_DISABLED_MESSAGE_ANDROID),
-            note="Android: LOCATION_DISABLED_MESSAGE_ANDROID (different wording, D-CHIO-A3)",
-        ),
+        "message": El(ios=(_A, LOCATION_DISABLED_MESSAGE), android=(_A, LOCATION_DISABLED_MESSAGE)),
         "cancel": El(ios=(_P, _BUTTON + "name == 'Cancel'"), android=(_A, "Cancel")),
         "go-to-settings": El(
             ios=(_P, _BUTTON + "name == 'Go to settings'"),
+            android=(_A, "Go to settings"),
+        ),
+    },
+)
+
+LOCATION_ACCESS_REQUIRED = Screen(
+    id="location-access-required",
+    anchor="title",
+    elements={
+        "title": El(
+            android=(_A, "Location access required"),
+            note="Android only: the app's dialog after a refusal the system may still ask about "
+            "again (D-CHIO-A3, recon A1 location_disabled.xml)",
+        ),
+        "message": El(
+            android=(_A, LOCATION_ACCESS_REQUIRED_MESSAGE),
+            note="Android only: LOCATION_ACCESS_REQUIRED_MESSAGE (D-CHIO-A3)",
+        ),
+        "cancel": El(android=(_A, "Cancel"), note="Android only"),
+        "enable": El(
             android=(_A, "Enable"),
-            note="Android: the equivalent action is labelled 'Enable' (recon A1, D-CHIO-A3)",
+            note="Android only: asks the system for the permission again (D-CHIO-A3)",
         ),
     },
 )
@@ -160,3 +180,14 @@ MOCK_LOCATION = Screen(
         "cancel": El(ios=(_P, _BUTTON + "name == 'Cancel'"), android=(_A, "Cancel")),
     },
 )
+
+# Not reached in recon A1 — the Android "don't ask again" path; confirmed by the module 05 runs.
+_DENIED_FOREVER = (
+    "Android: the dialog after a refusal the system will not ask about again — not reached in "
+    "recon A1; the same Dart dialog as iOS (showLocationDisabledDialog)"
+)
+ANDROID_UNVERIFIED = {
+    "location-disabled.title": _DENIED_FOREVER,
+    "location-disabled.message": _DENIED_FOREVER,
+    "location-disabled.go-to-settings": _DENIED_FOREVER,
+}

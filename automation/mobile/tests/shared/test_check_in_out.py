@@ -24,6 +24,7 @@ from pages.confirm_check_page import ConfirmCheckPage
 from pages.job_details_page import JobDetailsPage
 from pages.jobs_list_page import JobsListPage
 from pages.location_dialogs_page import (
+    LocationAccessRequiredDialog,
     LocationDisabledDialog,
     LocationPromptPage,
     MockLocationDialog,
@@ -54,6 +55,7 @@ def pages(driver, platform):
         mock = MockLocationDialog(driver, platform)
         prompt = LocationPromptPage(driver, platform)
         disabled = LocationDisabledDialog(driver, platform)
+        access_required = LocationAccessRequiredDialog(driver, platform)  # Android only
 
     return Pages
 
@@ -133,6 +135,14 @@ def test_go_to_settings(check_seed, guarded, ui_login, driver, platform, pages, 
     with ui_login.alerts_left_alone():  # WDA may press a dialog button
         pages.details.tap("check-in")
         with system_alerts(driver, platform):
+            pages.prompt.visible("title", SERVER)
+            pages.prompt.tap("dont-allow")
+        if platform == "android":
+            # A first refusal Android may still ask about: "Location access required" → Enable asks
+            # again; the second refusal is final ("don't ask again") and leads to the same
+            # "Location disabled" dialog as iOS (D-CHIO-A3; app: permissionDeniedForever).
+            pages.access_required.expect_text("title", expected("Location access required"), SERVER)
+            pages.access_required.tap("enable")
             pages.prompt.visible("title", SERVER)
             pages.prompt.tap("dont-allow")
         pages.disabled.expect_text("title", expected("Location disabled"), SERVER)

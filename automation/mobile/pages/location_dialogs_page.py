@@ -13,6 +13,7 @@ from collections.abc import Iterator
 
 from pages.base_page import BasePage
 from screens.location_dialogs_map import (
+    LOCATION_ACCESS_REQUIRED,
     LOCATION_DISABLED,
     LOCATION_PROMPT,
     MOCK_LOCATION,
@@ -40,6 +41,12 @@ class LocationPromptPage(BasePage):
 
 class LocationDisabledDialog(BasePage):
     screen = LOCATION_DISABLED
+
+
+class LocationAccessRequiredDialog(BasePage):
+    """Android only — after a refusal the system may still ask about (D-CHIO-A3)."""
+
+    screen = LOCATION_ACCESS_REQUIRED
 
 
 class NotAtSiteDialog(BasePage):

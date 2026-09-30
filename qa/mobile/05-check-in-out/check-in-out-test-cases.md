@@ -242,6 +242,13 @@ simulated location is enough.
 | 5 | expect-visible | app | — | the Settings app is in the foreground |
 | 6 | open | app | — | back to the app (the location permission is granted again for the next TCs) |
 
+**Android (step 4 of the Android stage, 2026-09-30):** a first refusal is one the system may still ask about, so after
+step 3 the app shows `location-access-required` ("Location access required" / Cancel / Enable, D-CHIO-A3, accepted);
+3a — click `location-access-required.enable`: the system prompt again; 3b — click `location-prompt.dont-allow`: this
+refusal is final ("don't ask again") and the app shows the same "Location disabled" dialog as iOS (app code:
+`permissionDeniedForever` → `showLocationDisabledDialog`); steps 4–6 as above, the Settings app is
+`com.android.settings`.
+
 ---
 
 ## Aliases used
