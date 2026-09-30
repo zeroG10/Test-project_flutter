@@ -18,6 +18,7 @@ _P = AppiumBy.IOS_PREDICATE
 _TEXT = "type == 'XCUIElementTypeStaticText' AND "
 _BUTTON = "type == 'XCUIElementTypeButton' AND "
 _A = AppiumBy.ACCESSIBILITY_ID
+_UI = AppiumBy.ANDROID_UIAUTOMATOR
 
 SUBMIT_DIALOG = Screen(
     id="submit-dialog",
@@ -25,10 +26,14 @@ SUBMIT_DIALOG = Screen(
     elements={
         "title": El(
             ios=(_P, _TEXT + "name == 'Submit deliverables'"),
-            android=(_A, "Submit deliverables"),
+            android=(
+                _UI,
+                'new UiSelector().className("android.view.View")'
+                '.description("Submit deliverables")',
+            ),
             note="a StaticText — the details' action of the same name is a Button. Android: a "
-            "content-desc View, same text as the details' action Button — no clash within this "
-            "dialog's own dump (recon A1)",
+            "content-desc View; the bare label also finds the details' Button once the dialog is "
+            "gone, so 'title hidden' never came (module 07 Android run 1, TC-DLV-001) — by class",
         ),
         "message": El(
             ios=(_P, _TEXT + "name BEGINSWITH 'You won'"),

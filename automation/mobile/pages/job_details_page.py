@@ -22,6 +22,10 @@ TIMER_READ = 5.0  # seconds to catch a clean timer name between digit roll-overs
 TIMER_TOLERANCE = 2.0  # whole seconds shown (±1) + the time a tree read takes (up to ~0.5 s)
 BANNER_WATCH = 2.0  # seconds a "no Updated banner" check keeps looking (the banner lives ~0.3 s)
 SNACKBAR = 10.0  # seconds for an earlier snackbar to leave the bottom action (recon 11: ~4 s)
+# Android: the pull starts on the deliverable rows (px, below the 283-px app bar): from y = 250
+# — iOS points — it started on the app bar and refreshed nothing (module 07 Android run 1,
+# TC-DLV-003: the details stayed "In progress" after a recorded submission).
+PULL_FROM_Y_ANDROID = 500
 
 
 class JobDetailsPage(BasePage):
@@ -113,7 +117,7 @@ class JobDetailsPage(BasePage):
         to_y = int(size["height"] * 0.8)
         with allure.step("pull to refresh (job-details)"):
             if self.platform != "ios":
-                self._drag(250, to_y)
+                self._drag(PULL_FROM_Y_ANDROID, to_y)
                 return
             # iOS: the native press-then-drag the Flutter scroll views follow (as the Jobs list)
             self.driver.execute_script(
