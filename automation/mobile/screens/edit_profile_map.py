@@ -99,7 +99,16 @@ DELETE_DIALOG = Screen(
     id="delete-dialog",
     anchor="title",
     elements={
-        "title": El(android=(_A, "Delete account"), ios=(_P, _TEXT + "name == 'Delete account'")),
+        "title": El(
+            android=(
+                _U,
+                'new UiSelector().className("android.view.View").description("Delete account")',
+            ),
+            ios=(_P, _TEXT + "name == 'Delete account'"),
+            note="Android: a content-desc View; Edit profile's own 'Delete account' is a Button, "
+            "and the bare label found it once the dialog was gone (module 12 Android run 1, "
+            "TC-PRF-007)",
+        ),
         "message": El(
             android=(
                 _U,
