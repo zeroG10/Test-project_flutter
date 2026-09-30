@@ -47,6 +47,9 @@ LOGIC_WAIT = 5.0  # the form re-renders at once after an answer; the wait only a
 # drag's real travel on nodes seen before and after it, and keeps every match at its position in
 # the whole form (two matches of one kind are never within DEDUP px of each other).
 SHIFT_BIN = 4  # px: shifts this close are the same travel (all nodes move together)
+MIN_TRAVEL = 20  # px: a drag that moved the form less than this counts as not moved
+CANDIDATES = 12  # the most frequent candidate shifts that are scored
+MIN_ALIGNED = 0.6  # share of the staying nodes the chosen shift must find again
 TYPE_CHUNK_ANDROID = 50  # characters per mobile: type call (68 landed from one 501 call)
 TOP_A, BOTTOM_A = 290, 2170  # px: below the app bar, above the Save button (Pixel 7)
 DEDUP = 40
@@ -97,35 +100,53 @@ def _android_form_order(alias: str, text: str | None) -> Callable[[Node], bool]:
 def _travel(before: list[Node], after: list[Node]) -> float | None:
     """How far the form moved up between two reads (px); None when nothing tells.
 
-    Every node in the scroll band is paired with every node of the same look in the other read,
-    and the most common shift wins: everything on screen moved by the SAME amount, while pairs
-    across the entries of a repeated section ("Splicing", "Yes", "Delete" in each entry) scatter.
-    Pairing only keys unique in each read (the first version) left too few pairs among repeated
-    entries — near the end of the form, where a drag travels less than its nominal length, the
-    walk then assumed the full drag and counted a trash icon twice (module 08 Android, TC-SRV-010,
-    TC-SRV-009: "#2" landed in the (Copy) section)."""
+    An alignment: every shift that pairs two nodes of the same look is a candidate; a candidate
+    scores by the share of the nodes that should still be on screen after that shift and are
+    found there. The true shift aligns everything; a false one aligns only what repeats — the
+    identical Yes / No rows at a fixed pitch, the same controls in every entry of a repeated
+    section. Taking the median of all pairs, or even their most common shift, picked such false
+    shifts (module 08 Android: "#2" landed in the (Copy) section, a trash icon counted twice,
+    only 5 of 15 'No' found on a three-entry form)."""
 
     def key(n: Node) -> tuple:
-        return (n.kind, n.label, n.hint, n.value, n.x, n.width, n.height)
+        # no height: a node cut by the bottom edge before the drag is whole after it
+        return (n.kind, n.label, n.hint, n.value, n.x, n.width)
 
-    after_by_key: dict[tuple, list[int]] = {}
+    def in_band(y: float) -> bool:
+        return TOP_A <= y < BOTTOM_A
+
+    old = [n for n in before if in_band(n.y)]
+    new_at: dict[tuple, list[int]] = {}
     for n in after:
-        if TOP_A <= n.y < BOTTOM_A:
-            after_by_key.setdefault(key(n), []).append(n.y)
-    shifts = [
-        n.y - y
-        for n in before
-        if TOP_A <= n.y < BOTTOM_A
-        for y in after_by_key.get(key(n), ())
-        if 0 <= n.y - y <= BOTTOM_A  # a drag up moves the form up, never down
-    ]
-    if not shifts:
+        if in_band(n.y):
+            new_at.setdefault(key(n), []).append(n.y)
+    candidates = Counter(
+        round((n.y - y) / SHIFT_BIN)
+        for n in old
+        for y in new_at.get(key(n), ())
+        if MIN_TRAVEL <= n.y - y <= BOTTOM_A  # a drag up moves the form up; 0 = it did not move
+    )
+    best: tuple[tuple[float, int], float] | None = None
+    for binned, _ in candidates.most_common(CANDIDATES):
+        shift = binned * SHIFT_BIN
+        stay = [n for n in old if in_band(n.y - shift)]
+        if len(stay) < 2:
+            continue
+        hits = sum(
+            1
+            for n in stay
+            if any(abs(n.y - shift - y) <= SHIFT_BIN for y in new_at.get(key(n), ()))
+        )
+        score = (hits / len(stay), hits)
+        if best is None or score > best[0]:
+            best = (score, shift)
+    if best is None or best[0][0] < MIN_ALIGNED:
         return None
-    bins = Counter(round(shift / SHIFT_BIN) for shift in shifts)
-    best, count = bins.most_common(1)[0]
-    if count < 2:
-        return None  # one pair proves nothing among repeated entries
-    return statistics.median([x for x in shifts if abs(round(x / SHIFT_BIN) - best) <= 1])
+    shift = best[1]
+    exact = [
+        n.y - y for n in old for y in new_at.get(key(n), ()) if abs(n.y - y - shift) <= SHIFT_BIN
+    ]
+    return statistics.median(exact)
 
 
 def _attrs(n: Node) -> dict:

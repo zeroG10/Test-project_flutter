@@ -107,45 +107,46 @@ class AndroidReaders(unittest.TestCase):
         self.assertNotIn("Log in", texts)
         self.assertIn("Registration", texts)
 
-    def test_travel_ignores_pairs_across_repeated_entries(self):
-        # entries of a repeated section hold the same controls: a key unique in each read can pair
-        # entry 1 (before) with entry 2 (after). The true pairs share ONE shift (the drag's 819 px);
-        # here the wrong pairs outnumber them, so a plain median would be wrong.
+    def _node(self, label, y, kind="CheckBox"):
         from pages.base_page import Node
+
+        return Node(kind=kind, label=label, value="", x=84, y=y, width=912, height=126,
+                    visible=True)  # fmt: skip
+
+    def test_travel_ignores_pairs_across_repeated_entries(self):
+        # entries 1 and 2 hold the same controls; the drag moved 819 px
         from pages.survey_page import _travel
 
-        def node(label, y):
-            return Node(
-                kind="CheckBox",
-                label=label,
-                value="",
-                x=84,
-                y=y,
-                width=912,
-                height=126,
-                visible=True,
-            )
-
-        before = [node("A", 1200), node("B", 1326),  # entry 1 — still on screen after the drag
-                  node("P", 1900), node("Q", 1950), node("R", 2000)]  # fmt: skip
-        after = [node("A", 381), node("B", 507),  # moved up 819
-                 node("P", 300), node("Q", 330), node("R", 360)]  # entry 2's copies  # fmt: skip
+        n = self._node
+        before = [n("A", 1200), n("B", 1326), n("P", 1900), n("Q", 1950), n("R", 2000)]
+        after = [n("A", 381), n("B", 507), n("P", 1081), n("Q", 1131), n("R", 1181),
+                 n("P", 300), n("Q", 330), n("R", 360)]  # fmt: skip  # entry 2's copies too
         self.assertEqual(_travel(before, after), 819)
 
     def test_travel_near_the_end_among_repeated_entries(self):
         # two entries with the same controls; the last drag only moves 300 px (end of the form)
-        from pages.base_page import Node
         from pages.survey_page import _travel
 
-        def node(label, y):
-            return Node(kind="CheckBox", label=label, value="", x=84, y=y, width=912, height=126,
-                        visible=True)  # fmt: skip
-
-        before = [node("Splicing", 600), node("Testing", 726), node("Delete", 1100),
-                  node("Splicing", 1800), node("Testing", 1926)]  # fmt: skip
-        after = [node("Splicing", 300), node("Testing", 426), node("Delete", 800),
-                 node("Splicing", 1500), node("Testing", 1626)]  # fmt: skip
+        n = self._node
+        before = [n("Splicing", 600), n("Testing", 726), n("Delete", 1100),
+                  n("Splicing", 1800), n("Testing", 1926)]  # fmt: skip
+        after = [n("Splicing", 300), n("Testing", 426), n("Delete", 800),
+                 n("Splicing", 1500), n("Testing", 1626)]  # fmt: skip
         self.assertEqual(_travel(before, after), 300)
+
+    def test_travel_is_not_fooled_by_rows_at_a_fixed_pitch(self):
+        # identical Yes / No rows every 254 px plus one unique title; true drag: 819 px
+        from pages.survey_page import _travel
+
+        rows = [300 + 254 * k for k in range(12)]  # the form: rows at y 300, 554, … (form px)
+
+        def screen(top):  # what the band shows when the form's top is scrolled by ``top``
+            out = [self._node("Yes", y - top, "Button") for y in rows if 290 <= y - top < 2170]
+            if 290 <= 1400 - top < 2170:
+                out.append(self._node("7. \nGood?", 1400 - top, "View"))
+            return out
+
+        self.assertEqual(_travel(screen(0), screen(819)), 819)
 
     def test_null_attribute_is_empty(self):
         # UiAutomator2 answers the string 'null' for a missing attribute of a native view
