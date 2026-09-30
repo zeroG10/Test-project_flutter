@@ -96,6 +96,19 @@ def pytest_report_header(config):
     return header
 
 
+def skipped_chks(item: pytest.Item, platform: str) -> dict[str, str]:
+    """CHK ids the owner decided NOT to check on ``platform`` for this test, with the reason:
+    ``@pytest.mark.chk_skipped_on("android", "CHK-ORDD-024", reason="owner, Q-ORDD-A4 …")``.
+    On that platform the id carries no tag, so the trace reads it as not run (never Passed, never
+    Failed) and the report says why; on the other platform nothing changes."""
+    skipped: dict[str, str] = {}
+    for marker in item.iter_markers("chk_skipped_on"):
+        if marker.args and normalize_platform(str(marker.args[0])) == platform:
+            for chk_id in marker.args[1:]:
+                skipped[str(chk_id)] = str(marker.kwargs.get("reason", ""))
+    return skipped
+
+
 def pytest_collection_modifyitems(config, items):
     platform = config.stash[PLATFORM_KEY]
     invalid: list[str] = []
@@ -103,12 +116,33 @@ def pytest_collection_modifyitems(config, items):
     deselected: list[pytest.Item] = []
 
     for item in items:
+        # 0. Owner-skipped CHK ids of this platform: a reason, ids of this test, no static tag
+        skipped = skipped_chks(item, platform)
+        declared_chk = {a for m in item.iter_markers("chk") for a in m.args}
+        static_tags = {
+            str(t)
+            for m in item.iter_markers("allure_label")
+            if m.kwargs.get("label_type") == "tag"
+            for t in m.args
+        }
+        for chk_id, reason in skipped.items():
+            if not reason.strip():
+                invalid.append(f"{item.nodeid}: chk_skipped_on {chk_id} without a reason")
+            if chk_id not in declared_chk:
+                invalid.append(f"{item.nodeid}: chk_skipped_on {chk_id} is not in its chk(...)")
+            if chk_id in static_tags:
+                invalid.append(
+                    f"{item.nodeid}: {chk_id} is skipped on {platform} but still in @allure.tag"
+                )
+
         # 1. CHK ids: validate and expose to JUnit (<property name="chk">) for trace_results.py
         for marker in item.iter_markers("chk"):
             if not marker.args:
                 invalid.append(f"{item.nodeid}: @pytest.mark.chk without an id")
             for chk_id in marker.args:
-                if isinstance(chk_id, str) and CHK_ID.match(chk_id):
+                if chk_id in skipped:
+                    item.user_properties.append(("chk_skipped", f"{chk_id}: {skipped[chk_id]}"))
+                elif isinstance(chk_id, str) and CHK_ID.match(chk_id):
                     item.user_properties.append(("chk", chk_id))
                 else:
                     invalid.append(f"{item.nodeid}: {chk_id!r}")
@@ -207,8 +241,11 @@ def _allure_context(request, platform):
         if marker.kwargs.get("label_type") == "tag"
         for tag in marker.args
     }
+    skipped = skipped_chks(item, platform)
     for chk_id in dict.fromkeys(chk_ids):
-        if chk_id not in declared:
+        if chk_id in skipped:  # owner decision for this platform: no tag, the reason instead
+            allure.dynamic.label("chk_skipped", f"{chk_id} — {skipped[chk_id]}")
+        elif chk_id not in declared:
             allure.dynamic.tag(chk_id)
     allure.dynamic.label("env", env_label(platform))
     if request.config.getoption("--prove-red"):

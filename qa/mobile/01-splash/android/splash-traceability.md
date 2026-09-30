@@ -112,7 +112,8 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 >   the steps behind CHK-SPL-001 / -002 (the brand splash after the system one, 3.3 s), CHK-SPL-003 (logo centred on
 >   the first brand frame) and CHK-SPL-005 (no labelled or clickable node in the tree, read during the splash) **passed**
 >   (Allure steps of TC-SPL-001, run 6). The test failed at "the app stays in the foreground" after the system Back —
->   **CHK-SPL-007 → [Q-SPL-A2](splash-questions.md)** (the Back closes the app on the splash; owner's decision pending).
+>   **CHK-SPL-007 → [BUG-SPL-002](../bugs/BUG-SPL-002.md)** (the Back closes the app on the splash; filed on the
+>   owner's go, Q-SPL-A2, 2026-09-30).
 >   CHK-SPL-011 (Welcome by itself) was not reached in this test. The verdicts above are the tool's and are not edited;
 >   splitting TC-SPL-001 so that each item gets its own verdict is a proposal for the owner.
 > - **CHK-SPL-009 → [BUG-SPL-001](../bugs/BUG-SPL-001.md)** — reproduced on Android 4 of 4 (runs 3–6).

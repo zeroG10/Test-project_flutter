@@ -61,4 +61,5 @@ markers = [
     "chk(id): checklist item this test proves, e.g. chk('CHK-AUTH-001'); several ids = several args; read by automation/tools/trace_results.py",
     "tc(id): the one test case this test implements, e.g. tc('TC-AUTH-005') — qa/mobile/<NN-module>/<module>-test-cases.md",
     "e2e: long end-to-end flow — its screen video is always kept (EVIDENCE_VIDEO=auto)",
+    "chk_skipped_on(platform, *ids, reason=...): checklist items the owner decided not to check on that platform for this test — no tag there, the reason as a label (never in @allure.tag)",
 ]

@@ -281,7 +281,13 @@ def test_updated_gone_after_viewing(details_seed, ui_login, field_services_api, 
 @pytest.mark.tc("TC-ORDD-005")
 # + CHK-CHIO-022, CHK-ORDD-024, -027 (module 05): flow starts; its explanation; refusal
 @pytest.mark.chk("CHK-ORDD-022", "CHK-ORDD-024", "CHK-ORDD-027", "CHK-CHIO-022")
-@allure.tag("CHK-ORDD-022", "CHK-ORDD-024", "CHK-ORDD-027", "CHK-CHIO-022")
+@pytest.mark.chk_skipped_on(
+    "android",
+    "CHK-ORDD-024",
+    reason="Skipped — owner decision 2026-09-30 (Q-ORDD-A4): Android's system location prompt "
+    "carries no app text; the explanation is not checked on Android",
+)
+@allure.tag("CHK-ORDD-022", "CHK-ORDD-027", "CHK-CHIO-022")  # CHK-ORDD-024: tagged per platform
 @allure.title(
     "TC-ORDD-005 Check in starts the check-in flow; refusing location and cancelling leaves "
     "the job New"
@@ -322,12 +328,15 @@ def test_check_in_starts_flow(
     with allure.step("expect no check-in recorded on the server"):
         status = field_services_api.job(job.id).get("statusType")
         assert status == expected("new"), f"job status on the server: {status!r}"
-    # CHK-ORDD-024 last, so that every other step of the flow gets its verdict first
-    with allure.step("expect the prompt to explain why the location is needed (CHK-ORDD-024)"):
-        assert explained, (
-            f"the location prompt shows {shown!r}, without the explanation "
-            f"{LOCATION_PROMPT_MESSAGE!r} (Android, Q-ORDD-A4)"
-        )
+    # CHK-ORDD-024: iOS — the prompt carries the app's explanation. Android — Skipped by the
+    # owner (Q-ORDD-A4, 2026-09-30): the system prompt carries no app text; not checked, and the
+    # item carries no tag there (chk_skipped_on), so this test proves nothing about it
+    if platform == "android":
+        with allure.step(f"CHK-ORDD-024 Skipped on Android (owner, Q-ORDD-A4); shown: {shown!r}"):
+            pass
+    else:
+        with allure.step("expect the prompt to explain why the location is needed (CHK-ORDD-024)"):
+            assert explained, f"the location prompt shows {shown!r}, without the explanation"
 
 
 @pytest.mark.regression
