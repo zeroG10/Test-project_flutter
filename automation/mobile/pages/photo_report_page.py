@@ -30,6 +30,8 @@ GRID_MIN_WIDTH = 150  # grid photos are ~189 pt wide; the preview on the metadat
 GRID_MIN_WIDTH_ANDROID = 400
 DELETE_MAX_WIDTH_ANDROID = 150
 PICKER_CELL_PREFIX = "Photo taken on"
+PICKER_SETTLE = 10.0  # s, the picker's grid must stop moving within this
+PICKER_SETTLE_STEP = 0.7  # s between two reads that must agree
 
 
 class PhotoAddSheet(BasePage):
@@ -54,6 +56,11 @@ class PhotoEditor(BasePage):
 
 class PhotoMetadata(BasePage):
     screen = PHOTO_METADATA
+    # The metadata form scrolls in a view inset to [42, 1038] px; a drag at the usual x = 21
+    # misses it and nothing moves (module 09 Android run 2, TC-PHR-002: the tags under a 500-char
+    # description never came up). Inside it, left of the text: on Android a multi-line field
+    # takes only horizontal drags, a vertical one scrolls the form.
+    DRAG_X_ANDROID = 60
 
     def is_edit(self, timeout: float | None = None) -> bool:
         return self.is_visible("edit-title", timeout)
@@ -215,10 +222,7 @@ class PhotoReportPage(BasePage):
             sheet.tap("gallery")
             picker.assert_open(PICKER_WAIT)
             if self.platform == "android":  # Android Photo picker: cells are in the tree
-                cells = sorted(
-                    (n for n in self.nodes() if n.label.startswith(PICKER_CELL_PREFIX)),
-                    key=lambda n: (n.y, n.x),
-                )
+                cells = self._settled_picker_cells()
                 assert len(cells) > cell, f"the picker shows {len(cells)} photo(s), need #{cell}"
                 c = cells[cell]
                 self.tap_xy(c.x + c.width / 2, c.y + c.height / 2)
@@ -230,6 +234,30 @@ class PhotoReportPage(BasePage):
             y = grid["y"] + size * (cell // 3 + 0.5)
             self.tap_xy(x, y)
             PhotoEditor(self.driver, self.platform).assert_open(15)
+
+    def _settled_picker_cells(self) -> list:
+        """Android: the picker's cells once two reads PICKER_SETTLE_STEP apart agree. The sheet
+        slides up, and its "… will only have access to the photos you select" banner can land
+        above the grid after the cells are listed, pushing them ~280 px down: the tap went to the
+        banner and the picker stayed open (module 09 Android run 2, TC-PHR-001)."""
+        with allure.step("wait for the picker's grid to stop moving"):
+            deadline = time.monotonic() + PICKER_SETTLE
+            before = None
+            while True:
+                cells = sorted(
+                    (n for n in self.nodes() if n.label.startswith(PICKER_CELL_PREFIX)),
+                    key=lambda n: (n.y, n.x),
+                )
+                where = [(n.x, n.y) for n in cells]
+                if cells and where == before:
+                    return cells
+                if time.monotonic() > deadline:
+                    raise AssertionError(
+                        f"the picker's grid did not settle within {PICKER_SETTLE:.0f} s "
+                        f"(last read: {len(cells)} cell(s), first at {where[:1]})"
+                    )
+                before = where
+                time.sleep(PICKER_SETTLE_STEP)
 
     def add_photo(self, cell: int = 1, description: str = "", tags: tuple[str, ...] = ()) -> None:
         """The whole add flow: sheet → gallery → editor ✓ → metadata → Save → back on the report."""

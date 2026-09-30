@@ -114,6 +114,9 @@ def page_nodes(source: str, platform: str) -> list[Node]:
 
 class BasePage:
     screen: Screen  # set by every subclass
+    # Android: where ``_drag`` puts the finger — left of every input (inputs start at x ≥ 42 px)
+    # and inside the full-width scroll views. A page whose scroll view is inset overrides it.
+    DRAG_X_ANDROID = 21
 
     def __init__(self, driver: WebDriver, platform: str | None = None):
         if getattr(self, "screen", None) is None:
@@ -246,7 +249,7 @@ class BasePage:
             self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "finger"), duration=400
         )
         pointer = actions.w3c_actions.pointer_action
-        x = 21 if self.platform == "android" else 10  # Android: left of every input (x ≥ 42 px)
+        x = self.DRAG_X_ANDROID if self.platform == "android" else 10
         # Android: a 0.3-s hold still let Flutter fling now and then (the survey walk measured
         # 1187 and 1305 px for an 840-px drag — module 08 Android run 5): hold longer there
         hold = 0.6 if self.platform == "android" else 0.3
