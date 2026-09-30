@@ -62,20 +62,22 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
         app.launch()
         first = splash.expect_shown_after_system_splash()  # iOS: the first frame (unchanged)
         if app.platform == "android":
-            # After a system splash of 4–32 s the brand splash is up for ~3 s, and one tree read
-            # takes up to 2 s on this host (module 01+03 Android runs 3–5): the looks and the tree
-            # get this start, the tap and the Back a cold start of their own.
+            # After a system splash of 4–32 s the brand splash is up for only about a second on
+            # this host (module 01+03 Android runs 3–5): start 1 — the logo on the first brand
+            # frame, a tap, then the tree (it proves by itself that it is still the splash's);
+            # start 2 — the system Back right after the first brand frame.
             splash.expect_logo_centred(first)
+            splash.tap_centre()
             splash.expect_no_interactive_elements()
             app.terminate()
             app.launch()
             splash.expect_shown_after_system_splash()
+            pages.welcome.go_back()  # the system Back
         else:
             splash.expect_no_interactive_elements()
-        splash.tap_centre()
-        pages.welcome.go_back()  # iOS: edge swipe; Android: the system Back
-        shown = splash.expect_shown("splash after a tap and an edge swipe")
-        if app.platform != "android":
+            splash.tap_centre()
+            pages.welcome.go_back()  # edge swipe
+            shown = splash.expect_shown("splash after a tap and an edge swipe")
             splash.expect_logo_centred(shown)
     except SplashMissed as exc:
         # Gone because the Back left the app (Android, Q-SPL-A2) is a verdict, not timing

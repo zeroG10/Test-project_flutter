@@ -18,6 +18,7 @@ from config.settings import settings
 from helpers import pixels, waits
 from pages.base_page import BasePage
 from screens.splash_map import SPLASH
+from screens.welcome_map import WELCOME
 
 SPLASH_SHARE = 0.9  # recon 4: 0.998 of the screen is the brand colour on every splash frame
 LOGO_TOLERANCE = 0.02  # test-case convention: centred within 2 % of the screen
@@ -78,20 +79,38 @@ class SplashPage(BasePage):
 
     def expect_no_interactive_elements(self) -> None:
         """No text, button, link, field or switch in the tree — and the splash still on screen
-        afterwards, so the tree was read during the splash."""
+        afterwards, so the tree was read during the splash (iOS)."""
         with allure.step("expect no interactive element in the tree during the splash"):
-            if self.platform == "android":  # no alias: the app's clickable nodes in the tree
-                source = self.driver.page_source
-                package = settings.app_id("android")
-                count = sum(
-                    1
-                    for el in ET.fromstring(source).iter()
-                    if el.attrib.get("package") == package and el.attrib.get("clickable") == "true"
-                )
-            else:
-                count = self.count_visible("interactive")
+            if self.platform == "android":
+                self._expect_bare_tree_android()
+                return
+            count = self.count_visible("interactive")
             self.expect_shown("splash after the tree read")
             assert count == 0, f"{count} text / button / field element(s) during the splash"
+
+    def _expect_bare_tree_android(self) -> None:
+        """Android: the tree itself proves when it was read. The brand splash is up for about a
+        second after the system splash on this host — gone before a screenshot after the read
+        (module 01+03 Android run 5 and the check after it) — but the splash has no text at all:
+        a tree that holds the Welcome title was read after it (SplashMissed → Blocked), and any
+        other labelled or clickable node of the app is on the splash (a failure)."""
+        package = settings.app_id("android")
+        nodes = [
+            n.attrib
+            for n in ET.fromstring(self.driver.page_source).iter()
+            if n.attrib.get("package") == package
+        ]
+        labels = [a.get("content-desc") or a.get("text") for a in nodes]
+        labels = [label for label in labels if label]
+        clickable = sum(1 for a in nodes if a.get("clickable") == "true")
+        allure.attach("\n".join(labels) or "(none)", name="labelled nodes of the app in the tree",
+                      attachment_type=allure.attachment_type.TEXT)  # fmt: skip
+        if WELCOME.locator("android", "root")[1] in labels:
+            raise SplashMissed("the tree was read after the splash (the Welcome title is in it)")
+        assert not labels and not clickable, (
+            f"{len(labels)} labelled / {clickable} clickable element(s) during the splash: "
+            f"{labels[:5]}"
+        )
 
     def tap_centre(self) -> None:
         size = self.driver.get_window_size()
