@@ -404,15 +404,40 @@ class SurveyPage(BasePage):
                 if moved is None and _still(before, after):
                     travels.append("0 (end)")  # the tree changed in place: the form did not move
                     return
-                if moved is None:  # for the report: what an unbounded alignment would say
-                    loose = _travel(before, after)
-                    travels.append(f"?(unbounded: {loose if loose is None else round(loose)})")
+                if moved is None:
+                    # Recover instead of guessing: back where we were, then a shorter drag (more
+                    # overlap between the two reads). Both trees go to the report either way.
+                    for label, tree in (("before", source), ("after", after_source)):
+                        allure.attach(tree, name=f"walk: unmeasured drag — tree {label}",
+                                      attachment_type=allure.attachment_type.XML)  # fmt: skip
+                    self._drag(int(height * 0.35), int(height * 0.7))  # the same drag, reversed
+                    back = self.nodes(self._still_source())
+                    if _still(back, before):
+                        back_offset = offset
+                    elif (up := _travel(back, before, max_shift=limit)) is not None:
+                        back_offset = offset - up  # it came back higher than it was
+                    elif (down := _travel(before, back, max_shift=limit)) is not None:
+                        back_offset = offset + down  # it came back lower than it was
+                    else:
+                        travels.append("?(no way back)")
+                        raise AssertionError(
+                            "the survey walk could not measure a drag, nor come back to where "
+                            "it was (see the attached trees)"
+                        )
+                    self._drag(int(height * 0.55), int(height * 0.35))  # a shorter drag
+                    after_source = self._still_source()
+                    after = self.nodes(after_source)
+                    short = _travel(back, after, max_shift=limit)
+                    if short is None:
+                        travels.append("?")
+                        raise AssertionError(
+                            "the survey walk could not measure a drag (no match between two "
+                            "reads, a shorter drag either — see the attached trees)"
+                        )
+                    moved = back_offset + short - offset  # from `before`'s place to `after`'s
+                    travels.append(f"{moved:.0f} (retried short)")
                 else:
                     travels.append(f"{moved:.0f}")
-                if moved is None:
-                    raise AssertionError(
-                        "the survey walk could not measure a drag (no match between two reads)"
-                    )
                 offset += moved
                 source, before = after_source, after
             raise AssertionError(f"the survey form did not end in {NTH_DRAGS} drags")
