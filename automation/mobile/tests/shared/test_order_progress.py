@@ -187,7 +187,7 @@ def test_primary_action_follows_status(
     assert not d.is_visible("submit-deliverables", 0), "'Submit deliverables' on a Submitted job"
     d.tap("deliverable", text=expected("Survey"))
     with allure.step(f"expect no Survey screen for {READ_ONLY_WATCH:.0f}s (read-only)"):
-        opened = pages.deliverable.is_visible("title", READ_ONLY_WATCH, text=expected("Survey"))
+        opened = pages.deliverable.shows(expected("Survey"), READ_ONLY_WATCH)
         assert not opened, "the Survey screen opened from a Submitted job"
     evidence.checkpoint("submitted-read-only")
     d.expect_header(expected(done.title_line))

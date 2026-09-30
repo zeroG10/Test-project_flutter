@@ -17,7 +17,7 @@ Android (recon A1, qa/shared/recon-dumps/android-2026-09-29/photo_report*.xml, 2
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from screens import El, Screen
+from screens import El, InAppBar, Screen
 
 _P = AppiumBy.IOS_PREDICATE
 _BUTTON = "type == 'XCUIElementTypeButton' AND "
@@ -31,7 +31,7 @@ PHOTO_REPORT = Screen(
     anchor="header",
     elements={
         "header": El(
-            android=(_AID, "Photo report"),
+            android=InAppBar("Photo report"),
             ios=(
                 _P,
                 "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' "

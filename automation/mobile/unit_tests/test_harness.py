@@ -22,7 +22,7 @@ from helpers import evidence, reporting
 from helpers.app import AppControl
 from helpers.field_services_api import ApiBlocked, FieldServicesApi, safe_body
 from helpers.waits import find, wait_any, wait_visible
-from screens import EditTextByHint
+from screens import EditTextByHint, InAppBar
 
 
 class FakeDriver:
@@ -298,6 +298,32 @@ class HintedField(unittest.TestCase):
         driver = self.Driver(["Last name"])
         with self.assertRaises(TimeoutException):
             wait_visible(driver, EditTextByHint(2, "Phone number"), 0.3)
+
+
+class AppBarTitle(unittest.TestCase):
+    """The job details list 'Survey' at y 378; the Survey screen's title is in the app bar (y 173)
+    — only the latter counts (module 06 Android run 1, TC-ORDP-005)."""
+
+    class El:
+        def __init__(self, y):
+            self.rect = {"x": 0, "y": y, "width": 100, "height": 60}
+
+        def is_displayed(self):
+            return True
+
+    class Driver:
+        def __init__(self, ys):
+            self.ys = ys
+
+        def find_elements(self, strategy, value):
+            return [AppBarTitle.El(y) for y in self.ys]
+
+    def test_row_below_the_app_bar_does_not_count(self):
+        with self.assertRaises(TimeoutException):
+            wait_visible(self.Driver([378]), InAppBar("Survey"), 0.3)
+
+    def test_title_in_the_app_bar_counts(self):
+        self.assertEqual(find(self.Driver([378, 173]), InAppBar("Survey")).rect["y"], 173)
 
 
 class PixelOracle(unittest.TestCase):

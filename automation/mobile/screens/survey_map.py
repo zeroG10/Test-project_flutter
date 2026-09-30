@@ -31,7 +31,7 @@ Android (recon A1, qa/shared/recon-dumps/android-2026-09-29/survey_*.xml, 2026-0
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from screens import El, Screen
+from screens import El, InAppBar, Screen
 
 _P = AppiumBy.IOS_PREDICATE
 _BUTTON = "type == 'XCUIElementTypeButton' AND "
@@ -46,7 +46,7 @@ SURVEY = Screen(
     anchor="header",
     elements={
         "header": El(
-            android=(_AID, "Survey"),
+            android=InAppBar("Survey"),
             ios=(
                 _P,
                 "type == 'XCUIElementTypeOther' AND traits CONTAINS 'Header' AND name == 'Survey'",

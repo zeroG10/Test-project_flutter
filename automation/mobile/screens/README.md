@@ -134,6 +134,9 @@ trees the way UiAutomator2 would — `unit_tests/android_dumps.py`, CLI:
   On a form with several fields use `EditTextByHint(n, "<hint>")`: Flutter hands Android only the
   on-screen fields, so after a scroll `instance(n)` is another field; `helpers.waits` finds it by
   its hint instead (module 02 run 5, TC-AUTH-014 read Email as Phone).
+- A screen's title by its label (`Survey`, `Notes`, `Photo report`) is also the label of a row on
+  the job details: use `InAppBar("<label>")` — only a match inside the app bar counts (module 06
+  Android run 1, TC-ORDP-005 saw the details row as the opened Survey screen).
 - Flutter may change a node's class with its state (a survey Yes/No is a Button, an ImageView when
   selected) — no class for toggles. Selected tab / chip: `.selected(true)`; checkbox / radio:
   `.checked(true)`.

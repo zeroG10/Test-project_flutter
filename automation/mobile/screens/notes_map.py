@@ -16,7 +16,7 @@ Android (recon A1, qa/shared/recon-dumps/android-2026-09-29/note*.xml, 2026-09-2
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from screens import El, Screen
+from screens import El, InAppBar, Screen
 
 _P = AppiumBy.IOS_PREDICATE
 _BUTTON = "type == 'XCUIElementTypeButton' AND "
@@ -30,7 +30,7 @@ NOTES = Screen(
     id="notes",
     anchor="header",
     elements={
-        "header": El(android=(_AID, "Notes"), ios=(_P, _HEADER + "name == 'Notes'")),
+        "header": El(android=InAppBar("Notes"), ios=(_P, _HEADER + "name == 'Notes'")),
         "back": El(android=(_AID, "Back"), ios=(_P, _BUTTON + "name == 'Back'")),
         "empty-title": El(
             android=(_AID, "No notes have been added yet"),

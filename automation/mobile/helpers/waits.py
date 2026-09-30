@@ -6,6 +6,7 @@ Page objects (``pages/``) call these; tests rarely need them directly.
 The driver fixture sets NO implicit wait, so these are the only waits in play.
 """
 
+import contextlib
 from collections.abc import Callable
 from typing import TypeVar
 
@@ -64,21 +65,40 @@ def _hint(locator: Locator) -> str | None:
     return getattr(locator, "hint", None)
 
 
+def _app_bar(locator: Locator) -> int | None:
+    """The app bar's bottom of a ``screens.InAppBar`` locator; None for every other locator."""
+    return getattr(locator, "app_bar_bottom", None)
+
+
+def _special(locator: Locator) -> bool:
+    return _hint(locator) is not None or _app_bar(locator) is not None
+
+
 def find_all(driver: WebDriver, locator: Locator) -> list[WebElement]:
-    """All matches of ``locator``. A hinted field: the on-screen EditTexts with that hint."""
+    """All matches of ``locator``. A hinted field: the on-screen EditTexts with that hint; an
+    app-bar title: only the matches whose top lies inside the app bar."""
     hint = _hint(locator)
-    if hint is None:
-        return driver.find_elements(*locator)
-    return [el for el in driver.find_elements(*_EDIT_TEXTS) if el.get_attribute("hint") == hint]
+    if hint is not None:
+        return [el for el in driver.find_elements(*_EDIT_TEXTS) if el.get_attribute("hint") == hint]
+    found = driver.find_elements(*locator)
+    bottom = _app_bar(locator)
+    if bottom is None:
+        return found
+    kept = []
+    for el in found:
+        with contextlib.suppress(StaleElementReferenceException):
+            if el.rect["y"] < bottom:
+                kept.append(el)
+    return kept
 
 
 def find(driver: WebDriver, locator: Locator) -> WebElement:
     """The first match of ``locator``; raises NoSuchElementException like ``find_element``."""
-    if _hint(locator) is None:
+    if not _special(locator):
         return driver.find_element(*locator)
     found = find_all(driver, locator)
     if not found:
-        raise NoSuchElementException(f"no on-screen EditText with hint {_hint(locator)!r}")
+        raise NoSuchElementException(f"{tuple(locator)}: no match in its region on screen")
     return found[0]
 
 
@@ -125,7 +145,7 @@ def wait_present(driver: WebDriver, locator: Locator, timeout: float | None = No
     return wait_until(
         driver,
         EC.presence_of_element_located(locator)
-        if _hint(locator) is None
+        if not _special(locator)
         else _hinted(locator, lambda _el: True),
         timeout,
         f"{locator} not present within {_seconds(timeout)}s",
@@ -137,7 +157,7 @@ def wait_visible(driver: WebDriver, locator: Locator, timeout: float | None = No
     return wait_until(
         driver,
         EC.visibility_of_element_located(locator)
-        if _hint(locator) is None
+        if not _special(locator)
         else _hinted(locator, lambda el: el.is_displayed()),
         timeout,
         f"{locator} not visible within {_seconds(timeout)}s",
@@ -149,7 +169,7 @@ def wait_clickable(driver: WebDriver, locator: Locator, timeout: float | None = 
     return wait_until(
         driver,
         EC.element_to_be_clickable(locator)
-        if _hint(locator) is None
+        if not _special(locator)
         else _hinted(locator, lambda el: el.is_displayed() and el.is_enabled()),
         timeout,
         f"{locator} not clickable within {_seconds(timeout)}s",
@@ -160,7 +180,7 @@ def wait_gone(driver: WebDriver, locator: Locator, timeout: float | None = None)
     """Element is absent or hidden (the ``expect-hidden`` step). Raises if it stays visible."""
     wait_until(
         driver,
-        EC.invisibility_of_element_located(locator) if _hint(locator) is None else _gone(locator),
+        EC.invisibility_of_element_located(locator) if not _special(locator) else _gone(locator),
         timeout,
         f"{locator} still visible after {_seconds(timeout)}s",
     )
@@ -173,7 +193,7 @@ def wait_text(
     wait_until(
         driver,
         EC.text_to_be_present_in_element(locator, text)
-        if _hint(locator) is None
+        if not _special(locator)
         else _hinted(locator, lambda el: text in (el.text or "")),
         timeout,
         f"{locator} does not contain {text!r} within {_seconds(timeout)}s",

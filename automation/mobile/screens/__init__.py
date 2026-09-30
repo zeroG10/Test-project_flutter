@@ -22,6 +22,7 @@ __all__ = [
     "ALLOWED_STRATEGIES",
     "EditTextByHint",
     "El",
+    "InAppBar",
     "Locator",
     "Screen",
     "fill",
@@ -73,6 +74,26 @@ class EditTextByHint(tuple):
             ),
         )
         self.hint = hint
+        return self
+
+
+APP_BAR_BOTTOM_ANDROID = 283  # px, Pixel 7: the app bar ends here (recon A1)
+
+
+class InAppBar(tuple):
+    """Android: a screen's title by its label, counted only inside the app bar.
+
+    The job details list their deliverables with the very same labels as the screens they open
+    ('Survey', 'Photo report', 'Notes'), lower down; the bare label "finds" the Survey screen
+    while the details are still shown (module 06 Android run 1, TC-ORDP-005: a false "opened").
+    ``helpers.waits`` keeps only the matches whose top lies above ``app_bar_bottom``.
+    """
+
+    app_bar_bottom: int
+
+    def __new__(cls, label: str) -> "InAppBar":
+        self = super().__new__(cls, (AppiumBy.ACCESSIBILITY_ID, label))
+        self.app_bar_bottom = APP_BAR_BOTTOM_ANDROID
         return self
 
 
