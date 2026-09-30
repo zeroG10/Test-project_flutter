@@ -74,6 +74,8 @@ the jobs refreshes both views.
   empty each time; the calendar's own pull-to-refresh fixed it in the attempt where it was tried).
 - Android: **1 of 1** (recon A1, 2026-09-29, 5 jobs `QA-AUTO-RA-*` created after login): the Jobs list showed all 5 after
   its pull-to-refresh, the calendar showed "No jobs" for today; the calendar's own pull-to-refresh brought all 5.
+  Automated: TC-ORDL-015 red in module 01+03 Android runs 5 and 6 (2026-09-29/30) — a job created after the Jobs screen
+  loaded is in the refreshed list but not in the calendar for its date (the jobs loaded at the screen start are).
 
 ## Crash? ANR?
 
@@ -90,6 +92,8 @@ the jobs refreshes both views.
   today "No jobs", 3 calendar after its own refresh (5 jobs). Screen trees:
   `qa/shared/recon-dumps/android-2026-09-29/jobs_list.xml`, `jobs_calendar.xml`, `jobs_calendar_after_refresh.xml`;
   recon report [qa/shared/recon-2026-09-29-android.md](../../../shared/recon-2026-09-29-android.md).
+  4 — run 6: the calendar for today without the job created after the screen loaded (16:00; the day's cards run from
+  15:00 down). Test jobs only.
 
 ## Workaround
 

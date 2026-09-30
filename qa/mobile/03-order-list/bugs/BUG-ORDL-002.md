@@ -28,7 +28,7 @@ scheduled date, so a job for tomorrow can sit below a job for yesterday.
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
-| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
+| Platforms checked | iOS ✓ reproduced · Android ✓ reproduced (Pixel 7 emulator · Android 16, debug APK 1.1.1 (178); module 01+03 Android runs, 2026-09-29/30; added under the Android plan rule: a repeating iOS bug goes into the same report) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -68,6 +68,8 @@ Jobs are listed by scheduled date, earliest first (the time within one date is n
 
 - [x] Always — **3 of 3 observations**: two recon runs (jobs created in date order, so the list looked sorted by date,
   newest first) and one probe with jobs created out of date order (2026-09-24), which showed the creation order.
+- Android: **4 of 4** (TC-ORDL-014, module 01+03 Android runs 3–6): top to bottom today → yesterday → another day, the
+  reverse of the creation order — as on iOS.
 
 ## Crash? ANR?
 
@@ -78,6 +80,8 @@ Jobs are listed by scheduled date, earliest first (the time within one date is n
 - Screenshot: [evidence/BUG-ORDL-002/ios/list-order-follows-creation-not-date.png](evidence/BUG-ORDL-002/ios/list-order-follows-creation-not-date.png)
   (test jobs only).
 - Screen tree: `qa/shared/recon-dumps/ios-2026-09-24/recon4f_sort_probe.xml`.
+- Android: [evidence/BUG-ORDL-002/android/list-order-not-by-date.png](evidence/BUG-ORDL-002/android/list-order-not-by-date.png)
+  (run 6: 30 Sep → 29 Sep → 1 Oct; test jobs only).
 - Probe: `automation/mobile/scripts/recon/recon_4.py`, pass `sort`; report
   [qa/shared/recon-2026-09-24-ios.md](../../../shared/recon-2026-09-24-ios.md).
 

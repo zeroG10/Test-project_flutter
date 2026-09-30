@@ -34,7 +34,7 @@ start opens the Jobs list ("No jobs") and the Profile still shows the deleted ac
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
-| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
+| Platforms checked | iOS ✓ reproduced · Android ✓ reproduced (Pixel 7 emulator · Android 16, debug APK 1.1.1 (178); module 01+03 Android runs, 2026-09-29/30; added under the Android plan rule: a repeating iOS bug goes into the same report) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -81,6 +81,8 @@ is signed out and sees Welcome, and no data of the deleted account stays on scre
 
 - [x] Always — **2 of 2 attempts** (recon 4, 2026-09-24: one cold start watched 20 s, one watched 60 s plus Profile and a
   second launch), each with a freshly registered and deleted account.
+- Android: **4 of 4** (TC-SPL-003, module 01+03 Android runs 3–6, 2026-09-29/30), each with a freshly registered and
+  deleted account: after the cold start the Jobs list ("No jobs") instead of Welcome.
 
 ## Crash? ANR?
 
@@ -92,6 +94,8 @@ is signed out and sees Welcome, and no data of the deleted account stays on scre
 - Screen trees: `qa/shared/recon-dumps/ios-2026-09-24/recon4b_revoked_{after_60s,profile,next_launch}.xml`.
 - Recon report: [qa/shared/recon-2026-09-24-ios.md](../../../shared/recon-2026-09-24-ios.md), section Splash.
 - Script: `automation/mobile/scripts/recon/recon_4.py`, passes `revoked`, `revoked2`.
+- Android: [evidence/BUG-SPL-001/android/jobs-list-after-account-deleted.png](evidence/BUG-SPL-001/android/jobs-list-after-account-deleted.png)
+  (run 3; runs 4–6 the same — Allure results `automation/mobile/results/android/*-0103-r{3,4,5,6}/`, local only).
 
 ## Workaround
 

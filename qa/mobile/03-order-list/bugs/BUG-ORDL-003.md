@@ -32,7 +32,7 @@ after the calendar itself is refreshed or the app is restarted.
 | Field | Value |
 |---|---|
 | Platform | Flutter on iOS |
-| Platforms checked | iOS ✓ reproduced · Android — not checked yet (step 7) |
+| Platforms checked | iOS ✓ reproduced · Android ✓ reproduced (Pixel 7 emulator · Android 16, debug APK 1.1.1 (178); module 01+03 Android runs, 2026-09-29/30; added under the Android plan rule: a repeating iOS bug goes into the same report) |
 | OS version | iOS 26.5 |
 | Device | iPhone 17 |
 | Form factor | phone |
@@ -79,6 +79,8 @@ longer "Updated": the card in the list (and in the calendar) shows no banner.
 - [x] Always — **3 of 3 attempts** (automated runs 1–3 of TC-ORDL-005, 2026-09-24, three separate seeds). Runs 2 and 3
   are confirmed by the drawn screen (banner fill 2.7 % of the screen, evidence 1) and by the server state
   (`isViewed=True`); run 1 by the screen tree only.
+- Android: **3 of 3** (TC-ORDL-005, module 01+03 Android runs 4–6): the tree has "Updated" and it is drawn (banner fill
+  2.45 % of the screen) after the details were opened; the server reports the job as viewed.
 
 ## Crash? ANR?
 
@@ -91,8 +93,10 @@ longer "Updated": the card in the list (and in the calendar) shows no banner.
 2. Server state after step 5 (attached to the run report): `isViewed=True updatedAt=2026-09-24T07:45:23.953Z`.
 3. Step timeline from the run report (UTC): details opened 07:45:23.25–24.31; back 07:45:24.31; list refresh
    07:45:26.11–29.05; card read 07:45:29.60 — "Updated" present.
-- **Not determined:** the behaviour on Android (not run yet — the code is shared Flutter, so the same result is expected);
-  whether the calendar's own pull-to-refresh clears the banner — **by code reading only**, not observed.
+4. Android: [evidence/BUG-ORDL-003/android/list-after-viewing-still-updated.png](evidence/BUG-ORDL-003/android/list-after-viewing-still-updated.png)
+   (run 6; test jobs only).
+- **Not determined:** whether the calendar's own pull-to-refresh clears the banner — **by code reading only**, not
+  observed.
 
 ## Workaround
 
