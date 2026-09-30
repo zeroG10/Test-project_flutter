@@ -19,6 +19,7 @@ import pytest
 
 from fixtures.details import moved, schedule_change
 from helpers import waits
+from pages.android.system_pages import DialerPage
 from pages.attachments_page import AttachmentsPage, PdfViewerPage, PhotoViewerPage
 from pages.in_app_browser_page import InAppBrowserPage
 from pages.job_details_page import JobDetailsPage
@@ -317,8 +318,8 @@ def test_pf_phone_opens_dialer(details_seed, ui_login, driver, platform, pages, 
     pages.details.tap("pf-phone", text=phone)
     digits = "".join(ch for ch in expected(phone) if ch.isdigit())
     with allure.step(f"expect the dialer with {digits}"):
-        waits.wait_until(driver, lambda d: "dialer" in (d.current_package or ""), SERVER,
-                         "the dialer did not open")  # fmt: skip
-        shown = "".join(ch for ch in driver.page_source if ch.isdigit())
-        assert digits in shown, f"dialer does not show {digits}"
+        # the dialer's own number field (recon A1, dialer.xml) — not every digit of the page
+        # source, where bounds and ids hold digits too
+        shown = "".join(ch for ch in DialerPage(driver, platform).number(SERVER) if ch.isdigit())
+        assert shown == digits, f"dialer shows {shown!r}, expected {digits!r}"
     driver.back()
