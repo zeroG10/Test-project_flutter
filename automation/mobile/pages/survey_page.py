@@ -640,6 +640,11 @@ class SurveyPage(BasePage):
             meta.tap("save")
             self.assert_open(15)
             if description:
+                if self.platform == "android":
+                    # the survey comes back where it was; the new thumbnail may lie outside the
+                    # screen, and Android shows only on-screen nodes (module 08 Android run 6,
+                    # TC-SRV-014's second photo of a question)
+                    self.scroll_to("thumbnail", text=description)
                 self.visible("thumbnail", 15, text=description)
 
     # --- repeatable sections ----------------------------------------------------------
