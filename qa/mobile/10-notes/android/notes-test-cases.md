@@ -51,7 +51,7 @@
 | Source CHK IDs | CHK-NOTE-043, CHK-NOTE-046, CHK-NOTE-044 |
 | Platforms | android |
 | Priority | P0 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (emulator) |
 | App state | warm start, then cold start at step 9 (terminate + relaunch, still offline) |
 | Permissions | n/a |
@@ -85,7 +85,7 @@
 | Source CHK IDs | CHK-NOTE-045 |
 | Platforms | android |
 | Priority | P0 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (emulator) |
 | App state | warm start |
 | Permissions | n/a |
@@ -110,7 +110,7 @@
 | Source CHK IDs | CHK-NOTE-047 |
 | Platforms | android |
 | Priority | P1 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (emulator) |
 | App state | warm start |
 | Permissions | n/a |

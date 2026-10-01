@@ -15,7 +15,7 @@
 | Source CHK IDs | CHK-AUTH-124 |
 | Platforms | android |
 | Priority | P1 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | cold start; logged out |
 | Permissions | notifications: granted |
@@ -50,7 +50,7 @@
 | Source CHK IDs | CHK-AUTH-070 |
 | Platforms | android |
 | Priority | P2 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | cold start; logged out |
 | Permissions | notifications: granted |
@@ -87,7 +87,7 @@
 | Source CHK IDs | CHK-AUTH-099, CHK-AUTH-100 |
 | Platforms | android |
 | Priority | P1 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | cold start; logged out |
 | Permissions | notifications: granted |
@@ -124,7 +124,7 @@
 | Source CHK IDs | CHK-AUTH-098 |
 | Platforms | android |
 | Priority | P2 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) — throttled network needs the Android emulator |
 | App state | cold start; logged out |
 | Permissions | notifications: granted |

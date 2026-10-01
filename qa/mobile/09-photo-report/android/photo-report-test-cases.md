@@ -56,7 +56,7 @@
 | Source CHK IDs | CHK-PHR-045, CHK-PHR-049, CHK-PHR-046 |
 | Platforms | android |
 | Priority | P0 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (emulator) |
 | App state | warm start, then cold start at step 11 (terminate + relaunch, still offline) |
 | Permissions | n/a — the Android Photo Picker needs no runtime permission (recon D-PHR-A1) |
@@ -92,7 +92,7 @@
 | Source CHK IDs | CHK-PHR-047, CHK-PHR-048 |
 | Platforms | android |
 | Priority | P0 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (emulator) |
 | App state | warm start |
 | Permissions | n/a |
@@ -118,7 +118,7 @@
 | Source CHK IDs | CHK-PHR-050 |
 | Platforms | android |
 | Priority | P1 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (emulator) |
 | App state | warm start |
 | Permissions | n/a |

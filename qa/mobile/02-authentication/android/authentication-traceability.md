@@ -1,6 +1,6 @@
 # Automated traceability — mobile
 
-Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:53 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/02-authentication/authentication-checklist.md` — 126 items
@@ -10,9 +10,9 @@ Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-onl
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `d109f2e`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
+- Harness commit (this repo): `d109f2e`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check), `1eac2dc` (offline-3-green)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `MERGED: step 4 — pytest --platform=android tests/shared/test_authentication.py (run 6, 2026-09-29) — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
+- Run label (suite / filter): `MERGED: step 4 — pytest --platform=android tests/shared/test_authentication.py (run 6, 2026-09-29) — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2; TC-ORDL-017, -018 and TC-AUTH-018 from offline-3-green, harness 1eac2dc), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -147,6 +147,14 @@ Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-AUTH-126 | Check that authenticated-only screens remain inaccessible without successful OT… | 1 — `tests.shared.test_authentication#test_otp_partial_code_countdown_and_back (TC-AUTH-009 OTP: Verify disabled below 4 digits, resend locked during the countdown, back returns to Login without signing in)` | Passed | allure: passed |
 
 **Summary:** total 126 · automated 86 · Passed 83 · Failed 3 · Blocked 0 · Not run 40 (= total − Passed − Failed − Blocked)
+
+## Tagged tests with no checklist item
+
+These CHK IDs appear in test tags but in none of the checklists above — a stale tag, a typo, or a missing `--checklist`. They count for nothing until resolved.
+
+| CHK ID | Tests | Statuses |
+|---|---|---|
+| CHK-ORDL-001 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
 
 ## Tagged tests with no checklist item
 

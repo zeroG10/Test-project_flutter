@@ -58,7 +58,7 @@
 | Source CHK IDs | CHK-ORDL-031, CHK-ORDL-064, CHK-ORDL-033 |
 | Platforms | android |
 | Priority | P1 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | warm start, signed in; a cold start (terminate + relaunch, still offline) partway through |
 | Permissions | notifications: granted |
@@ -93,7 +93,7 @@
 | Source CHK IDs | CHK-ORDL-034 |
 | Platforms | android |
 | Priority | P2 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | warm start, signed in |
 | Permissions | notifications: granted |
@@ -127,7 +127,7 @@
 | Source CHK IDs | CHK-ORDL-035 |
 | Platforms | android |
 | Priority | P1 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | warm start, signed in |
 | Permissions | notifications: granted |
@@ -159,7 +159,7 @@
 | Source CHK IDs | CHK-ORDL-032, CHK-ORDL-065 |
 | Platforms | android |
 | Priority | P2 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | warm start, signed in |
 | Permissions | notifications: granted |

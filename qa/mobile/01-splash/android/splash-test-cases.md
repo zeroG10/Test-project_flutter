@@ -15,7 +15,7 @@
 | Source CHK IDs | CHK-SPL-015 |
 | Platforms | android |
 | Priority | P2 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) — throttled network needs the Android emulator (not available on the iOS simulator) |
 | App state | cold start; app data reset (logged out) |
 | Permissions | notifications: granted (system alert auto-accepted) |

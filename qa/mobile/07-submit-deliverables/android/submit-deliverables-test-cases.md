@@ -58,7 +58,7 @@
 | Source CHK IDs | CHK-DLV-023, CHK-DLV-024 |
 | Platforms | android |
 | Priority | P0 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | warm start, signed in |
 | Permissions | n/a |
@@ -89,7 +89,7 @@
 | Source CHK IDs | CHK-DLV-025 |
 | Platforms | android |
 | Priority | P1 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | warm start, then a cold start partway through (terminate + relaunch, still offline) |
 | Permissions | n/a |
@@ -127,7 +127,7 @@
 | Source CHK IDs | CHK-DLV-026 |
 | Platforms | android |
 | Priority | P1 |
-| Automation | candidate |
+| Automation | automated(android) — `automation/mobile/tests/android/test_offline_*.py`, reviewed 2026-10-01 |
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | warm start, signed in |
 | Permissions | n/a |

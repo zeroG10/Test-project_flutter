@@ -1,6 +1,6 @@
 # Automated traceability — mobile
 
-Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:53 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/03-order-list/order-list-checklist.md` — 70 items
@@ -10,9 +10,9 @@ Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-onl
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `4de7949`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
+- Harness commit (this repo): `4de7949`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check), `1eac2dc` (offline-3-green)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `MERGED: step 4 — pytest --platform=android tests/shared/test_splash.py tests/shared/test_order_list.py tests/shared/test_authentication.py::test_login_with_email (run 6, 2026-09-30) — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
+- Run label (suite / filter): `MERGED: step 4 — pytest --platform=android tests/shared/test_splash.py tests/shared/test_order_list.py tests/shared/test_authentication.py::test_login_with_email (run 6, 2026-09-30) — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2; TC-ORDL-017, -018 and TC-AUTH-018 from offline-3-green, harness 1eac2dc), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -91,6 +91,33 @@ Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDL-070 | Check that jobs shown in the Orders List after a refresh are also shown in the… | 1 — `tests.shared.test_order_list#test_calendar_follows_list_refresh (TC-ORDL-015 Jobs that the refreshed list shows are shown in the calendar on their dates)` | Failed | allure: failed — selenium.common.exceptions.TimeoutException: Message: ('-android uiautomator', 'new UiSelector().descriptionContains("QA-AUTO-0930-095315-LATE")') not visible… |
 
 **Summary:** total 70 · automated 59 · Passed 55 · Failed 4 · Blocked 0 · Not run 11 (= total − Passed − Failed − Blocked)
+
+## Tagged tests with no checklist item
+
+These CHK IDs appear in test tags but in none of the checklists above — a stale tag, a typo, or a missing `--checklist`. They count for nothing until resolved.
+
+| CHK ID | Tests | Statuses |
+|---|---|---|
+| CHK-AUTH-073 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-074 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-075 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-088 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-089 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-110 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-115 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-117 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-119 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-ORDD-001 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
+| CHK-ORDD-002 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
+| CHK-SPL-001 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-002 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-003 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-005 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-007 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-008 | 1 — `tests.shared.test_splash#test_session_hands_over_to_jobs (TC-SPL-002 With a valid session, the splash hands over to the Jobs list and Welcome never appears)` | passed |
+| CHK-SPL-009 | 1 — `tests.shared.test_splash#test_deleted_account_session_ends (TC-SPL-003 A session whose account was deleted on the server ends on Welcome after a cold start)` | failed |
+| CHK-SPL-011 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-012 | 1 — `tests.shared.test_splash#test_session_hands_over_to_jobs (TC-SPL-002 With a valid session, the splash hands over to the Jobs list and Welcome never appears)` | passed |
 
 ## Tagged tests with no checklist item
 
