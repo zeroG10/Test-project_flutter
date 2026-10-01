@@ -12,6 +12,7 @@ import allure
 import pytest
 
 from fixtures.notifications import server_notifications
+from pages.android.offline_page import ConnectionRestoredDialog
 from pages.notifications_page import NotificationsPage
 from pages.tabbar_page import TabBarPage
 from tests.shared.test_notifications import open_tab
@@ -28,6 +29,7 @@ def pages(driver, platform):
     class Pages:
         tabs = TabBarPage(driver, platform)
         notes = NotificationsPage(driver, platform)
+        restored = ConnectionRestoredDialog(driver, platform)
 
     return Pages
 
@@ -62,6 +64,9 @@ def test_notifications_offline_no_cache(
     evidence.checkpoint("notifications-offline")
 
     network.on()  # open device.network on
+    # earlier tests' In progress jobs stay in the app's cache: the "Connection restored" dialog
+    # may come over the tab (D-OFF-10) — closed first
+    pages.restored.close_if_shown()
     # the list may reload by itself once the network is back (offline run 01021112-r1: the row
     # was there and Try again gone) — Try again is tapped while it is still offered
     if pages.notes.is_visible("try-again", RETRY_OFFERED):

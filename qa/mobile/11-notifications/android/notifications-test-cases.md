@@ -32,7 +32,7 @@
 | 5 | expect-visible | notifications.offline-title | — | "No internet connection" (after the initial "Slow or no internet connection…", recon A2 row 1/14) |
 | 6 | expect-visible | notifications.offline-text | — | the supporting offline message visible |
 | 7 | expect-visible | notifications.try-again | — | "Try again" visible and tappable |
-| 8 | open | device.network | on | Wi-Fi and mobile data enabled |
+| 8 | open | device.network | on | Wi-Fi and mobile data enabled; a "Connection restored" dialog (In progress jobs in the app's cache, D-OFF-10) is closed with `connection-restored.cancel` if it comes within ~25 s |
 | 9 | click | notifications.try-again | — | retry requested — if still offered: the list may reload by itself once the network is back (run 01021112-r1) |
 | 10 | expect-visible | notifications.row | — | the list reappears — at least `notif_job`'s row |
 

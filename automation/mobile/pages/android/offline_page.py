@@ -14,6 +14,7 @@ COMPACT_WAIT = 10.0  # s: the long text turns into "No internet connection." + T
 RESTORED_WAIT = 45.0  # s: the dialog came ~15 s after the network returned (recon A2 row 12)
 CLOSE_FROM_RIGHT = 84  # px: the ✕ centre from the right edge (recon A2: [954,288][1038,372])
 CLOSE_BELOW_BAR = 50  # px below the app bar: inside the ✕ of both banner heights
+CLOSE_IF_SHOWN_WAIT = 25.0  # s: the dialog came ~15 s after the network returned (recon A2)
 
 
 class OfflineBanner(BasePage):
@@ -54,6 +55,23 @@ class ConnectionRestoredDialog(BasePage):
             self.wait_open(timeout)
             self.tap("cancel")
             self.wait_gone("title", 5)
+
+    def close_if_shown(self, timeout: float = CLOSE_IF_SHOWN_WAIT) -> bool:
+        """On a tab screen after the network returns: Cancel the dialog if it comes within
+        ``timeout``. It names every In progress job of the app's details cache — also earlier
+        tests' jobs deleted on the server since (D-OFF-10) — and lies over the screen, which then
+        leaves the tree (full run offline-all-r1: TC-ORDL-018, TC-NOTIF-007)."""
+        with allure.step(f"Connection restored dialog within {timeout:.0f} s → Cancel (if shown)"):
+            if not self.shows(timeout):
+                return False
+            allure.attach(
+                self.label_of(self.find("message")),
+                name="Connection restored — message",
+                attachment_type=allure.attachment_type.TEXT,
+            )
+            self.tap("cancel")
+            self.wait_gone("title", 5)
+            return True
 
     def shows(self, timeout: float) -> bool:
         try:

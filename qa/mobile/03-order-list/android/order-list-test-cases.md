@@ -141,7 +141,7 @@
 | 2 | expect-visible | offline-banner.message | — | offline banner shown |
 | 3 | set | api.job | create via `POST /job` (`JobController_create`) → `{{job.offline_created}}` | created on the server; the device stays offline |
 | 4 | expect-hidden | jobs-list.card[{{job.offline_created.jobId}}] | — | not shown yet — device still offline, nothing to sync |
-| 5 | open | device.network | on | network restored |
+| 5 | open | device.network | on | network restored; a "Connection restored" dialog for In progress jobs in the app's cache (also earlier ones deleted on the server — D-OFF-10) is closed with `connection-restored.cancel` if it comes within ~25 s |
 | 6 | wait-for | jobs-list.card[{{job.offline_created.jobId}}] | — | visible within a generous wait (~30 s) — the app refreshes the list on reconnect, no manual pull (CHK-ORDL-035) |
 | 7 | expect-hidden | offline-banner.message | — | banner gone now that the network is back |
 

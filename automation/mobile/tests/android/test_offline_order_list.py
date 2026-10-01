@@ -19,7 +19,7 @@ import allure
 import pytest
 
 from fixtures.jobs import _create, _run_stamp
-from pages.android.offline_page import OfflineBanner
+from pages.android.offline_page import ConnectionRestoredDialog, OfflineBanner
 from pages.jobs_calendar_page import JobsCalendarPage
 from pages.jobs_list_page import JobsListPage
 
@@ -33,6 +33,7 @@ def pages(driver, platform):
         jobs = JobsListPage(driver, platform)
         calendar = JobsCalendarPage(driver, platform)
         banner = OfflineBanner(driver, platform)
+        restored = ConnectionRestoredDialog(driver, platform)
 
     return Pages
 
@@ -148,6 +149,9 @@ def test_offline_created_job_appears_on_reconnect(
     job = job_offline_creator()  # POST /job while the device stays offline
     jobs.wait_gone("card", text=job.job_id)  # not shown yet — nothing to sync
     network.on()  # waits until DNS resolves again
+    # earlier tests' In progress jobs stay in the app's cache: the "Connection restored" dialog
+    # may come over the list (D-OFF-10) — closed, then the list is read
+    pages.restored.close_if_shown()
     jobs.visible("card", RECONNECT_WAIT, text=job.job_id)  # auto-refresh on reconnect, no pull
     evidence.checkpoint("offline-created-job-synced")
     banner.wait_gone("message")  # banner gone now that the network is back
