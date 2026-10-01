@@ -97,15 +97,18 @@ def test_splash_ignores_interaction(app, driver, pages, expected):
         app.launch()
         splash.expect_shown_after_system_splash()
         if app.platform == "android":
-            # start 1 — a tap, then the tree: still the splash's, nothing opened by the tap;
-            # start 2 — the system Back right after the first brand frame (the splash lasts about
-            # a second after the system one on this host)
-            splash.tap_centre()
-            splash.expect_no_interactive_elements()
+            # start 1 — the system Back right after the first brand frame (the splash lasts about
+            # a second after the system one on this host) — it does not depend on how fast the
+            # tree is read, so it goes first (01-split-r1: the tap's tree read came too late and
+            # the whole TC was Blocked before the Back was tried);
+            # start 2 — a tap, then the tree: still the splash's, nothing opened by the tap
+            pages.welcome.go_back()  # the system Back
+            app.expect_stays_in_front("a back on the splash changes nothing")
             app.terminate()
             app.launch()
             splash.expect_shown_after_system_splash()
-            pages.welcome.go_back()  # the system Back
+            splash.tap_centre()
+            splash.expect_no_interactive_elements()
         else:
             splash.tap_centre()
             pages.welcome.go_back()  # edge swipe
@@ -117,8 +120,8 @@ def test_splash_ignores_interaction(app, driver, pages, expected):
     finally:
         if idle is not None:
             driver.update_settings({"waitForIdleTimeout": idle})
-    # the frame right after the system Back can still show the splash while Android is already
-    # leaving the app (Q-SPL-A2), so: over a window
+    # the frame right after the back can still show the splash while Android is already
+    # leaving the app (Q-SPL-A2), so: over a window (iOS: the edge swipe)
     app.expect_stays_in_front("a back on the splash changes nothing")
     pages.welcome.expect_text("title", expected(WELCOME_TITLE), LANDING)  # went on by itself
 

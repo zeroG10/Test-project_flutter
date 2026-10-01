@@ -111,9 +111,10 @@ numbers; on Android this TC is now start 1 without the tap: the first brand fram
 
 **Postconditions / cleanup:** nothing to clean.
 **Notes:** split from TC-SPL-001 on the owner's word (2026-10-01) — its old steps 4–6. On Android the steps run over two
-cold starts as before: start 1 — step 2, step 3, then the tree (no text at all: still the splash, the tap opened
-nothing); start 2 — step 2, then step 4 (the system Back) at once; step 5 becomes "the app stays in the foreground" over a
-1.5 s window (the frame right after Back can still show the splash while Android leaves the app). **Red on Android
+cold starts: start 1 — step 2, then step 4 (the system Back) at once; step 5 becomes "the app stays in the foreground"
+over a 1.5 s window (the frame right after Back can still show the splash while Android leaves the app); start 2 — step 2,
+step 3, then the tree (no text at all: still the splash, the tap opened nothing). The Back goes first: it does not
+depend on how fast the tree is read (run 01-split-r1: a late tree read Blocked the TC before the Back was tried). **Red on Android
 against BUG-SPL-002.**
 
 ---
