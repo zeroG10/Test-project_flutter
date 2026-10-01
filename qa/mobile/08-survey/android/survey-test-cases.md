@@ -7,7 +7,7 @@
 > `prompts/mobile/03`. IDs continue the file's numbering from `../survey-test-cases.md` (last:
 > TC-SRV-016).
 >
-> **Status: draft — waiting for the owner's validation (step 5 gate).**
+> **Status: validated by the owner 2026-10-01 (step 5 gate: D-OFF-1…9 answered, no remarks on the TCs).**
 
 | Field | Value |
 |---|---|

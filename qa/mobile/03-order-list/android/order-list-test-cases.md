@@ -13,7 +13,7 @@
 > [../android/order-list-questions.md](order-list-questions.md) (D-ORDL-A1…A3 — none of them
 > affect this file).
 >
-> **Status: draft — waiting for the owner's validation (step 5 gate).**
+> **Status: validated by the owner 2026-10-01 (step 5 gate: D-OFF-1…9 answered, no remarks on the TCs).**
 
 | Field | Value |
 |---|---|
@@ -178,7 +178,7 @@
 
 **Postconditions / cleanup:** device offline at TC end; network restored to ON by the harness. Nothing created.
 **Notes:** the checklist text ("No orders") is the Sheet's literal wording; the app and the accepted online baseline both say "No jobs" (D-ORDL-2/3) — this TC follows the app, as the online file does throughout.
-**Pending owner:** D-OFF-5 — recon A2: "«Немає кешу офлайн» — у SRS «placeholder for UX decision»; апка показує «No jobs» (як порожній онлайн) + плашку" (there is no distinct "no cache offline" state in the SRS — it is a placeholder; the app shows the ordinary "No jobs" empty state plus the offline banner). Proposal: "Прийняти як рішення UX: «No jobs» + плашка «No internet connection.»" (accept this as the UX decision: "No jobs" + the "No internet connection." banner — exactly as written above, with no separate no-cache message).
+**Resolved D-OFF-5** — Owner 2026-10-01: «ок» — "No jobs" + the offline banner is the accepted UX decision.
 
 ---
 
@@ -214,7 +214,7 @@
 
 ## Open questions
 
-- Pending owner: **D-OFF-5** (CHK-ORDL-032/-065) — see TC-ORDL-019's "Pending owner" note; awaiting
+- Resolved **D-OFF-5** (owner 2026-10-01: «ок» — accepted)
   the owner's validation that "No jobs" (the same empty state as online) + the offline banner is
   the accepted reading of "an appropriate message or indicator... (placeholder for UX decision)"
   (step 5 gate).

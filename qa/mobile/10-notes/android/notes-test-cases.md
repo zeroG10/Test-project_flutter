@@ -7,7 +7,7 @@
 > `prompts/mobile/03`. IDs continue the file's numbering from `../notes-test-cases.md` (last:
 > TC-NOTE-007; TC-NOTE-008 / -009 were removed there, 2026-09-26 — this file reuses TC-NOTE-008).
 >
-> **Status: draft — waiting for the owner's validation (step 5 gate).**
+> **Status: validated by the owner 2026-10-01 (step 5 gate: D-OFF-1…9 answered, no remarks on the TCs).**
 
 | Field | Value |
 |---|---|
@@ -74,7 +74,7 @@
 
 **Postconditions / cleanup:** device offline at TC end; network restored to ON by the harness (`Adb.offline()` `finally`). Job deleted.
 **Notes:** CHK-NOTE-046's "never reaches the server" half is closed in TC-NOTE-009 step 3, once the device is back online.
-**Pending owner:** D-OFF-7 — the offline banner lies over the first row's ⋮ (recon row 16); this TC closes it (`offline-banner.close`) before the delete tap. Proposal: UX note or S3 bug — owner's call (recon D-OFF-7).
+**Resolved D-OFF-7** — Owner 2026-10-01: a UI remark, not a bug — tests close the banner (✕) before taps in the covered strip.
 
 ## TC-NOTE-009 — Network back: notes created and edited offline are synced to the server; the note deleted while unsynced never reaches it
 
@@ -131,7 +131,7 @@
 
 **Postconditions / cleanup:** network ON. Job deleted.
 **Notes:** this is the same server-state check module 07 already performs after submission (TC-DLV-005); this TC adds the offline-delete trigger. Mirrors photo report's TC-PHR-010 — same mechanism, same owner decision (D-OFF-3).
-**Pending owner:** D-OFF-3 — automatic queued-delete sync (the FR-NOT-10 reading) is not what the app does: the deleted note is simply absent once the next job-response update (here, submission) runs — same mechanism recon 10 found for notes (draft `BUG-NOTE-001`, not filed, owner 2026-09-26) and BUG-PHR-001 for photos. Proposal: accept as the documented baseline for this path, verified on the server after submission (recon D-OFF-3).
+**Resolved D-OFF-3** — Owner 2026-10-01: «перевір» — the server state is checked after the submission (as BUG-PHR-001).
 
 ---
 

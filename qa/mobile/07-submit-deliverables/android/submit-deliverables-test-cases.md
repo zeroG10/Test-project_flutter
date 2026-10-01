@@ -14,7 +14,7 @@
 > decisions. Q-DLV-5 (DEV answers `POST /job/{id}/submit` with 500 although the submission is
 > recorded) carries over unchanged — see Conventions.
 >
-> **Status: draft — waiting for the owner's validation (step 5 gate).**
+> **Status: validated by the owner 2026-10-01 (step 5 gate: D-OFF-1…9 answered, no remarks on the TCs).**
 
 | Field | Value |
 |---|---|
@@ -114,7 +114,7 @@
 
 **Postconditions / cleanup:** device offline at TC end; network restored to ON by the harness. Job deleted.
 **Notes:** none of the three deliverables was ever sent to the server in this TC (the device never went online) — persistence here is purely local storage, as FR-IP-04 / FR-IP-09 describe.
-**Pending owner:** D-OFF-7 — the offline banner lies over the first (only) job card after the cold start (recon row 16); this TC closes it (`offline-banner.close`) before the tap, as the photo report / notes android files already do. Proposal: UX note or S3 bug — owner's call (recon D-OFF-7).
+**Resolved D-OFF-7** — Owner 2026-10-01: a UI remark, not a bug — tests close the banner (✕) before taps in the covered strip.
 
 ---
 
@@ -149,7 +149,7 @@
 
 **Postconditions / cleanup:** network ON. Job deleted.
 **Notes:** this reuses TC-DLV-003's server-record oracle, with the "Connection restored" dialog as the trigger instead of the normal Submit flow.
-**Pending owner:** D-OFF-2 — recon A2: "Автоматичної здачі після повернення мережі немає: апка показує «Connection restored» і чекає тапу Submit. Офлайн спроба здачі неможлива (кнопка неактивна)" (there is no automatic submission once the network returns: the app shows "Connection restored" and waits for a Submit tap; an offline submission attempt is impossible — the button is disabled). Proposal: "Прийняти діалог як «inform … so he can resubmit» (FR-IP-06); перевіряти діалог + здачу з нього. «Автоматично, якщо здачу перервано» — Blocked (на DEV здача й так 500)" (accept the dialog as satisfying FR-IP-06's "inform users ... so he can resubmit"; verify the dialog plus the submission it triggers, as written above. True automatic submission when an interrupted submission resumes is `Blocked` — DEV already returns 500 on submit regardless).
+**Resolved D-OFF-2** — Owner 2026-10-01: «ок» — the "Connection restored" dialog + Submit counts as FR-IP-06; an interrupted submission's auto-resume stays Blocked (DEV submit 500).
 
 ---
 
@@ -184,16 +184,16 @@
 | CHK ID | TC | Note |
 |---|---|---|
 | CHK-DLV-023, CHK-DLV-024 | TC-DLV-007 | |
-| CHK-DLV-025 | TC-DLV-008 | survey deep-checked (text); photo and note checked by presence after the cold start; Pending owner: D-OFF-7 (the banner-close step) |
+| CHK-DLV-025 | TC-DLV-008 | survey deep-checked (text); photo and note checked by presence after the cold start; **Resolved D-OFF-7** — Owner 2026-10-01: a UI remark, not a bug — tests close the banner (✕) before taps in the covered strip.
 | CHK-DLV-026 | TC-DLV-009 | D-OFF-2, pending owner |
 
 ## Open questions
 
-- Pending owner: **D-OFF-2** (CHK-DLV-026) — see TC-DLV-009's "Pending owner" note; the SRS reads
+- Resolved **D-OFF-2** (owner 2026-10-01: «ок» — dialog + Submit accepted)
   "automatically submit ... when connectivity is restored" (FR-SUB-06, FR-IP-06), but the app
   requires a manual tap on the "Connection restored" dialog — awaiting the owner's validation of
   the recon's proposed reading (step 5 gate).
-- Pending owner: **D-OFF-7** (TC-DLV-008) — the offline banner lies over the first job card after
+- Resolved **D-OFF-7** (owner 2026-10-01: UI remark, not a bug)
   a cold start; this TC closes it before tapping, as the photo report / notes android files already
   do — owner's call: UX note or bug (recon D-OFF-7), decided once for all modules it touches.
 - TC-DLV-004 (the app's own success-toast reaction to a successful submission) stays `Blocked` on

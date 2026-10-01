@@ -2,7 +2,7 @@
 
 > Scope/selection: the four `android-stage` checks of this module (owner, android-plan §2.5; `qa/mobile/ios/not-automated.md`) that need network control the iOS simulator does not have — CHK-AUTH-124 (login), CHK-AUTH-070 (registration), CHK-AUTH-099/-100 (OTP, offline + retry), CHK-AUTH-098 (OTP, slow network). Source recon: [qa/shared/recon-2026-10-01-android-offline.md](../../../shared/recon-2026-10-01-android-offline.md) (recon A2). Format: [qa/_templates/test-case-format.md](../../../_templates/test-case-format.md) · [qa/_templates/test-cases-mobile.md](../../../_templates/test-cases-mobile.md) · prompt `prompts/mobile/03`. IDs continue from the shared file (`../authentication-test-cases.md`, TC-AUTH-001…014) — numbered from TC-AUTH-015. Conventions, fixtures and the oracle model: same as `../authentication-test-cases.md`; Android texts/behaviour differences: [../android/authentication-questions.md](authentication-questions.md) (D-AUTH-A1…A3 — none of them affect these four TCs).
 >
-> **Status: draft — waiting for the owner's validation (step 5 gate).**
+> **Status: validated by the owner 2026-10-01 (step 5 gate: D-OFF-1…9 answered, no remarks on the TCs).**
 
 ---
 
@@ -111,7 +111,7 @@
 
 **Postconditions / cleanup:** network restored to on; reset app data (sign out).
 **Notes:** exactly one OTP attempt in this run (offline) — FR-OTP-13 locks the account for 2 min after the retry limit; serialize away from TC-AUTH-008 (which already spends the run's one wrong-OTP attempt) if both run in the same session. The offline attempt is not expected to reach the server (no request sent while offline), so it should not itself count against the server-side retry limit — unconfirmed on the first run, see Open questions.
-**Pending owner: D-OFF-1** — recon A2: "Після мережевої помилки на екрані коду кнопка Verify неактивна по суті: повтор можливий лише зміною цифри" (after the network error the Verify button is effectively inactive; retry only works by changing a digit — the app's code accepts Verify only from state `initial`, not from `error`). Proposal: "Схоже на баг (S3): «allow retry» — видима кнопка має повторювати. Тест: повтор = тап Verify; якщо червоний — баг-звіт з твого слова" (looks like a bug, severity S3: the visible "allow retry" button should retry; the test retries by tapping Verify as written above; if it goes red, file a bug report from the owner's word — never retry by changing a digit to force green, per doctrine rule 4).
+**Resolved D-OFF-1** — Owner 2026-10-01: «ок» — treated as a bug (S3); filed after the automated run shows it (evidence from the run).
 
 ---
 
@@ -175,13 +175,13 @@ Screen maps (android column) added in step 3 of the Android stage (map-health gr
 |---|---|---|
 | CHK-AUTH-124 | TC-AUTH-015 | |
 | CHK-AUTH-070 | TC-AUTH-016 | |
-| CHK-AUTH-099, -100 | TC-AUTH-017 | Pending owner: D-OFF-1 (see TC) |
+| CHK-AUTH-099, -100 | TC-AUTH-017 | **Resolved D-OFF-1** — Owner 2026-10-01: «ок» — treated as a bug (S3); filed after the automated run shows it (evidence from the run).
 | CHK-AUTH-098 | TC-AUTH-018 | |
 
 ## Open questions
 
 - TC-AUTH-015: the Login-screen error text in step 6 ("An unexpected error occurred. Please try logging in again.") is from the app's code only (recon A2 row 2), not yet observed live within the splash window the recon used — confirm on the first run; if it never renders, fix the step, no bug (not a numbered `D-OFF`).
 - TC-AUTH-016: the registration SnackBar text in step 9 ("No internet connection") is from the app's code only (recon A2 row 5) — confirm on the first run; same test-defect-not-bug rule if it differs (not a numbered `D-OFF`).
-- Pending owner: **D-OFF-1** (CHK-AUTH-100, TC-AUTH-017) — see the TC's "Pending owner" note; the retry-by-Verify-tap is the SRS-expected behaviour, recon A2 suggests it may not work (possible bug), awaiting the owner's word before any `BUG-AUTH-…` is filed.
+- Resolved **D-OFF-1** (owner 2026-10-01: «ок» — bug (S3), filed after the run)
 - Network throttling (`Data: slow (emulator: gsm speed, gprs delay)`) used by TC-AUTH-018 is not yet implemented in `helpers/android/device.py` — same gap as `qa/mobile/01-splash/android/splash-test-cases.md` (TC-SPL-004); one harness change covers both.
 - `otp.error`'s hardcoded text and the two new aliases (`offline-banner.*`, `registration.snackbar`) are testability/map work orders, not open behavioural questions — listed in Aliases used.

@@ -2,7 +2,7 @@
 
 > Scope/selection: the one `android-stage` check of this module (owner, android-plan §2.5; `qa/mobile/ios/not-automated.md`) — CHK-PRF-030, log out offline. Source recon: [qa/shared/recon-2026-10-01-android-offline.md](../../../shared/recon-2026-10-01-android-offline.md) (recon A2). Format: [qa/_templates/test-case-format.md](../../../_templates/test-case-format.md) · prompt `prompts/mobile/03`. Conventions, `logout-dialog.*` and the post-logout re-sign-in convention (Q-PRF-3): same as `../profile-test-cases.md`. No Android questions file exists yet for this module (`qa/mobile/12-profile/android/` has no `profile-questions.md`); any Android-specific D/Q raised here belongs there once filed.
 >
-> **Status: draft — waiting for the owner's validation (step 5 gate).**
+> **Status: validated by the owner 2026-10-01 (step 5 gate: D-OFF-1…9 answered, no remarks on the TCs).**
 
 ---
 
@@ -35,7 +35,7 @@
 
 **Postconditions / cleanup:** network restored to on (also guaranteed by the harness's `finally`, `Adb.offline()`); sign in again for the next test (`ui_login`), as the other logout TCs do (Q-PRF-3 convention, `../profile-test-cases.md`).
 **Notes:** recon A2 row 15: in code, logout offline clears tokens, the user and the jobs/details cache; notes, photos, the sync queue and survey drafts are left on the device. This TC asserts only the session side (what CHK-PRF-030 and FR-PROF-07 ask for); it does not probe local notes/photos/drafts.
-**Pending owner: D-OFF-6** — recon A2: "Вихід офлайн чистить сесію й кеш джоб; локальні нотатки / фото / чернетки лишаються на пристрої" (logout offline clears the session and jobs cache; local notes/photos/drafts remain on the device). Proposal: "Тест — сесія очищена (Welcome, після перезапуску теж). Чи мають зникати несинхронізовані нотатки / фото — твоє рішення" (the test checks the session is cleared — Welcome, and still Welcome after a restart — exactly as written above; whether unsynced local notes/photos must also be purged is the owner's decision, not asserted here).
+**Resolved D-OFF-6** — Owner 2026-10-01: no answer («не знаю») — the test proves the session is cleared (FR-PROF-07); whether local notes / photos / drafts must go stays an open question, not verified.
 
 ---
 
@@ -58,9 +58,9 @@
 
 | CHK ID | TC | Note |
 |---|---|---|
-| CHK-PRF-030 | TC-PRF-009 | Pending owner: D-OFF-6 — session side only; local-data scope is the owner's call |
+| CHK-PRF-030 | TC-PRF-009 | **Resolved D-OFF-6** — Owner 2026-10-01: no answer («не знаю») — the test proves the session is cleared (FR-PROF-07); whether local notes / photos / drafts must go stays an open question, not verified.
 
 ## Open questions
 
-- Pending owner: **D-OFF-6** (CHK-PRF-030) — see the TC's "Pending owner" note; whether unsynced local notes/photos/drafts must be purged on an offline logout is undecided and not asserted by this TC either way.
+- Resolved **D-OFF-6** (owner 2026-10-01: no answer — session only, the rest stays open)
 - No `qa/mobile/12-profile/android/profile-questions.md` exists yet — if the owner's answer to D-OFF-6 introduces an Android-specific decision beyond the shared `../profile-questions.md`, it belongs in a new file there.

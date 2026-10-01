@@ -2,7 +2,7 @@
 
 > Scope/selection: the one `android-stage` check of this module (owner, android-plan §2.5; `qa/mobile/ios/not-automated.md`) — CHK-SPL-015, slow start-up, which needs network throttling the iOS simulator cannot do. Source recon: [qa/shared/recon-2026-10-01-android-offline.md](../../../shared/recon-2026-10-01-android-offline.md) (recon A2). Format: [qa/_templates/test-case-format.md](../../../_templates/test-case-format.md) · [qa/_templates/test-cases-mobile.md](../../../_templates/test-cases-mobile.md) · prompt `prompts/mobile/03`. Conventions and existing TC-SPL-001…003 (incl. the Android recon-A1 notes on TC-SPL-001): [../splash-test-cases.md](../splash-test-cases.md).
 >
-> **Status: draft — waiting for the owner's validation (step 5 gate).**
+> **Status: validated by the owner 2026-10-01 (step 5 gate: D-OFF-1…9 answered, no remarks on the TCs).**
 
 ---
 
@@ -59,10 +59,10 @@
 
 | CHK ID | TC | Note |
 |---|---|---|
-| CHK-SPL-015 | TC-SPL-004 | Pending owner: D-OFF-9 — "Автотест на повільній мережі: сплеш → наступний екран, логотип по центру на кадрах сплешу, без помилок; «мерехтіння» — знімки як докази для людини" (recon A2). The TC asserts the objective parts (hand-over happens, no offline banner, logo centred); the subjective "no flicker" part is left to a human reviewing the kept screenshots, as proposed. |
+| CHK-SPL-015 | TC-SPL-004 | **Resolved D-OFF-9** — Owner 2026-10-01: «ок» — automated hand-over + logo check, screenshots for a person.
 
 ## Open questions
 
-- Pending owner: **D-OFF-9** (CHK-SPL-015) — see Coverage above; proposal from recon A2 is the TC as written, awaiting the owner's validation (step 5 gate).
+- Resolved **D-OFF-9** (owner 2026-10-01: «ок»)
 - Network throttling is not yet a harness capability on Android (`helpers/android/device.py` has `Adb.offline()` only) — needed before TC-SPL-004 can run; flag together with TC-AUTH-018 (module 02), which needs the same capability.
 - `splash.root` / `splash.logo` stay `MISSING` for Android as they already are for iOS (pixel-based page methods, no locator) — not a new gap introduced by this TC, carried over from `../splash-test-cases.md`.
