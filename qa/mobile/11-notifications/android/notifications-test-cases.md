@@ -33,7 +33,7 @@
 | 6 | expect-visible | notifications.offline-text | — | the supporting offline message visible |
 | 7 | expect-visible | notifications.try-again | — | "Try again" visible and tappable |
 | 8 | open | device.network | on | Wi-Fi and mobile data enabled |
-| 9 | click | notifications.try-again | — | retry requested |
+| 9 | click | notifications.try-again | — | retry requested — if still offered: the list may reload by itself once the network is back (run 01021112-r1) |
 | 10 | expect-visible | notifications.row | — | the list reappears — at least `notif_job`'s row |
 
 **Postconditions / cleanup:** delete `notif_job` through the API (as `../notifications-test-cases.md` TC-NOTIF-002…004); network restored to on.

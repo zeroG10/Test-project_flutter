@@ -95,7 +95,15 @@ def test_registration_offline_then_retry_online(
     reg.visible("form-error", 10, text=expected(REGISTRATION_OFFLINE_ERROR))
     evidence.checkpoint("registration-offline-error")
     with allure.step("expect the typed values preserved"):
-        assert reg.field_value(reg.find("first-name")) == new_user.first_name
+        # the form has scrolled: Flutter hands Android only the on-screen fields, so each field
+        # is scrolled to before it is read (offline run 01021112-r1: First name was above the top)
+        for alias, value in (
+            ("first-name", new_user.first_name),
+            ("last-name", new_user.last_name),
+            ("email", new_user.email),
+        ):
+            reg.scroll_to(alias)
+            assert reg.field_value(reg.find(alias)) == expected(value), alias
 
     network.on()  # open device.network on
     reg.submit()  # click registration.continue — retry without reopening the screen

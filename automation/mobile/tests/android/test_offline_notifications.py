@@ -20,6 +20,9 @@ OFFLINE_TITLE = "No internet connection"
 TRY_AGAIN = "Try again"
 
 
+RETRY_OFFERED = 5.0  # s: Try again is tapped only if still offered after the network returns
+
+
 @pytest.fixture
 def pages(driver, platform):
     class Pages:
@@ -59,5 +62,8 @@ def test_notifications_offline_no_cache(
     evidence.checkpoint("notifications-offline")
 
     network.on()  # open device.network on
-    pages.notes.tap("try-again")  # click notifications.try-again — retry requested
+    # the list may reload by itself once the network is back (offline run 01021112-r1: the row
+    # was there and Try again gone) — Try again is tapped while it is still offered
+    if pages.notes.is_visible("try-again", RETRY_OFFERED):
+        pages.notes.tap("try-again")  # click notifications.try-again — retry requested
     pages.notes.row(job.job_id)  # expect-visible notifications.row — the list reappears
