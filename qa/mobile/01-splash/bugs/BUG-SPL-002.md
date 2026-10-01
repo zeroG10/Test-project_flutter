@@ -84,7 +84,8 @@ on by itself to Welcome (no session) or to the Jobs list (a valid session).
 
 - Screenshots: [evidence/BUG-SPL-002/android/](evidence/BUG-SPL-002/android/) — the splash right before the Back and
   the home screen after it (module 01+03 Android run 4).
-- Automated test: `automation/mobile/tests/shared/test_splash.py::test_cold_start_splash_then_welcome` (TC-SPL-001) —
+- Automated test: `automation/mobile/tests/shared/test_splash.py::test_splash_ignores_interaction` (TC-SPL-005, split
+  from TC-SPL-001 on 2026-10-01; before that `test_cold_start_splash_then_welcome`) —
   red on Android at "expect the app to stay in the foreground (a back on the splash changes nothing)"; its other steps
   (brand splash, centred logo, no labelled or clickable node) pass. Allure results `automation/mobile/results/android/`
   `2026-09-30-0103-r6/` (local only).
@@ -104,8 +105,8 @@ Open the app again from the launcher or the recent apps.
 - SRS §3.1.0 FR-SPL-03: "The Splash Screen shall not require or allow any user interaction."
 - Checklist: `CHK-SPL-007` — "Check that no user interaction is possible on the Splash Screen, including taps, swipes,
   or system back actions." ([../splash-checklist.md](../splash-checklist.md))
-- Test case: `TC-SPL-001` step 5 / 6 ([../splash-test-cases.md](../splash-test-cases.md)) — stays red on Android
-  against this bug.
+- Test case: `TC-SPL-005` step 4 / 5 ([../splash-test-cases.md](../splash-test-cases.md); split from TC-SPL-001,
+  2026-10-01) — stays red on Android against this bug.
 - Question: `Q-SPL-A2` (answered «заведи», 2026-09-30) in [../android/splash-questions.md](../android/splash-questions.md).
 - Sibling: BUG-SPL-001 (same module).
 - Invariant: none fits — missing invariant: "a screen that allows no interaction ignores the system Back".

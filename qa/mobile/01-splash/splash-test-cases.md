@@ -40,7 +40,7 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 |---|---|
 | ID | TC-SPL-001 |
 | Title | Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself |
-| Source CHK IDs | CHK-SPL-001, CHK-SPL-002, CHK-SPL-003, CHK-SPL-005, CHK-SPL-007, CHK-SPL-011 |
+| Source CHK IDs | CHK-SPL-001, CHK-SPL-002, CHK-SPL-003, CHK-SPL-005, CHK-SPL-011 |
 | Platforms | ios, android |
 | Priority | P0 |
 | Automation | candidate |
@@ -56,13 +56,10 @@ Execution statuses: **Passed / Failed / Skipped / Blocked / (empty)** — result
 | 1 | open | app | cold start | — |
 | 2 | expect-visible | splash.root | — | the first captured frame: ≥ 90 % of the screen is the brand colour `#782A2A` (D-SPL-2) |
 | 3 | expect-hidden | splash.interactive | — | no text, button, link or input in the tree |
-| 4 | click | splash.root | screen centre | nothing happens |
-| 5 | back | — | edge swipe | nothing happens |
-| 6 | expect-visible | splash.root | — | still the splash — steps 4–5 landed on it and changed nothing |
-| 7 | expect-visible | splash.logo | — | the logo appears (debug build: ~8 s after launch); its centre within 2 % of the screen centre (both axes) |
-| 8 | wait-for | welcome.root | — | appears without any input |
-| 9 | expect-visible | welcome.root | — | visible — Welcome, not Login (D-SPL-3) |
-| 10 | expect-hidden | login.root | — | hidden |
+| 4 | expect-visible | splash.logo | — | the logo appears (debug build: ~8 s after launch); its centre within 2 % of the screen centre (both axes) |
+| 5 | wait-for | welcome.root | — | appears without any input |
+| 6 | expect-visible | welcome.root | — | visible — Welcome, not Login (D-SPL-3) |
+| 7 | expect-hidden | login.root | — | hidden |
 
 **Postconditions / cleanup:** nothing to clean.
 **Notes:** recon 4 (2026-09-24, debug build): the first screenshot comes 2.2–3.4 s after launch and is already 99.8 %
@@ -80,6 +77,44 @@ host — less than a tree read plus a screenshot — so on Android the steps run
 step 7 on that first brand frame (the logo is drawn from it), step 4, then step 3, where the tree proves by itself that
 it was read during the splash (no text at all; the Welcome title in it → Blocked, timing); start 2 — step 2, then step 5
 (the system Back) at once, then the 1.5 s window of step 6 and steps 8–10.
+**Split (owner «ок», 2026-10-01):** the interaction steps (old 4–6, CHK-SPL-007) moved to **TC-SPL-005**, so the one red
+item on Android (the system Back — BUG-SPL-002) no longer turns the other five red. The notes above keep the old step
+numbers; on Android this TC is now start 1 without the tap: the first brand frame, the logo on it, the tree.
+
+---
+
+## TC-SPL-005 — A tap and a back on the splash change nothing; the app goes on to Welcome by itself
+
+| Field | Value |
+|---|---|
+| ID | TC-SPL-005 |
+| Title | A tap and a back on the splash change nothing; the app goes on to Welcome by itself |
+| Source CHK IDs | CHK-SPL-007 |
+| Platforms | ios, android |
+| Priority | P0 |
+| Automation | automated(ios, android) — `tests/shared/test_splash.py::test_splash_ignores_interaction` |
+| Device / OS | P0 devices from the matrix |
+| App state | cold start; app data reset (logged out) |
+| Permissions | notifications: granted (system alert auto-accepted) |
+| Network | online Wi-Fi |
+| Preconditions | no session; the app is terminated |
+| Oracle | spec — SRS §3.1.0 FR-SPL-03 ("The Splash Screen shall not require or allow any user interaction."); spec — checklist CHK-SPL-007 |
+
+| # | Action | Target (alias) | Data | Expected |
+|---|---|---|---|---|
+| 1 | open | app | cold start | — |
+| 2 | expect-visible | splash.root | — | the brand splash (Android: the first brand frame after the system splash) |
+| 3 | click | splash.root | screen centre | nothing happens |
+| 4 | back | — | edge swipe (iOS) / the system Back (Android) | nothing happens; the app stays in the foreground |
+| 5 | expect-visible | splash.root | — | still the splash — steps 3–4 changed nothing |
+| 6 | wait-for | welcome.root | — | Welcome by itself, no input |
+
+**Postconditions / cleanup:** nothing to clean.
+**Notes:** split from TC-SPL-001 on the owner's word (2026-10-01) — its old steps 4–6. On Android the steps run over two
+cold starts as before: start 1 — step 2, step 3, then the tree (no text at all: still the splash, the tap opened
+nothing); start 2 — step 2, then step 4 (the system Back) at once; step 5 becomes "the app stays in the foreground" over a
+1.5 s window (the frame right after Back can still show the splash while Android leaves the app). **Red on Android
+against BUG-SPL-002.**
 
 ---
 
@@ -173,7 +208,8 @@ Screen maps come in step 5 of the module; `MISSING` = to be added from the recon
 
 | CHK ID | TC | Note |
 |---|---|---|
-| CHK-SPL-001, -003, -005, -007 | TC-SPL-001 | pixels / tree; Blocked (timing) if the splash window is missed |
+| CHK-SPL-001, -003, -005 | TC-SPL-001 | pixels / tree; Blocked (timing) if the splash window is missed |
+| CHK-SPL-007 | TC-SPL-005 | split from TC-SPL-001 (owner, 2026-10-01); Android: red against BUG-SPL-002 |
 | CHK-SPL-002 | TC-SPL-001 | brand colour instead of white — D-SPL-2 (accepted) |
 | CHK-SPL-011 | TC-SPL-001 | Welcome instead of Login — D-SPL-3 (accepted) |
 | CHK-SPL-008, -012 | TC-SPL-002 | -008 proven by the outcome (session honoured) |

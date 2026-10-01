@@ -1,4 +1,4 @@
-"""Splash (module 01) — TC-SPL-001…003.
+"""Splash (module 01) — TC-SPL-001…003, TC-SPL-005.
 
 Source of every step and expectation: qa/mobile/01-splash/splash-test-cases.md (D-SPL-1…4 accepted
 by the owner; recon 4, 2026-09-24). The splash has no labelled element: it is decided by pixels
@@ -43,17 +43,15 @@ def pages(driver, platform):
 @pytest.mark.smoke
 @pytest.mark.shared
 @pytest.mark.tc("TC-SPL-001")
-@pytest.mark.chk(
-    "CHK-SPL-001", "CHK-SPL-002", "CHK-SPL-003", "CHK-SPL-005", "CHK-SPL-007", "CHK-SPL-011"
-)  # fmt: skip
-@allure.tag(
-    "CHK-SPL-001", "CHK-SPL-002", "CHK-SPL-003", "CHK-SPL-005", "CHK-SPL-007", "CHK-SPL-011"
-)  # fmt: skip
+@pytest.mark.chk("CHK-SPL-001", "CHK-SPL-002", "CHK-SPL-003", "CHK-SPL-005", "CHK-SPL-011")
+@allure.tag("CHK-SPL-001", "CHK-SPL-002", "CHK-SPL-003", "CHK-SPL-005", "CHK-SPL-011")
 @allure.title(
     "TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and "
     "nothing to interact with, then opens Welcome by itself"
 )
 def test_cold_start_splash_then_welcome(app, driver, pages, expected):
+    """Split from the interaction checks (TC-SPL-005) on the owner's word (2026-10-01): one red
+    item — the system Back, BUG-SPL-002 — no longer turns these five red too."""
     splash = pages.splash.use_colour(pixels.hex_to_rgb(expected(BRAND)))
     app.clear_data()  # signed out and not running → the next launch is a cold start
     idle = driver.get_settings().get("waitForIdleTimeout")
@@ -62,11 +60,46 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
         app.launch()
         first = splash.expect_shown_after_system_splash()  # iOS: the first frame (unchanged)
         if app.platform == "android":
-            # After a system splash of 4–32 s the brand splash is up for only about a second on
-            # this host (module 01+03 Android runs 3–5): start 1 — the logo on the first brand
-            # frame, a tap, then the tree (it proves by itself that it is still the splash's);
-            # start 2 — the system Back right after the first brand frame.
+            # the brand splash is up for about a second after the system one (module 01+03
+            # Android runs 3–5): the logo on the first brand frame, then the tree, which proves
+            # by itself that it was read during the splash
             splash.expect_logo_centred(first)
+            splash.expect_no_interactive_elements()
+        else:
+            splash.expect_no_interactive_elements()
+            shown = splash.expect_shown("splash before the logo check")  # debug build: ~8 s
+            splash.expect_logo_centred(shown)
+    except SplashMissed as exc:
+        pytest.skip(f"Blocked: timing — {exc}; the splash could not be observed in time")
+    finally:
+        if idle is not None:
+            driver.update_settings({"waitForIdleTimeout": idle})
+    pages.welcome.expect_text("title", expected(WELCOME_TITLE), LANDING)  # Welcome, not Login
+    pages.login.wait_gone("root", 2)
+
+
+@pytest.mark.smoke
+@pytest.mark.shared
+@pytest.mark.tc("TC-SPL-005")
+@pytest.mark.chk("CHK-SPL-007")
+@allure.tag("CHK-SPL-007")
+@allure.title(
+    "TC-SPL-005 A tap and a back on the splash change nothing; the app goes on to Welcome by itself"
+)
+def test_splash_ignores_interaction(app, driver, pages, expected):
+    """CHK-SPL-007 on its own (split from TC-SPL-001, owner 2026-10-01). Android: red against
+    BUG-SPL-002 — the system Back on the splash leaves the app."""
+    splash = pages.splash.use_colour(pixels.hex_to_rgb(expected(BRAND)))
+    app.clear_data()
+    idle = driver.get_settings().get("waitForIdleTimeout")
+    driver.update_settings({"waitForIdleTimeout": 0})
+    try:
+        app.launch()
+        splash.expect_shown_after_system_splash()
+        if app.platform == "android":
+            # start 1 — a tap, then the tree: still the splash's, nothing opened by the tap;
+            # start 2 — the system Back right after the first brand frame (the splash lasts about
+            # a second after the system one on this host)
             splash.tap_centre()
             splash.expect_no_interactive_elements()
             app.terminate()
@@ -74,11 +107,9 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
             splash.expect_shown_after_system_splash()
             pages.welcome.go_back()  # the system Back
         else:
-            splash.expect_no_interactive_elements()
             splash.tap_centre()
             pages.welcome.go_back()  # edge swipe
-            shown = splash.expect_shown("splash after a tap and an edge swipe")
-            splash.expect_logo_centred(shown)
+            splash.expect_shown("splash after a tap and an edge swipe")
     except SplashMissed as exc:
         # Gone because the Back left the app (Android, Q-SPL-A2) is a verdict, not timing
         app.expect_stays_in_front("a back on the splash changes nothing", hold=0)
@@ -86,11 +117,10 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
     finally:
         if idle is not None:
             driver.update_settings({"waitForIdleTimeout": idle})
-    # CHK-SPL-007: the back changed nothing — on Android the frame right after the system Back
-    # still shows the splash while the app is already being left (Q-SPL-A2), so: over a window
+    # the frame right after the system Back can still show the splash while Android is already
+    # leaving the app (Q-SPL-A2), so: over a window
     app.expect_stays_in_front("a back on the splash changes nothing")
-    pages.welcome.expect_text("title", expected(WELCOME_TITLE), LANDING)  # Welcome, not Login
-    pages.login.wait_gone("root", 2)
+    pages.welcome.expect_text("title", expected(WELCOME_TITLE), LANDING)  # went on by itself
 
 
 @pytest.mark.regression
