@@ -11,7 +11,7 @@
 > the server (read back through `GET /job/{id}` before the deletion) was deleted in the app while offline; the network was
 > switched back on and the deliverables were submitted — the job became `submitted`, and the deleted photo was **still on
 > the server 30 s later**. TC-PHR-010 (`automation/mobile/tests/android/test_offline_photo_report.py::test_photo_report_synced_delete_offline_removed_after_submission`), red in runs `offline-0910-r1`, `offline-0910-r2`
-> and `offline-all-r1` (2026-10-01; to be confirmed when that run ends). Oracle: SRS FR-DEL-PH-08: "If the photo has already been synced, deletion shall be queued and synced when connectivity is restored." Checklist `CHK-PHR-050`.
+> and `offline-all-r1` (2026-10-01; red in all three). Oracle: SRS FR-DEL-PH-08: "If the photo has already been synced, deletion shall be queued and synced when connectivity is restored." Checklist `CHK-PHR-050`.
 > **Status for the owner: the reason for "not filed" no longer holds on Android — file?** (proposal: yes, S2 as below.)
 
 ## Summary

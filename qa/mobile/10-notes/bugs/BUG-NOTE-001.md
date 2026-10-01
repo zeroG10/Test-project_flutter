@@ -12,7 +12,7 @@
 > the server (read back through `GET /job/{id}` before the deletion) was deleted in the app while offline; the network was
 > switched back on and the deliverables were submitted — the job became `submitted`, and the deleted note was **still on
 > the server 30 s later**. TC-NOTE-010 (`automation/mobile/tests/android/test_offline_notes.py::test_notes_synced_delete_offline_removed_after_submission`), red in runs `offline-0910-r1`, `offline-0910-r2`
-> and `offline-all-r1` (2026-10-01; to be confirmed when that run ends). Oracle: SRS FR-NOT-10: "Offline note changes shall sync automatically when connectivity is restored." Checklist `CHK-NOTE-047`.
+> and `offline-all-r1` (2026-10-01; red in all three). Oracle: SRS FR-NOT-10: "Offline note changes shall sync automatically when connectivity is restored." Checklist `CHK-NOTE-047`.
 > **Status for the owner: the reason for "not filed" no longer holds on Android — file?** (proposal: yes, S2 as below.)
 
 ## Summary
