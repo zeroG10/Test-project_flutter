@@ -65,6 +65,11 @@ OTP = Screen(
             note="in the tree and 'visible' even when not drawn — "
             "decide by OtpPage.error_rendered() (Android: same trap, recon A1)",
         ),
+        "network-error": El(
+            android=(_A, "No internet connection"),
+            note="Android only (step 5): under the code field when the check fails offline "
+            "(recon A2 row 3, otp_offline_8s.xml)",
+        ),
         # "Didn't receive the code? You can request a new code in 0:59"
         "resend": El(
             android=(_U, 'new UiSelector().descriptionContains("You can request a new code in")'),

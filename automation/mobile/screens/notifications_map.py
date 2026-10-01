@@ -78,6 +78,25 @@ NOTIFICATIONS = Screen(
             note="'Turn on push notifications\\nTurn on push notifications to get alerts for job "
             "updates.\\nGo to Settings' — one element at the top",
         ),
+        "offline-title": El(
+            android=(_A, "No internet connection"),
+            note="Android only (step 5): the list's offline state — notifications are not cached "
+            "(D-OFF-4, recon A2 row 14); no final period, unlike the app-wide banner",
+        ),
+        "offline-text": El(
+            android=(
+                _A,
+                "Slow or no internet connection. Check the Internet settings and try again",
+            ),
+            note="Android only (step 5): under offline-title (recon A2 row 14)",
+        ),
+        "try-again": El(
+            android=(
+                _U,
+                'new UiSelector().className("android.widget.Button").description("Try again")',
+            ),
+            note="Android only (step 5): the offline state's Button; the banner's link is a View",
+        ),
         "go-to-settings": El(
             android=(
                 _U,

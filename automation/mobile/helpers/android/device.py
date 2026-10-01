@@ -19,13 +19,22 @@ import contextlib
 import subprocess
 import threading
 import time
+import urllib.parse
 from collections.abc import Iterator
 from pathlib import Path
 
 import allure
 
 APPIUM_SETTINGS = "io.appium.settings"
+NETWORK_BACK_TIMEOUT = 60.0  # s until a name resolves again after the network is switched on
 DEV_LINK_DOMAIN = "copsfieldservices.dev.concerttech.com"
+
+
+def api_host() -> str:
+    """The API host the app talks to (``API_BASE_URL`` in .env)."""
+    from config.settings import settings
+
+    return urllib.parse.urlparse(settings.api_base_url or "").hostname or DEV_LINK_DOMAIN
 
 
 class Adb:
@@ -133,15 +142,48 @@ class Adb:
     @contextlib.contextmanager
     def offline(self) -> Iterator[None]:
         """Wi-Fi and mobile data off for the block; both back on in ``finally``."""
-        with allure.step("device: network OFF (wifi + data)"):
-            self.shell("svc wifi disable")
-            self.shell("svc data disable")
+        self.set_network(False)
         try:
             yield
         finally:
-            with allure.step("device: network back ON"):
-                self.shell("svc wifi enable", check=False)
-                self.shell("svc data enable", check=False)
+            self.set_network(True, check=False)
+
+    def set_network(self, on: bool, *, check: bool = True) -> None:
+        """Wi-Fi and mobile data on / off. On: also waits until a name resolves on the device —
+        the radios come back within seconds, DNS a little later (recon A2: ~6 s), and a request
+        sent before that fails as offline although the switch is on."""
+        state = "enable" if on else "disable"
+        with allure.step(f"device: network {'ON' if on else 'OFF'} (wifi + data)"):
+            self.shell(f"svc wifi {state}", check=check)
+            self.shell(f"svc data {state}", check=check)
+            if on:
+                self.wait_online()
+
+    def wait_online(self, host: str = "", timeout: float = NETWORK_BACK_TIMEOUT) -> None:
+        """Until ``host`` (the API host by default) resolves on the device."""
+        host = host or api_host()
+        deadline = time.monotonic() + timeout
+        while True:
+            out = self.shell(f"ping -c 1 -W 3 {host}", check=False, timeout=20)
+            if "unknown host" not in out and "bad address" not in out:
+                return
+            if time.monotonic() > deadline:
+                raise RuntimeError(f"the device does not resolve {host} {timeout:.0f} s after ON")
+            time.sleep(2)
+
+    @contextlib.contextmanager
+    def throttled(self, speed: str = "gsm", delay: str = "gprs") -> Iterator[None]:
+        """A slow network for the block (emulator console: ``network speed`` / ``network delay``
+        — GSM ≈ 14 kbit/s, GPRS ≈ 150–550 ms); full speed and no delay again in ``finally``."""
+        with allure.step(f"device: network SLOW (speed {speed}, delay {delay})"):
+            self.run("emu", "network", "speed", speed)
+            self.run("emu", "network", "delay", delay)
+        try:
+            yield
+        finally:
+            with allure.step("device: network speed back to full"):
+                self.run("emu", "network", "speed", "full", check=False)
+                self.run("emu", "network", "delay", "none", check=False)
 
     # --- gallery ----------------------------------------------------------------------------
 

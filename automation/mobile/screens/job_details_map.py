@@ -158,6 +158,11 @@ JOB_DETAILS = Screen(
             "later.', submit_incomplete_toast.xml 'Complete the survey before job submission.', "
             "survey_saved_toast.xml 'Survey saved') — unique per screen, no y filter needed",
         ),
+        "offline-message": El(
+            android=(_A, "Offline. Data will sync when the connection is restored."),
+            note="Android only (step 5): above the disabled Submit deliverables while offline "
+            "(recon A2 row 8; SRS §3.1.3.4 Primary Action Area — the same text)",
+        ),
         "retry": El(
             ios=(_P, _BUTTON + "name == 'Retry'"),
             android=(_A, "Retry"),
