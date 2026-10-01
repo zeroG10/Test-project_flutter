@@ -67,6 +67,9 @@ def offline_create_edit_delete(n, banner, expected) -> None:
     n.assert_open(SERVER)
     n.visible("toast", 5)
     n.expect_text("toast", expected("Note added successfully"))
+    # the first row's ⋮ lies right under the banner's ✕ (D-OFF-7): a tap there closed the banner
+    # instead of opening the menu (offline run 0910-r2) — close the banner first
+    banner.close()
     editor = n.edit(n.texts().index("QA-AUTO offline keep"))
     editor.type_text(" edited")
     editor.tap("save")
@@ -74,7 +77,6 @@ def offline_create_edit_delete(n, banner, expected) -> None:
     n.visible("toast", 5)
     n.expect_text("toast", expected("Note saved successfully"))
     n.add_note("QA-AUTO offline throwaway")
-    banner.close()  # the banner covers the first row's ⋮ (D-OFF-7)
     n.delete_from_menu(n.texts().index("QA-AUTO offline throwaway"), confirm=True)
     n.visible("toast", 5)
     n.expect_text("toast", expected("Note deleted successfully"))
