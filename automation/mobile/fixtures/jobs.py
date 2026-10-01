@@ -209,3 +209,39 @@ def job_links(field_services_api, tech) -> JobLinks:
         )
     except ApiBlocked as exc:
         pytest.skip(str(exc))
+
+
+@pytest.fixture
+def job_new(field_services_api, tech_user_id):
+    """``{{job.new}}`` (TC-ORDL-016, -017, -019) — one job, status ``new``, today, created
+    through the API while the device is online; deleted after the test (as the online file's
+    ``jobs_seed``, one job at a time — convention of the offline test-case file;
+    Android offline tests, step 5)."""
+    job = _create(
+        field_services_api, tech_user_id, _run_stamp(), "new", date.today(), 9, "new", None
+    )
+    try:
+        yield job
+    finally:
+        field_services_api.delete_job({"id": job.id, "jobId": job.job_id})
+
+
+@pytest.fixture
+def job_offline_creator(field_services_api, tech_user_id):
+    """``{{job.offline_created}}`` (TC-ORDL-018) — created mid-test through ``POST /job`` while
+    the device stays offline; deleted after the test. A callable, as ``late_job`` (fixtures/jobs.py)
+    is for the online file: the job does not exist until the test creates it."""
+    made: list = []
+
+    def make():
+        job = _create(
+            field_services_api, tech_user_id, _run_stamp(), "offline", date.today(), 9, "new", None
+        )
+        made.append(job)
+        return job
+
+    try:
+        yield make
+    finally:
+        for job in made:
+            field_services_api.delete_job({"id": job.id, "jobId": job.job_id})

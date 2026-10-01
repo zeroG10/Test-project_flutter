@@ -57,14 +57,6 @@ def pages(driver, platform):
     return Pages
 
 
-def tap_disabled(page: JobDetailsPage, alias: str) -> None:
-    """Tap a control that is visible but accessibility-disabled. ``BasePage.tap`` waits on
-    ``wait_clickable`` (visible AND enabled), which never resolves on a disabled button — and
-    TC-DLV-007 needs exactly that: a tap on the disabled Submit deliverables sends nothing."""
-    rect = page.rect(alias)
-    page.tap_xy(rect["x"] + rect["width"] / 2, rect["y"] + rect["height"] / 2)
-
-
 @pytest.mark.android
 @pytest.mark.smoke
 @pytest.mark.tc("TC-DLV-007")
@@ -87,7 +79,7 @@ def test_offline_submit_disabled_with_message(
     )  # CHK-DLV-024
     pages.details.expect_disabled("submit-deliverables")  # CHK-DLV-023
     evidence.checkpoint("offline-submit-disabled")
-    tap_disabled(pages.details, "submit-deliverables")  # disabled control — a no-op
+    pages.details.tap_disabled("submit-deliverables")  # disabled control — a no-op
     pages.dialog.wait_gone("title", 5)  # the confirmation dialog never appears
     body = field_services_api.job(job.id)
     with allure.step("expect nothing submitted on the server"):

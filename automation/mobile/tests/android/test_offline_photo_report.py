@@ -33,9 +33,9 @@ from tests.shared.test_submit_deliverables import (
     server_job,
     submitted,
 )
+from tests.shared.test_survey import open_job
 
 SERVER = 30.0
-LIST_REFRESHES = 3
 
 
 @pytest.fixture
@@ -50,19 +50,6 @@ def pages(driver, platform):
         restored = ConnectionRestoredDialog(driver, platform)
 
     return Pages
-
-
-def open_job(pages, job, expected) -> None:
-    """Refresh until the job is listed, then open it — the online half of the precondition
-    (as tests/shared/test_photo_report.py's open_report, without the Photo report tap: the
-    offline TCs open the deliverable themselves, as a step, once the network is off)."""
-    locator = pages.jobs.locator("card", text=job.job_id)
-    for _ in range(LIST_REFRESHES):
-        pages.jobs.pull_to_refresh()
-        if pages.jobs.driver.find_elements(*locator):
-            break
-    pages.jobs.open_card(job.job_id)
-    pages.details.expect_header(expected(job.title_line), SERVER)
 
 
 def offline_add_edit_delete(pages, r, meta, expected) -> None:

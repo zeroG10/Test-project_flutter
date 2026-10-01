@@ -27,9 +27,9 @@ from pages.notes_page import NotesPage
 from pages.survey_page import SurveyPage
 from tests.shared.test_notes import server_notes
 from tests.shared.test_submit_deliverables import complete_survey, server_job, submitted
+from tests.shared.test_survey import open_job
 
 SERVER = 30.0
-LIST_REFRESHES = 3
 
 
 @pytest.fixture
@@ -43,19 +43,6 @@ def pages(driver, platform):
         restored = ConnectionRestoredDialog(driver, platform)
 
     return Pages
-
-
-def open_job(pages, job, expected) -> None:
-    """Refresh until the job is listed, then open it — the online half of the precondition
-    (as tests/shared/test_notes.py's open_notes, without the Notes tap: the offline TCs open
-    the deliverable themselves, as a step, once the network is off)."""
-    locator = pages.jobs.locator("card", text=job.job_id)
-    for _ in range(LIST_REFRESHES):
-        pages.jobs.pull_to_refresh()
-        if pages.jobs.driver.find_elements(*locator):
-            break
-    pages.jobs.open_card(job.job_id)
-    pages.details.expect_header(expected(job.title_line), SERVER)
 
 
 def offline_create_edit_delete(n, banner, expected) -> None:

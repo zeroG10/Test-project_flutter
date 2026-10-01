@@ -270,6 +270,14 @@ class BasePage:
         with allure.step(f"tap {self._name(alias, params)} at ({fx:.2f}, {fy:.2f}) → ({x}, {y})"):
             self.driver.tap([(x, y)])
 
+    def tap_disabled(self, alias: str, **params: object) -> None:
+        """Tap a control that is shown but disabled — to prove the tap does nothing. ``tap``
+        waits for it to be clickable (shown AND enabled), which a disabled control never is
+        (Android offline, TC-DLV-007: the disabled Submit deliverables)."""
+        rect = self.rect(alias, **params)
+        with allure.step(f"tap {self._name(alias, params)} (disabled)"):
+            self.tap_xy(rect["x"] + rect["width"] / 2, rect["y"] + rect["height"] / 2)
+
     def tap_xy(self, x: float, y: float) -> None:
         """A tap at a screen point (session units). iOS: ``mobile: tap`` as proven on the
         simulator; Android: ``mobile: clickGesture`` (``mobile: tap`` is XCUITest-only)."""
