@@ -7,6 +7,14 @@
 > Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md). Draft for the owner's validation. Found in
 > recon 10 (2026-09-25). Tracker: not configured, nothing sent anywhere. Sibling: [BUG-PHR-001](../../09-photo-report/bugs/BUG-PHR-001.md).
 
+> **Android, 2026-10-01 — checked after the submission (owner's «перевір», D-OFF-3).** The 2026-09-26 decision assumed the
+> deletion might reach the server with the job update at submission. On Android it does not: a note that was already on
+> the server (read back through `GET /job/{id}` before the deletion) was deleted in the app while offline; the network was
+> switched back on and the deliverables were submitted — the job became `submitted`, and the deleted note was **still on
+> the server 30 s later**. TC-NOTE-010 (`automation/mobile/tests/android/test_offline_notes.py::test_notes_synced_delete_offline_removed_after_submission`), red in runs `offline-0910-r1`, `offline-0910-r2`
+> and `offline-all-r1` (2026-10-01; to be confirmed when that run ends). Oracle: SRS FR-NOT-10: "Offline note changes shall sync automatically when connectivity is restored." Checklist `CHK-NOTE-047`.
+> **Status for the owner: the reason for "not filed" no longer holds on Android — file?** (proposal: yes, S2 as below.)
+
 ## Summary
 
 The Notes screen shows the technician's notes correctly, but the job on the server does not follow it:
