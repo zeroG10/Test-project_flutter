@@ -34,6 +34,32 @@ PICKER_SETTLE = 10.0  # s, the picker's grid must stop moving within this
 PICKER_SETTLE_STEP = 0.7  # s between two reads that must agree
 
 
+def settled_picker_cells(page: BasePage) -> list:
+    """Android: the picker's cells once two reads PICKER_SETTLE_STEP apart agree. The sheet
+    slides up, and its "… will only have access to the photos you select" banner can land
+    above the grid after the cells are listed, pushing them ~280 px down: the tap went to the
+    banner and the picker stayed open (module 09 Android run 2, TC-PHR-001); the survey read it
+    before the cells were there at all ("0 photos", final run 1, TC-SRV-014 / -019)."""
+    with allure.step("wait for the picker's grid to stop moving"):
+        deadline = time.monotonic() + PICKER_SETTLE
+        before = None
+        while True:
+            cells = sorted(
+                (n for n in page.nodes() if n.label.startswith(PICKER_CELL_PREFIX)),
+                key=lambda n: (n.y, n.x),
+            )
+            where = [(n.x, n.y) for n in cells]
+            if cells and where == before:
+                return cells
+            if time.monotonic() > deadline:
+                raise AssertionError(
+                    f"the picker's grid did not settle within {PICKER_SETTLE:.0f} s "
+                    f"(last read: {len(cells)} cell(s), first at {where[:1]})"
+                )
+            before = where
+            time.sleep(PICKER_SETTLE_STEP)
+
+
 class PhotoAddSheet(BasePage):
     screen = PHOTO_ADD_SHEET
 
@@ -222,7 +248,7 @@ class PhotoReportPage(BasePage):
             sheet.tap("gallery")
             picker.assert_open(PICKER_WAIT)
             if self.platform == "android":  # Android Photo picker: cells are in the tree
-                cells = self._settled_picker_cells()
+                cells = settled_picker_cells(self)
                 assert len(cells) > cell, f"the picker shows {len(cells)} photo(s), need #{cell}"
                 c = cells[cell]
                 self.tap_xy(c.x + c.width / 2, c.y + c.height / 2)
@@ -234,30 +260,6 @@ class PhotoReportPage(BasePage):
             y = grid["y"] + size * (cell // 3 + 0.5)
             self.tap_xy(x, y)
             PhotoEditor(self.driver, self.platform).assert_open(15)
-
-    def _settled_picker_cells(self) -> list:
-        """Android: the picker's cells once two reads PICKER_SETTLE_STEP apart agree. The sheet
-        slides up, and its "… will only have access to the photos you select" banner can land
-        above the grid after the cells are listed, pushing them ~280 px down: the tap went to the
-        banner and the picker stayed open (module 09 Android run 2, TC-PHR-001)."""
-        with allure.step("wait for the picker's grid to stop moving"):
-            deadline = time.monotonic() + PICKER_SETTLE
-            before = None
-            while True:
-                cells = sorted(
-                    (n for n in self.nodes() if n.label.startswith(PICKER_CELL_PREFIX)),
-                    key=lambda n: (n.y, n.x),
-                )
-                where = [(n.x, n.y) for n in cells]
-                if cells and where == before:
-                    return cells
-                if time.monotonic() > deadline:
-                    raise AssertionError(
-                        f"the picker's grid did not settle within {PICKER_SETTLE:.0f} s "
-                        f"(last read: {len(cells)} cell(s), first at {where[:1]})"
-                    )
-                before = where
-                time.sleep(PICKER_SETTLE_STEP)
 
     def add_photo(self, cell: int = 1, description: str = "", tags: tuple[str, ...] = ()) -> None:
         """The whole add flow: sheet → gallery → editor ✓ → metadata → Save → back on the report."""

@@ -23,6 +23,7 @@ from selenium.common.exceptions import TimeoutException
 
 from helpers import waits
 from pages.base_page import BasePage, Node
+from pages.photo_report_page import settled_picker_cells
 from screens.survey_map import (
     FORM_ORDER,
     SURVEY,
@@ -61,6 +62,12 @@ DATE_TEXT = re.compile(r"^[A-Z][a-z]{2} \d{1,2}, \d{4}$")  # 'Sep 15, 2026' once
 TIME_TEXT = re.compile(r"^\d{1,2}:\d{2}\s?[AP]M$")  # '9:30 AM' once picked
 _NOT_TEXT_HINTS = ("Select date", "Select time", "Hour", "Minute")
 TEXT_FOCUS_FROM_BOTTOM_A = 184  # px (70 pt): a whole-card text field's input area (TD-SRV-002)
+
+
+class WalkLost(AssertionError):
+    """The Android walk lost its place on the form: a drag it could not measure, and no way back
+    to where it was (a whole repeated entry jumped past between two reads — final run 1,
+    TC-SRV-010: "15. Q1" on top before the drag, "29. Q1" after)."""
 
 
 def _android_form_order(alias: str, text: str | None) -> Callable[[Node], bool]:
@@ -420,7 +427,7 @@ class SurveyPage(BasePage):
                         back_offset = offset + down  # it came back lower than it was
                     else:
                         travels.append("?(no way back)")
-                        raise AssertionError(
+                        raise WalkLost(
                             "the survey walk could not measure a drag, nor come back to where "
                             "it was (see the attached trees)"
                         )
@@ -430,7 +437,7 @@ class SurveyPage(BasePage):
                     short = _travel(back, after, max_shift=limit)
                     if short is None:
                         travels.append("?")
-                        raise AssertionError(
+                        raise WalkLost(
                             "the survey walk could not measure a drag (no match between two "
                             "reads, a shorter drag either — see the attached trees)"
                         )
@@ -445,12 +452,30 @@ class SurveyPage(BasePage):
             allure.attach(" ".join(travels) or "(no drag)", name="walk: travel per drag (px)",
                           attachment_type=allure.attachment_type.TEXT)  # fmt: skip
 
+    def _once_more(self, what: str, read: Callable[[], object]):
+        """``read`` (a whole walk that collects from scratch); if the walk lost its place, the
+        form is read once more from its top — logged as its own step. Only a lost place is read
+        again; every other walk error fails at once."""
+        try:
+            return read()
+        except WalkLost as exc:
+            with allure.step(
+                f"the walk lost its place ({exc}) — {what}: read once more from the top"
+            ):
+                pass
+            return read()
+
     def _viewports(self):
         """The form's screens from the top to the end (Android)."""
         for nodes, _ in self._scan():
             yield nodes
 
     def _walk(
+        self, match: Callable[[Node], bool], stop_after: int | None = None
+    ) -> tuple[list[tuple[float, Node]], float, list[Node]]:
+        return self._once_more("matches", lambda: self._walk_once(match, stop_after))
+
+    def _walk_once(
         self, match: Callable[[Node], bool], stop_after: int | None = None
     ) -> tuple[list[tuple[float, Node]], float, list[Node]]:
         """Matches of the whole form at their form positions, top to bottom (Android). With
@@ -492,6 +517,9 @@ class SurveyPage(BasePage):
         return _attrs(here[0])
 
     def _titles_android(self) -> list[str]:
+        return self._once_more("titles", self._titles_once)
+
+    def _titles_once(self) -> list[str]:
         by_number: dict[int, str] = {}
         for nodes in self._viewports():
             for node in nodes:
@@ -501,6 +529,9 @@ class SurveyPage(BasePage):
         return [by_number[k] for k in sorted(by_number)]
 
     def _count_android(self, alias: str, **params: object) -> int:
+        return self._once_more(f"count {alias}", lambda: self._count_once(alias, **params))
+
+    def _count_once(self, alias: str, **params: object) -> int:
         """Distinct ``alias`` elements over the whole form (Android walks it)."""
         locator = self.locator(alias, **params)
         seen: list[tuple[float, str]] = []
@@ -617,10 +648,7 @@ class SurveyPage(BasePage):
                 self.tap_nth("upload-photo", n)
                 picker.assert_open(PICKER_WAIT)
             if self.platform == "android":  # the Android Photo picker lists its cells
-                cells = sorted(
-                    (c for c in self.nodes() if c.label.startswith("Photo taken on")),
-                    key=lambda c: (c.y, c.x),
-                )
+                cells = settled_picker_cells(self)  # once its grid stops moving
                 assert len(cells) > cell, f"the picker shows {len(cells)} photo(s), need #{cell}"
                 c = cells[cell]
                 self.tap_xy(c.x + c.width / 2, c.y + c.height / 2)
@@ -658,14 +686,18 @@ class SurveyPage(BasePage):
             # first line ('<section>', '<section> 2', …), in the order the walk meets them
             # (module 08 Android run 1, TC-SRV-010 read the 2nd header twice, the 1st never).
             match = _android_form_order("entry-headers", section)
-            headers: list[str] = []
-            for nodes, _ in self._scan():
-                for node in nodes:
-                    if node.visible and match(node) and TOP_A <= node.y < BOTTOM_A:
-                        head = node.label.split("\n")[0]
-                        if head not in headers:
-                            headers.append(head)
-            return headers
+
+            def read() -> list[str]:
+                headers: list[str] = []
+                for nodes, _ in self._scan():
+                    for node in nodes:
+                        if node.visible and match(node) and TOP_A <= node.y < BOTTOM_A:
+                            head = node.label.split("\n")[0]
+                            if head not in headers:
+                                headers.append(head)
+                return headers
+
+            return self._once_more("entry headers", read)
         return [a.get("name", "").split("\n")[0] for a in self.matches("entry-headers", section)]
 
     def delete_entry(self, n: int, confirm: bool | None) -> None:

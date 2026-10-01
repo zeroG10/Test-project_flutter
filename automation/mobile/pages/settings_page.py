@@ -30,7 +30,8 @@ SCROLLS = 15  # the app sits at the end of Settings → Apps ('[DEV] …' sorts 
 # Android: switching the permission off in Settings ends the app's process (as for any revoked
 # runtime permission); at its next start the signed-in app asks again — the system prompt, which
 # iOS never shows twice (module 11 Android run 1, TC-NOTIF-005).
-PROMPT_WAIT_ANDROID = 20.0  # s: a cold start, the splash, the session check, then the prompt
+PROMPT_WAIT_ANDROID = 60.0  # s: a cold start, the splash, the session check, then the prompt —
+# 4.5 s in step 5, over 20 s in final run 1 (the prompt came after the wait and hid the tabs)
 
 
 class SystemSettingsPage(BasePage):
