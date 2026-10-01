@@ -1,6 +1,9 @@
 # BUG-NOTE-002 — A note created and then edited offline is not synced when the connection returns; it waits for the submission
 
-> **Status: DRAFT — for the owner's decision (not filed).** Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md).
+> **Status: NOT FILED — owner's decision 2026-10-01:** «ні не заводь». The Failed row CHK-NOTE-045 (TC-NOTE-009)
+> stays red with this decision as its explanation.
+
+> Process: [prompts/08-file-bug.md](../../../../prompts/08-file-bug.md).
 > Found by the Android offline test TC-NOTE-009 (step 5, 2026-10-01). Tracker: not configured, nothing sent anywhere.
 > Siblings: [BUG-NOTE-001](BUG-NOTE-001.md) (edits / deletions of synced notes), [BUG-PHR-001](../../09-photo-report/bugs/BUG-PHR-001.md).
 

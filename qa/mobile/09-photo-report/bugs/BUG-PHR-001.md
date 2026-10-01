@@ -1,5 +1,8 @@
 # BUG-PHR-001 — A photo deleted from the Photo report stays on the job on the server
 
+> **Status: NOT FILED — owner's decision 2026-10-01** (after the Android check below): «ні не заводь». The Failed row
+> CHK-PHR-050 (TC-PHR-010) stays red with this decision as its explanation.
+
 > **Status: NOT FILED — owner's decision 2026-09-26:** deleting works in the app on a real device, possibly applied through the
 > job update at submission; not a bug for now. The final server state is checked after submission in module 07.
 >
@@ -12,7 +15,7 @@
 > switched back on and the deliverables were submitted — the job became `submitted`, and the deleted photo was **still on
 > the server 30 s later**. TC-PHR-010 (`automation/mobile/tests/android/test_offline_photo_report.py::test_photo_report_synced_delete_offline_removed_after_submission`), red in runs `offline-0910-r1`, `offline-0910-r2`
 > and `offline-all-r1` (2026-10-01; red in all three). Oracle: SRS FR-DEL-PH-08: "If the photo has already been synced, deletion shall be queued and synced when connectivity is restored." Checklist `CHK-PHR-050`.
-> **Status for the owner: the reason for "not filed" no longer holds on Android — file?** (proposal: yes, S2 as below.)
+> **Owner, 2026-10-01: not filed** (see the status line above).
 
 ## Summary
 
