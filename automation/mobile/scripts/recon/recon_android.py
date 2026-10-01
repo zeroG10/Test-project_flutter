@@ -15,7 +15,8 @@ first, then the jobs.
 A target ``<q>`` is a UiAutomator query: ``Sign up`` (content-desc, else text, exact) · ``~part``
 (contains) · ``cls:EditText`` (class) · ``id:<resource-id>``; ``<q>#<n>`` picks the n-th match.
 
-Actions: ``login`` (Welcome → Login → email → OTP; the account never printed) · ``open:<kind>`` ·
+Actions: ``login`` (Welcome → Login → email → OTP; the account never printed) · ``email`` / ``otp``
+(the same two inputs one by one — offline recon 2026-10-01) · ``open:<kind>`` ·
 ``tap:<q>`` · ``tapxy:<x>,<y>`` · ``long:<q>`` · ``type:<q>:<text>`` · ``keys:<text>`` ·
 ``clearfocused`` · ``hidekb`` · ``swipe:up|down|left|right`` · ``pull`` · ``scrollto:<q>`` ·
 ``back`` (system Back) · ``appback`` (the app's Back button) · ``wait:<q>:<s>`` (prints the
@@ -264,6 +265,14 @@ def do(state: Path, dumps: Path, actions: list[str]) -> None:
                     time.sleep(1)
                     drv.switch_to.active_element.send_keys(settings.app_user_otp)
                     print(f"    login done in {time.time() - t0:.1f}s total", flush=True)
+                elif verb == "email":  # the account's email into the first field, never printed
+                    one("cls:EditText").click()
+                    time.sleep(0.8)
+                    drv.switch_to.active_element.send_keys(settings.app_user_email)
+                    time.sleep(0.8)
+                elif verb == "otp":  # the DEV code into the focused code field
+                    drv.switch_to.active_element.send_keys(settings.app_user_otp)
+                    time.sleep(1)
                 elif verb == "open":
                     job_id = jobs[arg]["jobId"]
                     drag(w // 2, int(h * 0.3), w // 2, int(h * 0.75))  # pull to refresh

@@ -7,7 +7,10 @@ Logging, Stdout and Stderr streams and appends every line to <out-file>. Nothing
 the app; stop it with Ctrl-C / kill.
 
     cd automation/mobile
-    PYTHONPATH=. uv run python scripts/recon/app_logs.py <out-file> [--seconds 1800]
+    PYTHONPATH=. uv run python scripts/recon/app_logs.py <out-file> [--seconds 1800] [--android]
+
+``--android``: the URL is read from logcat (tag ``flutter``) and its port forwarded with
+``adb forward`` (offline recon 2026-10-01: the app's reasons are in developer.log, not logcat).
 
 Why: Q-ORDD-6 — attachments do not load on the simulator and the app's reason is only in its
 own logs (developer.log / print), not in the simulator's unified log.
@@ -38,6 +41,20 @@ def newest_url() -> str | None:
     return found[-1] if found else None
 
 
+def newest_url_android() -> str | None:
+    out = subprocess.run(
+        ["adb", "logcat", "-d", "-s", "flutter"], capture_output=True, text=True, timeout=60
+    ).stdout
+    found = URL.findall(out)
+    if not found:
+        return None
+    url = found[-1]
+    port = re.search(r":(\d+)/", url).group(1)
+    forward = ["adb", "forward", f"tcp:{port}", f"tcp:{port}"]
+    subprocess.run(forward, capture_output=True, timeout=30)
+    return url
+
+
 def ws_url(http: str) -> str:
     return "ws://" + http.removeprefix("http://").rstrip("/") + "/ws"
 
@@ -60,13 +77,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("out")
     parser.add_argument("--seconds", type=int, default=1800)
+    parser.add_argument("--android", action="store_true")
     args = parser.parse_args()
     out = Path(args.out)
     end = time.monotonic() + args.seconds
     current, sock = None, None
     with out.open("a", encoding="utf-8") as log:
         while time.monotonic() < end:
-            url = newest_url()
+            url = newest_url_android() if args.android else newest_url()
             if url and url != current:
                 if sock is not None:
                     sock.close()
