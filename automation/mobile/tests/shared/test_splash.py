@@ -1,4 +1,4 @@
-"""Splash (module 01) — TC-SPL-001…003, TC-SPL-005.
+"""Splash (module 01) — TC-SPL-001…003, TC-SPL-005, TC-SPL-006.
 
 Source of every step and expectation: qa/mobile/01-splash/splash-test-cases.md (D-SPL-1…4 accepted
 by the owner; recon 4, 2026-09-24). The splash has no labelled element: it is decided by pixels
@@ -43,15 +43,16 @@ def pages(driver, platform):
 @pytest.mark.smoke
 @pytest.mark.shared
 @pytest.mark.tc("TC-SPL-001")
-@pytest.mark.chk("CHK-SPL-001", "CHK-SPL-002", "CHK-SPL-003", "CHK-SPL-005", "CHK-SPL-011")
-@allure.tag("CHK-SPL-001", "CHK-SPL-002", "CHK-SPL-003", "CHK-SPL-005", "CHK-SPL-011")
+@pytest.mark.chk("CHK-SPL-001", "CHK-SPL-002", "CHK-SPL-003", "CHK-SPL-011")
+@allure.tag("CHK-SPL-001", "CHK-SPL-002", "CHK-SPL-003", "CHK-SPL-011")
 @allure.title(
-    "TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and "
-    "nothing to interact with, then opens Welcome by itself"
+    "TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo, then "
+    "opens Welcome by itself"
 )
 def test_cold_start_splash_then_welcome(app, driver, pages, expected):
-    """Split from the interaction checks (TC-SPL-005) on the owner's word (2026-10-01): one red
-    item — the system Back, BUG-SPL-002 — no longer turns these five red too."""
+    """Split on the owner's word (2026-10-01): the interaction checks are TC-SPL-005 (one red item —
+    the system Back, BUG-SPL-002 — no longer turns these red too) and the tree check is TC-SPL-006
+    (a tree read that misses the ~1-s Android splash no longer Blocks these four)."""
     splash = pages.splash.use_colour(pixels.hex_to_rgb(expected(BRAND)))
     app.clear_data()  # signed out and not running → the next launch is a cold start
     idle = driver.get_settings().get("waitForIdleTimeout")
@@ -61,12 +62,9 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
         first = splash.expect_shown_after_system_splash()  # iOS: the first frame (unchanged)
         if app.platform == "android":
             # the brand splash is up for about a second after the system one (module 01+03
-            # Android runs 3–5): the logo on the first brand frame, then the tree, which proves
-            # by itself that it was read during the splash
+            # Android runs 3–5): the logo on the first brand frame
             splash.expect_logo_centred(first)
-            splash.expect_no_interactive_elements()
         else:
-            splash.expect_no_interactive_elements()
             shown = splash.expect_shown("splash before the logo check")  # debug build: ~8 s
             splash.expect_logo_centred(shown)
     except SplashMissed as exc:
@@ -76,6 +74,34 @@ def test_cold_start_splash_then_welcome(app, driver, pages, expected):
             driver.update_settings({"waitForIdleTimeout": idle})
     pages.welcome.expect_text("title", expected(WELCOME_TITLE), LANDING)  # Welcome, not Login
     pages.login.wait_gone("root", 2)
+
+
+@pytest.mark.smoke
+@pytest.mark.shared
+@pytest.mark.tc("TC-SPL-006")
+@pytest.mark.chk("CHK-SPL-005")
+@allure.tag("CHK-SPL-005")
+@allure.title(
+    "TC-SPL-006 The splash offers nothing to interact with: no text, button, link or field"
+)
+def test_splash_has_nothing_to_interact_with(app, driver, pages, expected):
+    """CHK-SPL-005 on its own (split from TC-SPL-001, owner 2026-10-01). Android: the tree must be
+    read inside a splash of about a second — the tree proves by itself whether it was (the Welcome
+    title in it → Blocked, timing; never Passed)."""
+    splash = pages.splash.use_colour(pixels.hex_to_rgb(expected(BRAND)))
+    app.clear_data()
+    idle = driver.get_settings().get("waitForIdleTimeout")
+    driver.update_settings({"waitForIdleTimeout": 0})
+    try:
+        app.launch()
+        splash.expect_shown_after_system_splash()
+        splash.expect_no_interactive_elements()
+    except SplashMissed as exc:
+        pytest.skip(f"Blocked: timing — {exc}; the splash could not be observed in time")
+    finally:
+        if idle is not None:
+            driver.update_settings({"waitForIdleTimeout": idle})
+    pages.welcome.expect_text("title", expected(WELCOME_TITLE), LANDING)
 
 
 @pytest.mark.smoke
