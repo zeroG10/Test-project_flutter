@@ -181,7 +181,14 @@ def test_notes_synced_delete_offline_removed_after_submission(
     evidence.checkpoint("synced-note-deleted-offline")
     network.on()
     pages.details.open_submit_dialog().submit()  # DEV 500s (Q-DLV-5); the server record decides
-    body = server_job(field_services_api, job, driver, until=submitted)
+    gone = expected("QA-AUTO synced then deleted")
+    # read until submitted AND the note gone (or the wait ends): a slow server is not a failure
+    body = server_job(
+        field_services_api,
+        job,
+        driver,
+        until=lambda b: submitted(b) and gone not in [x.get("text") for x in b.get("notes") or []],
+    )
     with allure.step("expect the job submitted and the deleted note gone from the server"):
         assert body.get("statusType") == expected("submitted"), body.get("statusType")
         notes = [x.get("text") for x in body.get("notes") or []]

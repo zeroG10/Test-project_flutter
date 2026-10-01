@@ -60,7 +60,8 @@ NOTES = Screen(
         "toast": El(
             android=(
                 _UI,
-                'new UiSelector().descriptionMatches("Note (added|saved|deleted) successfully")',
+                "new UiSelector().descriptionMatches("
+                '"(?s).*Note (added|saved|deleted) successfully.*")',
             ),
             ios=(
                 _P,

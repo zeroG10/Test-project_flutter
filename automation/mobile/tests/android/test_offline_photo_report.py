@@ -180,7 +180,14 @@ def test_photo_report_synced_delete_offline_removed_after_submission(
     evidence.checkpoint("synced-photo-deleted-offline")
     network.on()
     pages.details.open_submit_dialog().submit()  # DEV 500s (Q-DLV-5); the server record decides
-    body = server_job(field_services_api, job, driver, until=submitted)
+    gone = expected("QA-AUTO synced then deleted")
+    # read until submitted AND the photo gone (or the wait ends): a slow server is not a failure
+    body = server_job(
+        field_services_api,
+        job,
+        driver,
+        until=lambda b: submitted(b) and gone not in [p.get("note") for p in b.get("photos") or []],
+    )
     with allure.step("expect the job submitted and the deleted photo gone from the server"):
         assert body.get("statusType") == expected("submitted"), body.get("statusType")
         photos = [p.get("note") for p in body.get("photos") or []]

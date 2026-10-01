@@ -80,12 +80,14 @@ PHOTO_REPORT = Screen(
             android=(
                 _UI,
                 "new UiSelector().descriptionMatches("
-                '"Photo added successfully|Changes saved successfully")',
+                '"(?s).*(Photo added successfully|Changes saved successfully).*")',
             ),
             ios=(_P, "name == 'Photo added successfully' OR name == 'Changes saved successfully'"),
             note="a bottom toast for 3 s after a save — it lies over Add photo (module 09 run 1). "
             "Android: 'Photo added successfully' confirmed in photo_report_toast.xml; "
-            "'Changes saved successfully' not reached but same Flutter text as iOS",
+            "'Changes saved successfully' not reached but same Flutter text as iOS. Offline the "
+            "toast's label merges with the offline banner's — matched as 'contains' (run "
+            "080910-r1)",
         ),
         "delete": El(
             android=(
@@ -106,7 +108,16 @@ PHOTO_ADD_SHEET = Screen(
     id="photo-add-sheet",
     anchor="title",
     elements={
-        "title": El(android=(_AID, "Add photo"), ios=(_P, _TEXT + "name == 'Add photo'")),
+        "title": El(
+            android=(
+                _UI,
+                'new UiSelector().className("android.view.View").description("Add photo")',
+            ),
+            ios=(_P, _TEXT + "name == 'Add photo'"),
+            note="Android: the sheet's title is a View; the report's own 'Add photo' buttons are "
+            "ImageViews with the same label — the bare label 'opened' the sheet before it was "
+            "there (offline run 080910-r1)",
+        ),
         "camera": El(android=(_AID, "Camera"), ios=(_P, "name == 'Camera'")),
         "gallery": El(
             android=(_AID, "Gallery"),
