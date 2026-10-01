@@ -144,7 +144,7 @@
 | 5 | open | device.network | on | network restored |
 | 6 | wait-for | connection-restored.title | — | visible within a generous wait (recon: ≈15 s) |
 | 7 | expect-text | connection-restored.message | — | contains: "unfinished job" and {{job.progress.jobId}}; "Submit your deliverables now" — names the job (CHK-DLV-026) |
-| 8 | click | connection-restored.submit | — | the app opens the job (one unfinished job) — the dialog's Submit does not submit by itself |
+| 8 | click | connection-restored.submit | — | the app opens the job when the dialog names one unfinished job, the Jobs list when it names several (then the job's card is opened) — the dialog's Submit does not submit by itself |
 | 9 | expect-visible | job-details.header[{{job.progress}}] | — | the job details |
 | 10 | click | job-details.submit-deliverables | then submit-dialog.submit | the user resubmits (FR-IP-06 "so he can resubmit it") |
 | 11 | expect-text | api.job | — | within ~15–20 s: `submitted`; `submissionDate` set; the survey answer recorded — the resubmission is recorded on the server (Q-DLV-5: DEV still answers `POST /job/{id}/submit` with 500) |
@@ -206,3 +206,5 @@
 > unfinished job (or the Jobs list for several) — it does not submit by itself (app code `app_shell.dart`, read-only;
 > observed in run 0307-r1). The oracle and the owner's D-OFF-2 answer are unchanged: the dialog informs, the user
 > resubmits from it.
+> Run 0307-r2: the dialog names every In progress job of the app's details cache — also jobs deleted on the server since
+> (earlier tests' jobs); with several named, Submit opens the Jobs list. Step 8 covers both; the named list is attached.

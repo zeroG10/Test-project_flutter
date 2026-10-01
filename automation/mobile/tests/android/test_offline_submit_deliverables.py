@@ -15,6 +15,8 @@ device is online, deleted after the test (fixtures/survey.py ``survey_job``, as 
 Every expected value goes through ``expected(...)``.
 """
 
+import re
+
 import allure
 import pytest
 
@@ -37,6 +39,7 @@ from tests.shared.test_submit_deliverables import (
 )
 
 COLD_START_WAIT = 30.0  # recon A2: cache + banner settle within ~10–15 s after a cold start
+JOB_IDS = re.compile(r"QA-AUTO-[0-9A-Z-]+")  # the job ids the Connection restored dialog names
 
 
 @pytest.fixture
@@ -124,8 +127,11 @@ def test_offline_deliverables_survive_cold_start(
     with allure.step("expect survey.text[1] = the offline answer, survived the cold start"):
         value = pages.survey.text_value(0)
         assert value == expected("QA-AUTO offline survey"), value  # CHK-DLV-025
+    pages.survey.tap("back")  # nothing changed: no unsaved-changes dialog
+    pages.details.expect_header(expected(job.title_line), SERVER)
     open_deliverable(pages, expected, "Photo report", pages.report)
     pages.report.visible("photo", text=expected("QA-AUTO offline photo"))  # survived
+    back_to_details(pages, job, expected, pages.report)
     open_deliverable(pages, expected, "Notes", pages.notes)
     pages.notes.expect_texts([expected("QA-AUTO offline note")])  # survived
     evidence.checkpoint("offline-deliverables-after-cold-start")
@@ -163,9 +169,19 @@ def test_offline_connection_restored_dialog_leads_to_resubmit(
         pages.restored.expect_text("message", fragment)  # names the job (CHK-DLV-026)
     pages.restored.visible("cancel")
     pages.restored.visible("submit")
-    # Submit takes the user to the one unfinished job (it does not submit by itself —
-    # app_shell.dart); the user resubmits there (FR-IP-06 "so he can resubmit it", D-OFF-2)
+    # Submit does not submit by itself (app_shell.dart): it opens the one unfinished job, or the
+    # Jobs list when the dialog names several — every In progress job in the app's details cache
+    # counts, also ones deleted on the server since (offline run 0307-r2). The user resubmits
+    # from there (FR-IP-06 "so he can resubmit it", D-OFF-2).
+    message = pages.restored.label_of(pages.restored.find("message"))
+    allure.attach(
+        message, name="Connection restored — message", attachment_type=allure.attachment_type.TEXT
+    )
+    named = set(JOB_IDS.findall(message))
     pages.restored.tap("submit")
+    if len(named) > 1:
+        pages.jobs.assert_open(SERVER)
+        pages.jobs.open_card(job.job_id)
     pages.details.expect_header(expected(job.title_line), SERVER)
     pages.details.open_submit_dialog().submit()  # DEV 500s (Q-DLV-5); the server record decides
     body = server_job(field_services_api, job, driver, until=submitted)
