@@ -118,12 +118,12 @@
 
 ---
 
-## TC-DLV-009 — Network back: the "Connection restored" dialog names the job; Submit from the dialog is recorded on the server
+## TC-DLV-009 — Network back: the "Connection restored" dialog names the job; its Submit leads to the job, where the resubmission is recorded on the server
 
 | Field | Value |
 |---|---|
 | ID | TC-DLV-009 |
-| Title | Network back: the "Connection restored" dialog names the job; Submit from the dialog is recorded on the server |
+| Title | Network back: the "Connection restored" dialog names the job; its Submit leads to the job, where the resubmission is recorded on the server |
 | Source CHK IDs | CHK-DLV-026 |
 | Platforms | android |
 | Priority | P1 |
@@ -131,7 +131,7 @@
 | Device / OS | Pixel 7 · Android 16 (API 36) |
 | App state | warm start, signed in |
 | Permissions | n/a |
-| Network | offline (adb) → online Wi-Fi (step 3) |
+| Network | offline (adb) → online Wi-Fi (step 5) |
 | Preconditions | `{{job.progress}}` In progress, details open; survey completed while online (as TC-DLV-007) |
 | Oracle | spec — SRS FR-IP-06 "...Inform users once connectivity is restored, that order wasn't submitted, so he can resubmit it; Automatically submit data once connectivity is restored if the submission progress was interrupted."; FR-SUB-06 "...Automatically submit deliverables when connectivity is restored"; CHK-DLV-026; D-OFF-2 (owner-pending, recon A2); observed (discovery, not proof) — recon A2 row 12, 2026-10-01 |
 
@@ -139,13 +139,15 @@
 |---|---|---|---|---|
 | 1 | open | device.network | off | network disabled |
 | 2 | expect-disabled | job-details.submit-deliverables | — | disabled offline (baseline, CHK-DLV-023) |
-| 3 | open | device.network | on | network restored |
-| 4 | wait-for | connection-restored.title | — | visible within a generous wait (recon: ≈15 s) |
-| 5 | expect-text | connection-restored.message | — | contains: "unfinished job" and {{job.progress.jobId}}; "Submit your deliverables now" — names the job (CHK-DLV-026) |
-| 6 | expect-visible | connection-restored.cancel | — | Cancel present |
-| 7 | expect-visible | connection-restored.submit | — | Submit present |
-| 8 | click | connection-restored.submit | — | submission starts from the dialog |
-| 9 | expect-text | api.job | — | within ~15–20 s: `submitted`; `submissionDate` set; the survey answer recorded — the submission is recorded on the server (Q-DLV-5: DEV still answers `POST /job/{id}/submit` with 500; the app's own success toast is checked separately by TC-DLV-004, `Blocked` on DEV) |
+| 3 | click | job-details.back | — | the Jobs list — the dialog is drawn on the tab screens only |
+| 4 | expect-visible | jobs-list.root | — | visible |
+| 5 | open | device.network | on | network restored |
+| 6 | wait-for | connection-restored.title | — | visible within a generous wait (recon: ≈15 s) |
+| 7 | expect-text | connection-restored.message | — | contains: "unfinished job" and {{job.progress.jobId}}; "Submit your deliverables now" — names the job (CHK-DLV-026) |
+| 8 | click | connection-restored.submit | — | the app opens the job (one unfinished job) — the dialog's Submit does not submit by itself |
+| 9 | expect-visible | job-details.header[{{job.progress}}] | — | the job details |
+| 10 | click | job-details.submit-deliverables | then submit-dialog.submit | the user resubmits (FR-IP-06 "so he can resubmit it") |
+| 11 | expect-text | api.job | — | within ~15–20 s: `submitted`; `submissionDate` set; the survey answer recorded — the resubmission is recorded on the server (Q-DLV-5: DEV still answers `POST /job/{id}/submit` with 500) |
 
 **Postconditions / cleanup:** network ON. Job deleted.
 **Notes:** this reuses TC-DLV-003's server-record oracle, with the "Connection restored" dialog as the trigger instead of the normal Submit flow.
@@ -198,3 +200,9 @@
   do — owner's call: UX note or bug (recon D-OFF-7), decided once for all modules it touches.
 - TC-DLV-004 (the app's own success-toast reaction to a successful submission) stays `Blocked` on
   Android too — DEV answers 500 regardless of platform (Q-DLV-5, `docs/notes/android-plan.md` §4).
+
+> **Correction after run 0307-r1 (Opus, 2026-10-01):** TC-DLV-009 steps 3–4 and 8–10 were rewritten. The dialog is drawn
+> on the tab screens only (over job details it waits unseen until the user is back on a tab), and its Submit opens the
+> unfinished job (or the Jobs list for several) — it does not submit by itself (app code `app_shell.dart`, read-only;
+> observed in run 0307-r1). The oracle and the owner's D-OFF-2 answer are unchanged: the dialog informs, the user
+> resubmits from it.

@@ -137,10 +137,10 @@ def test_offline_deliverables_survive_cold_start(
 @pytest.mark.chk("CHK-DLV-026")
 @allure.tag("CHK-DLV-026")
 @allure.title(
-    "TC-DLV-009 Network back: the 'Connection restored' dialog names the job; Submit from the "
-    "dialog is recorded on the server"
+    "TC-DLV-009 Network back: the 'Connection restored' dialog names the job; its Submit leads "
+    "to the job, where the resubmission is recorded on the server"
 )
-def test_offline_connection_restored_dialog_submits(
+def test_offline_connection_restored_dialog_leads_to_resubmit(
     survey_job, ui_login, network, field_services_api, driver, pages, expected, evidence
 ):
     job = survey_job("short")
@@ -148,6 +148,10 @@ def test_offline_connection_restored_dialog_submits(
     complete_survey(pages, expected, "QA-AUTO reconnect answer")  # precondition, as TC-DLV-007
     network.off()
     pages.details.expect_disabled("submit-deliverables")  # baseline, CHK-DLV-023
+    # the dialog is drawn on the tab screens: over job details it would wait unseen until the
+    # user is back on a tab (app_shell.dart; offline run 0307-r1) — so back to the Jobs list
+    pages.details.tap("back")
+    pages.jobs.assert_open(SERVER)
     network.on()  # waits until DNS resolves again
     pages.restored.wait_open()  # recon A2: ≈15 s after the network returns
     evidence.checkpoint("connection-restored-dialog")
@@ -159,7 +163,11 @@ def test_offline_connection_restored_dialog_submits(
         pages.restored.expect_text("message", fragment)  # names the job (CHK-DLV-026)
     pages.restored.visible("cancel")
     pages.restored.visible("submit")
-    pages.restored.tap("submit")  # submission starts from the dialog
+    # Submit takes the user to the one unfinished job (it does not submit by itself —
+    # app_shell.dart); the user resubmits there (FR-IP-06 "so he can resubmit it", D-OFF-2)
+    pages.restored.tap("submit")
+    pages.details.expect_header(expected(job.title_line), SERVER)
+    pages.details.open_submit_dialog().submit()  # DEV 500s (Q-DLV-5); the server record decides
     body = server_job(field_services_api, job, driver, until=submitted)
     resp = body.get("surveyResponse") or {}
     with allure.step("expect the submission recorded on the server (CHK-DLV-026, Q-DLV-5)"):

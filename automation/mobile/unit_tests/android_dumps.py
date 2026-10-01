@@ -10,6 +10,8 @@ app on the emulator. A locator of a screen map is evaluated on them the way UiAu
 
 UiSelector does NOT unescape ``\\n`` in a quoted value (checked on the device, 2026-09-29): a label
 with a newline needs ``accessibility id`` or a ``…Contains`` / ``…StartsWith`` matcher.
+Nor ``\\\\``: a regex ``\\\\.`` reaches the device as two backslashes and a dot and never matches a
+literal dot (offline run 0307-r1, 2026-10-01) — write ``[.]``. Only ``\\"`` is unescaped here.
 
     cd automation/mobile
     PYTHONPATH=. uv run python -m unit_tests.android_dumps [screen-id ...]   # one line per alias
@@ -79,7 +81,7 @@ def parse_selector(expr: str) -> tuple[list[tuple[str, str | bool]], int | None]
         if name == "instance":
             instance = int(ival)
         elif name in _STRING and sval is not None:
-            calls.append((name, sval.replace('\\"', '"').replace("\\\\", "\\")))
+            calls.append((name, sval.replace('\\"', '"')))  # backslashes stay, as on device
         elif name in _BOOL and bval is not None:
             calls.append((name, bval == "true"))
         else:

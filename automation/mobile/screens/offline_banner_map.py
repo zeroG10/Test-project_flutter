@@ -25,9 +25,11 @@ BANNER_TEXTS = (
 )
 # Java regex for descriptionMatches: either text, also inside a merged label ("Photo added
 # successfully\nSlow or no internet …" while a toast is up — recon A2, photo_offline_saving)
+# A dot is [.] — no backslashes: the UiSelector string is unescaped once more on the device, and
+# "\\." never matched there (offline run 0307-r1), although the offline evaluator accepted it.
 _BANNER_RE = (
-    r"(?s).*(No internet connection\\.|Slow or no internet connection\\. Check the Internet "
-    r"settings and try again\\.).*"
+    "(?s).*(No internet connection[.]|Slow or no internet connection[.] Check the Internet "
+    "settings and try again[.]).*"
 )
 _TRY_AGAIN = 'new UiSelector().className("android.view.View").description("Try again")'
 _BUTTON = 'new UiSelector().className("android.widget.Button").description("{}")'
