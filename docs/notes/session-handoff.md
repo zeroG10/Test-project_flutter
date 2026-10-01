@@ -846,6 +846,16 @@ happy flow → валідації); які пункти чеклісту кож�
   **валідація власника (ворота кроку 5)** → автоматизація (`tests/android/`), прогін, prove-red, трасованість.
 - Інструменти: `recon_android.py` — дії `email` / `otp`; `app_logs.py --android` (адреса VM service з logcat + `adb
   forward`; журнал містить токен — лише в scratchpad).
+- **Ворота пройдено (2026-10-01):** власник відповів на D-OFF-1…9 (`docs/notes/decisions.md`), тест-кейси — без зауважень
+  (23 TC, статус «validated»). D-OFF-1 — баг після автотесту (TC-AUTH-017 має впасти на Verify); D-OFF-6 — відкрите;
+  D-OFF-7 — зауваження до інтерфейсу.
+- **Інструментарій офлайн (`a06d301`):** `screens/offline_banner_map.py` (плашка: `message` за обома текстами, `try-again`,
+  `close` — ✕ без назви, тап праворуч від Try again; `connection-restored.*`), нові псевдоніми: notifications `offline-title`
+  / `offline-text` / `try-again`, job-details `offline-message`, otp `network-error`; `Adb.set_network(on)` (після ON чекає,
+  поки пристрій знайде хост API), `Adb.throttled()`; `pages/android/offline_page.py` (`OfflineBanner.close()`,
+  `ConnectionRestoredDialog.dismiss()`); фікстура `network` (`fixtures/network.py`: off / on / slow, у finally — ON, full).
+- **Далі:** 3 субагенти Sonnet пишуть `tests/android/test_offline_*.py` (9 файлів) → перегляд Opus → прогони → prove-red →
+  `/bmad-testarch-test-review` → трасованість → баг D-OFF-1 (з доказами) → розділити TC-SPL-001 (власник «ок»).
 
 ## 4. Ключові факти (деталі — у файлах за посиланнями)
 
