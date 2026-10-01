@@ -19,7 +19,7 @@
 | # | Де | Що на екрані (Android 16) | Оракул (SRS) | Збіг |
 |---|---|---|---|---|
 | 1 | Будь-який екран | Плашка під панеллю застосунку: перші ~5 с «Slow or no internet connection. Check the Internet settings and try again.» + ✕, далі «No internet connection.» + «Try again» + ✕. Знову з'являється при кожній втраті зв'язку | §3.3.1: «display a “No Internet connection” message» | так |
-| 2 | Вхід (Continue) | Плашка з п. 1; окремого повідомлення на екрані входу в дереві через 6 с немає (у коді — «An unexpected error occurred. Please try logging in again.», можливо коротко) — **перевірить тест одразу після тапу** | FR-LOG-09: «show a generic error and allow retry» | уточнити тестом |
+| 2 | Вхід (Continue) | Плашка з п. 1 і внизу коротке повідомлення **«An unexpected error occurred. Please try logging in again.»** — видно ≈ 3 с після тапу, потім зникає (дамп `login_offline_0s`; перша спроба розвідки знімала дерево через 6 с і його не застала) | FR-LOG-09: «show a generic error and allow retry» | так |
 | 3 | Код (Verify) | Під полем — «No internet connection» (червоним), плашка з п. 1 | FR-OTP-12: «display a generic error and allow retry» | помилка — так |
 | 4 | Код після повернення мережі | **Verify видно активним, але тап нічого не робить** (ні запиту, ні запису в журналі апки), доки не змінити цифру коду — тоді код перевіряється сам, вхід проходить. Код апки: після помилки стан `error`, а Verify приймається лише зі стану `initial` | FR-OTP-12 «allow retry», CHK-AUTH-100 | **ні → D-AUTH-A?** |
 | 5 | Реєстрація | у коді — SnackBar «No internet connection»; наживо не проходили (довга форма) — **перевірить тест** | FR-REG-10 | уточнити тестом |
