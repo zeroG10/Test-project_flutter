@@ -10,7 +10,7 @@ Generated: 2026-10-01 11:16 UTC by `automation/tools/trace_results.py` (read-onl
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `4275466` (splash, 01-split-r3); `9d43c00`-era run 6 for the rest (see run 6 notes); `64da953` (offline)
+- Harness commit (this repo): `4275466` (splash, 01-split-r3); `4de7949` (run 6, the rest); `64da953` (offline)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
 - Run label (suite / filter): `MERGED: splash tests of module 01 run 01-split-r3 (harness 4275466 — TC-SPL-001 split into TC-SPL-001, -005, -006 on the owner's word) + the rest of module 01+03 run 6 (2026-09-30) + step 5 offline TC-SPL-004 (run offline-all-r1, harness 64da953), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
