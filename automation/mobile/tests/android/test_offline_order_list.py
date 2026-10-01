@@ -114,20 +114,23 @@ def test_offline_cached_list_and_calendar_with_banner(
 @allure.title(
     "TC-ORDL-017 Offline: pulling the list and tapping 'Try again' keep the cached list, no crash"
 )
-def test_offline_pull_and_try_again_keep_cached_list(job_new, ui_login, network, pages, evidence):
+def test_offline_pull_and_try_again_keep_cached_list(
+    job_new, ui_login, network, pages, expected, evidence
+):
     jobs, banner = pages.jobs, pages.banner
+    card = expected(job_new.job_id)  # the card the user must keep seeing
     jobs.pull_to_refresh()  # precondition: cache primed while online
-    jobs.visible("card", text=job_new.job_id)
+    jobs.visible("card", text=card)
     network.off()
     jobs.pull_to_refresh()  # retry attempt 1, offline
-    jobs.visible("card", text=job_new.job_id)  # same cached list, no crash
+    jobs.visible("card", text=card)  # same cached list, no crash
     banner.visible("try-again")
     evidence.checkpoint("offline-try-again")
     banner.tap("try-again")
-    jobs.visible("card", text=job_new.job_id)  # list unchanged, no crash
+    jobs.visible("card", text=card)  # list unchanged, no crash
     banner.expect_shown()  # banner persists (network still off)
     jobs.pull_to_refresh()  # retry attempt 2
-    jobs.visible("card", text=job_new.job_id)  # still stable after repeated retries (CHK-ORDL-034)
+    jobs.visible("card", text=card)  # still stable after repeated retries (CHK-ORDL-034)
 
 
 @pytest.mark.android
@@ -140,7 +143,7 @@ def test_offline_pull_and_try_again_keep_cached_list(job_new, ui_login, network,
     "by itself, without a manual pull"
 )
 def test_offline_created_job_appears_on_reconnect(
-    ui_login, network, job_offline_creator, pages, evidence
+    ui_login, network, job_offline_creator, pages, expected, evidence
 ):
     jobs, banner = pages.jobs, pages.banner
     jobs.pull_to_refresh()  # precondition: list already refreshed online
@@ -152,7 +155,7 @@ def test_offline_created_job_appears_on_reconnect(
     # earlier tests' In progress jobs stay in the app's cache: the "Connection restored" dialog
     # may come over the list (D-OFF-10) — closed, then the list is read
     pages.restored.close_if_shown()
-    jobs.visible("card", RECONNECT_WAIT, text=job.job_id)  # auto-refresh on reconnect, no pull
+    jobs.visible("card", RECONNECT_WAIT, text=expected(job.job_id))  # auto-refresh, no pull
     evidence.checkpoint("offline-created-job-synced")
     banner.wait_gone("message")  # banner gone now that the network is back
 

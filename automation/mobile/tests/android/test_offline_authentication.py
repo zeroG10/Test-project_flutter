@@ -160,6 +160,7 @@ def test_otp_slow_network_single_transition(logged_out_app, network, pages, tech
     pages.otp.enter_code(tech.otp)  # fill otp.code {{tech.otp}} — submits automatically, slow
 
     pages.jobs.assert_open(SLOW)  # wait-for jobs-list.root — a single transition, not several
+    pages.jobs.expect_text("root", expected("Jobs list"))  # signed in: the Jobs list
     pages.otp.wait_gone("root", 2)  # expect-hidden otp.root — exactly one OTP screen existed
     pages.jobs.go_back()  # back — system Back from the Jobs list
     pages.otp.wait_gone("root", 2)  # expect-hidden otp.root — no duplicate screen in the back stack
