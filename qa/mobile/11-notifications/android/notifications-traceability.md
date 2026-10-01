@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-30 20:24 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/11-notifications/notifications-checklist.md` — 31 items
-- Results (allure): `automation/mobile/results/android/2026-09-30-11-r2` — 6 tests (6 passed, 0 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-10-01-11-with-offline` — 7 tests (7 passed, 0 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `7837664`
+- Harness commit (this repo): `7837664`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `module 11 run 2 (tests/shared/test_notifications.py, 2026-09-30); push banner: the app's notifications switched off in Android Settings, the app's new request answered 'Don't allow' (D-NOTIF-A4)`
+- Run label (suite / filter): `MERGED: step 4 — module 11 run 2 (tests/shared/test_notifications.py, 2026-09-30); push banner: the app's notifications switched off in Android Settings, the app's new request answered 'Don't allow' (D-NOTIF-A4) — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -47,11 +47,11 @@ Generated: 2026-09-30 20:24 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-NOTIF-026 | Check that the empty state is displayed when no notifications exist for the use… | 1 — `tests.shared.test_notifications#test_tab_and_empty_state (TC-NOTIF-001 The Notifications tab: 'Notification list', the tab selected, the empty state)` | Passed | allure: passed |
 | CHK-NOTIF-027 | Check that the empty state displays the text “No notifications yet” and “You’ll… | 1 — `tests.shared.test_notifications#test_tab_and_empty_state (TC-NOTIF-001 The Notifications tab: 'Notification list', the tab selected, the empty state)` | Passed | allure: passed |
 | CHK-NOTIF-028 | Check that the push notifications banner (if push disabled) can still be shown… | 1 — `tests.shared.test_notifications#test_push_banner (TC-NOTIF-005 Push not allowed: the banner with its texts, together with the empty state; Go to Settings opens Settings; allowed again: no banner)` | Passed | allure: passed |
-| CHK-NOTIF-029 | Check that if the device is offline, the screen shows cached notifications if a… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-NOTIF-030 | Check that if the device is offline, the screen shows cached notifications if a… | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-NOTIF-029 | Check that if the device is offline, the screen shows cached notifications if a… | 1 — `tests.android.test_offline_notifications#test_notifications_offline_no_cache (TC-NOTIF-007 Offline: no cached rows, only the offline message and 'Try again'; back online, 'Try again' shows the list)` | Passed | allure: passed |
+| CHK-NOTIF-030 | Check that if the device is offline, the screen shows cached notifications if a… | 1 — `tests.android.test_offline_notifications#test_notifications_offline_no_cache (TC-NOTIF-007 Offline: no cached rows, only the offline message and 'Try again'; back online, 'Try again' shows the list)` | Passed | allure: passed |
 | CHK-NOTIF-031 | Check that long job names in notification descriptions are truncated gracefully… | 1 — `tests.shared.test_notifications#test_long_list (TC-NOTIF-006 A long list scrolls; a long job name wraps inside the screen; rows do not overlap)` | Passed | allure: passed |
 
-**Summary:** total 31 · automated 26 · Passed 26 · Failed 0 · Blocked 0 · Not run 5 (= total − Passed − Failed − Blocked)
+**Summary:** total 31 · automated 28 · Passed 28 · Failed 0 · Blocked 0 · Not run 3 (= total − Passed − Failed − Blocked)
 
 > **Notes (2026-09-30):**
 > - All 26 automated items **Passed on Android**, as on iOS.
@@ -63,3 +63,4 @@ Generated: 2026-09-30 20:24 UTC by `automation/tools/trace_results.py` (read-onl
 > - Prove-red (`--prove-red`, harness `7837664`): 6 of 6 failed, each on the deliberately wrong expected value; 14 jobs
 >   seeded, 14 removed; the notification permission is granted again after the run.
 
+> **Step 5 — offline (2026-10-01):** Step 5 (2026-10-01) added this module's `android-stage` checks — offline / slow network, Android only (owner, android-plan §2.5); test cases `../android/*-test-cases.md` (validated by the owner), tests `automation/mobile/tests/android/test_offline_*.py`, recon `qa/shared/recon-2026-10-01-android-offline.md`. CHK-NOTIF-029, -030 **Passed** (TC-NOTIF-007: no cache — the offline message and Try again, D-OFF-4; the list reloads by itself once the connection is back).

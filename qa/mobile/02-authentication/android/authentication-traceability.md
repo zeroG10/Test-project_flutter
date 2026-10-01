@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-29 13:01 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/02-authentication/authentication-checklist.md` — 126 items
-- Results (allure): `automation/mobile/results/android/2026-09-29-02-auth-r6` — 31 tests (30 passed, 1 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-10-01-02-with-offline` — 35 tests (33 passed, 2 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `d109f2e`
+- Harness commit (this repo): `d109f2e`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `pytest --platform=android tests/shared/test_authentication.py (run 6, 2026-09-29)`
+- Run label (suite / filter): `MERGED: step 4 — pytest --platform=android tests/shared/test_authentication.py (run 6, 2026-09-29) — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -88,7 +88,7 @@ Generated: 2026-09-29 13:01 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-AUTH-067 | Check that multiple rapid taps on Continue do not trigger duplicate registratio… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-AUTH-068 | Check that entered form values remain preserved if registration fails. | 1 — `tests.shared.test_authentication#test_registration_duplicate_phone (TC-AUTH-014 Registering with an already registered phone shows an error, keeps the values and allows a retry)` | Passed | allure: passed |
 | CHK-AUTH-069 | Check that the error message “An account with this phone number already exists.… | 1 — `tests.shared.test_authentication#test_registration_duplicate_phone (TC-AUTH-014 Registering with an already registered phone shows an error, keeps the values and allows a retry)` | Passed | allure: passed |
-| CHK-AUTH-070 | Check that a generic error message is displayed when registration fails due to… | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-AUTH-070 | Check that a generic error message is displayed when registration fails due to… | 1 — `tests.android.test_offline_authentication#test_registration_offline_then_retry_online (TC-AUTH-016 Registration offline shows the error and keeps the form; back online, Continue retries and reaches OTP)` | Passed | allure: passed |
 | CHK-AUTH-071 | Check that the user can retry registration after an error without reopening the… | 1 — `tests.shared.test_authentication#test_registration_duplicate_phone (TC-AUTH-014 Registering with an already registered phone shows an error, keeps the values and allows a retry)` | Passed | allure: passed |
 | CHK-AUTH-072 | Check that the Phone number verification screen displays the verified phone num… | 1 — `tests.shared.test_authentication#test_login_with_phone (TC-AUTH-006 Login with a phone number opens Phone verification and completes sign-in)` | Passed | allure: passed |
 | CHK-AUTH-073 | Check that the Email address verification screen displays the verified email ad… | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | Passed | allure: passed |
@@ -116,9 +116,9 @@ Generated: 2026-09-29 13:01 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-AUTH-095 | Check that requesting a new code restarts the countdown timer. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-AUTH-096 | Check that the verification flow works correctly for both SMS and Email deliver… | 1 — `tests.shared.test_authentication#test_login_with_phone (TC-AUTH-006 Login with a phone number opens Phone verification and completes sign-in)` | Passed | allure: passed |
 | CHK-AUTH-097 | Check that tapping the back arrow returns the user to the previous authenticati… | 1 — `tests.shared.test_authentication#test_otp_partial_code_countdown_and_back (TC-AUTH-009 OTP: Verify disabled below 4 digits, resend locked during the countdown, back returns to Login without signing in)` | Passed | allure: passed |
-| CHK-AUTH-098 | Check that OTP verification handles slow network responses without UI freezes o… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-AUTH-099 | Check that a generic error message is displayed if OTP verification fails due t… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-AUTH-100 | Check that the user can retry OTP verification after network-related failures. | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-AUTH-098 | Check that OTP verification handles slow network responses without UI freezes o… | 1 — `tests.android.test_offline_authentication#test_otp_slow_network_single_transition (TC-AUTH-018 OTP verification on a slow network: one verification pass, one navigation to the Jobs list, no duplicate OTP screen in the back stack)` | Passed | allure: passed |
+| CHK-AUTH-099 | Check that a generic error message is displayed if OTP verification fails due t… | 1 — `tests.android.test_offline_authentication#test_otp_offline_then_verify_retry (TC-AUTH-017 OTP offline shows 'No internet connection' under the code field; the owner's retry (tap Verify) once back online)` | Failed | allure: failed — selenium.common.exceptions.TimeoutException: Message: ('accessibility id', 'Jobs list') not visible within 20.0s |
+| CHK-AUTH-100 | Check that the user can retry OTP verification after network-related failures. | 1 — `tests.android.test_offline_authentication#test_otp_offline_then_verify_retry (TC-AUTH-017 OTP offline shows 'No internet connection' under the code field; the owner's retry (tap Verify) once back online)` | Failed | allure: failed — selenium.common.exceptions.TimeoutException: Message: ('accessibility id', 'Jobs list') not visible within 20.0s |
 | CHK-AUTH-101 | Check that OTP retry limits are enforced if configured by backend rules. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-AUTH-102 | Check that OTP state is preserved or reset correctly after reopening the verifi… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-AUTH-103 | Check that the Login screen is displayed when the user taps “Log in” from the W… | 1 — `tests.shared.test_authentication#test_welcome_actions (TC-AUTH-002 Welcome actions open Registration and Login)` | Passed | allure: passed |
@@ -142,11 +142,19 @@ Generated: 2026-09-29 13:01 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-AUTH-121 | Check that entered login values remain preserved if login fails. | 1 — `tests.shared.test_authentication#test_login_rejects_invalid_and_unregistered_email (TC-AUTH-007 Login rejects an invalid format and an unregistered email, retry in place)` | Passed | allure: passed |
 | CHK-AUTH-122 | Check that the error message “This phone number is not registered yet. Create a… | 1 — `tests.shared.test_authentication#test_login_rejects_unregistered_phone (TC-AUTH-007 Login rejects an unregistered phone number)` | Failed | allure: failed — selenium.common.exceptions.TimeoutException: Message: ('accessibility id', 'This phone number is not registered yet. Create an account to get started.') not vi… |
 | CHK-AUTH-123 | Check that the error message “This email is not registered yet. Create an accou… | 1 — `tests.shared.test_authentication#test_login_rejects_invalid_and_unregistered_email (TC-AUTH-007 Login rejects an invalid format and an unregistered email, retry in place)` | Passed | allure: passed |
-| CHK-AUTH-124 | Check that a generic error message is displayed if login fails due to backend o… | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-AUTH-124 | Check that a generic error message is displayed if login fails due to backend o… | 1 — `tests.android.test_offline_authentication#test_login_offline_then_retry_online (TC-AUTH-015 Login offline shows the generic connectivity error and blocks navigation; back online, Continue retries without reopening the screen)` | Passed | allure: passed |
 | CHK-AUTH-125 | Check that the user can retry login without reopening the Login screen after a… | 1 — `tests.shared.test_authentication#test_login_rejects_invalid_and_unregistered_email (TC-AUTH-007 Login rejects an invalid format and an unregistered email, retry in place)` | Passed | allure: passed |
 | CHK-AUTH-126 | Check that authenticated-only screens remain inaccessible without successful OT… | 1 — `tests.shared.test_authentication#test_otp_partial_code_countdown_and_back (TC-AUTH-009 OTP: Verify disabled below 4 digits, resend locked during the countdown, back returns to Login without signing in)` | Passed | allure: passed |
 
-**Summary:** total 126 · automated 81 · Passed 80 · Failed 1 · Blocked 0 · Not run 45 (= total − Passed − Failed − Blocked)
+**Summary:** total 126 · automated 86 · Passed 83 · Failed 3 · Blocked 0 · Not run 40 (= total − Passed − Failed − Blocked)
+
+## Tagged tests with no checklist item
+
+These CHK IDs appear in test tags but in none of the checklists above — a stale tag, a typo, or a missing `--checklist`. They count for nothing until resolved.
+
+| CHK ID | Tests | Statuses |
+|---|---|---|
+| CHK-ORDL-001 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
 
 ## Tagged tests with no checklist item
 
@@ -160,3 +168,5 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 > the landing screen after login). Its verdict is traced by the module 01+03 Android run, which includes this test —
 > as on iOS (`qa/mobile/03-order-list/ios/order-list-traceability.md`). The Failed row CHK-AUTH-122 is
 > [BUG-AUTH-001](../bugs/BUG-AUTH-001.md) (reproduced on Android, 3 of 3).
+
+> **Step 5 — offline (2026-10-01):** Step 5 (2026-10-01) added this module's `android-stage` checks — offline / slow network, Android only (owner, android-plan §2.5); test cases `../android/*-test-cases.md` (validated by the owner), tests `automation/mobile/tests/android/test_offline_*.py`, recon `qa/shared/recon-2026-10-01-android-offline.md`. CHK-AUTH-070, -098, -124 **Passed** (TC-AUTH-016, -018, -015). **CHK-AUTH-099 / -100 Failed** — both through TC-AUTH-017, which fails at the retry: after the connection error Verify does nothing until a digit is changed → **[BUG-AUTH-003](../bugs/BUG-AUTH-003.md)** (filed on the owner's go, D-OFF-1). The step behind CHK-AUTH-099 ("No internet connection" under the code) **passed** inside that test; the tool marks every item of a failed test Failed.

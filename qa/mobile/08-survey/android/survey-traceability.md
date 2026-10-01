@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-30 13:53 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/08-survey/survey-checklist.md` — 57 items
-- Results (allure): `automation/mobile/results/android/2026-09-30-08-r6-merged` — 16 tests (16 passed, 0 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-10-01-08-with-offline` — 19 tests (19 passed, 0 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `4e70865` for run 6, `ef51776` for the TC-SRV-014 rerun (see the run label)
+- Harness commit (this repo): `4e70865` for run 6, `ef51776` for the TC-SRV-014 rerun (see the run label); step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `MERGED: module 08 run 6 (harness 4e70865, 15 tests) + TC-SRV-014 rerun (harness ef51776: the Android thumbnail check scrolls first), 2026-09-30; published DEV surveys read-only, one In progress job per test`
+- Run label (suite / filter): `MERGED: step 4 — MERGED: module 08 run 6 (harness 4e70865, 15 tests) + TC-SRV-014 rerun (harness ef51776: the Android thumbnail check scrolls first), 2026-09-30; published DEV surveys read-only, one In progress job per test — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -41,11 +41,11 @@ Generated: 2026-09-30 13:53 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-SRV-020 | Check that attached photo thumbnails are displayed inside the Evidence section… | 2 — `tests.shared.test_survey#test_all_field_types (TC-SRV-002 Mo3: every field type takes its answer, and the server stores each value)`; `tests.shared.test_survey#test_photos (TC-SRV-014 Photos: required, several per question, kept after leaving, compressed, and stored under their question / entry)` | Passed | allure: passed<br>allure: passed |
 | CHK-SRV-021 | Check that photos are compressed before upload while maintaining acceptable vis… | 1 — `tests.shared.test_survey#test_photos (TC-SRV-014 Photos: required, several per question, kept after leaving, compressed, and stored under their question / entry)` | Passed | allure: passed |
 | CHK-SRV-022 | Check that attached photos remain visible in the survey after navigating away a… | 1 — `tests.shared.test_survey#test_photos (TC-SRV-014 Photos: required, several per question, kept after leaving, compressed, and stored under their question / entry)` | Passed | allure: passed |
-| CHK-SRV-023 | Check that attached photos remain available after app restart while offline. | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-SRV-024 | Check that the survey is fully functional when the device is offline. | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-SRV-025 | Check that survey responses can be edited and saved while offline. | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-SRV-026 | Check that attached photos are stored locally when added offline. | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-SRV-027 | Check that survey data and photos are automatically synced when connectivity is… | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-SRV-023 | Check that attached photos remain available after app restart while offline. | 1 — `tests.android.test_offline_survey#test_survey_offline_photo_kept_after_cold_start (TC-SRV-018 Offline: a photo attached to a survey photo question is kept, also after a cold start while still offline)` | Passed | allure: passed |
+| CHK-SRV-024 | Check that the survey is fully functional when the device is offline. | 1 — `tests.android.test_offline_survey#test_survey_offline_answer_change_save (TC-SRV-017 Offline: the survey is reachable and fully functional — answer, change the answer, and Save all work with no network)` | Passed | allure: passed |
+| CHK-SRV-025 | Check that survey responses can be edited and saved while offline. | 1 — `tests.android.test_offline_survey#test_survey_offline_answer_change_save (TC-SRV-017 Offline: the survey is reachable and fully functional — answer, change the answer, and Save all work with no network)` | Passed | allure: passed |
+| CHK-SRV-026 | Check that attached photos are stored locally when added offline. | 1 — `tests.android.test_offline_survey#test_survey_offline_photo_kept_after_cold_start (TC-SRV-018 Offline: a photo attached to a survey photo question is kept, also after a cold start while still offline)` | Passed | allure: passed |
+| CHK-SRV-027 | Check that survey data and photos are automatically synced when connectivity is… | 1 — `tests.android.test_offline_survey#test_survey_offline_sync_on_network_back (TC-SRV-019 Network back: the survey answers and the attached photo from TC-SRV-018 are synced to the server within about 15 s)` | Passed | allure: passed |
 | CHK-SRV-028 | Check that an error message is displayed if survey data fails to save locally. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-SRV-029 | Check that entered survey data is preserved when a save error occurs. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-SRV-030 | Check that the user is allowed to retry saving the survey after a save failure. | 0 |  | no tagged test — not run (manual / exploratory), never green |
@@ -77,7 +77,7 @@ Generated: 2026-09-30 13:53 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-SRV-056 | Check that a survey with no questions opens and can be saved. | 1 — `tests.shared.test_survey#test_empty_survey (TC-SRV-015 A survey with no questions opens and saves)` | Passed | allure: passed |
 | CHK-SRV-057 | Check that an "Other" option asks for its own text, and that text is required. | 1 — `tests.shared.test_survey#test_all_field_types (TC-SRV-002 Mo3: every field type takes its answer, and the server stores each value)` | Passed | allure: passed |
 
-**Summary:** total 57 · automated 46 · Passed 46 · Failed 0 · Blocked 0 · Not run 11 (= total − Passed − Failed − Blocked)
+**Summary:** total 57 · automated 51 · Passed 51 · Failed 0 · Blocked 0 · Not run 6 (= total − Passed − Failed − Blocked)
 
 > **Notes (2026-09-30):**
 > - All 46 automated items **Passed on Android**, as on iOS. The Android survey page walks the form (Flutter hands
@@ -89,3 +89,4 @@ Generated: 2026-09-30 13:53 UTC by `automation/tools/trace_results.py` (read-onl
 > - The harness commit in `RUN_INFO.txt` of run 6 reads `ef51776` because `run.sh` recorded it at the END of the run;
 >   the run started on `4e70865` — fixed in `run.sh` (recorded at the start now).
 
+> **Step 5 — offline (2026-10-01):** Step 5 (2026-10-01) added this module's `android-stage` checks — offline / slow network, Android only (owner, android-plan §2.5); test cases `../android/*-test-cases.md` (validated by the owner), tests `automation/mobile/tests/android/test_offline_*.py`, recon `qa/shared/recon-2026-10-01-android-offline.md`. CHK-SRV-023…027 **Passed** (TC-SRV-017…019): the survey works offline, an offline photo survives a cold start, answers and photos reach the server after the connection returns.

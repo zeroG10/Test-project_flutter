@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-30 19:48 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/10-notes/notes-checklist.md` — 52 items
-- Results (allure): `automation/mobile/results/android/2026-09-30-10-r2-merged` — 7 tests (7 passed, 0 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-10-01-10-with-offline` — 10 tests (8 passed, 2 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `8c286b4` for run 2, `f66e0a3` for the TC-NOTE-003 rerun (see the run label)
+- Harness commit (this repo): `8c286b4` for run 2, `f66e0a3` for the TC-NOTE-003 rerun (see the run label); step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `MERGED: module 10 run 2 (harness 8c286b4, 6 tests) + TC-NOTE-003 rerun (harness f66e0a3: the over-limit text is typed key by key), 2026-09-30; one In progress job per test`
+- Run label (suite / filter): `MERGED: step 4 — MERGED: module 10 run 2 (harness 8c286b4, 6 tests) + TC-NOTE-003 rerun (harness f66e0a3: the over-limit text is typed key by key), 2026-09-30; one In progress job per test — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -61,18 +61,18 @@ Generated: 2026-09-30 19:48 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-NOTE-040 | Check that deleted notes are no longer accessible for viewing or editing. | 1 — `tests.shared.test_notes#test_delete_note (TC-NOTE-005 Deleting from ⋮ and from 'Edit note': the dialog, Cancel keeps, Delete removes with 'Note deleted successfully')` | Passed | allure: passed |
 | CHK-NOTE-041 | Check that deleting a required note updates the deliverables completion state a… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-NOTE-042 | Check that notes cannot be edited or deleted after deliverables are submitted. | 1 — `tests.shared.test_notes#test_submitted_notes_read_only (TC-NOTE-007 After the deliverables are submitted, Notes cannot be opened or changed)` | Passed | allure: passed |
-| CHK-NOTE-043 | Check that notes can be created, edited, and deleted while the device is offlin… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-NOTE-044 | Check that offline note changes are stored locally on the device. | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-NOTE-045 | Check that locally stored note changes are synced automatically when connectivi… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-NOTE-046 | Check that deleting an unsynced note removes it from local storage immediately. | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-NOTE-047 | Check that deleting a synced note queues the deletion and syncs it when the dev… | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-NOTE-043 | Check that notes can be created, edited, and deleted while the device is offlin… | 1 — `tests.android.test_offline_notes#test_notes_offline_create_edit_delete_cold_start (TC-NOTE-008 Offline: create a note, edit it, then delete a second note at once — kept after a cold start, still offline)` | Passed | allure: passed |
+| CHK-NOTE-044 | Check that offline note changes are stored locally on the device. | 1 — `tests.android.test_offline_notes#test_notes_offline_create_edit_delete_cold_start (TC-NOTE-008 Offline: create a note, edit it, then delete a second note at once — kept after a cold start, still offline)` | Passed | allure: passed |
+| CHK-NOTE-045 | Check that locally stored note changes are synced automatically when connectivi… | 1 — `tests.android.test_offline_notes#test_notes_offline_sync_on_network_back (TC-NOTE-009 Network back: notes created and edited offline are synced to the server; the note deleted while unsynced never reaches it)` | Failed | allure: failed — AssertionError: [] |
+| CHK-NOTE-046 | Check that deleting an unsynced note removes it from local storage immediately. | 1 — `tests.android.test_offline_notes#test_notes_offline_create_edit_delete_cold_start (TC-NOTE-008 Offline: create a note, edit it, then delete a second note at once — kept after a cold start, still offline)` | Passed | allure: passed |
+| CHK-NOTE-047 | Check that deleting a synced note queues the deletion and syncs it when the dev… | 1 — `tests.android.test_offline_notes#test_notes_synced_delete_offline_removed_after_submission (TC-NOTE-010 A synced note deleted offline: network back → submit deliverables → the server has no such note (D-OFF-3))` | Failed | allure: failed — AssertionError: ['QA-AUTO synced then deleted'] |
 | CHK-NOTE-048 | Check that an error message is displayed if saving a note fails. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-NOTE-049 | Check that the note content is preserved when a save error occurs. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-NOTE-050 | Check that the user can retry saving the note after a failure. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-NOTE-051 | Check that an error message is displayed if note deletion fails. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-NOTE-052 | Check that the note is retained when deletion fails and the user can retry. | 0 |  | no tagged test — not run (manual / exploratory), never green |
 
-**Summary:** total 52 · automated 41 · Passed 41 · Failed 0 · Blocked 0 · Not run 11 (= total − Passed − Failed − Blocked)
+**Summary:** total 52 · automated 46 · Passed 44 · Failed 2 · Blocked 0 · Not run 6 (= total − Passed − Failed − Blocked)
 
 > **Notes (2026-09-30):**
 > - All 41 automated items **Passed on Android**, as on iOS. BUG-NOTE-001 stays not filed (owner, 2026-09-26) — no
@@ -86,3 +86,5 @@ Generated: 2026-09-30 19:48 UTC by `automation/tools/trace_results.py` (read-onl
 >   source is contradicted; how an over-long set is cut is not specified. Runs 1 and 2 (508 and 501 characters set)
 >   gave 493 both times.
 > - **Merged:** run 2 (6 tests) and a TC-NOTE-003 rerun after that harness change; run 2's own TC-NOTE-003 is left out.
+
+> **Step 5 — offline (2026-10-01):** Step 5 (2026-10-01) added this module's `android-stage` checks — offline / slow network, Android only (owner, android-plan §2.5); test cases `../android/*-test-cases.md` (validated by the owner), tests `automation/mobile/tests/android/test_offline_*.py`, recon `qa/shared/recon-2026-10-01-android-offline.md`. CHK-NOTE-043, -044, -046 **Passed** (TC-NOTE-008). **CHK-NOTE-045 Failed** (TC-NOTE-009): a note created AND edited offline is not sent when the connection returns (only with the submission) — draft **[BUG-NOTE-002](../bugs/BUG-NOTE-002.md)**, owner decides; a note created offline without an edit does sync (recon). **CHK-NOTE-047 Failed** (TC-NOTE-010): a synced note deleted offline stays on the server after the submission (D-OFF-3) — evidence added to [BUG-NOTE-001](../bugs/BUG-NOTE-001.md), owner decides.

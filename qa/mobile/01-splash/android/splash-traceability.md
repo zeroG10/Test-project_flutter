@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-30 06:57 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/01-splash/splash-checklist.md` — 15 items
-- Results (allure): `automation/mobile/results/android/2026-09-30-0103-r6` — 20 tests (15 passed, 5 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-10-01-01-with-offline` — 21 tests (16 passed, 5 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `4de7949`
+- Harness commit (this repo): `4de7949`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `pytest --platform=android tests/shared/test_splash.py tests/shared/test_order_list.py tests/shared/test_authentication.py::test_login_with_email (run 6, 2026-09-30)`
+- Run label (suite / filter): `MERGED: step 4 — pytest --platform=android tests/shared/test_splash.py tests/shared/test_order_list.py tests/shared/test_authentication.py::test_login_with_email (run 6, 2026-09-30) — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -33,9 +33,79 @@ Generated: 2026-09-30 06:57 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-SPL-012 | Check that the application automatically navigates to the Home / Jobs List or C… | 1 — `tests.shared.test_splash#test_session_hands_over_to_jobs (TC-SPL-002 With a valid session, the splash hands over to the Jobs list and Welcome never appears)` | Passed | allure: passed |
 | CHK-SPL-013 | Check that the transition from the Splash Screen to the next screen occurs auto… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-SPL-014 | Check that the Splash Screen is displayed for the minimum required time needed… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-SPL-015 | Check that the Splash Screen handles slow initialization gracefully without vis… | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-SPL-015 | Check that the Splash Screen handles slow initialization gracefully without vis… | 1 — `tests.android.test_offline_splash#test_slow_network_splash_hands_over (TC-SPL-004 On a slow network the splash hands over to the next screen automatically, with no error and a centred logo)` | Passed | allure: passed |
 
-**Summary:** total 15 · automated 9 · Passed 2 · Failed 7 · Blocked 0 · Not run 6 (= total − Passed − Failed − Blocked)
+**Summary:** total 15 · automated 10 · Passed 3 · Failed 7 · Blocked 0 · Not run 5 (= total − Passed − Failed − Blocked)
+
+## Tagged tests with no checklist item
+
+These CHK IDs appear in test tags but in none of the checklists above — a stale tag, a typo, or a missing `--checklist`. They count for nothing until resolved.
+
+| CHK ID | Tests | Statuses |
+|---|---|---|
+| CHK-AUTH-073 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-074 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-075 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-088 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-089 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-110 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-115 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-117 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-119 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-ORDD-001 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
+| CHK-ORDD-002 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
+| CHK-ORDL-001 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-ORDL-002 | 1 — `tests.shared.test_order_list#test_own_phone_link_opens_jobs (TC-ORDL-013 A job link for the technician's own phone opens the Jobs list)` | passed |
+| CHK-ORDL-003 | 1 — `tests.shared.test_order_list#test_signed_out_job_links (TC-ORDL-011 Signed out, a job link does not open the Jobs list: an unknown key shows 'Link expired', a valid key leads to registration)` | passed |
+| CHK-ORDL-004 | 1 — `tests.shared.test_order_list#test_mismatch_dialog_shown (TC-ORDL-012 A job link for another phone number shows the mismatch dialog)` | passed |
+| CHK-ORDL-005 | 1 — `tests.shared.test_order_list#test_mismatch_dialog_shown (TC-ORDL-012 A job link for another phone number shows the mismatch dialog)` | passed |
+| CHK-ORDL-006 | 1 — `tests.shared.test_order_list#test_mismatch_dialog_shown (TC-ORDL-012 A job link for another phone number shows the mismatch dialog)` | passed |
+| CHK-ORDL-007 | 1 — `tests.shared.test_order_list#test_mismatch_cancel_and_log_out (TC-ORDL-012 Mismatch dialog: Cancel keeps the session, Log out ends it)` | passed |
+| CHK-ORDL-008 | 1 — `tests.shared.test_order_list#test_mismatch_cancel_and_log_out (TC-ORDL-012 Mismatch dialog: Cancel keeps the session, Log out ends it)` | passed |
+| CHK-ORDL-009 | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | passed |
+| CHK-ORDL-010 | 1 — `tests.shared.test_order_list#test_calendar_toggle (TC-ORDL-006 The calendar toggle opens the weekly view with Sunday to Saturday, today selected and Jobs still active, and toggles back)` | passed |
+| CHK-ORDL-011 | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | passed |
+| CHK-ORDL-012 | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | passed |
+| CHK-ORDL-013 | 1 — `tests.shared.test_order_list#test_jobs_reachable_from_tabs (TC-ORDL-002 The Jobs list stays reachable from the other bottom tabs)` | passed |
+| CHK-ORDL-015 | 2 — `tests.shared.test_order_list#test_status_badges (TC-ORDL-004 Each job status shows its own badge; completed, canceled and expired jobs are not listed)`; `tests.shared.test_order_list#test_job_card_and_details (TC-ORDL-003 A job assigned to the technician appears once as a card with its date, time, status, title and address, and opens its details)` | passed, passed |
+| CHK-ORDL-016 | 1 — `tests.shared.test_order_list#test_job_card_and_details (TC-ORDL-003 A job assigned to the technician appears once as a card with its date, time, status, title and address, and opens its details)` | passed |
+| CHK-ORDL-017 | 1 — `tests.shared.test_order_list#test_job_card_and_details (TC-ORDL-003 A job assigned to the technician appears once as a card with its date, time, status, title and address, and opens its details)` | passed |
+| CHK-ORDL-018 | 1 — `tests.shared.test_order_list#test_job_card_and_details (TC-ORDL-003 A job assigned to the technician appears once as a card with its date, time, status, title and address, and opens its details)` | passed |
+| CHK-ORDL-019 | 1 — `tests.shared.test_order_list#test_job_card_and_details (TC-ORDL-003 A job assigned to the technician appears once as a card with its date, time, status, title and address, and opens its details)` | passed |
+| CHK-ORDL-020 | 1 — `tests.shared.test_order_list#test_status_badges (TC-ORDL-004 Each job status shows its own badge; completed, canceled and expired jobs are not listed)` | passed |
+| CHK-ORDL-022 | 1 — `tests.shared.test_order_list#test_updated_label_until_viewed (TC-ORDL-005 An unviewed job carries 'Updated' in the list and in the calendar until its details are opened)` | failed |
+| CHK-ORDL-024 | 1 — `tests.shared.test_order_list#test_job_card_and_details (TC-ORDL-003 A job assigned to the technician appears once as a card with its date, time, status, title and address, and opens its details)` | passed |
+| CHK-ORDL-026 | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | passed |
+| CHK-ORDL-027 | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | passed |
+| CHK-ORDL-028 | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | passed |
+| CHK-ORDL-029 | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | passed |
+| CHK-ORDL-036 | 1 — `tests.shared.test_order_list#test_job_card_and_details (TC-ORDL-003 A job assigned to the technician appears once as a card with its date, time, status, title and address, and opens its details)` | passed |
+| CHK-ORDL-037 | 1 — `tests.shared.test_order_list#test_calendar_toggle (TC-ORDL-006 The calendar toggle opens the weekly view with Sunday to Saturday, today selected and Jobs still active, and toggles back)` | passed |
+| CHK-ORDL-038 | 1 — `tests.shared.test_order_list#test_signed_out_job_links (TC-ORDL-011 Signed out, a job link does not open the Jobs list: an unknown key shows 'Link expired', a valid key leads to registration)` | passed |
+| CHK-ORDL-039 | 1 — `tests.shared.test_order_list#test_calendar_toggle (TC-ORDL-006 The calendar toggle opens the weekly view with Sunday to Saturday, today selected and Jobs still active, and toggles back)` | passed |
+| CHK-ORDL-040 | 1 — `tests.shared.test_order_list#test_calendar_toggle (TC-ORDL-006 The calendar toggle opens the weekly view with Sunday to Saturday, today selected and Jobs still active, and toggles back)` | passed |
+| CHK-ORDL-042 | 1 — `tests.shared.test_order_list#test_calendar_toggle (TC-ORDL-006 The calendar toggle opens the weekly view with Sunday to Saturday, today selected and Jobs still active, and toggles back)` | passed |
+| CHK-ORDL-043 | 1 — `tests.shared.test_order_list#test_week_swipe (TC-ORDL-009 Swiping the week strip moves to the next and the previous week)` | passed |
+| CHK-ORDL-044 | 1 — `tests.shared.test_order_list#test_calendar_toggle (TC-ORDL-006 The calendar toggle opens the weekly view with Sunday to Saturday, today selected and Jobs still active, and toggles back)` | passed |
+| CHK-ORDL-047 | 1 — `tests.shared.test_order_list#test_week_swipe (TC-ORDL-009 Swiping the week strip moves to the next and the previous week)` | passed |
+| CHK-ORDL-048 | 1 — `tests.shared.test_order_list#test_week_swipe (TC-ORDL-009 Swiping the week strip moves to the next and the previous week)` | passed |
+| CHK-ORDL-049 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-050 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-051 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-052 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-053 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-054 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-055 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-056 | 1 — `tests.shared.test_order_list#test_updated_label_until_viewed (TC-ORDL-005 An unviewed job carries 'Updated' in the list and in the calendar until its details are opened)` | failed |
+| CHK-ORDL-057 | 1 — `tests.shared.test_order_list#test_calendar_statuses (TC-ORDL-010 The weekly calendar shows New, In progress and Submitted jobs and hides Completed, Canceled and Expired ones)` | passed |
+| CHK-ORDL-058 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
+| CHK-ORDL-060 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-061 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-062 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-063 | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | passed |
+| CHK-ORDL-068 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
+| CHK-ORDL-069 | 1 — `tests.shared.test_order_list#test_list_ordered_by_date (TC-ORDL-014 The Jobs list is ordered by scheduled date, earliest first)` | failed |
+| CHK-ORDL-070 | 1 — `tests.shared.test_order_list#test_calendar_follows_list_refresh (TC-ORDL-015 Jobs that the refreshed list shows are shown in the calendar on their dates)` | failed |
 
 ## Tagged tests with no checklist item
 
@@ -120,3 +190,4 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 > - Orphans: CHK-AUTH-* belong to module 02 (traced in `02-authentication/android/`), CHK-ORDL-* to module 03
 >   (`03-order-list/android/`), CHK-ORDD-001/-002 to module 04 (its Android run) — the shared 01+03 run, as on iOS.
 
+> **Step 5 — offline (2026-10-01):** Step 5 (2026-10-01) added this module's `android-stage` checks — offline / slow network, Android only (owner, android-plan §2.5); test cases `../android/*-test-cases.md` (validated by the owner), tests `automation/mobile/tests/android/test_offline_*.py`, recon `qa/shared/recon-2026-10-01-android-offline.md`. CHK-SPL-015 **Passed** (TC-SPL-004: on a GSM-speed, GPRS-delay network the splash hands over by itself, logo centred, no offline banner; screenshots for a person, D-OFF-9).

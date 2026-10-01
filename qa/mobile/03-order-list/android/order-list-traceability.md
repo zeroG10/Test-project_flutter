@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-30 06:57 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/03-order-list/order-list-checklist.md` — 70 items
-- Results (allure): `automation/mobile/results/android/2026-09-30-0103-r6` — 20 tests (15 passed, 5 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-10-01-03-with-offline` — 24 tests (19 passed, 5 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `4de7949`
+- Harness commit (this repo): `4de7949`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `pytest --platform=android tests/shared/test_splash.py tests/shared/test_order_list.py tests/shared/test_authentication.py::test_login_with_email (run 6, 2026-09-30)`
+- Run label (suite / filter): `MERGED: step 4 — pytest --platform=android tests/shared/test_splash.py tests/shared/test_order_list.py tests/shared/test_authentication.py::test_login_with_email (run 6, 2026-09-30) — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -50,11 +50,11 @@ Generated: 2026-09-30 06:57 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDL-028 | Check that the empty state displays the title text “No orders”. | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | Passed | allure: passed |
 | CHK-ORDL-029 | Check that the empty state displays an informational message explaining that no… | 1 — `tests.shared.test_order_list#test_empty_jobs_list (TC-ORDL-001 With no active jobs, the Jobs list shows its app bar, the bottom navigation with Jobs active, and the 'No jobs' empty state)` | Passed | allure: passed |
 | CHK-ORDL-030 | Check that orders assigned via a valid access link appear in the Orders List af… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDL-031 | Check that cached orders are displayed on the Orders List screen when the devic… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDL-032 | Check that the Orders List screen displays an appropriate message or indicator… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDL-033 | Check that an error message is displayed when the orders list fails to load due… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDL-034 | Check that the user is able to retry loading the Orders List after a network er… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDL-035 | Check that the Orders List screen recovers correctly after connectivity is rest… | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-ORDL-031 | Check that cached orders are displayed on the Orders List screen when the devic… | 1 — `tests.android.test_offline_order_list#test_offline_cached_list_and_calendar_with_banner (TC-ORDL-016 Offline: the cached list and the cached calendar are shown with the offline banner, including after a cold start)` | Passed | allure: passed |
+| CHK-ORDL-032 | Check that the Orders List screen displays an appropriate message or indicator… | 1 — `tests.android.test_offline_order_list#test_offline_no_jobs_shows_empty_state_and_banner (TC-ORDL-019 Offline with no jobs for the technician: list and calendar show 'No jobs' with the offline banner)` | Passed | allure: passed |
+| CHK-ORDL-033 | Check that an error message is displayed when the orders list fails to load due… | 1 — `tests.android.test_offline_order_list#test_offline_cached_list_and_calendar_with_banner (TC-ORDL-016 Offline: the cached list and the cached calendar are shown with the offline banner, including after a cold start)` | Passed | allure: passed |
+| CHK-ORDL-034 | Check that the user is able to retry loading the Orders List after a network er… | 1 — `tests.android.test_offline_order_list#test_offline_pull_and_try_again_keep_cached_list (TC-ORDL-017 Offline: pulling the list and tapping 'Try again' keep the cached list, no crash)` | Passed | allure: passed |
+| CHK-ORDL-035 | Check that the Orders List screen recovers correctly after connectivity is rest… | 1 — `tests.android.test_offline_order_list#test_offline_created_job_appears_on_reconnect (TC-ORDL-018 Network back: a job created through the API while offline appears in the list by itself, without a manual pull)` | Passed | allure: passed |
 | CHK-ORDL-036 | Check that the Orders List screen does not display duplicate orders after refre… | 1 — `tests.shared.test_order_list#test_job_card_and_details (TC-ORDL-003 A job assigned to the technician appears once as a card with its date, time, status, title and address, and opens its details)` | Passed | allure: passed |
 | CHK-ORDL-037 | Check that the Calendar (Weekly) view is displayed when the user switches from… | 1 — `tests.shared.test_order_list#test_calendar_toggle (TC-ORDL-006 The calendar toggle opens the weekly view with Sunday to Saturday, today selected and Jobs still active, and toggles back)` | Passed | allure: passed |
 | CHK-ORDL-038 | Check that the Calendar (Weekly) view is accessible only to authenticated users. | 1 — `tests.shared.test_order_list#test_signed_out_job_links (TC-ORDL-011 Signed out, a job link does not open the Jobs list: an unknown key shows 'Link expired', a valid key leads to registration)` | Passed | allure: passed |
@@ -83,14 +83,41 @@ Generated: 2026-09-30 06:57 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-ORDL-061 | Check that the empty state displays the title text “No orders”. | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | Passed | allure: passed |
 | CHK-ORDL-062 | Check that the empty state displays informational text explaining that no order… | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | Passed | allure: passed |
 | CHK-ORDL-063 | Check that the empty state is shown instead of an empty list when no orders are… | 1 — `tests.shared.test_order_list#test_calendar_date_selection (TC-ORDL-007 Selecting a date shows only that date's jobs, and a date without jobs shows 'No jobs')` | Passed | allure: passed |
-| CHK-ORDL-064 | Check that cached calendar and order data is displayed when the device is offli… | 0 |  | no tagged test — not run (manual / exploratory), never green |
-| CHK-ORDL-065 | Check that the Calendar (Weekly) view displays an appropriate state when offlin… | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-ORDL-064 | Check that cached calendar and order data is displayed when the device is offli… | 1 — `tests.android.test_offline_order_list#test_offline_cached_list_and_calendar_with_banner (TC-ORDL-016 Offline: the cached list and the cached calendar are shown with the offline banner, including after a cold start)` | Passed | allure: passed |
+| CHK-ORDL-065 | Check that the Calendar (Weekly) view displays an appropriate state when offlin… | 1 — `tests.android.test_offline_order_list#test_offline_no_jobs_shows_empty_state_and_banner (TC-ORDL-019 Offline with no jobs for the technician: list and calendar show 'No jobs' with the offline banner)` | Passed | allure: passed |
 | CHK-ORDL-066 | Check that switching between weeks does not cause UI flickering or layout shift… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDL-067 | Check that the Calendar (Weekly) view handles a large number of orders without… | 0 |  | no tagged test — not run (manual / exploratory), never green |
 | CHK-ORDL-068 | Check that the selected date and order list state are preserved when switching… | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | Passed | allure: passed |
 | CHK-ORDL-070 | Check that jobs shown in the Orders List after a refresh are also shown in the… | 1 — `tests.shared.test_order_list#test_calendar_follows_list_refresh (TC-ORDL-015 Jobs that the refreshed list shows are shown in the calendar on their dates)` | Failed | allure: failed — selenium.common.exceptions.TimeoutException: Message: ('-android uiautomator', 'new UiSelector().descriptionContains("QA-AUTO-0930-095315-LATE")') not visible… |
 
-**Summary:** total 70 · automated 52 · Passed 48 · Failed 4 · Blocked 0 · Not run 18 (= total − Passed − Failed − Blocked)
+**Summary:** total 70 · automated 59 · Passed 55 · Failed 4 · Blocked 0 · Not run 11 (= total − Passed − Failed − Blocked)
+
+## Tagged tests with no checklist item
+
+These CHK IDs appear in test tags but in none of the checklists above — a stale tag, a typo, or a missing `--checklist`. They count for nothing until resolved.
+
+| CHK ID | Tests | Statuses |
+|---|---|---|
+| CHK-AUTH-073 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-074 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-075 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-088 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-089 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-110 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-115 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-117 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-AUTH-119 | 1 — `tests.shared.test_authentication#test_login_with_email (TC-AUTH-005 Login with email and the OTP opens the Jobs list)` | passed |
+| CHK-ORDD-001 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
+| CHK-ORDD-002 | 1 — `tests.shared.test_order_list#test_calendar_selection_kept_and_card_opens (TC-ORDL-008 The selected date survives a switch to the list and back, and a calendar card opens its job)` | passed |
+| CHK-SPL-001 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-002 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-003 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-005 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-007 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-008 | 1 — `tests.shared.test_splash#test_session_hands_over_to_jobs (TC-SPL-002 With a valid session, the splash hands over to the Jobs list and Welcome never appears)` | passed |
+| CHK-SPL-009 | 1 — `tests.shared.test_splash#test_deleted_account_session_ends (TC-SPL-003 A session whose account was deleted on the server ends on Welcome after a cold start)` | failed |
+| CHK-SPL-011 | 1 — `tests.shared.test_splash#test_cold_start_splash_then_welcome (TC-SPL-001 Without a session, a cold start shows the brand splash with a centred logo and nothing to interact with, then opens Welcome by itself)` | failed |
+| CHK-SPL-012 | 1 — `tests.shared.test_splash#test_session_hands_over_to_jobs (TC-SPL-002 With a valid session, the splash hands over to the Jobs list and Welcome never appears)` | passed |
 
 ## Tagged tests with no checklist item
 
@@ -131,3 +158,4 @@ These CHK IDs appear in test tags but in none of the checklists above — a stal
 > - Orphans: CHK-SPL-* belong to module 01 (`01-splash/android/`), CHK-AUTH-* to module 02
 >   (`02-authentication/android/`), CHK-ORDD-001/-002 to module 04 (its Android run) — the shared 01+03 run, as on iOS.
 
+> **Step 5 — offline (2026-10-01):** Step 5 (2026-10-01) added this module's `android-stage` checks — offline / slow network, Android only (owner, android-plan §2.5); test cases `../android/*-test-cases.md` (validated by the owner), tests `automation/mobile/tests/android/test_offline_*.py`, recon `qa/shared/recon-2026-10-01-android-offline.md`. CHK-ORDL-031…035, -064, -065 **Passed** (TC-ORDL-016…019). The "Connection restored" dialog names every In progress job of the app's cache, also deleted ones (D-OFF-10) — TC-ORDL-018 closes it if it comes.

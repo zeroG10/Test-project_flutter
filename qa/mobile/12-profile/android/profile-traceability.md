@@ -1,18 +1,18 @@
 # Automated traceability — mobile
 
-Generated: 2026-09-30 20:36 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
+Generated: 2026-10-01 10:28 UTC by `automation/tools/trace_results.py` (read-only: nothing written to Sheets or checklists).
 
 - Platform: **mobile**
 - Checklist: `qa/mobile/12-profile/profile-checklist.md` — 35 items
-- Results (allure): `automation/mobile/results/android/2026-09-30-12-r2` — 8 tests (8 passed, 0 failed, 0 skipped)
+- Results (allure): `automation/mobile/results/android/2026-10-01-12-with-offline` — 9 tests (9 passed, 0 failed, 0 skipped)
 
 ## Run context — the limits of every verdict below
 
 - Target: `Android emulator Pixel 7 · Android 16 (API 36) · DEV API`
 - Product build / version: `1.1.1 (178), development @ 85a84f3, CLIENT_BUILD=true, debug APK`
-- Harness commit (this repo): `e4e6a3e`
+- Harness commit (this repo): `e4e6a3e`; step 5 offline: `64da953` (offline-all-r1), `38cb0c2` (offline-0311-check)
 - Environment label (pytest): `Android · Pixel_7_API_36 · Android 16 · build 1.1.1 (178)`
-- Run label (suite / filter): `module 12 run 2 (tests/shared/test_profile.py, 2026-09-30); the main account's name is changed and put back, only a throwaway technician is deleted`
+- Run label (suite / filter): `MERGED: step 4 — module 12 run 2 (tests/shared/test_profile.py, 2026-09-30); the main account's name is changed and put back, only a throwaway technician is deleted — + step 5 offline tests of this module (run offline-all-r1, harness 64da953; TC-ORDL-018 and TC-NOTIF-007 from offline-0311-check, harness 38cb0c2), 2026-10-01`
 - Not covered by this run: every browser, device, environment, role and quarantined test not listed above. A Passed here says nothing about them.
 
 > Verdict rules: **Passed** only if ALL tagged tests passed; **Failed** if any failed; **Blocked** if any was skipped / did not execute and none failed (a skip is Blocked, never a pass); empty = no tagged test → not run, never green. Manual and exploratory verdicts live in the checklist Sheet, not here.
@@ -48,14 +48,14 @@ Generated: 2026-09-30 20:36 UTC by `automation/tools/trace_results.py` (read-onl
 | CHK-PRF-027 | Check that tapping Cancel closes the logout dialog without logging the user out. | 1 — `tests.shared.test_profile#test_log_out (TC-PRF-006 Log out: the dialog; Cancel stays signed in; Log out goes to Welcome and a relaunch stays there)` | Passed | allure: passed |
 | CHK-PRF-028 | Check that tapping Log out clears the user session and navigates to the Welcome… | 1 — `tests.shared.test_profile#test_log_out (TC-PRF-006 Log out: the dialog; Cancel stays signed in; Log out goes to Welcome and a relaunch stays there)` | Passed | allure: passed |
 | CHK-PRF-029 | Check that the user cannot access authenticated screens after logging out. | 1 — `tests.shared.test_profile#test_log_out (TC-PRF-006 Log out: the dialog; Cancel stays signed in; Log out goes to Welcome and a relaunch stays there)` | Passed | allure: passed |
-| CHK-PRF-030 | Check that logout clears local user data even when the device is offline. | 0 |  | no tagged test — not run (manual / exploratory), never green |
+| CHK-PRF-030 | Check that logout clears local user data even when the device is offline. | 1 — `tests.android.test_offline_profile#test_log_out_offline_clears_session (TC-PRF-009 Log out offline: the dialog clears the session (Welcome); a cold start while still offline stays on Welcome — the session is actually cleared, not just hidden)` | Passed | allure: passed |
 | CHK-PRF-031 | Check that tapping Delete account opens the account deletion confirmation pop-u… | 1 — `tests.shared.test_profile#test_delete_account_dialog (TC-PRF-007 The delete-account dialog as the app has it; Cancel changes nothing)` | Passed | allure: passed |
 | CHK-PRF-032 | Check that account deletion is blocked until the user types the required “Delet… | 1 — `tests.shared.test_profile#test_delete_account_dialog (TC-PRF-007 The delete-account dialog as the app has it; Cancel changes nothing)` | Passed | allure: passed |
 | CHK-PRF-033 | Check that tapping Cancel closes the delete account dialog without any changes. | 1 — `tests.shared.test_profile#test_delete_account_dialog (TC-PRF-007 The delete-account dialog as the app has it; Cancel changes nothing)` | Passed | allure: passed |
 | CHK-PRF-034 | Check that confirming account deletion removes the user account and logs the us… | 1 — `tests.shared.test_profile#test_delete_throwaway_account (TC-PRF-008 A throwaway account deleted in the app: Welcome; the same email cannot sign in; gone on the server)` | Passed | allure: passed |
 | CHK-PRF-035 | Check that deleted accounts cannot log in again using the same credentials. | 1 — `tests.shared.test_profile#test_delete_throwaway_account (TC-PRF-008 A throwaway account deleted in the app: Welcome; the same email cannot sign in; gone on the server)` | Passed | allure: passed |
 
-**Summary:** total 35 · automated 33 · Passed 33 · Failed 0 · Blocked 0 · Not run 2 (= total − Passed − Failed − Blocked)
+**Summary:** total 35 · automated 34 · Passed 34 · Failed 0 · Blocked 0 · Not run 1 (= total − Passed − Failed − Blocked)
 
 > **Notes (2026-09-30):**
 > - All 33 automated items **Passed on Android**, as on iOS.
@@ -67,3 +67,4 @@ Generated: 2026-09-30 20:36 UTC by `automation/tools/trace_results.py` (read-onl
 >   throwaway technician is deleted.
 > - Prove-red (`--prove-red`, harness `e4e6a3e`): 8 of 8 failed, each on the deliberately wrong expected value.
 
+> **Step 5 — offline (2026-10-01):** Step 5 (2026-10-01) added this module's `android-stage` checks — offline / slow network, Android only (owner, android-plan §2.5); test cases `../android/*-test-cases.md` (validated by the owner), tests `automation/mobile/tests/android/test_offline_*.py`, recon `qa/shared/recon-2026-10-01-android-offline.md`. CHK-PRF-030 **Passed** (TC-PRF-009: log out offline → Welcome, and Welcome again after a cold start offline — the session is cleared). Whether local notes / photos / drafts must also go is open (D-OFF-6, the owner had no answer) — not verified.
