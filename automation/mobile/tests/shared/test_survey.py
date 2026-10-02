@@ -13,7 +13,7 @@ qa/mobile/08-survey/survey-definitions/. Every expected value goes through ``exp
 """
 
 import io
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 
 import allure
 import pytest
@@ -87,10 +87,13 @@ def stored(api, job, driver, since: str | None = None) -> dict:
         return resp
 
 
-def local_midnight(day: int) -> str:
-    """How the app stores a picked date: local midnight in UTC (accepted, Q-SRV-6)."""
-    today = date.today()
-    picked = datetime(today.year, today.month, day)
+def local_midnight(day: int, driver) -> str:
+    """How the app stores a picked date: local midnight in UTC (accepted, Q-SRV-6) — midnight in
+    the DEVICE's time zone, of the device's current month: the host's zone can differ (the Mac's
+    own zone switched between +03:00 and +08:00 during a final Android run, and the emulator kept
+    the one it booted with — TC-SRV-002 / -009 off by 5 h, run final-t1)."""
+    now = datetime.fromisoformat(driver.get_device_time("YYYY-MM-DDTHH:mm:ssZ"))
+    picked = datetime(now.year, now.month, day, tzinfo=now.tzinfo)
     return picked.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
 
@@ -194,7 +197,9 @@ def test_all_field_types(
         assert sr.answer(resp, "Add technician notes").values == [expected("QA-AUTO notes")]
         photo = sr.answer(resp, "Upload a photo of the completed work")
         assert photo.notes == [expected("QA-AUTO survey photo")], photo.files
-        assert sr.answer(resp, "Select the work completion date").values == [local_midnight(15)]
+        assert sr.answer(resp, "Select the work completion date").values == [
+            local_midnight(15, driver)
+        ]
         assert sr.answer(resp, "Select the work completion time").values == [expected("09:45")]
 
 
@@ -461,7 +466,7 @@ def test_fiber_end_to_end(
             (f"{FIBER} 2", False, 11, "Testing"),
         ):
             assert sr.answer(resp, FIBER_Q[0], block).values == [toggle]
-            assert sr.answer(resp, FIBER_Q[1], block).values == [local_midnight(day)]
+            assert sr.answer(resp, FIBER_Q[1], block).values == [local_midnight(day, driver)]
             assert sr.answer(resp, FIBER_Q[2], block).values == [expected(task)]
             assert sr.answer(resp, FIBER_Q[3], block).values == [expected("Completed as planned")]
         copy = [a for a in sr.answers(resp) if a.block == f"{FIBER} (Copy)"]
