@@ -56,6 +56,8 @@ EDGE_GAP = 20  # px: a bottom edge this close to the band's end may be the scrol
 CANDIDATES = 12  # the most frequent candidate shifts that are scored
 MIN_ALIGNED = 0.6  # share of the staying nodes the chosen shift must find again
 TYPE_CHUNK_ANDROID = 50  # characters per mobile: type call (68 landed from one 501 call)
+TEXT_LIMIT = 500  # a text answer's limit (CHK-SRV-008)
+KEYCODE_DEL = 67
 TOP_A, BOTTOM_A = 290, 2170  # px: below the app bar, above the Save button (Pixel 7)
 DEDUP = 40
 DATE_TEXT = re.compile(r"^[A-Z][a-z]{2} \d{1,2}, \d{4}$")  # 'Sep 15, 2026' once picked
@@ -443,6 +445,14 @@ class SurveyPage(BasePage):
                         )
                     moved = back_offset + short - offset  # from `before`'s place to `after`'s
                     travels.append(f"{moved:.0f} (retried short)")
+                    if not MIN_TRAVEL <= moved <= limit:
+                        # the walk only goes down, a drag at most `limit`: anything else is a
+                        # recovery that matched the wrong repeat of an entry (-1322 px in check
+                        # run 2 of step 6, TC-SRV-010 — the 3rd header was skipped)
+                        raise WalkLost(
+                            f"the survey walk's recovery measured an impossible travel "
+                            f"({moved:.0f} px)"
+                        )
                 else:
                     travels.append(f"{moved:.0f}")
                 offset += moved
@@ -577,12 +587,36 @@ class SurveyPage(BasePage):
                 # element", recon A1): type key by key through the IME instead — in chunks: one
                 # 501-character call landed only 68 characters (the app's counter said 432
                 # remaining; module 08 Android run 1, TC-SRV-003).
-                for start in range(0, len(text), TYPE_CHUNK_ANDROID):
-                    chunk = text[start : start + TYPE_CHUNK_ANDROID]
-                    self.driver.execute_script("mobile: type", {"text": chunk})
+                before = self.field_value(field)
+                self._type_android(text)
+                self._check_typed_android(before + text)
             else:
                 field.send_keys(text)
             self.hide_keyboard()
+
+    def _type_android(self, text: str) -> None:
+        for start in range(0, len(text), TYPE_CHUNK_ANDROID):
+            chunk = text[start : start + TYPE_CHUNK_ANDROID]
+            self.driver.execute_script("mobile: type", {"text": chunk})
+
+    def _check_typed_android(self, wanted: str) -> None:
+        """Input plumbing, not a verdict: the IME switch of `mobile: type` can drop the first key
+        ('A-AUTO room' reached the server for 'QA-AUTO room' — step 6 check run 2, TC-SRV-019).
+        A field that does not hold ``wanted`` is cleared and typed once more (a logged step); one
+        that still does not is a harness failure. Over the 500 limit the field cuts the text by
+        design (TC-SRV-003) — nothing to compare."""
+        if len(wanted) > TEXT_LIMIT:
+            return
+        value = self.field_value(waits.focused(self.driver))
+        if value == wanted:
+            return
+        with allure.step(f"typed text did not land ({value!r}) — clear and type once more"):
+            for _ in range(len(value) + 2):  # end of text, then delete
+                self.driver.execute_script("mobile: pressKey", {"keycode": KEYCODE_DEL})
+            self._type_android(wanted)
+            value = self.field_value(waits.focused(self.driver))
+            if value != wanted:
+                raise AssertionError(f"typing {wanted!r} left {value!r} in the field")
 
     def clear_text(self, n: int) -> None:
         with allure.step(f"clear survey.text #{n + 1}"):
