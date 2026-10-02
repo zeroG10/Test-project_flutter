@@ -54,6 +54,12 @@ if [ "$PLATFORM" = "android" ]; then
     echo "refused: the device cannot resolve $API_HOST (DNS) — the emulator keeps the DNS of the network it booted on; restart it" >&2
     exit 3
   fi
+  # A hung System UI ("Application Not Responding: com.android.systemui") took UiAutomator2 down
+  # 40 min into a final run and blocked every cold start after it (step 6, 2026-10-02)
+  if adb shell dumpsys window 2>/dev/null | grep -q "mCurrentFocus=.*Application Not Responding"; then
+    echo "refused: an 'Application Not Responding' window is up on the device — cold-boot the emulator (-no-snapshot-load)" >&2
+    exit 3
+  fi
 fi
 
 LOCK="results/.run.lock"
