@@ -31,6 +31,7 @@ from pathlib import Path
 import allure
 import pytest
 from appium import webdriver
+from selenium.common.exceptions import WebDriverException
 
 from config.capabilities import get_capabilities
 from config.settings import normalize_platform, settings
@@ -219,6 +220,53 @@ def driver(platform):
         yield drv
     with contextlib.suppress(Exception):
         drv.quit()
+
+
+_ANDROID_MODULES_SEEN: list[str] = []
+# What a dead UiAutomator2 server (or a dead session) answers — the session is started anew
+_DEAD_SESSION = (
+    "socket hang up",
+    "instrumentation process is not running",
+    "invalid session id",
+    "session is either terminated",
+    "Could not proxy command",
+)
+
+
+def _new_session(drv, platform: str, why: str) -> None:
+    """A fresh Appium session on the same driver object: a new UiAutomator2 server process and
+    a fast-reset app (the tests sign in by themselves, as each module did in step 4)."""
+    with allure.step(f"Appium: a new session ({why})"):
+        with contextlib.suppress(Exception):
+            drv.quit()
+        drv.start_session(get_capabilities(platform))
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _android_session_per_module(request, driver, platform):
+    """Android: one Appium session per test module, as the module runs of step 4. In the first
+    full run of step 6 the UiAutomator2 server died after ~40 min of one session ("socket hang
+    up") and every later test errored (final-s1: 109 errors); a fresh server per module keeps
+    a death inside one module."""
+    if platform == "android":
+        if _ANDROID_MODULES_SEEN:
+            _new_session(driver, platform, f"module {request.module.__name__}")
+        _ANDROID_MODULES_SEEN.append(request.module.__name__)
+    yield
+
+
+@pytest.fixture(autouse=True)
+def _android_session_alive(driver, platform):
+    """Android: before each test, a dead session (UiAutomator2 gone) is started anew — the test
+    that was running when it died has its own verdict; the next ones do not inherit it."""
+    if platform == "android":
+        try:
+            driver.get_window_size()
+        except WebDriverException as exc:
+            if not any(sign in str(exc) for sign in _DEAD_SESSION):
+                raise
+            _new_session(driver, platform, f"the last one died: {str(exc)[:80]}")
+    yield
 
 
 @pytest.fixture(autouse=True)
