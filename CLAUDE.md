@@ -179,7 +179,7 @@ cd automation/api && uv sync && cp .env.example .env && uv run pytest -m smoke  
 cd automation/mobile && uv sync && cp .env.example .env && bash scripts/doctor.sh
 bash scripts/start_appium.sh   # terminal 1
 uv run pytest --platform=android -m smoke   # or --platform=ios
-# Mobile, one command — a platform or both side by side (automation/mobile/PARALLEL-RUNS.md); skills: docs/notes/qa-skills.en.md (uk: qa-skills.md)
+# Mobile, one command — a platform or both side by side (automation/mobile/PARALLEL-RUNS.md); skills: docs/notes/mobile-qa-skills.en.md (uk: mobile-qa-skills.md)
 scripts/qa.sh <ios|android|both> <all|module|path> [--name N] [--sequential] [--dry-run]
 # Offline self-tests — no target, no credentials; part of gate G-5
 npm run test:helpers                                                 # web reporting + cleanup helpers
@@ -187,8 +187,8 @@ cd automation/api && uv run python -m unittest discover -s unit_tests # redactio
 # Tools
 cd automation/tools && uv sync && uv run pytest                      # offline self-test (Sheets sync + traceability)
 uv run python sync_checklist_to_sheets.py --target web <checklist.md> --dry-run
-uv run python compare_runs.py --platform <ios|android> ../mobile/results/<platform>/<run>   # a run vs the last final run
-uv run python build_reports.py [--share] && node export_pdf.mjs                           # the test completion reports
+uv run python mobile_compare_runs.py --platform <ios|android> ../mobile/results/<platform>/<run>   # a run vs the last final run
+uv run python mobile_reports.py [--share] && node mobile_export_pdf.mjs                           # the test completion reports
 uv run python trace_results.py --platform web --checklist <checklist.md> \
   --playwright-json ../web/playwright/test-results/results.json \
   --target "$BASE_URL" --build "<version>" --run-label "pw:test, chromium+firefox" \
@@ -245,10 +245,10 @@ prompt content plus the input path and the target output path.
 | `/setup-project` | Discovery (Step 0) + deploy the template from `setup/project.yaml` per `setup/SETUP.md` |
 | `/qa-checklist` | Platform-routed checklist with stable CHK ids and live Figma pull |
 | `/qa-sheets-sync` | Publish a checklist to its Google Sheet, dry-run first |
-| `/qa-run` | Mobile: run a module or a test on iOS, Android or both side by side (`scripts/qa.sh`), then what is new red vs the last final run |
-| `/qa-regress` | Mobile: the whole regression on a platform or both; every test compared with the baseline (`compare_runs.py`) |
-| `/qa-triage` | Why a test is red or blocked: environment / test / expectation / app / no oracle — with evidence; bug drafts per `prompts/08` |
-| `/qa-report` | From a regression run to the final reports: traceability, six test completion reports, PDFs, privacy check; publish only on the owner's word |
+| `/qa-mobile-run` | Mobile: run a module or a test on iOS, Android or both side by side (`scripts/qa.sh`), then what is new red vs the last final run |
+| `/qa-mobile-regress` | Mobile: the whole regression on a platform or both; every test compared with the baseline (`mobile_compare_runs.py`) |
+| `/qa-mobile-triage` | Why a test is red or blocked: environment / test / expectation / app / no oracle — with evidence; bug drafts per `prompts/08` |
+| `/qa-mobile-report` | From a regression run to the final reports: traceability, six test completion reports, PDFs, privacy check; publish only on the owner's word |
 | `/bmad-tea`, `/bmad-testarch-test-design`, `/bmad-testarch-automate`, `/bmad-testarch-atdd`, `/bmad-testarch-trace`, `/bmad-testarch-test-review` | BMAD TEA (only the TEA module is installed; `bmm` skills do not exist here by design). Test review is mandatory for generated tests |
 | `/bmad-advanced-elicitation`, `/bmad-review-edge-case-hunter`, `/bmad-party-mode` | Deeper critique passes used by the `qa-*` skills |
 

@@ -41,7 +41,7 @@ how the harness is built.
 | **The run lock and the results** | two runs writing one folder mix their evidence | a lock per platform (`results/.run.<platform>.lock`), results per platform and run |
 | **Seeded data** — jobs, files | ids were stamped to the second: two runs seeding in the same second got the same id | the platform's letter in the stamp (`QA-AUTO-1002I201937-NEW` / `…A…`); every sweep and cleanup is scoped to the run's own technician |
 | **Generated users** | — | emails are random and unique; phones come from one reserved block of 100 numbers and are checked against the server before use (a clash needs two registrations in the same second: accepted) |
-| **The report's privacy check** | a second account would appear unmasked in a shared report | redaction covers every account in `.env` (`automation/tools`: `Redactor`, `redact_screens.py`) |
+| **The report's privacy check** | a second account would appear unmasked in a shared report | redaction covers every account in `.env` (`automation/tools`: `Redactor`, `mobile_redact_screens.py`) |
 | Read-only things — the build, the survey template, the API admin login | nothing writes to them | shared |
 | **The machine and the server** | two devices and a doubled load on the test server slow everything; a test with a tight timing may go Blocked or red | not a correctness problem but a risk: see section 4 |
 

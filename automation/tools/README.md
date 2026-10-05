@@ -8,9 +8,9 @@ chain described in [`automation/README.md`](../README.md):
 | `sync_checklist_to_sheets.py` | 0 → Sheet | checklist `.md` → Google Sheet | the team Sheet (**the only Sheets writer in this repo**) |
 | `import_checklist_from_sheets.py` | Sheet → 0 (one-time) | Google Sheet → per-feature checklist `.md` | markdown under `qa/web/<NN-slug>/` — **reads** Sheets, never writes them |
 | `trace_results.py` | 4 (closure) | run results → checklist IDs | one markdown report, by convention `qa/web/<NN-module>/<module>-traceability.md`, mobile per platform `qa/mobile/<NN-module>/{ios,android}/<module>-traceability.md` — never Sheets |
-| `build_summary.py` | 4 (report) | one mobile run → internal report site: summary, a page per module and per defect | local `automation/mobile/reports/<platform>/internal/` (gitignored) |
-| `compare_runs.py` | 4 (closure) | a run vs a baseline (default: the platform's final run), test by test: NEW RED, NEW BLOCKED, fixed?, known red with its defect, missing | stdout only; exit 1 = something to triage |
-| `build_reports.py` | 4 (report) | the final runs (`setup/project.yaml → report`) → all six test completion reports (iOS / Android / both × internal / client; `mobile_report.py`, `client_report.py`) | local `automation/mobile/reports/<slice>/` (gitignored); `--share` → `reports/` (the account hidden, checked by `redact_screens.py`); PDFs: `node export_pdf.mjs` — publishing is an owner call |
+| `mobile_summary.py` | 4 (report) | one mobile run → internal report site: summary, a page per module and per defect | local `automation/mobile/reports/<platform>/internal/` (gitignored) |
+| `mobile_compare_runs.py` | 4 (closure) | a run vs a baseline (default: the platform's final run), test by test: NEW RED, NEW BLOCKED, fixed?, known red with its defect, missing | stdout only; exit 1 = something to triage |
+| `mobile_reports.py` | 4 (report) | the final runs (`setup/project.yaml → report.mobile`) → all six test completion reports (iOS / Android / both × internal / client; `mobile_combined_report.py`, `mobile_client_report.py`) | local `automation/mobile/reports/<slice>/` (gitignored); `--share` → `reports/mobile/<slice>/` (the account hidden, checked by `mobile_redact_screens.py`); PDFs: `node mobile_export_pdf.mjs` — publishing is an owner call |
 
 All of them honour the QA Doctrine in `CLAUDE.md`: no result is ever upgraded to
 Passed by a tool, a skip is Blocked, an empty run is not a passing run.
@@ -253,7 +253,7 @@ a successful import. Register the codes used by the map in
 
 ---
 
-## build_summary.py — mobile report site for the lead and the team
+## mobile_summary.py — mobile report site for the lead and the team
 
 A small static site over **one clean run**, laid out like the admin panel's report (web, same
 product) so the two read alike:
@@ -274,7 +274,7 @@ check (`- Test case: \`TC-…\`` or `::test_name`); any other failure is *unexpe
 over the results; writes only `--out-dir`.
 
 ```bash
-uv run python build_summary.py \
+uv run python mobile_summary.py \
   --platform ios --allure-dir ../mobile/results/ios/stable-3 \
   --checklist ../../qa/mobile/01-splash/splash-checklist.md ...        # one per module \
   --history-dir ../mobile/results/ios/stable-1 ...                       # earlier full runs, oldest first \
@@ -299,7 +299,7 @@ uv run python build_summary.py \
 | `--out-dir DIR` | default `automation/mobile/reports/<platform>/internal/` (gitignored) |
 
 The pages show screenshots of the client's app — the full copy stays local; only the `--public` build leaves this
-machine, and `build_reports.py --share` is the way to make it (boxes found by OCR, a check that nothing of the account
+machine, and `mobile_reports.py --share` is the way to make it (boxes found by OCR, a check that nothing of the account
 is left, the publish fragments in `automation/mobile/reports/publish/`). Publishing is an owner call.
 `assets/` and `bugs/` are rebuilt on every run (only folders this script created are ever
 deleted).

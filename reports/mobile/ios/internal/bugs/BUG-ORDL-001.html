@@ -1,0 +1,333 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'><title>BUG-ORDL-001</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600;700&display=swap"><style>
+:root{
+  --ground:#F6F7FA; --surface:#FFFFFF; --ink:#122E52; --muted:#5B6B85; --line:#DCE3EE;
+  --accent:#3282EB; --accent-soft:#E6F0FD; --navy:#122E52; --on-navy:#FFFFFF;
+  --pass:#1E8E5A; --known:#B4761A; --fail:#C62828; --idle:#C7CFDB;
+  --pass-soft:#E3F3EA; --known-soft:#F8EDD9; --fail-soft:#FBE3E1;
+  --display:"Manrope","Segoe UI",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0E1A2E; --surface:#162540; --ink:#E7EDF7; --muted:#97A6BE; --line:#263A57;
+    --accent:#6FA8F5; --accent-soft:#1B2E4D; --navy:#0B1526; --on-navy:#E7EDF7;
+    --pass:#5DD394; --known:#E3A94F; --fail:#F07167; --idle:#3D4F6B;
+    --pass-soft:#12352A; --known-soft:#33260F; --fail-soft:#3A1A1F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0E1A2E; --surface:#162540; --ink:#E7EDF7; --muted:#97A6BE; --line:#263A57;
+  --accent:#6FA8F5; --accent-soft:#1B2E4D; --navy:#0B1526; --on-navy:#E7EDF7;
+  --pass:#5DD394; --known:#E3A94F; --fail:#F07167; --idle:#3D4F6B;
+  --pass-soft:#12352A; --known-soft:#33260F; --fail-soft:#3A1A1F;
+}
+/* the logo's own colours, and the wordmark turned light on a dark ground */
+.brand-logo .st0{fill:#122E52} .brand-logo .st1{fill:#3282EB}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .brand-logo .st0{fill:#FFFFFF} }
+:root[data-theme="dark"] .brand-logo .st0{fill:#FFFFFF}
+@media print{ .brand-logo .st0{fill:#122E52 !important} }
+
+:root{ --block:#5B4B9A; --block-soft:#ECE8F7; --figure:#122E52; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --block:#B7A8F0; --block-soft:#252244; --figure:#E7EDF7; } }
+:root[data-theme="dark"]{ --block:#B7A8F0; --block-soft:#252244; --figure:#E7EDF7; }
+.brandbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding-bottom:12px;border-bottom:1px solid var(--line)}
+.brandline{font:600 12px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tag{display:inline-block;font:700 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--on-navy);background:var(--navy);padding:6px 9px;border-radius:6px;vertical-align:middle}
+.docinfo{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);
+  font-size:13px;color:var(--muted)}
+.docinfo b{color:var(--ink)} .docinfo a,.docinfo code{overflow-wrap:anywhere;word-break:break-all}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.55 var(--body);
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
+a{color:var(--accent)}a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:34px;letter-spacing:-.01em}h2{font-size:22px;margin-bottom:14px}h3{font-size:16px;margin-bottom:8px}
+p{margin:0 0 10px;max-width:70ch}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:10px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px 22px;margin:6px 0 0}
+.facts div{display:grid;gap:2px}
+.facts dt{font:600 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:0;font:500 14px/1.35 var(--body);overflow-wrap:anywhere}
+.layer{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0}
+.layer a{font:600 13px/1 var(--body);text-decoration:none;color:var(--ink);border:1px solid var(--line);
+background:var(--surface);padding:8px 12px;border-radius:999px}.layer a:hover{border-color:var(--accent)}
+.pill{display:inline-flex;align-items:center;gap:6px;font:700 12px/1 var(--mono);letter-spacing:.05em;
+text-transform:uppercase;padding:6px 10px;border-radius:999px;vertical-align:middle;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.pass{background:var(--pass-soft);color:var(--pass)}.pill.known{background:var(--known-soft);color:var(--known)}
+.pill.fail{background:var(--fail-soft);color:var(--fail)}.pill.block{background:var(--block-soft);color:var(--block)}
+section{padding-top:34px}.lead{font-size:17px;max-width:72ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:18px 0 14px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:4px}
+.kpi b{font:700 30px/1 var(--display);font-variant-numeric:tabular-nums;color:var(--figure)}.kpi span{color:var(--muted);font-size:13px}
+.kpi.pass b{color:var(--pass)}.kpi.known b{color:var(--known)}.kpi.fail b{color:var(--fail)}.kpi.block b{color:var(--block)}
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--idle)}
+.bar i{display:block;height:100%}.bar .p{background:var(--pass)}.bar .k{background:var(--known)}
+.bar .f{background:var(--fail)}.bar .b{background:var(--block)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{font:600 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.num,th.num{text-align:right}.mono{font-family:var(--mono);font-size:13px}
+td.id,td.nowrap{white-space:nowrap}.mods td:first-child{font-weight:600;white-space:nowrap}
+.mods .barcell{min-width:160px;width:34%}.mods .bar{height:10px;margin-top:5px}
+.sev{font:700 12px/1 var(--mono);padding:4px 7px;border-radius:5px;white-space:nowrap}
+.sev.S1,.sev.S2{background:var(--fail-soft);color:var(--fail)}.sev.S3{background:var(--known-soft);color:var(--known)}
+.sev.S4{background:var(--accent-soft);color:var(--accent)}
+.muted{color:var(--muted)}.note{font-size:13px;color:var(--muted);margin-top:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.box ul{margin:6px 0 0;padding-left:18px}.box li{margin:4px 0}
+code{font-family:var(--mono);font-size:12.5px;background:var(--accent-soft);padding:1px 5px;border-radius:4px;
+overflow-wrap:anywhere}
+details summary{cursor:pointer}
+.divider{margin-top:40px;padding-top:26px;border-top:2px solid var(--ink)}
+svg text{fill:var(--muted);font:11px var(--mono)}svg .lbl{fill:var(--ink);font:600 11px var(--body)}
+svg .axis{stroke:var(--line)}svg .line{stroke:var(--accent);fill:none;stroke-width:2}
+svg .dot{fill:var(--accent)}svg .num{fill:var(--surface);font:700 10px var(--mono)}
+ol.pace{columns:2 260px;margin:10px 0 0;padding-left:22px;font-size:13px}ol.pace li{margin:2px 0}
+.v{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.v.pass{color:var(--pass);background:var(--pass-soft)}.v.known{color:var(--known);background:var(--known-soft)}
+.v.fail{color:var(--fail);background:var(--fail-soft)}.v.block{color:var(--block);background:var(--block-soft)}
+.v.idle{color:var(--muted);background:var(--line)}
+.why{color:var(--muted);font-size:12.5px;margin-top:3px;overflow-wrap:anywhere}
+table.checks{table-layout:fixed;min-width:760px}
+table.checks col.c1{width:128px}table.checks col.c3{width:170px}table.checks col.c4{width:150px}
+table.checks col.c5{width:104px}.src{font:11.5px/1.35 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.sect{margin:26px 0 6px;font:600 12px/1.2 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:18px 0 12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card b{display:block;font:700 24px/1.1 var(--display);font-variant-numeric:tabular-nums;color:var(--figure)}
+.card span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+nav.top{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+nav.top a{font:600 13px/1 var(--body);text-decoration:none;color:var(--ink);border:1px solid var(--line);
+background:var(--surface);padding:8px 12px;border-radius:999px}nav.top a:hover{border-color:var(--accent)}
+.shots,.strip{display:flex;gap:12px}.shots{flex-wrap:wrap;margin-top:8px}
+.strip{overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x mandatory}
+.shots figure,.strip figure{margin:0;flex:0 0 auto;scroll-snap-align:start}
+.shots figure{width:118px}.strip figure{width:150px}
+a.shot{display:block;line-height:0}
+a.shot img{width:100%;height:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.shots figcaption,.strip figcaption{color:var(--muted);font:11.5px/1.35 var(--body);margin-top:5px;overflow-wrap:anywhere}
+details.ev>summary{color:var(--accent);font-size:12.5px;white-space:nowrap}
+details.test{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:8px 0}
+details.test>summary{padding:10px 14px}
+.tbody{padding:0 14px 12px;border-top:1px solid var(--line)}
+.dur{font:12px var(--mono);color:var(--muted);margin-left:8px}
+.phase{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px}
+ol.steps{list-style:none;margin:0;padding-left:16px;border-left:1px solid var(--line)}
+ol.steps>li{margin:3px 0;font-size:14px}.mark{display:inline-block;width:18px;font-weight:600}
+.st-passed>.mark{color:var(--pass)}.st-failed>.mark,.st-broken>.mark{color:var(--fail)}
+.st-skipped>.mark{color:var(--block)}.sname{overflow-wrap:anywhere}
+.atts{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 6px 18px}.atts figure{margin:0;width:118px}
+.att-omitted{font:12px var(--mono);color:var(--muted);margin:4px 0 4px 18px}
+details.att-text{width:100%}details.att-text>summary{font:12px var(--mono);color:var(--muted)}
+pre{font:12px/1.5 var(--mono);background:var(--ground);border:1px solid var(--line);border-radius:6px;
+padding:8px 10px;overflow:auto;max-height:280px;white-space:pre-wrap;overflow-wrap:anywhere}
+pre.err{color:var(--fail);margin:12px 0}
+video{max-width:100%;width:260px;border-radius:14px;border:1px solid var(--line)}
+.md h2{font-size:19px;margin:30px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+.md h3{margin:20px 0 8px}.md table{margin:8px 0}.md th,.md td{border:1px solid var(--line);padding:6px 10px}
+.md blockquote{margin:10px 0;padding:8px 14px;border-left:3px solid var(--known);background:var(--known-soft)}
+.md li{max-width:72ch}.md p{max-width:72ch}
+.md a.shot{display:inline-block;width:150px;margin:6px 8px 6px 0;vertical-align:top}
+dialog.lb{border:0;padding:0;background:transparent;max-width:min(94vw,520px);color:#fff}
+dialog.lb::backdrop{background:rgb(9 18 33/.82)}
+dialog.lb img{display:block;max-width:100%;max-height:84vh;width:auto;margin:0 auto;border-radius:22px}
+dialog.lb p{text-align:center;font-size:13px;margin:10px auto 0}
+footer.note{margin-top:34px}
+@media (max-width:560px){h1{font-size:27px}.kpi b{font-size:25px}.wrap{padding:20px 16px 56px}
+.shots figure{width:96px}.strip figure{width:120px}td,th{padding:8px 7px}}
+@media print{body{background:#fff;font-size:12px}.wrap{max-width:none;padding:0}.layer,nav.top{display:none}
+.strip{flex-wrap:wrap;overflow:visible}.strip figure{width:118px}
+section{padding-top:22px}h2,h3{break-after:avoid}tr,.kpis,.kpi,.box,.facts,svg{break-inside:avoid}
+.divider{break-before:page}}
+</style></head><body><div class='wrap'><div class="brandbar"><svg class="brand-logo" height="26" width="101" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180.9 46.4" role="img" aria-label="TRIARE"><g><path class="st0" d="M76,13.8H55.8c-0.2,0-0.3,0.1-0.3,0.3v3.1c0,0.1,0.1,0.3,0.3,0.3H64v15c0,0.2,0.1,0.3,0.3,0.3h3.1c0.2,0,0.3-0.1,0.3-0.3v-15H76c0.2,0,0.3-0.1,0.3-0.3v-3.1C76.2,13.9,76.1,13.8,76,13.8L76,13.8z"/><path class="st0" d="M94.9,26.6c2.7-0.7,3.1-3.4,3.1-4.8v-3.2c0-1.5-0.5-4.9-4.5-4.9h-11c-2,0-3.7,1.6-3.7,3.7v15c0,0.2,0.1,0.3,0.3,0.3h3.1c0.2,0,0.3-0.1,0.3-0.3v-4.7c0-0.3,0.3-0.6,0.6-0.6h6.9c0.3,0,0.6,0.1,0.8,0.3l4.3,5.1c0,0,0.1,0.1,0.2,0.1h4.2c0.4,0,0.1-0.3,0.1-0.3L94.9,26.6L94.9,26.6z M91.4,23.8h-7.9c-0.6,0-1-0.5-1-1v-4.2l0,0c0-0.8,0.6-1.4,1.4-1.4h7.5c0.6,0,2.9,0,2.9,3.3S92,23.8,91.4,23.8z"/><path class="st0" d="M102.4,13.8h3.1c0.2,0,0.3,0.1,0.3,0.3v18.4c0,0.2-0.1,0.3-0.3,0.3h-3.1c-0.2,0-0.3-0.1-0.3-0.3V14.1C102.1,13.9,102.3,13.8,102.4,13.8z"/><path class="st0" d="M124.3,16.8c-1.6-3.3-3.7-3-4.5-3s-2.9-0.3-4.5,3c-1.4,3-6.3,13.7-7.2,15.6c-0.1,0.2,0,0.3,0.2,0.3h3.8c0.2,0,0.3-0.1,0.4-0.2c0.3-0.7,1.4-3.1,1.5-3.2c0.1-0.2,0.2-0.3,0.4-0.3h11c0.2,0,0.3,0,0.4,0.3c0.1,0.2,1.2,2.5,1.5,3.2c0.1,0.1,0.1,0.2,0.4,0.2h3.8c0.2,0,0.3-0.1,0.2-0.3C130.6,30.5,125.7,19.8,124.3,16.8L124.3,16.8z M122.3,25.6h-5c-1.1,0-1.6-0.3-1.1-1.4c1.1-2.4,2.2-4.7,2.8-6c0,0,0.3-0.7,0.9-0.7s0.9,0.7,0.9,0.7c0.6,1.2,1.7,3.5,2.8,6C123.9,25.3,123.4,25.6,122.3,25.6z"/><path class="st0" d="M160.4,17.8c0-0.3,0.3-0.6,0.6-0.6h14.2c0.1,0,0.3-0.1,0.3-0.3v-2.9c0-0.1-0.1-0.3-0.3-0.3H160c-1.8,0-3.2,1.5-3.2,3.3v12.4c0,1.8,1.5,3.2,3.2,3.2h15.2c0.1,0,0.3-0.1,0.3-0.3v-2.9c0-0.1-0.1-0.3-0.3-0.3H161c-0.3,0-0.6-0.3-0.6-0.6v-3.4c0-0.3,0.3-0.6,0.6-0.6h12.4c0.1,0,0.3-0.1,0.3-0.3v-2.9c0-0.1-0.1-0.3-0.3-0.3H161c-0.3,0-0.6-0.3-0.6-0.6L160.4,17.8L160.4,17.8z"/><path class="st1" d="M37.9,4.6c-0.6-1.1-2-1.4-3.1-0.8L27,8.3c-0.8,0.4-1.8,0.5-2.6,0.1l-6.9-4c-1.3-0.7-3.1-0.7-4.4,0L7.6,7.6C7.1,7.9,6.7,8.3,6.4,8.7c-0.2,0.4-0.4,0.9-0.4,1.4c0,1,0.6,2,1.6,2.6l3.8,2.1l6.8,3.9c1.1,0.6,2.5,0.3,3.1-0.8c0.6-1.1,0.2-2.5-0.8-3.1l-4-2.3L13.7,11l0,0c-0.8-0.4-1.5-0.9-0.2-1.6l0.3-0.2c0.8-0.5,1.9-0.5,2.7-0.1l6.9,4c1.3,0.7,3.1,0.7,4.4,0l9.3-5.4C38.2,7.1,38.5,5.7,37.9,4.6L37.9,4.6z"/><path class="st0" d="M23.4,25.6c0,5.8,0,9.9,0,9.9c0,0.9,0,1.8-1.3,1l-0.3-0.2c-0.8-0.5-1.4-1.4-1.4-2.3v-8c0-1.5-0.9-3-2.2-3.8L8.9,17c-1.1-0.6-2.5-0.3-3.1,0.8s-0.2,2.5,0.8,3.1l7.9,4.4c0.8,0.5,1.3,1.4,1.3,2.2v8c0,1.5,0.9,3,2.2,3.8l5.6,3.2c0.5,0.3,1.1,0.5,1.6,0.4c0.5,0,1-0.1,1.4-0.4c0.9-0.5,1.4-1.5,1.4-2.6V26l0,0c0-2.4,1.2-5,3.3-6.2l0,0l8.5-4.9c0.8-0.4,1.5-0.9,1.5,0.6v0.4c0,0.9-0.5,1.9-1.3,2.4l-6.9,4C31.9,23,31,24.6,31,26v10.7c0,1.3,1,2.3,2.3,2.3c1.3,0,2.2-1,2.2-2.3v-9c0-0.9,0.5-1.8,1.2-2.3l6.9-4c1.3-0.7,2.2-2.3,2.2-3.8v-6.4c0-0.6-0.2-1.1-0.4-1.6c-0.2-0.4-0.6-0.8-1-1c-0.9-0.5-2-0.5-3,0.1c0,0-5.9,3.4-12,6.9C24.9,18.2,23.4,19.8,23.4,25.6L23.4,25.6z"/><path class="st0" d="M149.6,26.6c2.7-0.7,3.1-3.4,3.1-4.8v-3.2c0-1.5-0.5-4.9-4.5-4.9h-11c-2,0-3.7,1.6-3.7,3.7v15c0,0.2,0.1,0.3,0.3,0.3h3.1c0.1,0,0.3-0.1,0.3-0.3v-4.7c0-0.3,0.3-0.6,0.6-0.6h6.9c0.3,0,0.6,0.1,0.8,0.3l4.3,5.1c0,0,0.1,0.1,0.2,0.1h4.2c0.4,0,0.1-0.3,0.1-0.3L149.6,26.6L149.6,26.6z M146.1,23.8h-7.9c-0.6,0-1-0.5-1-1v-4.2l0,0c0-0.8,0.6-1.4,1.4-1.4h7.5c0.6,0,2.9,0,2.9,3.3S146.7,23.8,146.1,23.8z"/></g></svg><span class="brandline">TRIARE · QA delivery team · Internal</span></div><nav class='top' style='margin-top:16px'><a href='../index.html#defects'>← All open defects</a><a href='../03-order-list.html'>03 · Order list: every check</a></nav><p class='eyebrow'>Defect report · 03 · Order list</p><h1 style='font-size:28px;margin:8px 0 18px'>BUG-ORDL-001 — The weekly calendar keeps showing &quot;No jobs&quot; for jobs the refreshed Jobs list already shows</h1><div class='md'><blockquote>
+<p>Process: prompts/08-file-bug.md. Filed locally 2026-09-24 on the owner's go
+(mykola.zhuchenko, answer 3 to the recon 4 questions: «так заведи»). Tracker: not configured, nothing sent anywhere.</p>
+</blockquote>
+<h2>Summary</h2>
+<p>Jobs assigned while the app is open appear in the Jobs list after a pull-to-refresh, but the weekly calendar still shows
+&quot;No jobs&quot; for their dates until the calendar itself is pulled to refresh or the app is restarted.</p>
+<h2>Layer</h2>
+<ul>
+<li>☑ App (UI) — the list refresh reloads only the list; the calendar keeps the week it loaded when the Jobs screen
+opened (<code>lib/features/jobs/presentation/bloc/jobs/jobs_bloc.dart</code>: <code>JobsListRefreshed</code> fetches the list only;
+the calendar week is fetched on screen start, on its own pull-to-refresh, on a week change and on reconnect).</li>
+<li>☐ Backend / API</li>
+<li>☐ Unclear</li>
+</ul>
+<h2>Severity / Priority</h2>
+<ul>
+<li><strong>Severity:</strong> S3 (minor) — <strong>branch fired:</strong> #3 — the calendar misses assigned jobs, but a workaround exists (pull to
+refresh inside the calendar, or restart the app).</li>
+<li><strong>Priority:</strong> <em>proposal</em> P3 — owner / PM decide.</li>
+</ul>
+<h2>Environment</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Platform</td>
+<td>Flutter on iOS</td>
+</tr>
+<tr>
+<td>Platforms checked</td>
+<td>iOS ✓ reproduced · Android ✓ reproduced (Pixel 7 emulator · Android 16, recon A1 2026-09-29; added on the owner's go)</td>
+</tr>
+<tr>
+<td>OS version</td>
+<td>iOS 26.5</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>iPhone 17</td>
+</tr>
+<tr>
+<td>Form factor</td>
+<td>phone</td>
+</tr>
+<tr>
+<td>Device type</td>
+<td>simulator</td>
+</tr>
+<tr>
+<td>App version</td>
+<td><code>[DEV] CT Mobile</code> 1.1.1 (178), <code>development</code> @ 85a84f3</td>
+</tr>
+<tr>
+<td>Build type</td>
+<td>debug (flavor <code>development</code>, <code>CLIENT_BUILD=true</code>)</td>
+</tr>
+<tr>
+<td>Install method</td>
+<td>sideload (simulator build)</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>Wi-Fi (host network), DEV API</td>
+</tr>
+<tr>
+<td>Locale</td>
+<td>en</td>
+</tr>
+<tr>
+<td>Orientation</td>
+<td>portrait</td>
+</tr>
+<tr>
+<td>User role</td>
+<td>Field Technician (signed in)</td>
+</tr>
+<tr>
+<td>Feature flags</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Permissions state</td>
+<td>notifications=granted</td>
+</tr>
+</tbody>
+</table>
+<h2>Preconditions</h2>
+<ul>
+<li>Signed in as a technician; the Jobs list is open in list mode.</li>
+<li>While the app is open, new jobs are assigned to the technician for today and for another day of the current week
+(in the recon: <code>POST /job</code> with the technician's <code>userId</code>, statuses New / In progress / Submitted).</li>
+</ul>
+<h2>Steps to reproduce</h2>
+<ol>
+<li>On the Jobs list, pull down to refresh.</li>
+<li>Tap the calendar icon.</li>
+<li>Look at today.</li>
+<li>Tap the other day that has a new job.</li>
+</ol>
+<h2>Actual result</h2>
+<p>After step 1 the list shows the new jobs. In the calendar, today and the other day both show &quot;No jobs&quot;. Only a
+pull-to-refresh inside the calendar (or a restart) brings the jobs into the calendar.
+// <a class='shot' href='evidence/BUG-ORDL-001/ios/1-list-after-refresh-shows-jobs.png'><img loading='lazy' src='evidence/BUG-ORDL-001/ios/1-list-after-refresh-shows-jobs.png' alt='1-list-after-refresh-shows-jobs.png'></a>,
+<a class='shot' href='evidence/BUG-ORDL-001/ios/2-calendar-today-no-jobs.png'><img loading='lazy' src='evidence/BUG-ORDL-001/ios/2-calendar-today-no-jobs.png' alt='2-calendar-today-no-jobs.png'></a>,
+<a class='shot' href='evidence/BUG-ORDL-001/ios/3-calendar-after-its-own-refresh.png'><img loading='lazy' src='evidence/BUG-ORDL-001/ios/3-calendar-after-its-own-refresh.png' alt='3-calendar-after-its-own-refresh.png'></a></p>
+<h2>Expected result</h2>
+<p>The calendar shows every job assigned to the technician on its scheduled date whenever the list shows it — refreshing
+the jobs refreshes both views.</p>
+<h2>Frequency</h2>
+<ul>
+<li>☑ Always — <strong>2 of 2 attempts</strong> (recon 4, 2026-09-24, two separate sets of 8 jobs; today and the other day both
+empty each time; the calendar's own pull-to-refresh fixed it in the attempt where it was tried).</li>
+<li>Android: <strong>1 of 1</strong> (recon A1, 2026-09-29, 5 jobs <code>QA-AUTO-RA-*</code> created after login): the Jobs list showed all 5 after
+its pull-to-refresh, the calendar showed &quot;No jobs&quot; for today; the calendar's own pull-to-refresh brought all 5.
+Automated: TC-ORDL-015 red in module 01+03 Android runs 5 and 6 (2026-09-29/30) — a job created after the Jobs screen
+loaded is in the refreshed list but not in the calendar for its date (the jobs loaded at the screen start are).</li>
+</ul>
+<h2>Crash? ANR?</h2>
+<ul>
+<li>☑ No crash</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li>Screenshots: evidence/BUG-ORDL-001/ios/ — 1 and 2 from the first attempt, 3 from the second
+(different job ids, same steps). Test jobs only (<code>QA-AUTO-R4-*</code>).</li>
+<li>Screen trees: <code>qa/shared/recon-dumps/ios-2026-09-24/recon4_calendar_today.xml</code>, <code>recon4b_calendar_after_list_refresh.xml</code>,
+<code>recon4b_calendar_after_calendar_refresh.xml</code>.</li>
+<li>Recon report: qa/shared/recon-2026-09-24-ios.md, section Order list.</li>
+<li>Android: evidence/BUG-ORDL-001/android/ — 1 list after refresh (5 jobs), 2 calendar
+today &quot;No jobs&quot;, 3 calendar after its own refresh (5 jobs). Screen trees:
+<code>qa/shared/recon-dumps/android-2026-09-29/jobs_list.xml</code>, <code>jobs_calendar.xml</code>, <code>jobs_calendar_after_refresh.xml</code>;
+recon report qa/shared/recon-2026-09-29-android.md.
+4 — run 6: the calendar for today without the job created after the screen loaded (16:00; the day's cards run from
+15:00 down). Test jobs only.</li>
+</ul>
+<h2>Workaround</h2>
+<p>Pull down to refresh inside the calendar view, or close and reopen the app.</p>
+<h2>Regression info</h2>
+<ul>
+<li>Last known good version: unknown.</li>
+<li>First broken version: unknown.</li>
+<li>The same gap applies when the list is refreshed by the app itself (the list-refresh notifier used after a job link is
+synchronized) — by code reading, not observed.</li>
+</ul>
+<h2>Related</h2>
+<ul>
+<li>SRS §3.1.2.2: &quot;Weekly View screen provides Field Technicians with a time-oriented view of assigned orders, organized
+by week and specific dates.&quot; and &quot;This screen complements the Orders List view and supports planning and daily
+execution.&quot;</li>
+<li>SRS §3.1.2.2 FR-CAL-W-01: &quot;The system shall display orders grouped by the selected calendar date within the current
+week.&quot;</li>
+<li>Checklist: <code>CHK-ORDL-049</code>, <code>CHK-ORDL-050</code> (../order-list-checklist.md) — no item states
+the list / calendar consistency itself (CHK-ORDL-070 was added for it, 2026-09-24).</li>
+<li>Test cases: <code>TC-ORDL-015</code> — the regression check, red until the fix; <code>TC-ORDL-007</code>, <code>TC-ORDL-010</code>
+(../order-list-test-cases.md) refresh the calendar on purpose so their own checks are
+not hidden by this bug.</li>
+<li>Question: <code>D-ORDL-11</code> in ../order-list-questions.md.</li>
+<li>Invariant: none fits — missing invariant: &quot;list and calendar show the same set of assigned jobs after any refresh&quot;.</li>
+<li>Tracker: not filed (no tracker configured).</li>
+</ul>
+<blockquote>
+<p><strong>When this bug is verified fixed:</strong> re-verify with the steps above on the fixed build, add the invariant, and keep the
+regression check CHK-ORDL-070 / TC-ORDL-015.</p>
+</blockquote>
+</div></div><dialog class="lb" id="lb" aria-label="Screen"><img alt=""><p></p></dialog>
+<script>(()=>{const d=document.getElementById('lb');if(!d||!d.showModal)return;
+const im=d.querySelector('img'),cap=d.querySelector('p');
+document.addEventListener('click',e=>{const a=e.target.closest('a.shot');
+if(a){e.preventDefault();const i=a.querySelector('img');im.src=a.getAttribute('href');
+im.alt=i?i.alt:'';cap.textContent=im.alt;d.showModal();return}
+if(d.open&&e.target.closest('#lb'))d.close()})})();</script></body></html>

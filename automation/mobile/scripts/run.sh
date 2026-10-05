@@ -7,7 +7,7 @@
 #
 # Writes Allure results to results/<platform>/<YYYY-MM-DD>-<name>/ (gitignored) plus RUN_INFO.txt
 # (harness commit, command, start / end, exit code) — the run context trace_results.py and
-# build_summary.py report. Refuses:
+# mobile_summary.py report. Refuses:
 #   - a results folder that already exists (a run is never overwritten or mixed with another);
 #   - uncommitted changes to tracked files (owner rule: commit before every run) — ALLOW_DIRTY=1
 #     overrides for a throwaway debug run, and RUN_INFO.txt then says the tree was dirty;

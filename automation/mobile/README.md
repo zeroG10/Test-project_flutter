@@ -141,8 +141,8 @@ scripts/qa.sh ios 08,09           # several modules
 scripts/qa.sh both all --dry-run  # the plan only
 ```
 
-In Claude Code the same is four skills — `/qa-run`, `/qa-regress`, `/qa-triage`, `/qa-report`
-(how to use them: [English](../../docs/notes/qa-skills.en.md) · [українською](../../docs/notes/qa-skills.md)).
+In Claude Code the same is four skills — `/qa-mobile-run`, `/qa-mobile-regress`, `/qa-mobile-triage`, `/qa-mobile-report`
+(how to use them: [English](../../docs/notes/mobile-qa-skills.en.md) · [українською](../../docs/notes/mobile-qa-skills.md)).
 
 By hand — terminal 1, the Appium server (of a platform, or the shared one without an argument):
 
@@ -342,14 +342,14 @@ allure generate results/ios/stable-3 -o reports/ios/allure-report --clean   # st
 
 ## Test completion reports
 
-`automation/tools/build_reports.py` turns the final runs named in `setup/project.yaml → report.slices` into the
+`automation/tools/mobile_reports.py` turns the final runs named in `setup/project.yaml → report.mobile.slices` into the
 test completion reports (ISTQB shape) — iOS, Android and both together, each internal (every check, test, step,
-screen and defect clickable; `build_summary.py` renders a platform, `mobile_report.py` the combined one) and for the
-client (`client_report.py`). CHK verdicts come from `trace_results.py` itself, so the reports and the traceability
-matrices agree. `uv run python build_reports.py` writes the full local copy to `reports/<slice>/` here (gitignored:
+screen and defect clickable; `mobile_summary.py` renders a platform, `mobile_combined_report.py` the combined one) and for the
+client (`mobile_client_report.py`). CHK verdicts come from `trace_results.py` itself, so the reports and the traceability
+matrices agree. `uv run python mobile_reports.py` writes the full local copy to `reports/mobile/<slice>/` here (gitignored:
 API bodies and videos); `--share` writes the copy people get to the repository's `reports/` — the test account
-hidden and pixelated (`redact_screens.py`), checked before it is done — and `node export_pdf.mjs` its PDFs.
-What is where and the published links: [`reports/README.md`](../../reports/README.md); options:
+hidden and pixelated (`mobile_redact_screens.py`), checked before it is done — and `node mobile_export_pdf.mjs` its PDFs.
+What is where and the published links: [`reports/mobile/README.md`](../../reports/README.md); options:
 [`automation/tools/README.md`](../tools/README.md).
 
 ## Prove red (GATES rule 6)

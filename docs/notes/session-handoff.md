@@ -967,6 +967,21 @@ happy flow → валідації); які пункти чеклісту кож�
   `docs/notes/qa-skills.md`, порівняння прогонів `automation/tools/compare_runs.py`; у реальному прогоні ще не вживались;
   (3) власник хоче обговорити переюз для майбутніх проєктів.
 
+## 3э. Підготовка до перенесення в шаблон (2026-10-05, гілка `qa/mobile-template-prep`)
+
+- **Правило власника:** веб-проєкт не чіпати; у шаблон першим заходить веб, мобільне підлаштовується і не перетинається.
+- **Нові назви (старі в розділах вище — історія):** скіли `/qa-mobile-{run,regress,triage,report}`; інструменти
+  `automation/tools/mobile_*.py` + `mobile_export_pdf.mjs` (було: `build_summary` → `mobile_summary`, `build_reports` →
+  `mobile_reports`, `mobile_report` → `mobile_combined_report`, `report_data` → `mobile_report_data`, `client_report`,
+  `compare_runs`, `redact_screens`, `export_pdf` — з префіксом); `brand.py` / `paths.py` — вебові без змін,
+  `mobile_brand.py` поверх; `setup/project.yaml → report.mobile:` (зрізи `ios` / `android` / `all`); звіти
+  `reports/mobile/{ios,android,all}/`, локальна повна копія `automation/mobile/reports/{ios,android,all}/`;
+  інструкція власнику `docs/notes/mobile-qa-skills(.en).md`.
+- **Перезбір:** `cd automation/tools && uv run python mobile_reports.py [--share] && node mobile_export_pdf.mjs`.
+- **Опубліковані сторінки** ще зі старою розкладкою тек (працюють); при наступній публікації: `root` =
+  `reports/mobile`, спільний звіт — `all/internal/…` (старі `mobile/internal/…` прибрати з артефакта).
+- **Далі:** `setup/PORT-MOBILE.md` (що шаблон / що адаптувати / що проєкт) → після веба — перенесення в гілку шаблону.
+
 ## 4. Ключові факти (деталі — у файлах за посиланнями)
 
 | Що | Значення | Де детальніше |

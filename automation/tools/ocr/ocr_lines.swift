@@ -1,6 +1,6 @@
 // Text lines on screenshots, with their boxes in image pixels (origin top-left), as JSON lines on stdout:
 //   {"file": "...", "width": 1080, "height": 2400, "lines": [{"text": "...", "box": [x0, y0, x1, y1]}]}
-// macOS Vision, on the machine: nothing leaves it. Used by redact_screens.py to find personal data to pixelate.
+// macOS Vision, on the machine: nothing leaves it. Used by mobile_redact_screens.py to find personal data to pixelate.
 import Foundation
 import Vision
 import AppKit

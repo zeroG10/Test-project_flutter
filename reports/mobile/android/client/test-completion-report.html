@@ -1,0 +1,145 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'>
+<title>Android App Test Completion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600;700&display=swap">
+<style>
+:root{
+  --ground:#F6F7FA; --surface:#FFFFFF; --ink:#122E52; --muted:#5B6B85; --line:#DCE3EE;
+  --accent:#3282EB; --accent-soft:#E6F0FD; --navy:#122E52; --on-navy:#FFFFFF;
+  --pass:#1E8E5A; --known:#B4761A; --fail:#C62828; --idle:#C7CFDB;
+  --pass-soft:#E3F3EA; --known-soft:#F8EDD9; --fail-soft:#FBE3E1;
+  --display:"Manrope","Segoe UI",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0E1A2E; --surface:#162540; --ink:#E7EDF7; --muted:#97A6BE; --line:#263A57;
+    --accent:#6FA8F5; --accent-soft:#1B2E4D; --navy:#0B1526; --on-navy:#E7EDF7;
+    --pass:#5DD394; --known:#E3A94F; --fail:#F07167; --idle:#3D4F6B;
+    --pass-soft:#12352A; --known-soft:#33260F; --fail-soft:#3A1A1F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0E1A2E; --surface:#162540; --ink:#E7EDF7; --muted:#97A6BE; --line:#263A57;
+  --accent:#6FA8F5; --accent-soft:#1B2E4D; --navy:#0B1526; --on-navy:#E7EDF7;
+  --pass:#5DD394; --known:#E3A94F; --fail:#F07167; --idle:#3D4F6B;
+  --pass-soft:#12352A; --known-soft:#33260F; --fail-soft:#3A1A1F;
+}
+/* the logo's own colours, and the wordmark turned light on a dark ground */
+.brand-logo .st0{fill:#122E52} .brand-logo .st1{fill:#3282EB}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .brand-logo .st0{fill:#FFFFFF} }
+:root[data-theme="dark"] .brand-logo .st0{fill:#FFFFFF}
+@media print{ .brand-logo .st0{fill:#122E52 !important} }
+
+:root{ --block:#5B4B9A; --block-soft:#ECE8F7; --figure:#122E52; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --block:#B7A8F0; --block-soft:#252244; --figure:#E7EDF7; } }
+:root[data-theme="dark"]{ --block:#B7A8F0; --block-soft:#252244; --figure:#E7EDF7; }
+.brandbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding-bottom:12px;border-bottom:1px solid var(--line)}
+.brandline{font:600 12px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tag{display:inline-block;font:700 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--on-navy);background:var(--navy);padding:6px 9px;border-radius:6px;vertical-align:middle}
+.docinfo{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);
+  font-size:13px;color:var(--muted)}
+.docinfo b{color:var(--ink)} .docinfo a,.docinfo code{overflow-wrap:anywhere;word-break:break-all}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding-inline:20px;padding-block:26px 64px}
+a{color:var(--accent)} a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:30px;letter-spacing:-.01em}
+h2{font-size:20px;margin:36px 0 12px;padding-top:16px;border-top:1px solid var(--line)}
+h3{font-size:15px;margin:16px 0 6px}
+p{margin:0 0 10px;max-width:72ch}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+.pill{display:inline-flex;align-items:center;gap:6px;font:700 12px/1 var(--mono);letter-spacing:.05em;
+  text-transform:uppercase;padding:6px 10px;border-radius:999px;vertical-align:middle}
+.pill.pass{background:var(--pass-soft);color:var(--pass)} .pill.fail{background:var(--fail-soft);color:var(--fail)}
+.pill.known{background:var(--known-soft);color:var(--known)} .pill.block{background:var(--block-soft);color:var(--block)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px 22px;margin:16px 0 0;padding:0}
+.facts div{display:grid;gap:2px}
+.facts dt{font:600 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:0;font:500 14px/1.4 var(--body);overflow-wrap:anywhere}
+.lead{font-size:17px;line-height:1.6;max-width:72ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0 14px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:4px}
+.kpi b{font:700 30px/1 var(--display);font-variant-numeric:tabular-nums;color:var(--figure)}
+.kpi span{color:var(--muted);font-size:13px}
+.kpi.pass b{color:var(--pass)} .kpi.known b{color:var(--known)} .kpi.block b{color:var(--block)}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--idle);margin-top:4px}
+.bar i{display:block;height:100%} .bar .p{background:var(--pass)} .bar .k{background:var(--known)} .bar .b{background:var(--block)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px} .legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{font:600 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+  text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+td.num,th.num{text-align:right} tr.total td{font-weight:700}
+.sev{font:700 12px/1 var(--mono);padding:4px 7px;border-radius:5px;white-space:nowrap}
+.sev.S1,.sev.S2{background:var(--fail-soft);color:var(--fail)} .sev.S3{background:var(--known-soft);color:var(--known)}
+.sev.S4{background:var(--accent-soft);color:var(--accent)}
+.os{font:600 12px/1 var(--mono);padding:4px 7px;border-radius:5px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.ok{color:var(--pass);font-weight:700} .warn{color:var(--known);font-weight:700}
+.draft{margin:0 0 14px;padding:10px 14px;border-radius:8px;background:var(--fail-soft);color:var(--fail)}
+.note{font-size:13px;color:var(--muted)}
+ul{margin:6px 0 10px;padding-left:20px} li{margin:4px 0;max-width:72ch}
+.signoff{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 22px;margin-top:8px}
+.signoff dt{font:600 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)} .signoff dd{margin:0}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media (max-width:560px){h1{font-size:24px}.kpi b{font-size:24px}.wrap{padding-inline:16px}.facts{grid-template-columns:1fr 1fr}}
+@media print{
+  body{background:#fff;color:#122E52;font-size:12px} .wrap{max-width:none;padding:0}
+  h2{break-after:avoid;margin-top:22px} h3{break-after:avoid}
+  tr,.kpis,.kpi,.facts,.docinfo{break-inside:avoid} a{color:#122E52;text-decoration:none}
+}
+</style></head><body>
+<div class='wrap'>
+<header><div class="brandbar"><svg class="brand-logo" height="26" width="101" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180.9 46.4" role="img" aria-label="TRIARE"><g><path class="st0" d="M76,13.8H55.8c-0.2,0-0.3,0.1-0.3,0.3v3.1c0,0.1,0.1,0.3,0.3,0.3H64v15c0,0.2,0.1,0.3,0.3,0.3h3.1c0.2,0,0.3-0.1,0.3-0.3v-15H76c0.2,0,0.3-0.1,0.3-0.3v-3.1C76.2,13.9,76.1,13.8,76,13.8L76,13.8z"/><path class="st0" d="M94.9,26.6c2.7-0.7,3.1-3.4,3.1-4.8v-3.2c0-1.5-0.5-4.9-4.5-4.9h-11c-2,0-3.7,1.6-3.7,3.7v15c0,0.2,0.1,0.3,0.3,0.3h3.1c0.2,0,0.3-0.1,0.3-0.3v-4.7c0-0.3,0.3-0.6,0.6-0.6h6.9c0.3,0,0.6,0.1,0.8,0.3l4.3,5.1c0,0,0.1,0.1,0.2,0.1h4.2c0.4,0,0.1-0.3,0.1-0.3L94.9,26.6L94.9,26.6z M91.4,23.8h-7.9c-0.6,0-1-0.5-1-1v-4.2l0,0c0-0.8,0.6-1.4,1.4-1.4h7.5c0.6,0,2.9,0,2.9,3.3S92,23.8,91.4,23.8z"/><path class="st0" d="M102.4,13.8h3.1c0.2,0,0.3,0.1,0.3,0.3v18.4c0,0.2-0.1,0.3-0.3,0.3h-3.1c-0.2,0-0.3-0.1-0.3-0.3V14.1C102.1,13.9,102.3,13.8,102.4,13.8z"/><path class="st0" d="M124.3,16.8c-1.6-3.3-3.7-3-4.5-3s-2.9-0.3-4.5,3c-1.4,3-6.3,13.7-7.2,15.6c-0.1,0.2,0,0.3,0.2,0.3h3.8c0.2,0,0.3-0.1,0.4-0.2c0.3-0.7,1.4-3.1,1.5-3.2c0.1-0.2,0.2-0.3,0.4-0.3h11c0.2,0,0.3,0,0.4,0.3c0.1,0.2,1.2,2.5,1.5,3.2c0.1,0.1,0.1,0.2,0.4,0.2h3.8c0.2,0,0.3-0.1,0.2-0.3C130.6,30.5,125.7,19.8,124.3,16.8L124.3,16.8z M122.3,25.6h-5c-1.1,0-1.6-0.3-1.1-1.4c1.1-2.4,2.2-4.7,2.8-6c0,0,0.3-0.7,0.9-0.7s0.9,0.7,0.9,0.7c0.6,1.2,1.7,3.5,2.8,6C123.9,25.3,123.4,25.6,122.3,25.6z"/><path class="st0" d="M160.4,17.8c0-0.3,0.3-0.6,0.6-0.6h14.2c0.1,0,0.3-0.1,0.3-0.3v-2.9c0-0.1-0.1-0.3-0.3-0.3H160c-1.8,0-3.2,1.5-3.2,3.3v12.4c0,1.8,1.5,3.2,3.2,3.2h15.2c0.1,0,0.3-0.1,0.3-0.3v-2.9c0-0.1-0.1-0.3-0.3-0.3H161c-0.3,0-0.6-0.3-0.6-0.6v-3.4c0-0.3,0.3-0.6,0.6-0.6h12.4c0.1,0,0.3-0.1,0.3-0.3v-2.9c0-0.1-0.1-0.3-0.3-0.3H161c-0.3,0-0.6-0.3-0.6-0.6L160.4,17.8L160.4,17.8z"/><path class="st1" d="M37.9,4.6c-0.6-1.1-2-1.4-3.1-0.8L27,8.3c-0.8,0.4-1.8,0.5-2.6,0.1l-6.9-4c-1.3-0.7-3.1-0.7-4.4,0L7.6,7.6C7.1,7.9,6.7,8.3,6.4,8.7c-0.2,0.4-0.4,0.9-0.4,1.4c0,1,0.6,2,1.6,2.6l3.8,2.1l6.8,3.9c1.1,0.6,2.5,0.3,3.1-0.8c0.6-1.1,0.2-2.5-0.8-3.1l-4-2.3L13.7,11l0,0c-0.8-0.4-1.5-0.9-0.2-1.6l0.3-0.2c0.8-0.5,1.9-0.5,2.7-0.1l6.9,4c1.3,0.7,3.1,0.7,4.4,0l9.3-5.4C38.2,7.1,38.5,5.7,37.9,4.6L37.9,4.6z"/><path class="st0" d="M23.4,25.6c0,5.8,0,9.9,0,9.9c0,0.9,0,1.8-1.3,1l-0.3-0.2c-0.8-0.5-1.4-1.4-1.4-2.3v-8c0-1.5-0.9-3-2.2-3.8L8.9,17c-1.1-0.6-2.5-0.3-3.1,0.8s-0.2,2.5,0.8,3.1l7.9,4.4c0.8,0.5,1.3,1.4,1.3,2.2v8c0,1.5,0.9,3,2.2,3.8l5.6,3.2c0.5,0.3,1.1,0.5,1.6,0.4c0.5,0,1-0.1,1.4-0.4c0.9-0.5,1.4-1.5,1.4-2.6V26l0,0c0-2.4,1.2-5,3.3-6.2l0,0l8.5-4.9c0.8-0.4,1.5-0.9,1.5,0.6v0.4c0,0.9-0.5,1.9-1.3,2.4l-6.9,4C31.9,23,31,24.6,31,26v10.7c0,1.3,1,2.3,2.3,2.3c1.3,0,2.2-1,2.2-2.3v-9c0-0.9,0.5-1.8,1.2-2.3l6.9-4c1.3-0.7,2.2-2.3,2.2-3.8v-6.4c0-0.6-0.2-1.1-0.4-1.6c-0.2-0.4-0.6-0.8-1-1c-0.9-0.5-2-0.5-3,0.1c0,0-5.9,3.4-12,6.9C24.9,18.2,23.4,19.8,23.4,25.6L23.4,25.6z"/><path class="st0" d="M149.6,26.6c2.7-0.7,3.1-3.4,3.1-4.8v-3.2c0-1.5-0.5-4.9-4.5-4.9h-11c-2,0-3.7,1.6-3.7,3.7v15c0,0.2,0.1,0.3,0.3,0.3h3.1c0.1,0,0.3-0.1,0.3-0.3v-4.7c0-0.3,0.3-0.6,0.6-0.6h6.9c0.3,0,0.6,0.1,0.8,0.3l4.3,5.1c0,0,0.1,0.1,0.2,0.1h4.2c0.4,0,0.1-0.3,0.1-0.3L149.6,26.6L149.6,26.6z M146.1,23.8h-7.9c-0.6,0-1-0.5-1-1v-4.2l0,0c0-0.8,0.6-1.4,1.4-1.4h7.5c0.6,0,2.9,0,2.9,3.3S146.7,23.8,146.1,23.8z"/></g></svg><span class="brandline">Prepared by TRIARE for Concert Technologies</span></div>
+<div class='eyebrow'>Test completion report · Mobile regression · Android</div>
+<h1>Concert Technologies Field Technicians Android App — Test Completion Report <span class='pill known'>No unexpected failures</span></h1>
+<dl class='facts'><div><dt>Test cycle</dt><dd>2 October 2026</dd></div><div><dt>Environment</dt><dd>DEV</dd></div><div><dt>Device</dt><dd>Pixel 7 emulator (Android 16 · API 36)</dd></div><div><dt>App build</dt><dd>1.1.1 (178) · debug build</dd></div><div><dt>Report date</dt><dd>5 October 2026</dd></div><div><dt>Prepared by</dt><dd>TRIARE QA</dd></div><div><dt>Client</dt><dd>Concert Technologies</dd></div></dl>
+<div class='docinfo'><b>Document.</b> Version of 2026-10-02 (Android run of 2026-10-02) · Online version: <a href='https://claude.ai/artifact/2sTviSM7raPbMcdxjLvYk8'>https://claude.ai/artifact/2sTviSM7raPbMcdxjLvYk8</a> · PDF: <code>ConcertTechnologies_FieldTechnicians_Android_TestCompletionReport_2026-10-02.pdf</code> · Confidential.</div>
+</header>
+<h2>1. Summary</h2>
+<p class='lead'>Regression testing of the Concert Technologies Field Technicians Android App finished on 2 October 2026 with <b>no unexpected failures</b>. Of the <b>645</b> checks in the QA checklist, <b>497</b> (77%) are automated: <b>482</b> passed, <b>12</b> are red because of 7 known, reported defects and 3 behaviours accepted by the product owner, and <b>3</b> could not run on the test environment for agreed reasons. <b>7</b> defects are open, none of them critical or major. The other <b>148</b> checks are not automated, each for a written reason (section 5).</p>
+<h2>2. Scope</h2>
+<p>Automated functional regression of the field technicians' mobile app (Android) through its user interface, on the test environment (DEV). The checklist covers 12 modules:</p><ul><li>Splash</li><li>Authentication</li><li>Order list</li><li>Order details</li><li>Check in out</li><li>Order progress</li><li>Submit deliverables</li><li>Survey</li><li>Photo report</li><li>Notes</li><li>Notifications</li><li>Profile</li></ul>
+<h3>Out of scope</h3><ul><li>API testing as a discipline (the API was used only to prepare test data and to verify what the app stored)</li><li>Performance and load testing</li><li>Security testing</li><li>The web admin panel</li><li>The production environment</li><li>Real devices, tablets and operating-system versions other than those in section 3</li></ul>
+<h2>3. Test environment</h2>
+<div class='scroll'><table><thead><tr><th></th><th>Android</th></tr></thead><tbody><tr><td>Operating system</td><td>Android 16 · API 36</td></tr><tr><td>Device</td><td>Pixel 7 — emulator</td></tr><tr><td>App build</td><td>1.1.1 (178) · debug build</td></tr><tr><td>App type</td><td>Flutter</td></tr><tr><td>Backend</td><td>DEV</td></tr><tr><td>Test automation</td><td>Appium + pytest, through the app's interface</td></tr><tr><td>Run finished</td><td>2 October 2026, 19:55 UTC</td></tr></tbody></table></div>
+<h2>4. Results</h2>
+<div class='kpis'><div class='kpi'><b>645</b><span>checks in the QA checklist</span></div><div class='kpi'><b>497</b><span>automated · 77%</span></div><div class='kpi pass'><b>482</b><span>passed</span></div><div class='kpi known'><b>12</b><span>red — known cause</span></div><div class='kpi block'><b>3</b><span>could not run</span></div></div>
+<div class='bar' role='img' aria-label='482 passed, 12 red with a known cause, 3 could not run, 148 not automated, of 645'><i class='p' style='width:74.73%'></i><i class='k' style='width:1.86%'></i><i class='b' style='width:0.47%'></i></div><div class='legend'><span><i style='background:var(--pass)'></i>passed</span><span><i style='background:var(--known)'></i>red — known cause</span><span><i style='background:var(--block)'></i>could not run</span><span><i style='background:var(--idle)'></i>not automated (section 5)</span></div>
+<h3>By module</h3><div class='scroll'><table><thead><tr><th>Module</th><th class=num>Checks</th><th class=num>Automated</th><th class=num>Passed</th><th class=num>Red (known)</th><th class=num>Could not run</th><th class=num>Not automated</th></tr></thead><tbody><tr><td>Splash</td><td class=num>15</td><td class=num>10</td><td class=num>8</td><td class=num>2</td><td class=num>0</td><td class=num>5</td></tr><tr><td>Authentication</td><td class=num>126</td><td class=num>86</td><td class=num>83</td><td class=num>3</td><td class=num>0</td><td class=num>40</td></tr><tr><td>Order list</td><td class=num>70</td><td class=num>59</td><td class=num>55</td><td class=num>4</td><td class=num>0</td><td class=num>11</td></tr><tr><td>Order details</td><td class=num>89</td><td class=num>55</td><td class=num>55</td><td class=num>0</td><td class=num>0</td><td class=num>34</td></tr><tr><td>Check in out</td><td class=num>41</td><td class=num>25</td><td class=num>25</td><td class=num>0</td><td class=num>0</td><td class=num>16</td></tr><tr><td>Order progress</td><td class=num>42</td><td class=num>31</td><td class=num>29</td><td class=num>0</td><td class=num>2</td><td class=num>11</td></tr><tr><td>Submit deliverables</td><td class=num>33</td><td class=num>32</td><td class=num>31</td><td class=num>0</td><td class=num>1</td><td class=num>1</td></tr><tr><td>Survey</td><td class=num>57</td><td class=num>51</td><td class=num>51</td><td class=num>0</td><td class=num>0</td><td class=num>6</td></tr><tr><td>Photo report</td><td class=num>54</td><td class=num>40</td><td class=num>39</td><td class=num>1</td><td class=num>0</td><td class=num>14</td></tr><tr><td>Notes</td><td class=num>52</td><td class=num>46</td><td class=num>44</td><td class=num>2</td><td class=num>0</td><td class=num>6</td></tr><tr><td>Notifications</td><td class=num>31</td><td class=num>28</td><td class=num>28</td><td class=num>0</td><td class=num>0</td><td class=num>3</td></tr><tr><td>Profile</td><td class=num>35</td><td class=num>34</td><td class=num>34</td><td class=num>0</td><td class=num>0</td><td class=num>1</td></tr><tr class=total><td>Total</td><td class=num>645</td><td class=num>497</td><td class=num>482</td><td class=num>12</td><td class=num>3</td><td class=num>148</td></tr></tbody></table></div>
+<h3>Could not run · 1 test</h3>
+<div class='scroll'><table><thead><tr><th>Test</th><th>Why</th></tr></thead><tbody><tr><td>The app&#x27;s reaction to a successful submission: &#x27;Deliverables sent to review successfully&#x27;, &#x27;Successful&#x27;, then Check out, locked at once</td><td>The test environment answers a job submission with a server error although it records it, so the success message cannot appear.</td></tr></tbody></table></div>
+<h2>5. Checks not automated · 148</h2>
+<p>Each of these has a written reason in the QA records. They are not failures: they are checks automation does not decide, grouped by why.</p>
+<div class='scroll'><table><thead><tr><th>Reason</th><th class=num>Checks</th></tr></thead><tbody><tr><td>Planned for automation</td><td class=num>36</td></tr><tr><td>Kept manual by the product owner&#x27;s decision</td><td class=num>33</td></tr><tr><td>Visual and judgement checks, kept manual</td><td class=num>24</td></tr><tr><td>Works differently by design — accepted by the product owner</td><td class=num>15</td></tr><tr><td>Needs a real device or acts outside the app</td><td class=num>15</td></tr><tr><td>Failure conditions the test environment cannot produce</td><td class=num>10</td></tr><tr><td>Not observable through the app on the test environment</td><td class=num>9</td></tr><tr><td>Requirement under clarification</td><td class=num>3</td></tr><tr><td>Load conditions, excluded by agreement</td><td class=num>2</td></tr><tr><td>Proved once, in another check</td><td class=num>1</td></tr></tbody></table></div>
+<h2>6. Open defects · 7</h2>
+<p><span class='sev S3'>minor</span> 6 · <span class='sev S4'>cosmetic</span> 1. Severity as assessed by QA; priority is decided by the product owner.</p>
+<div class='scroll'><table><thead><tr><th>Defect</th><th>Module</th><th>Severity</th><th>Status</th></tr></thead><tbody><tr><td>&quot;Updated&quot; stays on a job after its details were opened, until the calendar is refreshed</td><td>Order list</td><td><span class='sev S3'>minor</span></td><td>Open</td></tr><tr><td>A deleted account stays signed in: the app keeps opening the Jobs list and the profile after a cold start</td><td>Splash</td><td><span class='sev S3'>minor</span></td><td>Open</td></tr><tr><td>After a connection error on the code screen, Verify does nothing until a digit is changed</td><td>Authentication</td><td><span class='sev S3'>minor</span></td><td>Open</td></tr><tr><td>Login with an unregistered phone number shows a generic error instead of &quot;not registered&quot;</td><td>Authentication</td><td><span class='sev S3'>minor</span></td><td>Open</td></tr><tr><td>The Jobs list is ordered by when a job was created, not by its scheduled date</td><td>Order list</td><td><span class='sev S3'>minor</span></td><td>Open</td></tr><tr><td>The weekly calendar keeps showing &quot;No jobs&quot; for jobs the refreshed Jobs list already shows</td><td>Order list</td><td><span class='sev S3'>minor</span></td><td>Open</td></tr><tr><td>Android: the system Back on the splash screen leaves the app</td><td>Splash</td><td><span class='sev S4'>cosmetic</span></td><td>Open</td></tr></tbody></table></div>
+<h3>Known behaviour accepted by the product owner · 3</h3>
+<p>QA reported these against the requirements; the product owner reviewed them and decided not to raise them as defects. Their checks stay red and are counted above as “red — known cause”.</p>
+<div class='scroll'><table><thead><tr><th>Behaviour</th><th>Module</th><th>QA severity</th><th>Status</th></tr></thead><tbody><tr><td>A photo deleted from the Photo report stays on the job on the server</td><td>Photo report</td><td><span class='sev S2'>major</span></td><td>Accepted</td></tr><tr><td>Editing or deleting a note never reaches the server; each new note replaces the job&#x27;s notes there</td><td>Notes</td><td><span class='sev S2'>major</span></td><td>Accepted</td></tr><tr><td>A note created and then edited offline is not synced when the connection returns; it waits for the submission</td><td>Notes</td><td><span class='sev S3'>minor</span></td><td>Accepted</td></tr></tbody></table></div>
+<h2>7. Exit criteria</h2>
+<div class='scroll'><table><thead><tr><th>Criterion</th><th>Met</th><th>Detail</th></tr></thead><tbody><tr><td>Every planned test executed</td><td><span class='warn'>No</span></td><td>149 tests, 1 could not run (section 4)</td></tr><tr><td>No unexpected test failure</td><td><span class='ok'>Yes</span></td><td>0 unexpected</td></tr><tr><td>Every red check has a known cause</td><td><span class='ok'>Yes</span></td><td>0 unexplained</td></tr><tr><td>No open critical defect</td><td><span class='ok'>Yes</span></td><td>0 open</td></tr><tr><td>No open major defect</td><td><span class='ok'>Yes</span></td><td>0 open; 2 major-severity behaviours accepted by the product owner (section 6)</td></tr><tr><td>P0 devices of the device matrix covered</td><td><span class='ok'>Yes</span></td><td>all covered</td></tr></tbody></table></div>
+<h2>8. Residual risks and recommendations</h2><ul>
+<li>The 7 minor and cosmetic defects can follow in a later release.</li>
+<li><b>Accepted behaviour (major by QA's assessment):</b> A photo deleted from the Photo report stays on the job on the server. The product owner decided not to raise it; we recommend confirming with the client that this is intended.</li>
+<li><b>Accepted behaviour (major by QA's assessment):</b> Editing or deleting a note never reaches the server; each new note replaces the job&#x27;s notes there. The product owner decided not to raise it; we recommend confirming with the client that this is intended.</li>
+<li><b>Accepted behaviour (minor by QA's assessment):</b> A note created and then edited offline is not synced when the connection returns; it waits for the submission. The product owner decided not to raise it; we recommend confirming with the client that this is intended.</li>
+<li>39 checks stay outside automation (visual judgement, real-device behaviour): a short manual pass over them on a real device is recommended before release.</li>
+<li>1 test could not run on the test environment (section 4); re-run when the environment allows.</li>
+<li>Only Pixel 7 emulator (Android 16 · API 36) and the test environment were covered: behaviour on real devices, other OS versions and production is not asserted by this report.</li>
+</ul>
+<h2>9. Sign-off</h2>
+<dl class='signoff'><div><dt>Prepared by</dt><dd>TRIARE QA</dd></div><div><dt>Approved by</dt><dd>QA Lead, TRIARE</dd></div><div><dt>Date</dt><dd>5 October 2026</dd></div></dl>
+<footer><span>TRIARE · Confidential</span><span>Concert Technologies Field Technicians Android App · run of 2026-10-02</span></footer>
+</div></body></html>
