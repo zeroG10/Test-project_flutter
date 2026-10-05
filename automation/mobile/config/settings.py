@@ -10,8 +10,16 @@ Two independent axes — never mix them:
                      (appium-flutter-integration-driver — opt-in for debug builds).
 
 ``FLUTTER_ENABLED=true`` is a deprecated alias for ``APP_KIND=flutter`` and still works.
+
+Parallel runs (PARALLEL-RUNS.md): everything a run shares with a run of the OTHER platform can
+be given per platform — the test account (``IOS_USER_*`` / ``ANDROID_USER_*``) and the Appium
+server (``IOS_APPIUM_PORT`` / ``ANDROID_APPIUM_PORT``). Unset → the shared ``APP_USER_*`` /
+``APPIUM_PORT``, and the two platforms then run one at a time. ``settings.apply_platform()``
+makes the choice once, when the platform of the run is known (conftest ``pytest_configure``,
+the scripts).
 """
 
+import hashlib
 import warnings
 from pathlib import Path
 from typing import Literal, Self
@@ -66,6 +74,10 @@ class Settings(BaseSettings):
     android_app_package: str = "com.example.app"
     android_app_activity: str = "com.example.app.MainActivity"
 
+    # How scripts/qa.sh boots the emulator when none is running. The DNS servers: an emulator keeps
+    # the DNS of the network it booted on and resolves nothing after the Mac changes network.
+    android_emulator_args: str = "-netdelay none -netspeed full -dns-server 8.8.8.8,1.1.1.1"
+
     ios_device_name: str = "iPhone 15"
     ios_platform_version: str = "17.4"
     ios_app_path: str = "./builds/ios/App.app"
@@ -76,6 +88,20 @@ class Settings(BaseSettings):
     app_user_phone: str = ""
     app_user_email: str = ""
     app_user_otp: str = ""
+    # The same, per platform — a second account lets iOS and Android run at the same time
+    # (PARALLEL-RUNS.md). Empty → the shared APP_USER_* value above.
+    ios_user_phone: str = ""
+    ios_user_email: str = ""
+    ios_user_otp: str = ""
+    android_user_phone: str = ""
+    android_user_email: str = ""
+    android_user_otp: str = ""
+    # One Appium server per platform for parallel runs; None → APPIUM_PORT.
+    ios_appium_port: int | None = None
+    android_appium_port: int | None = None
+    # Set by apply_platform(): one letter that marks the test data of this platform's run
+    # (fixtures/jobs.py run stamp) — two runs seeding in the same second never share an id.
+    run_tag: str = "-"
 
     # Field Services API — лише підготовка/прибирання даних для UI-тестів
     # (docs/api/dev-test-data.md). Порожній API_BASE_URL -> фікстури з API = Blocked.
@@ -113,6 +139,55 @@ class Settings(BaseSettings):
         if self.flutter_driver == "integration" and self.app_kind != "flutter":
             raise ValueError("FLUTTER_DRIVER=integration requires APP_KIND=flutter")
         return self
+
+    def account(self, platform: str) -> tuple[str, str, str]:
+        """(email, phone, otp) of the test account ``platform`` runs under."""
+        p = normalize_platform(platform)
+        return (
+            getattr(self, f"{p}_user_email") or self.app_user_email,
+            getattr(self, f"{p}_user_phone") or self.app_user_phone,
+            getattr(self, f"{p}_user_otp") or self.app_user_otp,
+        )
+
+    def accounts(self) -> list[tuple[str, str]]:
+        """Every (email, phone) a run may sign in with — what a shared report must hide."""
+        seen = {(self.app_user_email, self.app_user_phone)}
+        seen |= {self.account(p)[:2] for p in PLATFORMS}
+        return sorted(pair for pair in seen if any(pair))
+
+    def account_key(self, platform: str) -> str:
+        """A fingerprint of the platform's account: tells two accounts apart in a lock file or a
+        log without naming either."""
+        email = self.account(platform)[0].strip().lower()
+        return hashlib.sha256(email.encode()).hexdigest()[:12] if email else ""
+
+    def appium_port_for(self, platform: str) -> int:
+        return getattr(self, f"{normalize_platform(platform)}_appium_port") or self.appium_port
+
+    def can_run_in_parallel(self) -> tuple[bool, str]:
+        """May an iOS run and an Android run go at the same time? (yes, "") or (no, why)."""
+        if not all(self.account_key(p) for p in PLATFORMS):
+            return False, "a platform has no test account"
+        if self.account_key("ios") == self.account_key("android"):
+            return False, (
+                "both platforms use ONE test account — set IOS_USER_* or ANDROID_USER_* to a "
+                "second account"
+            )
+        if self.appium_port_for("ios") == self.appium_port_for("android"):
+            return False, (
+                "both platforms use ONE Appium server — set IOS_APPIUM_PORT and "
+                "ANDROID_APPIUM_PORT to different ports"
+            )
+        return True, ""
+
+    def apply_platform(self, platform: str) -> None:
+        """Make this process a run of ``platform``: its account, its Appium server, its data tag.
+        Idempotent; every reader of ``app_user_*`` / ``appium_url`` then sees the platform's own."""
+        p = normalize_platform(platform)
+        self.app_user_email, self.app_user_phone, self.app_user_otp = self.account(p)
+        self.appium_port = self.appium_port_for(p)
+        self.platform = p
+        self.run_tag = p[0].upper()  # "I" | "A"
 
     @property
     def appium_url(self) -> str:

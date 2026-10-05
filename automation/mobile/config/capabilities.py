@@ -11,6 +11,8 @@ Client quirk worth knowing: ``AppiumOptions`` stores class defaults (``automatio
 integration driver therefore gets option subclasses whose *defaults* name it.
 """
 
+import os
+
 from appium.options.android import UiAutomator2Options
 from appium.options.common import AppiumOptions
 from appium.options.common.automation_name_option import AUTOMATION_NAME
@@ -54,6 +56,8 @@ def android_caps() -> UiAutomator2Options:
     opts = cls()  # platformName / automationName come from the class defaults
     opts.platform_version = settings.android_platform_version
     opts.device_name = settings.android_device_name
+    if os.environ.get("ANDROID_SERIAL"):  # scripts/qa.sh: the emulator, not a phone on a cable
+        opts.udid = os.environ["ANDROID_SERIAL"]
     opts.app = str(settings.app_path("android"))
     opts.app_package = settings.android_app_package
     opts.app_activity = settings.android_app_activity

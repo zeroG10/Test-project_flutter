@@ -156,6 +156,8 @@ Modules are independent of `platforms.*` but a module may assume a stack: e.g.
   `automation/mobile/builds/{android,ios,flutter}/`.
 - Start server: `bash scripts/start_appium.sh`.
 - **Verify:** `uv run pytest --platform=android -m smoke` (or `--platform=ios`).
+- **Both platforms at the same time** (optional): a test account and an Appium port per platform —
+  [automation/mobile/PARALLEL-RUNS.md](../automation/mobile/PARALLEL-RUNS.md) §5; then `scripts/qa.sh both all --dry-run`.
 
 ## 4. Post-setup hygiene (what /setup-project also does)
 

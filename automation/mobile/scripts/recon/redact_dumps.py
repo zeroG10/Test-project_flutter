@@ -23,14 +23,15 @@ def main() -> None:
     parser.add_argument("dumps")
     parser.add_argument("--name", default="")
     args = parser.parse_args()
-    digits = re.sub(r"\D", "", settings.app_user_phone)
-    national = digits[-10:]
-    pairs = [
-        (settings.app_user_email, "[APP_USER_EMAIL]"),
-        (settings.app_user_phone, "[APP_USER_PHONE]"),
-        (f"({national[:3]}) {national[3:6]}-{national[6:]}", "[APP_USER_PHONE]"),
-        (national, "[APP_USER_PHONE]"),
-    ]
+    pairs = []
+    for email, phone in settings.accounts():  # the shared account and each platform's own
+        national = re.sub(r"\D", "", phone)[-10:]
+        pairs += [(email, "[APP_USER_EMAIL]"), (phone, "[APP_USER_PHONE]")]
+        if len(national) == 10:
+            pairs += [
+                (f"({national[:3]}) {national[3:6]}-{national[6:]}", "[APP_USER_PHONE]"),
+                (national, "[APP_USER_PHONE]"),
+            ]
     if args.name:
         pairs.append((args.name, "[APP_USER_NAME]"))
     for path in sorted(Path(args.dumps).glob("*.xml")):

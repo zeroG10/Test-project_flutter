@@ -5,8 +5,8 @@ is left.
 The shared copy of a report hides the test account's email, phone and name in its text (`build_summary.Redactor`);
 on the screens they are pixelated by boxes listed in a redactions file. Finding those boxes by eye does not scale
 (the Android run alone saved 138 screens), so this reads every screen with macOS Vision — on the machine, nothing
-leaves it — and boxes each text line that carries the email (or its local part), the phone (its last 7 digits) or
-the account's first / last name. `--check DIR` runs the same reading over a built copy and fails on any match.
+leaves it — and boxes each text line that carries an account's email (or its local part), phone (its last 7 digits)
+or first / last name — for every test account in the .env: the shared one and each platform's own. `--check DIR` runs the same reading over a built copy and fails on any match.
 
 The values are read from `automation/mobile/.env` and, for the name, from the DEV API (one read, in memory); none
 is printed or written anywhere.
@@ -54,16 +54,19 @@ def ocr(paths: list[Path]) -> Iterable[dict]:
 
 
 def account_names() -> list[str]:
-    """The main test account's first and last name, read from the DEV API in a child process — returned, never
-    printed (the same read the iOS shared copy used, build-public.sh)."""
+    """The first and last names of every test account a run signs in with (the shared one and each platform's
+    own — PARALLEL-RUNS.md), read from the DEV API in a child process — returned, never printed."""
     code = (
         "import json, sys\n"
         "from config.settings import settings\n"
         "from helpers.field_services_api import FieldServicesApi\n"
         "api = FieldServicesApi()\n"
-        "techs = api.find_technicians_by_email(settings.app_user_email)\n"
-        "u = (techs[0].get('user') or {}) if techs else {}\n"
-        "print(json.dumps([u.get('firstName', ''), u.get('lastName', '')]))\n"
+        "names = []\n"
+        "for email, _ in settings.accounts():\n"
+        "    techs = api.find_technicians_by_email(email) if email else []\n"
+        "    u = (techs[0].get('user') or {}) if techs else {}\n"
+        "    names += [u.get('firstName', ''), u.get('lastName', '')]\n"
+        "print(json.dumps(names))\n"
         "api.close()\n"
     )
     python = MOBILE / ".venv" / "bin" / "python"
@@ -78,33 +81,41 @@ class Terms:
 
     def __init__(self, names: list[str]) -> None:
         env = dotenv_values(MOBILE / ".env")
-        email = (env.get("APP_USER_EMAIL") or "").strip().lower()
-        self.email = email.replace(" ", "")
-        self.local = email.split("@")[0].split("+")[0] if email else ""
-        digits = re.sub(r"\D", "", env.get("APP_USER_PHONE") or "")
-        self.phone = digits[-7:] if len(digits) >= 7 else ""
-        self.names = [n for n in names if len(n) >= 3]
-        if not (self.email and self.phone and self.names):
-            raise RuntimeError("Blocked: the account's email, phone or name is unknown — nothing to look for")
-
-    def values(self) -> list[str]:
-        return [self.email, self.local, self.phone, *self.names]
+        self.emails: list[str] = []
+        self.locals: list[str] = []
+        self.phones: list[str] = []
+        for prefix in ("APP_USER", "IOS_USER", "ANDROID_USER"):  # the shared account and each platform's own
+            email = (env.get(f"{prefix}_EMAIL") or "").strip().lower().replace(" ", "")
+            digits = re.sub(r"\D", "", env.get(f"{prefix}_PHONE") or "")
+            if email and email not in self.emails:
+                self.emails.append(email)
+                local = email.split("@")[0].split("+")[0]
+                if len(local) >= 5 and local not in self.locals:
+                    self.locals.append(local)
+            if len(digits) >= 7 and digits[-7:] not in self.phones:
+                self.phones.append(digits[-7:])
+        self.names = sorted({n for n in names if len(n) >= 3})
+        if not (self.emails and self.phones and self.names):
+            raise RuntimeError("Blocked: the accounts' email, phone or name is unknown — nothing to look for")
 
     def in_page(self, body: str) -> bool:
         """A page's own text (markup stripped) naming the account: its email, a phone number ending in its digits,
         or its name."""
         plain = re.sub(r"<[^>]+>", " ", body)
-        if self.email in body.lower() or (len(self.local) >= 5 and self.local in plain.lower()):
+        low = body.lower()
+        if any(e in low for e in self.emails) or any(x in plain.lower() for x in self.locals):
             return True
-        if any(self.phone in re.sub(r"\D", "", m) for m in re.findall(r"\+?\d[\d\s().-]{6,}\d", plain)):
+        numbers = [re.sub(r"\D", "", m) for m in re.findall(r"\+?\d[\d\s().-]{6,}\d", plain)]
+        if any(phone in number for phone in self.phones for number in numbers):
             return True
         return any(re.search(rf"(?<![A-Za-z]){re.escape(n)}(?![A-Za-z])", plain, re.IGNORECASE) for n in self.names)
 
     def hit(self, text: str) -> bool:
         flat = text.lower().replace(" ", "")
-        if self.email in flat or (len(self.local) >= 5 and self.local in flat):
+        if any(e in flat for e in self.emails) or any(x in flat for x in self.locals):
             return True
-        if self.phone and self.phone in re.sub(r"\D", "", text):
+        digits = re.sub(r"\D", "", text)
+        if any(phone in digits for phone in self.phones):
             return True
         return any(re.search(rf"(?<![A-Za-z]){re.escape(n)}(?![A-Za-z])", text, re.IGNORECASE) for n in self.names)
 

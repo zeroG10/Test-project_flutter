@@ -11,9 +11,12 @@
 #   - a results folder that already exists (a run is never overwritten or mixed with another);
 #   - uncommitted changes to tracked files (owner rule: commit before every run) — ALLOW_DIRTY=1
 #     overrides for a throwaway debug run, and RUN_INFO.txt then says the tree was dirty;
-#   - a second run while one is going (one device, one shared DEV test account — never two runs,
-#     never iOS and Android side by side).
+#   - a second run of the SAME platform while one is going (one device per platform);
+#   - a run of the OTHER platform while one is going, unless the two share nothing: each platform its
+#     own test account and its own Appium server (.env: IOS_USER_* / ANDROID_USER_*,
+#     IOS_APPIUM_PORT / ANDROID_APPIUM_PORT — PARALLEL-RUNS.md). Then iOS and Android run side by side.
 # A plain `uv run pytest` without this script writes to results/_scratch/ (pyproject.toml).
+# Both platforms, modules by name, devices and Appium started for you: scripts/qa.sh.
 set -euo pipefail
 
 MOBILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -62,13 +65,25 @@ if [ "$PLATFORM" = "android" ]; then
   fi
 fi
 
-LOCK="results/.run.lock"
+# What this platform's run uses: its Appium server, its account (a fingerprint, never the email)
+# and whether the two platforms may run side by side.
+eval "$(uv run python scripts/run_context.py "$PLATFORM")"
+
+# One lock per platform. Ours is taken FIRST and the other platform's looked at after, so two runs
+# starting in the same second cannot both miss each other.
+LOCK="results/.run.$PLATFORM.lock"
+OTHER_LOCK="results/.run.$OTHER_PLATFORM.lock"
 mkdir -p "results/$PLATFORM"
 if ! mkdir "$LOCK" 2>/dev/null; then
-  echo "refused: another run holds $LOCK ($(cat "$LOCK/owner" 2>/dev/null || echo unknown)) — runs go one at a time" >&2
+  echo "refused: another $PLATFORM run holds $LOCK ($(cat "$LOCK/owner" 2>/dev/null || echo unknown)) — one run per platform at a time" >&2
   exit 3
 fi
 echo "$PLATFORM $NAME pid $$" > "$LOCK/owner"
+if [ -d "$OTHER_LOCK" ] && [ "$PARALLEL_OK" != "yes" ]; then
+  rmdir "$LOCK" 2>/dev/null || rm -rf "$LOCK"
+  echo "refused: a $OTHER_PLATFORM run is going ($(cat "$OTHER_LOCK/owner" 2>/dev/null || echo unknown)) and the platforms cannot run side by side: $PARALLEL_WHY (PARALLEL-RUNS.md)" >&2
+  exit 3
+fi
 
 # RUN_INFO.txt is written when the run ends (also on Ctrl-C): pytest's --clean-alluredir
 # (pyproject.toml) empties the results folder when the run starts.
@@ -82,6 +97,8 @@ finish() {
       echo "harness:   $HARNESS"
       echo "dirty:     $DIRTY"
       echo "command:   uv run pytest --platform=$PLATFORM --alluredir=$OUT $ARGS"
+      echo "appium:    $APPIUM_URL"
+      echo "account:   $ACCOUNT_KEY (fingerprint; parallel with $OTHER_PLATFORM: $PARALLEL_OK)"
       echo "video:     EVIDENCE_VIDEO=${EVIDENCE_VIDEO:-<default>}"
       echo "started:   $STARTED"
       echo "finished:  $(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -94,10 +111,11 @@ ARGS="$*"
 trap finish EXIT
 mkdir -p "$OUT"
 
-# Close every Appium session a killed run left behind (we hold the run lock: no other run is
-# live). A leftover session stops the device's UiAutomator2 server when its newCommandTimeout
-# expires — under THIS run (module 02 run 4). Needs start_appium.sh's session_discovery.
-APPIUM="http://${APPIUM_HOST:-127.0.0.1}:${APPIUM_PORT:-4723}"
+# Close every Appium session a killed run left behind on THIS platform's server (we hold its lock;
+# a live run of the other platform is on its own server, or it was refused above). A leftover
+# session stops the device's UiAutomator2 server when its newCommandTimeout expires — under THIS
+# run (module 02 run 4). Needs start_appium.sh's session_discovery.
+APPIUM="$APPIUM_URL"
 for sid in $(curl -s -m 10 "$APPIUM/appium/sessions" | python3 -c \
     'import json,sys; print(" ".join(s["id"] for s in json.load(sys.stdin).get("value") or [] if isinstance(s, dict)))' \
     2>/dev/null); do

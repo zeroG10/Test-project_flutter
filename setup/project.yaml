@@ -155,6 +155,12 @@ mobile:
     app_activity: "com.concerttechnologies.app.MainActivity"
   ios:
     bundle_id: "com.concerttechnologies.app.dev"           # flavor development; prod = com.ctfieldservices.app
+  # iOS and Android at the same time (automation/mobile/PARALLEL-RUNS.md): a test account and an Appium
+  # server per platform. Variable NAMES only — the values live in automation/mobile/.env.
+  parallel:
+    enabled: true                       # owner, 2026-10-05; proven by a run: not yet (PARALLEL-RUNS.md §4)
+    accounts: { ios: "IOS_USER_*", android: "APP_USER_*" }
+    appium_ports: { ios: 4723, android: 4724 }
   figma:
     file_key: "eAb4RANWzBFgqiyiA5hUZ0"
     file_name: "Concert Technologies: Mobile app (For review)"

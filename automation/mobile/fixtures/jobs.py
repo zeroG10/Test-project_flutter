@@ -20,6 +20,7 @@ from datetime import date, datetime, timedelta
 import allure
 import pytest
 
+from config.settings import settings
 from fixtures import test_data
 from helpers.field_services_api import ApiBlocked
 
@@ -113,7 +114,10 @@ def _create(api, user_id: str, run: str, kind: str, day: date, hour: int, status
 
 
 def _run_stamp() -> str:
-    return datetime.now().strftime("%m%d-%H%M%S")
+    """``1002I201937`` — month-day, the platform's letter, the time: the id of every job and file
+    a test seeds. The letter (``-`` outside a run) keeps an iOS and an Android run that seed in the
+    same second apart (PARALLEL-RUNS.md); the length is the one the ids always had."""
+    return datetime.now().strftime(f"%m%d{settings.run_tag}%H%M%S")
 
 
 @pytest.fixture(scope="session")

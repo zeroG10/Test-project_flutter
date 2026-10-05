@@ -29,6 +29,7 @@ Reachability note: `<is the target reachable from GitHub-hosted runners without 
 | Role | Env vars | Can | Cannot |
 |---|---|---|---|
 | **Field Technician (FT)** — єдина роль у мобільній апці | `APP_USER_PHONE`, `APP_USER_EMAIL`, `APP_USER_OTP` в `automation/mobile/.env` | переглядати призначені замовлення, check-in / check-out, заповнювати опитування, додавати фото й нотатки, здавати результати | керувати замовленнями, призначати роботи — це робить PF через веб |
+| **Field Technician — другий акаунт** (власник, 2026-10-05) | `IOS_USER_EMAIL`, `IOS_USER_PHONE` (OTP той самий — `APP_USER_OTP`) | те саме; під ним ганяється **iOS**, щоб iOS і Android могли йти одночасно ([PARALLEL-RUNS.md](../automation/mobile/PARALLEL-RUNS.md)) | ніхто не тестує під ним руками, поки йде прогін |
 | Project Facilitator (PF) | — | керує замовленнями у веб-панелі | **поза скоупом** мобільної автоматизації |
 
 > Record here any place where the UI names a role differently from the API — that is a

@@ -257,11 +257,16 @@ def read_environment(allure_dir: Path) -> dict[str, str]:
     return env
 
 
-class Redactor:
-    """Hides the test account's identifiers on a page that leaves this machine.
+# The test accounts a run may sign in with: the shared one and one per platform (parallel runs —
+# automation/mobile/PARALLEL-RUNS.md). A shared report hides all of them.
+ACCOUNT_PREFIXES = ("APP_USER", "IOS_USER", "ANDROID_USER")
 
-    Text: every known form of APP_USER_EMAIL / APP_USER_PHONE (from automation/mobile/.env,
-    never printed) becomes ``‹test account›``. Images: boxes listed in a redactions file
+
+class Redactor:
+    """Hides the test accounts' identifiers on a page that leaves this machine.
+
+    Text: every known form of the accounts' emails and phones (APP_USER_* / IOS_USER_* /
+    ANDROID_USER_* in automation/mobile/.env, never printed) becomes ``‹test account›``. Images: boxes listed in a redactions file
     (attachment source → [[x0, y0, x1, y1] in points]) are pixelated on the page's copy;
     the original results stay untouched.
     """
@@ -276,13 +281,14 @@ class Redactor:
             from dotenv import dotenv_values
 
             env = dotenv_values(env_file)
-            email = (env.get("APP_USER_EMAIL") or "").strip()
-            phone = (env.get("APP_USER_PHONE") or "").strip()
-            digits = re.sub(r"\D", "", phone)[-10:]
-            forms = [email, email.lower(), phone]
-            if len(digits) == 10:
-                forms += [f"+1{digits}", f"({digits[:3]}) {digits[3:6]}-{digits[6:]}", digits]
-            self.values += [v for v in forms if v]
+            for prefix in ACCOUNT_PREFIXES:  # the shared account and each platform's own
+                email = (env.get(f"{prefix}_EMAIL") or "").strip()
+                phone = (env.get(f"{prefix}_PHONE") or "").strip()
+                digits = re.sub(r"\D", "", phone)[-10:]
+                forms = [email, email.lower(), phone]
+                if len(digits) == 10:
+                    forms += [f"+1{digits}", f"({digits[:3]}) {digits[3:6]}-{digits[6:]}", digits]
+                self.values += [v for v in forms if v]
         self.values = sorted(set(self.values), key=len, reverse=True)
         self.boxes: dict[str, list[list[float]]] = {}
         self.points_width = 402.0

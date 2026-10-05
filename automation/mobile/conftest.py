@@ -85,13 +85,17 @@ def pytest_configure(config):
         config.stash[PLATFORM_KEY] = normalize_platform(raw)
     except ValueError as exc:
         raise pytest.UsageError(str(exc)) from exc
+    # the platform's own test account and Appium server (PARALLEL-RUNS.md), before any
+    # fixture reads them
+    settings.apply_platform(config.stash[PLATFORM_KEY])
 
 
 def pytest_report_header(config):
     flutter_driver = settings.flutter_driver if settings.is_flutter else "-"
     header = (
         f"mobile: platform={config.stash[PLATFORM_KEY]} app_kind={settings.app_kind} "
-        f"flutter_driver={flutter_driver} appium={settings.appium_url}"
+        f"flutter_driver={flutter_driver} appium={settings.appium_url} "
+        f"account={settings.account_key(config.stash[PLATFORM_KEY]) or 'not set'}"
     )
     if config.getoption("--prove-red"):
         header += "\nPROVE-RED RUN: every test must FAIL; a passing test is not proven"
