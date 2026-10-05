@@ -220,6 +220,25 @@ def test_a_draft_not_filed_is_not_an_open_defect(run_dir: Path) -> None:
     _, page, out = _build(run_dir)
     assert "Open defects · 0" in page
     assert not (out / "bugs" / "BUG-AUTH-009.html").exists()
+    assert "href='bugs/BUG-AUTH-009.html'" not in page + _module(out)
+
+
+def test_a_draft_the_owner_decided_not_to_file_is_a_known_failure(run_dir: Path) -> None:
+    _file_bug(run_dir, "BUG-AUTH-009", "> **Status: NOT FILED — owner's decision**\n" + BUG_MD)
+    _, page, out = _build(run_dir)
+    assert '<span class="pill known">No unexpected failures</span>' in page
+    assert "decided not to file (BUG-AUTH-009)" in page
+    assert "Known, not filed · 1" in page
+    assert "<td class='mono'>AUTH-003</td>" in page  # the check it holds red
+    assert "<div class='kpi known'><b>1</b><span>held red by 1 known defect" in page
+    assert "BUG-AUTH-009 <span class='muted'>(known, not filed — owner's decision)</span>" in _module(out)
+
+
+def test_a_draft_without_the_owners_decision_stays_unexpected(run_dir: Path) -> None:
+    _file_bug(run_dir, "BUG-AUTH-009", "> **Status: NOT FILED — waiting for the owner**\n" + BUG_MD)
+    _, page, _ = _build(run_dir)
+    assert '<span class="pill fail">Failed</span>' in page
+    assert "Known, not filed" not in page
 
 
 def test_module_page_shows_every_check_with_its_reason(run_dir: Path) -> None:

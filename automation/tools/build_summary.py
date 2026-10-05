@@ -267,6 +267,8 @@ class Bug:
     priority_proposed: bool = False  # QA's proposal, not yet the owner's / PM's decision
     regression_tc: str = ""  # the TC that stays red until the fix ("- Test case: `TC-…`")
     filed: bool = True  # a draft the owner decided not to file is not an open defect
+    # ...but its red test is no surprise: the owner triaged it ("known, not filed", 2026-10-05)
+    owner_not_filed: bool = False
 
     @property
     def module_dir(self) -> str:
@@ -294,6 +296,7 @@ def load_bugs(pattern_root: Path = tr.REPO_ROOT / "qa" / "mobile") -> list[Bug]:
                 priority_proposed=bool(pri and pri.group(1)),
                 regression_tc=tc.group(1) if tc else "",
                 filed=not re.search(r"Status:\s*NOT FILED", text),
+                owner_not_filed=bool(re.search(r"Status:\s*NOT FILED\s*—\s*owner's decision", text)),
             )
         )
     return bugs
@@ -301,16 +304,18 @@ def load_bugs(pattern_root: Path = tr.REPO_ROOT / "qa" / "mobile") -> list[Bug]:
 
 def bug_for(run: TestRun, bugs: list[Bug]) -> Bug | None:
     """The filed bug whose report names this test as its regression check — by the test
-    function, or by the test case on its "Test case:" line."""
+    function, or by the test case on its "Test case:" line. Failing that, a draft the owner
+    decided not to file that names it: the failure is known, not unexpected."""
     cited = re.compile(rf"::{re.escape(run.func)}(?!\[)\b") if run.func else None
-    for b in bugs:
-        if not b.filed:
-            continue
-        if run.tc and run.tc == b.regression_tc:
-            return b
-        # "::test_name" not followed by "[": a bug citing ONE parametrised row never claims them all
-        if cited and cited.search(b.path.read_text(encoding="utf-8")):
-            return b
+    for wanted in (lambda b: b.filed, lambda b: not b.filed and b.owner_not_filed):
+        for b in bugs:
+            if not wanted(b):
+                continue
+            if run.tc and run.tc == b.regression_tc:
+                return b
+            # "::test_name" not followed by "[": a bug citing ONE parametrised row never claims them all
+            if cited and cited.search(b.path.read_text(encoding="utf-8")):
+                return b
     return None
 
 
@@ -403,7 +408,7 @@ class RunRecord:
     harness: str
     tests: int
     counts: dict[str, int]  # Passed / Failed / Blocked tests
-    unexpected: int  # failed tests no filed bug names as its regression check
+    unexpected: int  # failed tests no filed bug (or owner-decided draft) names as its regression check
     checks: tr.Summary
     statuses: dict[str, str]  # test key -> status
 
@@ -868,11 +873,21 @@ class Report:
             self.modules.append(Module(key, label, rows, runs))
         self.module_of_chk = {row.item.chk_id: m for m in self.modules for row in m.rows}
         self.open_bugs = [b for b in self.bugs if b.filed]
+        # drafts the owner decided not to file whose tests stay red in this run
+        self.known_drafts = [
+            b for b in self.bugs if not b.filed and any(v is b for v in self.bug_of.values())
+        ]
 
     # --- text helpers ------------------------------------------------------------------
 
     def t(self, value: object) -> str:
         return _e(self.red.text(value))
+
+    def bug_ref(self, bug: Bug) -> str:
+        """A filed defect links to its page; a draft the owner decided not to file has none."""
+        if bug.filed:
+            return f"<a href='bugs/{self.t(bug.bug_id)}.html'>{self.t(bug.bug_id)}</a>"
+        return f"{self.t(bug.bug_id)} <span class='muted'>(known, not filed — owner's decision)</span>"
 
     def verdict(self, row: tr.TraceRow) -> str:
         """Passed | Held red | Failed | Blocked | Not automated."""
@@ -953,8 +968,11 @@ class Report:
     def verdict_pill(self) -> tuple[str, str]:
         tc = self.test_counts()
         unexpected = self.unexpected_tests()
-        known = tc["Failed"] - len(unexpected)
-        bugs_red = {self.bug_of[r.uid].bug_id for r in self.runs if self.bug_of.get(r.uid)}
+        held = [self.bug_of[r.uid] for r in self.runs if self.bug_of.get(r.uid)]
+        known = sum(1 for b in held if b.filed)
+        drafts = len(held) - known
+        bugs_red = {b.bug_id for b in held if b.filed}
+        draft_ids = sorted({b.bug_id for b in held if not b.filed})
         if unexpected:
             return (
                 '<span class="pill fail">Failed</span>',
@@ -971,6 +989,11 @@ class Report:
                     f"{_plural(len(bugs_red), 'filed defect')} and stay red until "
                     f"{'it is' if len(bugs_red) == 1 else 'they are'} fixed"
                 )
+            if drafts:
+                parts.append(
+                    f"{_plural(drafts, 'red test')} {'shows' if drafts == 1 else 'show'} app "
+                    f"behaviour the owner triaged and decided not to file ({', '.join(draft_ids)})"
+                )
             if tc["Blocked"]:
                 parts.append(
                     f"{_plural(tc['Blocked'], 'test')} could not run (Blocked), each with its "
@@ -978,7 +1001,7 @@ class Report:
                 )
             return (
                 '<span class="pill known">No unexpected failures</span>',
-                "Nothing failed that is not already a filed defect: " + "; ".join(parts) + ".",
+                "Nothing failed that is not already a known defect: " + "; ".join(parts) + ".",
             )
         return (
             '<span class="pill pass">Passed</span>',
@@ -1017,7 +1040,8 @@ class Report:
 
         # --- summary
         pct = f"{100 * s.automated / s.total:.0f}%" if s.total else "0%"
-        bugs_red = {b.bug_id for row in self.rows for b in self.row_bugs(row)}
+        bugs_red = {b.bug_id for row in self.rows for b in self.row_bugs(row) if b.filed}
+        drafts_red = {b.bug_id for row in self.rows for b in self.row_bugs(row) if not b.filed}
         unexpected = c["Failed"]
         w("<section id='summary'><h2>Summary</h2>")
         w(
@@ -1025,8 +1049,13 @@ class Report:
             f"across {len(self.modules)} modules. <b>{s.automated}</b> of them ({pct}) are "
             f"automated and ran on {t(self.target or self.env.get('Device', 'the device'))}. "
             f"In this run <b>{c['Passed']}</b> passed; <b>{c['Held red']}</b> "
-            f"{'is' if c['Held red'] == 1 else 'are'} held red by {_plural(len(bugs_red), 'open defect')}, "
-            f"each with a test that fails until the defect is fixed; <b>{c['Blocked']}</b> could "
+            f"{'is' if c['Held red'] == 1 else 'are'} held red by {_plural(len(bugs_red), 'open defect')}"
+            + (
+                f" and {_plural(len(drafts_red), 'known issue')} the owner decided not to file"
+                if drafts_red
+                else ""
+            )
+            + f", each with a test that fails until the defect is fixed; <b>{c['Blocked']}</b> could "
             f"not run for a stated reason. "
             + (
                 f"<b>{unexpected}</b> failed with no defect behind them. "
@@ -1042,7 +1071,7 @@ class Report:
         w(f"<div class='kpi pass'><b>{c['Passed']}</b><span>passed in this run</span></div>")
         w(
             f"<div class='kpi known'><b>{c['Held red']}</b><span>held red by "
-            f"{_plural(len(bugs_red), 'known defect')}</span></div>"
+            f"{_plural(len(bugs_red | drafts_red), 'known defect')}</span></div>"
         )
         if c["Failed"]:
             w(f"<div class='kpi fail'><b>{c['Failed']}</b><span>failed, no defect yet</span></div>")
@@ -1163,11 +1192,35 @@ class Report:
         items += [t(d) for d in self.decisions]
         return items or ["Nothing is waiting on the owner."]
 
+    def known_drafts_html(self) -> str:
+        """Red tests the owner triaged as app behaviour and decided not to file."""
+        if not self.known_drafts:
+            return ""
+        t = self.t
+        mod_by_key = {m.key: m for m in self.modules}
+        rows = []
+        for b in self.known_drafts:
+            m = mod_by_key.get(b.module_dir)
+            mod = f"<a href='{m.page}'>{t(m.label)}</a>" if m else t(b.module_dir)
+            held = ", ".join(t(x.removeprefix("CHK-")) for x in self.held_by(b))
+            rows.append(
+                f"<tr><td class='mono id'>{t(b.bug_id)}</td><td>{mod}</td><td>{t(b.title)}</td>"
+                f"<td class='mono'>{held}</td></tr>"
+            )
+        return (
+            f"<h3 style='margin-top:22px'>Known, not filed · {len(self.known_drafts)}</h3>"
+            "<p>The owner triaged these as the app's behaviour and decided not to file them. Their "
+            "tests stay red and are counted as held red by a known defect, not as unexpected "
+            "failures; the reports stay in the repository as drafts.</p>"
+            "<div class='scroll'><table><thead><tr><th>Draft</th><th>Module</th><th>What is wrong</th>"
+            "<th>Checks held red</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table></div>"
+        )
+
     def defects_section(self) -> str:
         t = self.t
         out = [f"<section id='defects'><h2>Open defects · {len(self.open_bugs)}</h2>"]
         if not self.open_bugs:
-            out.append("<p>No open defects.</p></section>")
+            out.append("<p>No open defects.</p>" + self.known_drafts_html() + "</section>")
             return "".join(out)
         holding = [b for b in self.open_bugs if self.held_by(b)]
         out.append(
@@ -1211,7 +1264,9 @@ class Report:
         out.append("</tbody></table></div>")
         out.append(
             "<p class='note'>Each defect has a report with steps, the expected and actual result, "
-            "screenshots and its regression test, under <code>qa/mobile/&lt;module&gt;/bugs/</code>.</p></section>"
+            "screenshots and its regression test, under <code>qa/mobile/&lt;module&gt;/bugs/</code>.</p>"
+            + self.known_drafts_html()
+            + "</section>"
         )
         return "".join(out)
 
@@ -1545,6 +1600,12 @@ class Report:
             for b in bugs:
                 w(f"<li><a href='bugs/{t(b.bug_id)}.html'>{t(b.bug_id)}</a> — {t(b.title)}</li>")
             w("</ul>")
+        drafts = [b for b in self.known_drafts if any(self.module_of_chk.get(x) is m for x in self.held_by(b))]
+        if drafts:
+            w("<h2 style='margin-top:26px'>Known, not filed</h2><ul>")
+            for b in drafts:
+                w(f"<li>{self.bug_ref(b)} — {t(b.title)}</li>")
+            w("</ul>")
         blocked = [r for r in m.runs if r.status == "Blocked"]
         if blocked:
             w("<h2 style='margin-top:26px'>Could not run</h2><ul>")
@@ -1588,7 +1649,7 @@ class Report:
         note = ""
         if verdict == "Held red":
             note = "".join(
-                f"<div class='why'><a href='bugs/{t(b.bug_id)}.html'>{t(b.bug_id)}</a></div>"
+                f"<div class='why'>{self.bug_ref(b)}</div>"
                 for b in self.row_bugs(row)
             )
         elif verdict in ("Failed", "Blocked"):
@@ -1664,7 +1725,7 @@ class Report:
             meta.append(f"<span class='mono'>{t(loc)}</span>")
         bug = self.bug_of.get(r.uid)
         if bug:
-            meta.append(f"Regression check of <a href='bugs/{t(bug.bug_id)}.html'>{t(bug.bug_id)}</a>")
+            meta.append(f"Regression check of {self.bug_ref(bug)}")
         if meta:
             out.append(f"<p class='why' style='margin-top:10px'>{' · '.join(meta)}</p>")
         if r.message:
