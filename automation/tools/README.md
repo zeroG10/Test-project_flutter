@@ -9,6 +9,7 @@ chain described in [`automation/README.md`](../README.md):
 | `import_checklist_from_sheets.py` | Sheet → 0 (one-time) | Google Sheet → per-feature checklist `.md` | markdown under `qa/web/<NN-slug>/` — **reads** Sheets, never writes them |
 | `trace_results.py` | 4 (closure) | run results → checklist IDs | one markdown report, by convention `qa/web/<NN-module>/<module>-traceability.md`, mobile per platform `qa/mobile/<NN-module>/{ios,android}/<module>-traceability.md` — never Sheets |
 | `build_summary.py` | 4 (report) | one mobile run → internal report site: summary, a page per module and per defect | local `automation/mobile/reports/<platform>/internal/` (gitignored) |
+| `compare_runs.py` | 4 (closure) | a run vs a baseline (default: the platform's final run), test by test: NEW RED, NEW BLOCKED, fixed?, known red with its defect, missing | stdout only; exit 1 = something to triage |
 | `build_reports.py` | 4 (report) | the final runs (`setup/project.yaml → report`) → all six test completion reports (iOS / Android / both × internal / client; `mobile_report.py`, `client_report.py`) | local `automation/mobile/reports/<slice>/` (gitignored); `--share` → `reports/` (the account hidden, checked by `redact_screens.py`); PDFs: `node export_pdf.mjs` — publishing is an owner call |
 
 All of them honour the QA Doctrine in `CLAUDE.md`: no result is ever upgraded to

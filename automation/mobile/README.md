@@ -59,7 +59,8 @@ automation/mobile/
 ├── scripts/
 │   ├── run.sh             # one named run: results/<platform>/<date>-<name>/ + RUN_INFO.txt
 │   ├── doctor.sh          # prerequisites table, exit 1 on a missing required item
-│   ├── start_appium.sh    # Appium server
+│   ├── qa.sh              # one command for a run: platform or both, regression or module (qa.py)
+│   ├── start_appium.sh    # Appium server (per platform for parallel runs)
 │   └── reset_simulator.sh # erase + boot an iOS simulator
 ├── results/{ios,android}/<run>/  # Allure results per run (gitignored) — input for trace_results.py;
 │                          # results/_scratch/ = a plain `pytest` without run.sh, wiped every time
@@ -123,14 +124,30 @@ point `ANDROID_APP_PATH` / `IOS_APP_PATH` at it. A missing build makes every tes
 | `IOS_*` | device name, OS version, app path, bundle id | XCUITest caps |
 | `EVIDENCE_VIDEO` | `off` \| `auto` \| `all` (default `off`) | screen video per test; `off` for working runs (~5 s per test saved); `auto` — for report / demo runs and CI — keeps it for failed / Blocked tests and tests marked `e2e` |
 | `APP_USER_EMAIL`, `APP_USER_PHONE`, `APP_USER_OTP` | — | the DEV test technician (`{{tech.*}}`); empty → dependent tests `Blocked` |
+| `IOS_USER_*`, `ANDROID_USER_*` (`EMAIL`, `PHONE`, `OTP`) | unset → `APP_USER_*` | a test account of the platform's own — what lets iOS and Android run at the same time ([PARALLEL-RUNS.md](PARALLEL-RUNS.md)) |
+| `IOS_APPIUM_PORT`, `ANDROID_APPIUM_PORT` | unset → `APPIUM_PORT` | an Appium server per platform, for parallel runs |
+| `ANDROID_EMULATOR_ARGS` | `-netdelay none -netspeed full -dns-server 8.8.8.8,1.1.1.1` | how `scripts/qa.sh` boots the emulator when none is up |
 | `API_BASE_URL`, `API_ADMIN_EMAIL`, `API_ADMIN_PASSWORD` | — | Field Services API for test-data setup / cleanup; empty → dependent tests `Blocked` |
 
 ## Run
 
-Terminal 1 — Appium server:
+**One command** — a platform or both side by side, the whole regression or a module; the device and
+the Appium server are started for you ([PARALLEL-RUNS.md](PARALLEL-RUNS.md)):
 
 ```bash
-bash scripts/start_appium.sh
+scripts/qa.sh both all            # iOS and Android regression at the same time
+scripts/qa.sh android auth        # one module (number, name or a unique part of it)
+scripts/qa.sh ios 08,09           # several modules
+scripts/qa.sh both all --dry-run  # the plan only
+```
+
+In Claude Code the same is four skills — `/qa-run`, `/qa-regress`, `/qa-triage`, `/qa-report`
+(how to use them: [English](../../docs/notes/qa-skills.en.md) · [українською](../../docs/notes/qa-skills.md)).
+
+By hand — terminal 1, the Appium server (of a platform, or the shared one without an argument):
+
+```bash
+bash scripts/start_appium.sh [ios|android]
 ```
 
 Terminal 2 — tests:
@@ -147,7 +164,8 @@ allure serve results/_scratch                             # report
 A run worth keeping goes through `scripts/run.sh <ios|android> <name> [pytest args]`: results land
 in `results/<platform>/<YYYY-MM-DD>-<name>/` with `RUN_INFO.txt` (harness commit, command, times,
 exit code). It refuses an existing folder, uncommitted changes to tracked files (commit before
-every run; `ALLOW_DIRTY=1` for a throwaway debug run) and a second run while one is going.
+every run; `ALLOW_DIRTY=1` for a throwaway debug run), a second run of the same platform, and a run of
+the other platform unless the two share neither the test account nor the Appium server.
 
 ```bash
 EVIDENCE_VIDEO=auto bash scripts/run.sh android 02-auth tests/shared/test_authentication.py
