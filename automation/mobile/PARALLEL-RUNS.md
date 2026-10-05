@@ -112,3 +112,30 @@ server, both passed; its results were deleted on purpose (a check of the tool, n
 
 A phone on a USB cable does not get in the way: `qa.sh` pins the Android run to the emulator
 (`ANDROID_SERIAL`).
+
+**First parallel module run (2026-10-05, `quick-1`: splash + profile on both, 10 min).** iOS: 12 passed,
+1 known red — clean, also under the second account and on the code changed for Android. Android: 11
+passed, 2 known red, **2 Blocked that pass alone** (TC-PRF-001, TC-PRF-007; diagnostic run `diag-1`,
+alone on Android: 2 of 2 passed). Both blocked at the sign-in before the test: the server answered
+"Incorrect code." to the correct code. The DEV code is four identical digits, so mistyped digits are
+ruled out; both failures came 4 s and 22 s after a sign-in of the iOS account, the three Android
+sign-ins that passed had none within 55 s. **Settled by a controlled check (owner's go, the app's own two calls —
+`POST /auth/sign-in/email`, `POST /auth/confirm/otp` — for the two accounts in turn, 17 sign-ins in
+7 min):** DEV answers `429 ThrottlerException: Too Many Requests` on **`/auth/confirm/otp`**, and the
+limit is **not per account**: about three confirmations in a short window from this machine and the
+next ones are refused for either account, for roughly a minute. Alone, each account signs in every
+time. The app shows that 429 as "Incorrect code." (its text for a confirmation error without a
+message of its own). So:
+
+- it is the test environment's rate limit, shared by everything behind one address — not the harness,
+  not the second account, not the Mac's load;
+- one platform alone stays under it; two at once double the sign-ins and cross it — the blocked
+  tests are sign-in preconditions, reported as Blocked, never green;
+- for the product it is a question to the backend team: is the limit per IP on production too (two
+  technicians on one Wi-Fi signing in within a minute), and should the app say "Too many requests"
+  instead of "Incorrect code." — not filed, the owner decides.
+
+**What parallel needs before a whole regression (owner's decision):** the backend relaxes the limit on
+DEV or keys it per account; or the harness paces sign-ins across the two runs (one shared gate, a
+minimum gap between confirmations — slower, but no blocked preconditions); or fewer UI sign-ins
+(sessions reused). Until then: modules that sign in often run one platform at a time.
