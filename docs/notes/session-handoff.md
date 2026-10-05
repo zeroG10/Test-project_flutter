@@ -916,6 +916,29 @@ happy flow → валідації); які пункти чеклісту кож�
   у scratchpad (`compare_runs.py`, ключ = fullName + повна назва тесту).
 - **Далі — лише за командою власника:** пуш; iOS — «якщо буде час»; звіти А / Б (крок 7) — за рішенням власника.
 
+## 3ъ. Фінальні звіти регресу (2026-10-05, готово; коміт — на «коміть»)
+
+- **Що є:** 6 звітів (ISTQB Test Completion Report) — iOS, Android, спільний; кожен внутрішній (усе клікабельне: модулі,
+  перевірки, тести з кроками / знімками, баги; спільний веде у звіти платформ) і клієнтський (розділи 1–9). PDF — 6 шт.
+- **Де:** `reports/` — копія для поширення (опис і посилання — `reports/README.md`); повна локальна копія з відповідями
+  API і відео — `automation/mobile/reports/` (gitignored).
+- **Опубліковано (приватно, ділиться власник через Share):** команда https://claude.ai/artifact/Vh4DJSdzZmaGH7fwRMUbde
+  (335 файлів, усі три внутрішні), клієнт https://claude.ai/artifact/2sTviSM7raPbMcdxjLvYk8. Оновлювати ТІ САМІ:
+  Artifact publish з `url`, `file_path` = `automation/mobile/reports/publish/{internal,client}-page.html` (фрагменти,
+  їх пише `build_reports.py --share`), `root` = абсолютний шлях до `reports`, `files` = змінені файли (≤255 за раз;
+  файли, яких немає у виклику, лишаються).
+- **Як перезібрати:** `cd automation/tools && uv run python build_reports.py [--share] && node export_pdf.mjs` —
+  тести не запускаються, звіти читають наявні прогони (`setup/project.yaml → report.slices`).
+- **Особисті дані:** `redact_screens.py` читає кожен знімок через macOS Vision (локально) і замазує рядки з email /
+  телефоном / ім'ям акаунта (ім'я — з DEV API, у пам'яті); `--share` завершується перевіркою — має бути
+  `0 · 0 · 0` (знімки / сторінки / відео). iOS: OCR знайшов ті самі 13 знімків, що й ручна розмітка; Android — 17.
+- **Код:** `automation/tools/{brand.py, brand/triare-logo.svg, report_data.py, client_report.py, mobile_report.py,
+  build_reports.py, redact_screens.py, ocr/ocr_lines.swift, export_pdf.mjs}`, оновлено `build_summary.py`
+  (бренд, шапка, блок Document, факти ОС / пристрій / білд / Flutter, версії Appium у технічному шарі, перевірки з
+  іншого модуля ведуть на свою сторінку); `pyyaml` додано (з кешу). Самотести `automation/tools` зелені.
+- **Galaxy S23 прибрано (власник, 2026-10-05):** матриця пристроїв — лише iPhone 17 і Pixel 7 (API 36); «P0 devices
+  covered» = Yes на обох. Прибирання: 71 непотрібний локальний прогін видалено, старі виходи звітів замінено (decisions).
+
 ## 4. Ключові факти (деталі — у файлах за посиланнями)
 
 | Що | Значення | Де детальніше |

@@ -1,0 +1,10 @@
+{
+ "date": "2026-09-28",
+ "runs": {
+  "ios": "2026-09-28"
+ },
+ "company": "TRIARE",
+ "product": "Concert Technologies Field Technicians iOS App",
+ "file_prefix": "ConcertTechnologies_FieldTechnicians_iOS",
+ "verdict": "No unexpected failures"
+}

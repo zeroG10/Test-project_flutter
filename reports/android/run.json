@@ -1,0 +1,10 @@
+{
+ "date": "2026-10-02",
+ "runs": {
+  "android": "2026-10-02"
+ },
+ "company": "TRIARE",
+ "product": "Concert Technologies Field Technicians Android App",
+ "file_prefix": "ConcertTechnologies_FieldTechnicians_Android",
+ "verdict": "No unexpected failures"
+}
