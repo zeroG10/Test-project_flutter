@@ -8,7 +8,8 @@ chain described in [`automation/README.md`](../README.md):
 | `sync_checklist_to_sheets.py` | 0 → Sheet | checklist `.md` → Google Sheet | the team Sheet (**the only Sheets writer in this repo**) |
 | `import_checklist_from_sheets.py` | Sheet → 0 (one-time) | Google Sheet → per-feature checklist `.md` | markdown under `qa/web/<NN-slug>/` — **reads** Sheets, never writes them |
 | `trace_results.py` | 4 (closure) | run results → checklist IDs | one markdown report, by convention `qa/web/<NN-module>/<module>-traceability.md`, mobile per platform `qa/mobile/<NN-module>/{ios,android}/<module>-traceability.md` — never Sheets |
-| `build_summary.py` | 4 (report) | one mobile run → report site: summary, a page per module and per defect | local `automation/mobile/reports/<platform>/summary/` (gitignored) — publishing is an owner call |
+| `build_summary.py` | 4 (report) | one mobile run → internal report site: summary, a page per module and per defect | local `automation/mobile/reports/<platform>/internal/` (gitignored) |
+| `build_reports.py` | 4 (report) | the final runs (`setup/project.yaml → report`) → all six test completion reports (iOS / Android / both × internal / client; `mobile_report.py`, `client_report.py`) | local `automation/mobile/reports/<slice>/` (gitignored); `--share` → `reports/` (the account hidden, checked by `redact_screens.py`); PDFs: `node export_pdf.mjs` — publishing is an owner call |
 
 All of them honour the QA Doctrine in `CLAUDE.md`: no result is ever upgraded to
 Passed by a tool, a skip is Blocked, an empty run is not a passing run.
@@ -278,7 +279,7 @@ uv run python build_summary.py \
   --history-dir ../mobile/results/ios/stable-1 ...                       # earlier full runs, oldest first \
   --target "iOS simulator · iPhone 17 · iOS 26.5" --run-label "…" \
   [--note "…"] [--decision "…"] [--history-note "…"] \
-  [--public --redact-boxes boxes.json --redact-text-env QA_FIRST] [--out-dir ../mobile/reports/ios/summary]
+  [--public --redact-boxes boxes.json --redact-text-env QA_ACCOUNT_FIRST] [--out-dir ../mobile/reports/ios/internal]
 ```
 
 | Option | Meaning |
@@ -294,11 +295,11 @@ uv run python build_summary.py \
 | `--public` | the copy that may leave this machine: no text attachments (API bodies, page sources), no videos |
 | `--redact-env`, `--redact-text-env NAME`, `--redact-boxes JSON` | hide the test account in text (values never printed) and pixelate boxes on the screens |
 | `--no-git` | skip the delivery-pace chart |
-| `--out-dir DIR` | default `automation/mobile/reports/<platform>/summary/` (gitignored) |
+| `--out-dir DIR` | default `automation/mobile/reports/<platform>/internal/` (gitignored) |
 
-The pages show screenshots of the client's app — they stay local; publishing is an owner
-call, and only the `--public` build is published. For an artifact publish the main page is
-`page.html` (a fragment, served as `index.html`); every other file goes in `files`.
+The pages show screenshots of the client's app — the full copy stays local; only the `--public` build leaves this
+machine, and `build_reports.py --share` is the way to make it (boxes found by OCR, a check that nothing of the account
+is left, the publish fragments in `automation/mobile/reports/publish/`). Publishing is an owner call.
 `assets/` and `bugs/` are rebuilt on every run (only folders this script created are ever
 deleted).
 

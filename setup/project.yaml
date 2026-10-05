@@ -60,6 +60,66 @@ tracker:
   field_defaults: "<issue type, initial status, priority scale, component → assignee, sprint rule, watchers>"
   filing_confirmed_by: "<who says go before anything is created — doctrine rule 5>"
 
+# Test completion reports (ISTQB / ISO 29119-3 shape) — read by automation/tools/brand.py; the owner's
+# decisions of 2026-10-05: three slices (iOS, Android, both), each with an internal report (every check, test,
+# screenshot and defect clickable) and a client report; the company's look (TRIARE) lives in brand.py.
+report:
+  client: "Concert Technologies"                  # "Prepared by TRIARE for <client>"
+  confidentiality: "Confidential"
+  approved_by: "QA Lead, TRIARE"                  # the client report's sign-off
+  environment: "DEV"                              # the test environment, as the reports name it
+  out_of_scope:                                   # the client report's "Out of scope" list
+    - "API testing as a discipline (the API was used only to prepare test data and to verify what the app stored)"
+    - "Performance and load testing"
+    - "Security testing"
+    - "The web admin panel"
+    - "The production environment"
+    - "Real devices, tablets and operating-system versions other than those in section 3"
+  client_groups:                                  # why checks are not automated, as the client reads it (kind → group)
+    person: "Visual and judgement checks, kept manual"
+    owner-manual: "Kept manual by the product owner's decision"
+    owner-skipped: "Kept manual by the product owner's decision"
+    deferred: "Planned for automation"
+    by-design: "Works differently by design — accepted by the product owner"
+    simulator: "Needs a real device or acts outside the app"
+    cannot-cause: "Failure conditions the test environment cannot produce"
+    not-observable: "Not observable through the app on the test environment"
+    unclear: "Requirement under clarification"
+    load: "Load conditions, excluded by agreement"
+    covered: "Proved once, in another check"
+    android-stage: "Offline behaviour — automated on Android (the iOS simulator cannot go offline)"
+  client_blocked:                                 # why a test could not run, as the client reads it (test case → text)
+    TC-ORDD-004: "The iOS simulator has no Phone app, so tapping the number cannot open a dialer; covered on Android."
+    TC-ORDP-006: "The iOS simulator has no Phone app, so tapping the number cannot open a dialer; covered on Android."
+    TC-ORDL-012: "On the iOS simulator the dialog closes by itself before it can be answered; to be checked on a device."
+    TC-DLV-004: "The test environment answers a job submission with a server error although it records it, so the success message cannot appear."
+  slices:
+    ios:
+      product: "Concert Technologies Field Technicians iOS App"
+      product_short: "iOS App"                    # browser tabs: "<short> QA Report" / "<short> Test Completion"
+      file_prefix: "ConcertTechnologies_FieldTechnicians_iOS"
+      run: "automation/mobile/results/ios/stable-3"                # the run the report describes
+      history: ["automation/mobile/results/ios/final-1", "automation/mobile/results/ios/final-2",
+                "automation/mobile/results/ios/stable-1", "automation/mobile/results/ios/stable-2"]
+      history_note: "final-1 and final-2 were earlier attempts at the final run: the red there beyond the filed defects came from harness defects, each fixed before the series restarted. stable-1…3 ran the same harness code, 7015c46."
+      internal_url: "https://claude.ai/artifact/Vh4DJSdzZmaGH7fwRMUbde"   # all three internal reports, one site (2026-10-05)
+      client_url: "https://claude.ai/artifact/2sTviSM7raPbMcdxjLvYk8"
+    android:
+      product: "Concert Technologies Field Technicians Android App"
+      product_short: "Android App"
+      file_prefix: "ConcertTechnologies_FieldTechnicians_Android"
+      run: "automation/mobile/results/android/2026-10-02-final-u3"
+      history: ["automation/mobile/results/android/2026-10-02-final-u1", "automation/mobile/results/android/2026-10-02-final-u2"]
+      history_note: "u1–u3 ran the same harness code, 9101eb7: u2 and u3 identical per test; u1 differs only in TC-SPL-006 (Blocked — the ~1 s splash was missed). Earlier attempts stopped on environment faults (a System UI hang, the Mac's time zone flip), fixed in the harness before u1."
+      internal_url: "https://claude.ai/artifact/Vh4DJSdzZmaGH7fwRMUbde"
+      client_url: "https://claude.ai/artifact/2sTviSM7raPbMcdxjLvYk8"
+    mobile:
+      product: "Concert Technologies Field Technicians App (iOS & Android)"
+      product_short: "Mobile App"
+      file_prefix: "ConcertTechnologies_FieldTechnicians_Mobile"
+      internal_url: "https://claude.ai/artifact/Vh4DJSdzZmaGH7fwRMUbde"
+      client_url: "https://claude.ai/artifact/2sTviSM7raPbMcdxjLvYk8"
+
 # Which test stacks this project actually uses. Every stack ships wired in the template
 # (web = Playwright, mobile = Appium for Android / iOS / Flutter, api = httpx+pytest);
 # set the unused ones to false — /setup-project then skips their configuration and CI

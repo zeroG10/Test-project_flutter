@@ -43,15 +43,72 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import brand
 import trace_results as tr
 
-PAGE_TITLE = "Concert Mobile QA Report"
 PLATFORMS = ("ios", "android")  # each platform's records live in its own subfolder
+PLATFORM_NAME = {"ios": "iOS", "android": "Android"}
 MOBILE_QA = tr.REPO_ROOT / "qa" / "mobile"
+REPORTS = tr.REPO_ROOT / "automation" / "mobile" / "reports"  # gitignored: the full copy holds API bodies and videos
 
 
 def default_out(platform: str) -> Path:
-    return tr.REPO_ROOT / "automation" / "mobile" / "reports" / platform / "summary"
+    return REPORTS / platform / "internal"
+
+
+def build_info(platform: str) -> dict[str, str]:
+    """`automation/mobile/builds/<platform>/BUILD_INFO.txt` as key → value (the build the runs used)."""
+    path = tr.REPO_ROOT / "automation" / "mobile" / "builds" / platform / "BUILD_INFO.txt"
+    info: dict[str, str] = {}
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return info
+    for line in lines:
+        key, sep, value = line.partition(":")
+        if sep and key.strip() and not line.startswith(" "):
+            info[key.strip()] = value.strip()
+    return info
+
+
+def run_facts(env: dict[str, str], platform: str) -> dict[str, str]:
+    """What a mobile report states about the run: OS, device (simulator / emulator / device), build and its
+    type, the kind of app — read from the run's environment and the build's BUILD_INFO.txt."""
+    info = build_info(platform)
+    target = (info.get("target", "") + " " + info.get("type", "")).lower()
+    kind = "simulator" if "simulator" in target else "emulator" if "emulator" in target else "device"
+    build_type = "release" if "release" in target and "debug" not in target else "debug" if "debug" in target else ""
+    device_cell = env.get("Device", "")
+    parts = [x.strip() for x in device_cell.split("·")]
+    device = re.sub(r"_API_\d+$", "", parts[0]).replace("_", " ") if parts and parts[0] else "not recorded"
+    os_name = parts[1] if len(parts) > 1 else env.get("Platform", "not recorded")
+    api = re.search(r"API_(\d+)", device_cell)
+    if api:
+        os_name += f" · API {api.group(1)}"
+    app_kind = env.get("App kind", "")
+    return {
+        "os": os_name,
+        "device": f"{device} — {kind}",
+        "build": " · ".join(x for x in (env.get("Build", ""), f"{build_type} build" if build_type else "") if x)
+        or "not recorded",
+        "app_type": "Flutter" if "flutter" in app_kind.lower() else (app_kind.split(" ")[0].capitalize() or "not recorded"),
+        "app": env.get("App", "not recorded"),
+    }
+
+
+def tool_versions(platform: str) -> str:
+    """Appium and the platform's driver, as installed on the QA machine when the report is built."""
+    driver = "xcuitest" if platform == "ios" else "uiautomator2"
+    try:
+        appium = subprocess.run(["appium", "--version"], capture_output=True, text=True, timeout=30).stdout.strip()
+        listing = subprocess.run(
+            ["appium", "driver", "list", "--installed"], capture_output=True, text=True, timeout=60
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return "not recorded"
+    found = re.search(rf"{driver}@([\d.]+)", re.sub(r"\x1b\[[0-9;]*m", "", listing.stdout + listing.stderr))
+    name = "XCUITest" if platform == "ios" else "UiAutomator2"
+    return f"Appium {appium or '?'} · {name} {found.group(1) if found else '?'}"
 
 
 def default_reasons(platform: str) -> Path:
@@ -527,43 +584,19 @@ def source_of(run: TestRun) -> str:
 # Rendering — shared pieces
 # --------------------------------------------------------------------------- #
 
-# Palette and type follow the admin panel's report (same product, same reader). Light tokens
-# on :root; dark under the system query AND the explicit data-theme stamp (artifact viewers
-# have three theme states). "Held red" is amber (a known defect), "Failed" is red (nobody
-# explained it yet), "Blocked" is violet (could not run) and never looks like a pass.
-_DARK = """color-scheme:dark;
---ground:#101513;--surface:#171E1B;--ink:#E4EAE6;--muted:#9AA7A1;--line:#29332F;
---accent:#93AEDD;--accent-soft:#1D2838;--pass:#5DBB8C;--known:#E3A94F;--fail:#F07167;
---block:#B7A8F0;--idle:#46514D;--pass-soft:#16281F;--known-soft:#2C2413;--fail-soft:#311918;
---block-soft:#221D33;"""
-FONTS = (
-    '<link rel="preconnect" href="https://fonts.googleapis.com">'
-    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:'
-    "wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Sans:"
-    'wght@400;500;600;700&display=swap">'
-)
+# Palette, faces and logo are TRIARE's (brand.py — the same look as the web project's reports). "Held red" is
+# amber (a known defect), "Failed" is red (nobody explained it yet), "Blocked" is violet (could not run) and never
+# looks like a pass.
+FONTS = brand.FONTS_LINK
 CSS = (
-    """
-:root{--ground:#F3F4F0;--surface:#FFFFFF;--ink:#18201D;--muted:#5A6661;--line:#DCE1DB;
---accent:#2B4C7E;--accent-soft:#E4EAF4;--pass:#2F7D57;--known:#B4761A;--fail:#B42318;
---block:#5B4B9A;--idle:#C4CBC6;--pass-soft:#E3F1E9;--known-soft:#F8EDD9;--fail-soft:#F9E1DE;
---block-soft:#ECE8F7;
---display:"IBM Plex Sans Condensed","IBM Plex Sans","Arial Narrow",system-ui,sans-serif;
---body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
---mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){"""
-    + _DARK
-    + """}}
-:root[data-theme="dark"]{"""
-    + _DARK
-    + """}
+    brand.TOKENS_CSS
+    + """
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.55 var(--body);
 -webkit-font-smoothing:antialiased}
 .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 a{color:var(--accent)}a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.15;text-wrap:balance;margin:0}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
 h1{font-size:34px;letter-spacing:-.01em}h2{font-size:22px;margin-bottom:14px}h3{font-size:16px;margin-bottom:8px}
 p{margin:0 0 10px;max-width:70ch}
 .eyebrow{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -583,7 +616,7 @@ text-transform:uppercase;padding:6px 10px;border-radius:999px;vertical-align:mid
 section{padding-top:34px}.lead{font-size:17px;max-width:72ch}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:18px 0 14px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:4px}
-.kpi b{font:600 30px/1 var(--mono);font-variant-numeric:tabular-nums}.kpi span{color:var(--muted);font-size:13px}
+.kpi b{font:700 30px/1 var(--display);font-variant-numeric:tabular-nums;color:var(--figure)}.kpi span{color:var(--muted);font-size:13px}
 .kpi.pass b{color:var(--pass)}.kpi.known b{color:var(--known)}.kpi.fail b{color:var(--fail)}.kpi.block b{color:var(--block)}
 .bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--idle)}
 .bar i{display:block;height:100%}.bar .p{background:var(--pass)}.bar .k{background:var(--known)}
@@ -625,7 +658,7 @@ table.checks col.c5{width:104px}.src{font:11.5px/1.35 var(--mono);color:var(--mu
 .sect{margin:26px 0 6px;font:600 12px/1.2 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:18px 0 12px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-.card b{display:block;font:600 24px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.card b{display:block;font:700 24px/1.1 var(--display);font-variant-numeric:tabular-nums;color:var(--figure)}
 .card span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
 nav.top{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
 nav.top a{font:600 13px/1 var(--body);text-decoration:none;color:var(--ink);border:1px solid var(--line);
@@ -660,13 +693,14 @@ video{max-width:100%;width:260px;border-radius:14px;border:1px solid var(--line)
 .md li{max-width:72ch}.md p{max-width:72ch}
 .md a.shot{display:inline-block;width:150px;margin:6px 8px 6px 0;vertical-align:top}
 dialog.lb{border:0;padding:0;background:transparent;max-width:min(94vw,520px);color:#fff}
-dialog.lb::backdrop{background:rgb(8 10 9/.8)}
+dialog.lb::backdrop{background:rgb(9 18 33/.82)}
 dialog.lb img{display:block;max-width:100%;max-height:84vh;width:auto;margin:0 auto;border-radius:22px}
 dialog.lb p{text-align:center;font-size:13px;margin:10px auto 0}
 footer.note{margin-top:34px}
 @media (max-width:560px){h1{font-size:27px}.kpi b{font-size:25px}.wrap{padding:20px 16px 56px}
 .shots figure{width:96px}.strip figure{width:120px}td,th{padding:8px 7px}}
 @media print{body{background:#fff;font-size:12px}.wrap{max-width:none;padding:0}.layer,nav.top{display:none}
+.strip{flex-wrap:wrap;overflow:visible}.strip figure{width:118px}
 section{padding-top:22px}h2,h3{break-after:avoid}tr,.kpis,.kpi,.box,.facts,svg{break-inside:avoid}
 .divider{break-before:page}}
 """
@@ -731,12 +765,35 @@ class AssetCopier:
         (self.dir / MARKER).write_text("generated by automation/tools/build_summary.py\n")
 
     def __call__(self, source: Path) -> str:
-        target = self.dir / source.name
-        if not target.exists():
+        shared = PUBLIC and source.suffix.lower() in (".png", ".jpg", ".jpeg")
+        name = f"{source.stem}.jpg" if shared else source.name
+        if not (self.dir / name).exists():
+            target = self.dir / source.name
             shutil.copy2(source, target)
             if self.redactor:
-                self.redactor.image(target)
-        return f"assets/{source.name}"
+                self.redactor.image(target)  # on the full-size screen: the boxes are in its pixels
+            if shared:
+                try:
+                    _shrink(target, self.dir / name)
+                except OSError:  # not an image Pillow reads: shared as it is
+                    return f"assets/{source.name}"
+        return f"assets/{name}"
+
+
+SHARED_WIDTH = 720  # the shared copy's screens: enough to read a phone screen, a tenth of the bytes
+
+
+def _shrink(source: Path, target: Path) -> None:
+    """A screen for the shared copy: at most SHARED_WIDTH wide, JPEG — the original (already pixelated) goes."""
+    from PIL import Image  # noqa: PLC0415
+
+    with Image.open(source) as img:
+        img = img.convert("RGB")
+        if img.width > SHARED_WIDTH:
+            img = img.resize((SHARED_WIDTH, round(img.height * SHARED_WIDTH / img.width)), Image.LANCZOS)
+        img.save(target, "JPEG", quality=82, optimize=True, progressive=True)
+    if source != target:
+        source.unlink()
 
 
 MARK = {"passed": "✓", "failed": "✗", "broken": "✗", "skipped": "–"}
@@ -852,6 +909,8 @@ class Report:
     first_commit: datetime | None = None
     platform: str = "ios"
     reasons_file: str = "qa/mobile/ios/not-automated.md"
+    slice: brand.Slice | None = None
+    tools: str = ""  # Appium and driver versions (technical layer)
 
     def __post_init__(self) -> None:
         self.by_chk: dict[str, list[TestRun]] = {}
@@ -946,13 +1005,15 @@ class Report:
             else self.now
         )
         env = self.env
-        app = " · ".join(v for v in (env.get("App", ""), env.get("Build", "")) if v)
+        rf = run_facts(env, self.platform)
         tc = self.test_counts()
         unexpected = len(self.unexpected_tests())
         return [
             ("Run finished", f"{finished:%Y-%m-%d %H:%M} UTC · {_minutes(wall)}"),
-            ("Device", self.target or " · ".join(v for v in (env.get("Platform", ""), env.get("Device", "")) if v) or "not recorded"),
-            ("App under test", app or "not recorded"),
+            ("Operating system", rf["os"]),
+            ("Device", self.target or rf["device"]),
+            ("App build", f"{rf['app']} · {rf['build']}"),
+            ("App type", rf["app_type"]),
             ("App source", env.get("App source", "not recorded")),
             ("Harness code", env.get("Harness commit", "not recorded")),
             (
@@ -962,6 +1023,30 @@ class Report:
             ),
             ("Report generated", f"{self.now:%Y-%m-%d %H:%M} UTC"),
         ]
+
+    def device_line(self) -> str:
+        rf = run_facts(self.env, self.platform)
+        return f"{rf['device']}, {rf['os']}"
+
+    def run_date(self) -> str:
+        """The date of the run this report describes — a PDF's name and the document's version carry it."""
+        stop = max((r.stop_ms for r in self.runs), default=0)
+        return datetime.fromtimestamp(stop / 1000, UTC).strftime("%Y-%m-%d") if stop else self.now.strftime("%Y-%m-%d")
+
+    def docinfo(self, slc: brand.Slice) -> str:
+        """Where this document lives, so a printout can never be mistaken for another version of it."""
+        t = self.t
+        run_date = self.run_date()
+        source = f"automation/mobile/reports/{self.platform}/internal/index.html"
+        online = (
+            f"<a href='{t(slc.internal_url)}'>{t(slc.internal_url)}</a>" if slc.internal_url else "—"
+        )
+        return (
+            f"<p class='docinfo'><b>Document.</b> Version of {t(run_date)} (the run this report describes) · "
+            f"Source: <code>{t(source)}</code> · Online: {online} · PDF: "
+            f"<code>{t(slc.pdf_name('TestCompletionReport_INTERNAL', run_date))}</code> · "
+            f"{t(brand.CONFIDENTIALITY)}, {t(brand.COMPANY)} internal.</p>"
+        )
 
     # --- index -------------------------------------------------------------------------
 
@@ -1015,9 +1100,11 @@ class Report:
         out: list[str] = []
         w = out.append
         pill, meaning = self.verdict_pill()
+        slc = self.slice or brand.slice_(self.platform)
         w("<div class='wrap'><header>")
-        w("<div class='eyebrow'>Mobile UI regression · Concert Technologies Field Services app</div>")
-        w(f"<h1>Mobile app test report {pill}</h1>")
+        w(brand.brandbar("internal"))
+        w(f"<div class='eyebrow'>Test completion report · Mobile regression · {PLATFORM_NAME[self.platform]}</div>")
+        w(f"<h1>{t(slc.product)} — Test Completion Report <span class='tag'>Internal</span> {pill}</h1>")
         w(f"<p class='muted' style='margin:0'>{t(meaning)}</p>")
         w(
             f"<p style='margin:4px 0 0'><b>Checklist now</b> (this run): {c['Passed']} green · "
@@ -1027,7 +1114,9 @@ class Report:
         w("<dl class='facts'>")
         for key, value in self.facts():
             w(f"<div><dt>{t(key)}</dt><dd>{t(value)}</dd></div>")
-        w("</dl><nav class='layer' aria-label='Report layers'>")
+        w("</dl>")
+        w(self.docinfo(slc))
+        w("<nav class='layer' aria-label='Report layers'>")
         links = [("summary", "Summary"), ("defects", "Open defects"), ("blocked", "Could not run"),
                  ("not-automated", "Not automated")]
         if self.history:
@@ -1047,7 +1136,7 @@ class Report:
         w(
             f"<p class='lead'>The QA checklist for the mobile app holds <b>{s.total}</b> checks "
             f"across {len(self.modules)} modules. <b>{s.automated}</b> of them ({pct}) are "
-            f"automated and ran on {t(self.target or self.env.get('Device', 'the device'))}. "
+            f"automated and ran on {t(self.target or self.device_line())}. "
             f"In this run <b>{c['Passed']}</b> passed; <b>{c['Held red']}</b> "
             f"{'is' if c['Held red'] == 1 else 'are'} held red by {_plural(len(bugs_red), 'open defect')}"
             + (
@@ -1496,8 +1585,15 @@ class Report:
             f"Device: {self.target or env.get('Device', 'not recorded')}.",
             f"App: {env.get('App', 'not recorded')} {env.get('Build', '')}, built from "
             f"{env.get('App source', 'not recorded')}.",
-            "Driver: Appium with XCUITest — the Flutter app is read through the iOS accessibility "
-            "tree; one test at a time, the app relaunched or reset by each test's preconditions.",
+            (
+                "Driver: Appium with XCUITest — the Flutter app is read through the iOS accessibility "
+                "tree; one test at a time, the app relaunched or reset by each test's preconditions."
+                if self.platform == "ios"
+                else "Driver: Appium with UiAutomator2 — the Flutter app is read through the Android "
+                "accessibility tree; one test at a time, one Appium session per module, the app relaunched "
+                "or reset by each test's preconditions."
+            ),
+            f"Tools: {self.tools or 'not recorded'} (installed on the QA machine when this report was built).",
             "DEV only; production is never tested. The API is used to create test data, clean up "
             "and check what the app stored — API tests are out of scope.",
             "Test data is created, marked (QA-AUTO-…) and deleted by the tests; a throwaway "
@@ -1519,7 +1615,7 @@ class Report:
         out.append(
             "<div class='box'><h3>How it is built</h3><ul>"
             "<li>Checklist → automation plan → the owner's answers to D / Q questions → recon on "
-            "the simulator → structured test cases → screen maps (the only place a locator lives) "
+            f"the {'simulator' if self.platform == 'ios' else 'emulator'} → structured test cases → screen maps (the only place a locator lives) "
             "→ page objects → pytest tests tagged with checklist ids → generated traceability.</li>"
             "<li>Each module went through a test review (<code>/bmad-testarch-test-review</code>) "
             "before it was called done.</li>"
@@ -1561,7 +1657,7 @@ class Report:
         env = self.env
         out: list[str] = []
         w = out.append
-        w("<div class='wrap'><nav class='top'><a href='index.html'>← Summary</a>")
+        w("<div class='wrap'>" + brand.brandbar("internal") + "<nav class='top' style='margin-top:16px'><a href='index.html'>← Summary</a>")
         w("<a href='index.html#defects'>Open defects</a>")
         i = self.modules.index(m)
         if i > 0:
@@ -1569,7 +1665,10 @@ class Report:
         if i + 1 < len(self.modules):
             w(f"<a href='{self.modules[i + 1].page}'>{t(self.modules[i + 1].label)} →</a>")
         w("</nav>")
-        w(f"<p class='eyebrow'>Module {t(m.number)} · mobile regression</p><h1>{t(m.name)}</h1>")
+        w(
+            f"<p class='eyebrow'>Module {t(m.number)} · {PLATFORM_NAME[self.platform]} · "
+            f"{t((self.slice or brand.slice_(self.platform)).product)}</p><h1>{t(m.name)}</h1>"
+        )
         w(
             f"<p class='muted' style='margin-top:6px'>{t(self.target or env.get('Device', ''))} · "
             f"{t(env.get('Build', ''))} · harness {t(env.get('Harness commit', ''))} · generated "
@@ -1702,6 +1801,12 @@ class Report:
             f"<td>{''.join(proved)}</td><td>{seen}</td></tr>"
         )
 
+    def check_href(self, chk: str, run: TestRun) -> str:
+        """A check a test covers: on this page, or on its own module's page when it belongs to another module."""
+        home = self.module_of_chk.get(chk)
+        here = self.module_of_run(run)
+        return f"#{_e(chk)}" if home is None or home is here else f"{home.page}#{_e(chk)}"
+
     def module_of_run(self, run: TestRun) -> Module | None:
         return next((m for m in self.modules if m.label == run.module), None)
 
@@ -1718,7 +1823,9 @@ class Report:
         meta = []
         if r.chk_ids:
             meta.append(
-                "Checks: " + ", ".join(f"<a href='#{t(x)}'>{t(x.removeprefix('CHK-'))}</a>" for x in r.chk_ids)
+                "Checks: " + ", ".join(
+                    f"<a href='{self.check_href(x, r)}'>{t(x.removeprefix('CHK-'))}</a>" for x in r.chk_ids
+                )
             )
         loc = source_of(r)
         if loc:
@@ -1777,7 +1884,7 @@ class Report:
         )
         body = re.sub(r'<a href="(?!https?://|#)[^"]*">(.*?)</a>', r"\1", body, flags=re.DOTALL)
         m = next((m for m in self.modules if m.key == bug.module_dir), None)
-        nav = "<nav class='top'><a href='../index.html#defects'>← All open defects</a>"
+        nav = brand.brandbar("internal") + "<nav class='top' style='margin-top:16px'><a href='../index.html#defects'>← All open defects</a>"
         if m:
             nav += f"<a href='../{m.page}'>{t(m.label)}: every check</a>"
         nav += "</nav>"
@@ -1804,10 +1911,11 @@ class Report:
 def write_site(report: Report, out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     body = report.index()
-    head = report.head(PAGE_TITLE)
-    (out_dir / "index.html").write_text(report.document(PAGE_TITLE, body), encoding="utf-8")
-    # Artifact publish: the host wraps the skeleton itself — a fragment, head first.
-    (out_dir / "page.html").write_text(f"{head}\n{body}\n", encoding="utf-8")
+    title = f"{(report.slice or brand.slice_(report.platform)).product_short} QA Report"
+    (out_dir / "index.html").write_text(report.document(title, body), encoding="utf-8")
+    stale = out_dir / "page.html"  # the single-report artifact fragment, superseded by build_reports.py --share
+    if stale.exists():
+        stale.unlink()
     for m in report.modules:
         (out_dir / m.page).write_text(
             report.document(f"{m.name} — mobile checks", report.module_page(m)), encoding="utf-8"
@@ -1829,15 +1937,6 @@ def write_site(report: Report, out_dir: Path) -> None:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, target)
                 report.red.image(target)
-
-
-def published_files(out_dir: Path) -> list[str]:
-    """Every file the page links to, relative to the site root (for an artifact publish)."""
-    files = []
-    for p in sorted(out_dir.rglob("*")):
-        if p.is_file() and p.name not in ("page.html", MARKER) and not p.name.startswith("."):
-            files.append(p.relative_to(out_dir).as_posix())
-    return files
 
 
 # --------------------------------------------------------------------------- #
@@ -1878,7 +1977,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="owner's estimate for the manual comparison; omitted = not shown",
     )
-    p.add_argument("--out-dir", type=Path, default=None, help="default automation/mobile/reports/<platform>/summary")
+    p.add_argument("--out-dir", type=Path, default=None, help="default automation/mobile/reports/<platform>/internal")
     p.add_argument(
         "--platform",
         choices=PLATFORMS,
@@ -1966,6 +2065,8 @@ def main(argv: list[str] | None = None) -> int:
         red=redactor,
         platform=args.platform,
         reasons_file=rel_to_repo(args.reasons),
+        slice=brand.slice_(args.platform),
+        tools=tool_versions(args.platform),
     )
     if not args.no_git:
         for m in report.modules:

@@ -322,14 +322,17 @@ allure serve results/ios/stable-3                 # interactive
 allure generate results/ios/stable-3 -o reports/ios/allure-report --clean   # static folder
 ```
 
-## Summary page for the lead
+## Test completion reports
 
-`automation/tools/build_summary.py` turns ONE clean run into a local page: a PM half (checklist
-items verified, what failed, what was blocked and why, run time vs an optional manual estimate)
-and an engineering half (per-module coverage, per-test results, key screens, run context).
-CHK verdicts come from `trace_results.py` itself, so the page and the traceability matrix agree.
-Output goes to `reports/<platform>/summary/` (gitignored: it shows the client's app); publishing it is an
-owner call. Usage: [`automation/tools/README.md`](../tools/README.md).
+`automation/tools/build_reports.py` turns the final runs named in `setup/project.yaml → report.slices` into the
+test completion reports (ISTQB shape) — iOS, Android and both together, each internal (every check, test, step,
+screen and defect clickable; `build_summary.py` renders a platform, `mobile_report.py` the combined one) and for the
+client (`client_report.py`). CHK verdicts come from `trace_results.py` itself, so the reports and the traceability
+matrices agree. `uv run python build_reports.py` writes the full local copy to `reports/<slice>/` here (gitignored:
+API bodies and videos); `--share` writes the copy people get to the repository's `reports/` — the test account
+hidden and pixelated (`redact_screens.py`), checked before it is done — and `node export_pdf.mjs` its PDFs.
+What is where and the published links: [`reports/README.md`](../../reports/README.md); options:
+[`automation/tools/README.md`](../tools/README.md).
 
 ## Prove red (GATES rule 6)
 

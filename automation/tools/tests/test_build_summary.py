@@ -345,17 +345,15 @@ def test_empty_run_is_blocked(tmp_path: Path) -> None:
     assert code == 2
 
 
-def test_artifact_fragment_has_no_document_skeleton(run_dir: Path) -> None:
-    _, _, out = _build(run_dir)
-    fragment = (out / "page.html").read_text(encoding="utf-8")
-    assert fragment.startswith("<title>Concert Mobile QA Report</title>")
-    for tag in ("<!doctype", "<html", "<head>", "<body"):
-        assert tag not in fragment.lower()
+def test_pages_carry_the_brand_title_and_both_themes(run_dir: Path) -> None:
+    _, page, out = _build(run_dir)
+    assert "<title>iOS App QA Report</title>" in page  # setup/project.yaml → report.slices.ios
     # the three theme states: system dark, explicit dark, explicit light
-    assert ':root:not([data-theme="light"])' in fragment
-    assert ':root[data-theme="dark"]' in fragment
-    # the other pages are whole documents
+    assert ':root:not([data-theme="light"])' in page
+    assert ':root[data-theme="dark"]' in page
+    assert "class=\"brand-logo\"" in page and "<span class='tag'>Internal</span>" in page
     assert _module(out).lower().startswith("<!doctype html>")
+    assert not (out / "page.html").exists()  # publishing goes through build_reports.py --share
 
 
 def test_test_account_is_hidden_in_text(run_dir: Path) -> None:
