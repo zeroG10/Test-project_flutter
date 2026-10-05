@@ -8,12 +8,11 @@ Maintain one row per device/OS combination. Suggested columns:
 
 | Platform | Device | OS Version | Form Factor | Priority | Notes |
 |---|---|---|---|---|---|
-| iOS | iPhone 15 | 17.4 | Standard | P0 | Primary target |
-| iOS | iPhone SE (3rd gen) | 17.4 | Small | P1 | Smallest supported screen |
-| iOS | iPad Pro 11" | 17.4 | Tablet | P2 | If app supports iPad |
-| Android | Pixel 7 | 14 | Standard | P0 | Reference device |
-| Android | Samsung Galaxy S23 | 14 | Standard | P0 | OneUI quirks |
-| Android | Pixel 4a | 13 | Small | P1 | Lowest supported OS |
+| iOS | iPhone 17 (simulator) | 26.5 | Standard | P0 | This project's automation target |
+| Android | Pixel 7 (emulator) | 16 (API 36) | Standard | P0 | This project's automation target |
+
+List only devices the runs actually use: the final reports read the P0 rows of
+[device-matrix.md](device-matrix.md) for their exit criterion "P0 devices of the device matrix covered".
 
 ## Priority guidance
 

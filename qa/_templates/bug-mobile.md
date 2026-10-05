@@ -48,7 +48,7 @@ Walk the tree top-down, first match wins — and record which branch fired:
 |---|---|
 | Platform | iOS / Android / Flutter (on iOS or Android) |
 | OS version | iOS 17.4 / Android 14 (API 34) |
-| Device | iPhone 15 Pro / Pixel 7 / Samsung Galaxy S23 |
+| Device | iPhone 17 / Pixel 7 |
 | Form factor | phone / tablet / foldable |
 | Device type | real device / simulator / emulator |
 | App version | 2.4.1 (build 1234) |

@@ -92,7 +92,6 @@
 | Class | Example | Tier |
 |---|---|---|
 | Reference (Pixel) | Pixel 7, Pixel 6a | P0 |
-| Samsung flagship | Galaxy S23, S22 | P0 |
 | Mid-range | Pixel 4a, Galaxy A54 | P1 |
 | Low-end | RAM ≤ 3GB | P2 |
 | Tablet | Galaxy Tab S9 | P2 (only if tablet supported) |
