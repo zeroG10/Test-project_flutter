@@ -141,6 +141,9 @@ scripts/qa.sh ios 08,09           # several modules
 scripts/qa.sh both all --dry-run  # the plan only
 ```
 
+Setting the project up on another Mac (what git does not carry: `.env`, builds, final runs):
+[docs/notes/new-machine.md](../../docs/notes/new-machine.md).
+
 In Claude Code the same is four skills — `/qa-mobile-run`, `/qa-mobile-regress`, `/qa-mobile-triage`, `/qa-mobile-report`
 (how to use them: [English](../../docs/notes/mobile-qa-skills.en.md) · [українською](../../docs/notes/mobile-qa-skills.md)).
 
