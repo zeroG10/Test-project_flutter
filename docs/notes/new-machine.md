@@ -8,8 +8,7 @@ Git містить увесь код, документи, скіли й фіна
 
 ```bash
 git clone https://github.com/zeroG10/Test-project_flutter.git
-cd Test-project_flutter
-git checkout qa/android        # робоча гілка мобільного проєкту
+cd Test-project_flutter        # гілка main — увесь робочий проєкт (main = qa/android з 2026-10-06)
 ```
 
 ## 2. Що перенести вручну (не в git)
