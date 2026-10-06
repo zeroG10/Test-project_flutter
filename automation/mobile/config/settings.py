@@ -64,8 +64,8 @@ class Settings(BaseSettings):
 
     default_timeout: float = 15.0  # seconds, explicit waits (helpers/waits.py)
     # seconds, Appium session idle timeout. 900: API calls that wait out a network blip or the
-    # server's code throttle must not end the one session a run shares (stable run 1, 2026-09-27:
-    # 300 s of API timeouts ended it and 89 tests errored)
+    # server's code throttle must not end the one session a run shares (300 s once let a slow API
+    # end it, and every test after it errored)
     new_command_timeout: int = 900
 
     android_device_name: str = "Pixel_7_API_34"
@@ -83,8 +83,8 @@ class Settings(BaseSettings):
     ios_app_path: str = "./builds/ios/App.app"
     ios_bundle_id: str = "com.example.app"
 
-    # Тестовий акаунт Field Technician. Вхід = телефон|email -> 4-значний OTP,
-    # пароля в апці немає (SRS FR-LOG-05). На DEV код захардкоджений.
+    # The test account the UI signs in with (the project's sign-in flow: fixtures/app_state.py);
+    # the values live only in .env.
     app_user_phone: str = ""
     app_user_email: str = ""
     app_user_otp: str = ""
@@ -103,17 +103,19 @@ class Settings(BaseSettings):
     # (fixtures/jobs.py run stamp) — two runs seeding in the same second never share an id.
     run_tag: str = "-"
 
-    # Field Services API — лише підготовка/прибирання даних для UI-тестів
-    # (docs/api/dev-test-data.md). Порожній API_BASE_URL -> фікстури з API = Blocked.
+    # The product's API — test data for the UI tests (seed, clean up, check what the app stored).
+    # Empty API_BASE_URL → the fixtures that need it are Blocked.
     api_base_url: str = ""
     api_admin_email: str = ""
     api_admin_password: str = ""
     api_timeout: float = 30.0  # seconds per request
+    # The host of the app's deep / App Links (https://<domain>/…): Android lets a debug build open
+    # them only by the user's choice (helpers/android/device.py ``app_links_allowed``).
+    app_link_domain: str = ""
 
-    # Докази (README, "Evidence"): off = не писати (за замовчуванням — робочі прогони, запис
-    # коштує ~5 с на тест); auto = писати кожен тест, зберігати лише для впалих або Blocked і
-    # тестів з маркером e2e; all = зберігати всі. Звітний прогін: EVIDENCE_VIDEO=auto (рішення
-    # власника 2026-09-24).
+    # Evidence (README, "Evidence"): off = do not record (the default — working runs; recording
+    # costs ~5 s per test); auto = record every test, keep it for failed or Blocked tests and tests
+    # marked e2e; all = keep every video. A report / demo run and CI: EVIDENCE_VIDEO=auto.
     evidence_video: Literal["auto", "all", "off"] = "off"
 
     @field_validator("platform")

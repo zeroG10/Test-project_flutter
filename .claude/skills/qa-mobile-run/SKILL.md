@@ -1,13 +1,12 @@
 ---
 name: qa-mobile-run
-description: MOBILE (iOS / Android app, native or Flutter) — run a module, several modules or one test on iOS, Android or both at the same time through automation/mobile/scripts/qa.sh, then say what passed, what is new red and what is a known defect. Use when the user names a mobile platform or the app: "прожени auth на android", "запусти модуль 08 на обох платформах", "run the notes tests on ios", "перевір цей тест на емуляторі". Web suites use /qa-run; the whole mobile regression is /qa-mobile-regress.
+description: MOBILE (iOS / Android app, native or Flutter) — run a module, several modules or one test on iOS, Android or both at the same time through automation/mobile/scripts/qa.sh, then say what passed, what is new red and what is a known defect. Use when the user names a mobile platform or the app: "прожени auth на android", "запусти модуль 08 на обох платформах", "run the notes tests on ios", "перевір цей тест на емуляторі". The whole mobile regression is /qa-mobile-regress.
 ---
 
 # QA run — a module or a test, on one platform or both
 
 > **Scope.** The mobile stack only (`automation/mobile/`), for any app kind — native or Flutter: the platform is the
-> OS (`ios` / `android`), `APP_KIND` lives in `.env`. The web stack has its own skills (`/qa-run`, `/qa-report`);
-> platform-neutral ones (`/qa-bug`, `/qa-handoff`, where the template provides them) serve both.
+> OS (`ios` / `android`), `APP_KIND` lives in `.env`.
 
 A thin wrapper around [automation/mobile/scripts/qa.sh](../../../automation/mobile/scripts/qa.sh)
 (devices and Appium started for you; rules of parallel runs:
@@ -27,7 +26,7 @@ owner's language, in plain words. Invoking this skill is the owner's go for THIS
 ## Step 2 — Preflight (stop instead of working around)
 
 - `git status --short` — tracked changes present → **stop**: `run.sh` wants a committed tree, and
-  commits are made only on the owner's word. Offer: the owner says «коміть», or agrees to a
+  commits are made only on the owner's word. Offer: the owner says commit, or agrees to a
   throwaway debug run (`ALLOW_DIRTY=1`, never traced, never a report's basis).
 - A run of the same platform already going (`results/.run.<platform>.lock`) → say so, do not kill it.
 

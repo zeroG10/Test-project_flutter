@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Mobile regression report — a small static site over ONE clean mobile run.
 
-Third reporting level (owner decision 2026-09-23), next to the Allure report (per test, for
-engineers) and the traceability matrix (``trace_results.py``, per CHK id). The layout follows
-the admin panel's report (web, same product), so the two read alike:
+Third reporting level, next to the Allure report (per test, for engineers) and the
+traceability matrix (``trace_results.py``, per CHK id). The look is the shared brand of the web
+reports (``brand.py``), so a project's web and mobile reports read alike:
 
 * ``index.html`` — for a PM first: the verdict, the numbers, open defects, what could not
   run, why checks are not automated, stability and pace; technical detail below;
@@ -22,10 +22,10 @@ builds the copy that may leave this machine.
 
     cd automation/tools
     uv run python mobile_summary.py \\
-        --allure-dir ../mobile/allure-results \\
+        --allure-dir ../mobile/results/ios/<run> \\
         --checklist ../../qa/mobile/02-authentication/authentication-checklist.md \\
         --run-label "pytest --platform=ios, Authentication" \\
-        [--history-dir ../mobile/allure-results-stable-1 ...] [--note "…"] [--decision "…"] \\
+        [--history-dir ../mobile/results/ios/<earlier full run> ...] [--note "…"] [--decision "…"] \\
         [--public --redact-boxes boxes.json --redact-text-env NAME] [--out-dir …]
 """
 
@@ -91,7 +91,9 @@ def run_facts(env: dict[str, str], platform: str) -> dict[str, str]:
         "device": f"{device} — {kind}",
         "build": " · ".join(x for x in (env.get("Build", ""), f"{build_type} build" if build_type else "") if x)
         or "not recorded",
-        "app_type": "Flutter" if "flutter" in app_kind.lower() else (app_kind.split(" ")[0].capitalize() or "not recorded"),
+        "app_type": "Flutter"
+        if "flutter" in app_kind.lower()
+        else (app_kind.split(" ")[0].capitalize() or "not recorded"),
         "app": env.get("App", "not recorded"),
     }
 
@@ -130,7 +132,7 @@ STATUS = {"passed": "Passed", "failed": "Failed", "skipped": "Blocked"}
 SHOTS_PER_CHECK = 6
 
 # --public: the copy that leaves this machine. Text attachments (API response bodies, page
-# sources) and screen videos are left out — they carry other users' job data and the test
+# sources) and screen videos are left out — they can carry other users' data and the test
 # account's name, and a recording starts before sign-in.
 PUBLIC = False
 
@@ -273,9 +275,7 @@ class Redactor:
 
     MASK = "‹test account›"
 
-    def __init__(
-        self, env_file: Path | None, boxes_file: Path | None, extra: list[str] | None = None
-    ):
+    def __init__(self, env_file: Path | None, boxes_file: Path | None, extra: list[str] | None = None):
         self.values: list[str] = [v for v in (extra or []) if v]
         if env_file and env_file.exists():
             from dotenv import dotenv_values
@@ -330,7 +330,7 @@ class Bug:
     priority_proposed: bool = False  # QA's proposal, not yet the owner's / PM's decision
     regression_tc: str = ""  # the TC that stays red until the fix ("- Test case: `TC-…`")
     filed: bool = True  # a draft the owner decided not to file is not an open defect
-    # ...but its red test is no surprise: the owner triaged it ("known, not filed", 2026-10-05)
+    # ...but its red test is no surprise: the owner triaged it ("known, not filed")
     owner_not_filed: bool = False
 
     @property
@@ -476,9 +476,7 @@ class RunRecord:
     statuses: dict[str, str]  # test key -> status
 
 
-def load_record(
-    directory: Path, items: list[tr.CheckItem], bugs: list[Bug], label: str = ""
-) -> RunRecord | None:
+def load_record(directory: Path, items: list[tr.CheckItem], bugs: list[Bug], label: str = "") -> RunRecord | None:
     try:
         results = tr.load_allure_results(directory)
     except tr.ResultsError as exc:
@@ -749,9 +747,7 @@ def _plural(n: int, noun: str, many: str = "") -> str:
 
 def _bar(parts: list[tuple[str, int, str]], total: int, label: str) -> str:
     cells = "".join(
-        f'<i class="{cls}" style="width:{_pct(n, total)}" title="{_e(title)}"></i>'
-        for cls, n, title in parts
-        if n
+        f'<i class="{cls}" style="width:{_pct(n, total)}" title="{_e(title)}"></i>' for cls, n, title in parts if n
     )
     return f'<div class="bar" role="img" aria-label="{_e(label)}">{cells}</div>'
 
@@ -759,9 +755,7 @@ def _bar(parts: list[tuple[str, int, str]], total: int, label: str) -> str:
 class AssetCopier:
     """Copies the attachments the page shows next to it; names stay unique and stable."""
 
-    def __init__(
-        self, out_dir: Path, redactor: Redactor | None = None, source_root: Path = Path(".")
-    ):
+    def __init__(self, out_dir: Path, redactor: Redactor | None = None, source_root: Path = Path(".")):
         self.redactor = redactor
         self.source_root = source_root
         self.dir = out_dir / "assets"
@@ -923,9 +917,7 @@ class Report:
         for r in self.runs:
             for chk in r.chk_ids:
                 self.by_chk.setdefault(chk, []).append(r)
-        self.bug_of: dict[str, Bug | None] = {
-            r.uid: bug_for(r, self.bugs) for r in self.runs if r.status == "Failed"
-        }
+        self.bug_of: dict[str, Bug | None] = {r.uid: bug_for(r, self.bugs) for r in self.runs if r.status == "Failed"}
         suites = {r.module.split("·")[0].strip(): r.module for r in self.runs}
         grouped: dict[str, list[tr.TraceRow]] = {}
         for row in self.rows:
@@ -939,9 +931,7 @@ class Report:
         self.module_of_chk = {row.item.chk_id: m for m in self.modules for row in m.rows}
         self.open_bugs = [b for b in self.bugs if b.filed]
         # drafts the owner decided not to file whose tests stay red in this run
-        self.known_drafts = [
-            b for b in self.bugs if not b.filed and any(v is b for v in self.bug_of.values())
-        ]
+        self.known_drafts = [b for b in self.bugs if not b.filed and any(v is b for v in self.bug_of.values())]
 
     # --- text helpers ------------------------------------------------------------------
 
@@ -1000,16 +990,8 @@ class Report:
         )
 
     def facts(self) -> list[tuple[str, str]]:
-        wall = (
-            (max(r.stop_ms for r in self.runs) - min(r.start_ms for r in self.runs)) / 1000
-            if self.runs
-            else 0
-        )
-        finished = (
-            datetime.fromtimestamp(max(r.stop_ms for r in self.runs) / 1000, UTC)
-            if self.runs
-            else self.now
-        )
+        wall = (max(r.stop_ms for r in self.runs) - min(r.start_ms for r in self.runs)) / 1000 if self.runs else 0
+        finished = datetime.fromtimestamp(max(r.stop_ms for r in self.runs) / 1000, UTC) if self.runs else self.now
         env = self.env
         rf = run_facts(env, self.platform)
         tc = self.test_counts()
@@ -1024,8 +1006,7 @@ class Report:
             ("Harness code", env.get("Harness commit", "not recorded")),
             (
                 "Tests run",
-                f"{len(self.runs)} · {tc['Failed']} red · {tc['Blocked']} blocked · "
-                f"{unexpected} unexpected",
+                f"{len(self.runs)} · {tc['Failed']} red · {tc['Blocked']} blocked · {unexpected} unexpected",
             ),
             ("Report generated", f"{self.now:%Y-%m-%d %H:%M} UTC"),
         ]
@@ -1044,9 +1025,7 @@ class Report:
         t = self.t
         run_date = self.run_date()
         source = f"automation/mobile/reports/{self.platform}/internal/index.html"
-        online = (
-            f"<a href='{t(slc.internal_url)}'>{t(slc.internal_url)}</a>" if slc.internal_url else "—"
-        )
+        online = f"<a href='{t(slc.internal_url)}'>{t(slc.internal_url)}</a>" if slc.internal_url else "—"
         return (
             f"<p class='docinfo'><b>Document.</b> Version of {t(run_date)} (the run this report describes) · "
             f"Source: <code>{t(source)}</code> · Online: {online} · PDF: "
@@ -1123,8 +1102,12 @@ class Report:
         w("</dl>")
         w(self.docinfo(slc))
         w("<nav class='layer' aria-label='Report layers'>")
-        links = [("summary", "Summary"), ("defects", "Open defects"), ("blocked", "Could not run"),
-                 ("not-automated", "Not automated")]
+        links = [
+            ("summary", "Summary"),
+            ("defects", "Open defects"),
+            ("blocked", "Could not run"),
+            ("not-automated", "Not automated"),
+        ]
         if self.history:
             links.append(("stability", "Stability"))
         if self.pace:
@@ -1145,11 +1128,7 @@ class Report:
             f"automated and ran on {t(self.target or self.device_line())}. "
             f"In this run <b>{c['Passed']}</b> passed; <b>{c['Held red']}</b> "
             f"{'is' if c['Held red'] == 1 else 'are'} held red by {_plural(len(bugs_red), 'open defect')}"
-            + (
-                f" and {_plural(len(drafts_red), 'known issue')} the owner decided not to file"
-                if drafts_red
-                else ""
-            )
+            + (f" and {_plural(len(drafts_red), 'known issue')} the owner decided not to file" if drafts_red else "")
             + f", each with a test that fails until the defect is fixed; <b>{c['Blocked']}</b> could "
             f"not run for a stated reason. "
             + (
@@ -1275,7 +1254,8 @@ class Report:
         if proposed:
             items.append(
                 f"The priority of {_plural(len(proposed), 'open defect')} is QA's proposal — the "
-                "owner / PM decide: " + ", ".join(f"<a href='bugs/{t(b.bug_id)}.html'>{t(b.bug_id)}</a>" for b in proposed)
+                "owner / PM decide: "
+                + ", ".join(f"<a href='bugs/{t(b.bug_id)}.html'>{t(b.bug_id)}</a>" for b in proposed)
             )
         missing = [row.item.chk_id for row in self.rows if not row.results and row.item.chk_id not in self.reasons]
         if missing:
@@ -1329,9 +1309,7 @@ class Report:
             labels.setdefault(b.severity, b.severity_label)
         out.append(
             "<p>"
-            + " · ".join(
-                f"<span class='sev {t(k)}'>{t(k)}</span> {t(labels[k])}: {n}" for k, n in sorted(sev.items())
-            )
+            + " · ".join(f"<span class='sev {t(k)}'>{t(k)}</span> {t(labels[k])}: {n}" for k, n in sorted(sev.items()))
             + ". Every defect is filed locally, in the repository; no tracker is configured.</p>"
         )
         out.append(
@@ -1420,9 +1398,7 @@ class Report:
             kind = self.kinds.get(key)
             title = kind.title if kind else "Reason missing"
             meaning = kind.meaning if kind else f"no row in {self.reasons_file} — owed"
-            out.append(
-                f"<tr><td><b>{t(title)}</b></td><td>{t(meaning)}</td><td class='num'>{n}</td></tr>"
-            )
+            out.append(f"<tr><td><b>{t(title)}</b></td><td>{t(meaning)}</td><td class='num'>{n}</td></tr>")
         out.append("</tbody></table></div></section>")
         return "".join(out)
 
@@ -1536,7 +1512,7 @@ class Report:
             (bx, by), (nx, ny) = bubbles[i], bubbles[i + 1]
             if abs(nx - bx) < 18 and abs(ny - by) < 18:
                 bubbles[i] = (nx - 18, by)
-        for i, ((px, py), (bx, by)) in enumerate(zip(points, bubbles), 1):
+        for i, ((px, py), (bx, by)) in enumerate(zip(points, bubbles, strict=True), 1):
             if (bx, by) != (px, py):
                 svg.append(f'<line class="line" x1="{px:.1f}" y1="{py:.1f}" x2="{bx:.1f}" y2="{by:.1f}"/>')
             svg.append(
@@ -1566,11 +1542,11 @@ class Report:
             "<div class='box'><h3>How a verdict is decided</h3><ul>"
             "<li><b>Passed</b> only when an assertion with a named oracle decided it: the "
             "checklist or the SRS, the app's accessibility tree, the pixels of a screenshot "
-            "(a colour, the theme's brightness) or the DEV API's copy of what the app saved.</li>"
+            "(a colour, the theme's brightness) or the server's own copy of what the app saved.</li>"
             "<li><b>Held red</b>: a filed defect's regression test asserts the correct behaviour "
             "and fails until the fix; its report names the test. A fix turns it green by itself.</li>"
-            f"<li><b>Blocked</b> ({blocked} in this run) — a precondition the simulator or DEV "
-            "cannot give — is never green and never silent; each says why.</li>"
+            f"<li><b>Blocked</b> ({blocked} in this run) — a precondition the device or the test "
+            "environment cannot give — is never green and never silent; each says why.</li>"
             "<li>No retries. One Appium session per run. Every test was proven red once by "
             "breaking its own expectation (<code>--prove-red</code>) before it was trusted.</li>"
             "</ul></div>"
@@ -1587,23 +1563,21 @@ class Report:
             "owner rulings: <code>docs/notes/decisions.md</code>.</li>"
             "<li>This page: <code>automation/tools/mobile_summary.py</code>.</li></ul></div>"
         )
+        app = "Flutter app" if run_facts(env, self.platform)["app_type"] == "Flutter" else "app"
         scope = [
             f"Device: {self.target or env.get('Device', 'not recorded')}.",
             f"App: {env.get('App', 'not recorded')} {env.get('Build', '')}, built from "
             f"{env.get('App source', 'not recorded')}.",
             (
-                "Driver: Appium with XCUITest — the Flutter app is read through the iOS accessibility "
+                f"Driver: Appium with XCUITest — the {app} is read through the iOS accessibility "
                 "tree; one test at a time, the app relaunched or reset by each test's preconditions."
                 if self.platform == "ios"
-                else "Driver: Appium with UiAutomator2 — the Flutter app is read through the Android "
+                else f"Driver: Appium with UiAutomator2 — the {app} is read through the Android "
                 "accessibility tree; one test at a time, one Appium session per module, the app relaunched "
                 "or reset by each test's preconditions."
             ),
             f"Tools: {self.tools or 'not recorded'} (installed on the QA machine when this report was built).",
-            "DEV only; production is never tested. The API is used to create test data, clean up "
-            "and check what the app stored — API tests are out of scope.",
-            "Test data is created, marked (QA-AUTO-…) and deleted by the tests; a throwaway "
-            "technician is registered and removed; the main test account's name and theme are put back.",
+            *brand.SCOPE_NOTES,  # the project's own lines: setup/project.yaml → report.mobile.scope_notes
         ] + list(self.notes)
         out.append(
             "<div class='box'><h3>Scope of this run</h3><ul>"
@@ -1626,14 +1600,10 @@ class Report:
             "<li>Each module went through a test review (<code>/bmad-testarch-test-review</code>) "
             "before it was called done.</li>"
             "<li>Evidence: named screenshots at checkpoints, a screenshot on failure, a screen "
-            "video of failed and end-to-end tests.</li>"
-            + shared
-            + "</ul></div></div>"
+            "video of failed and end-to-end tests.</li>" + shared + "</ul></div></div>"
         )
         rows = self.not_automated_rows()
-        out.append(
-            f"<h3 style='margin-top:26px'>Every check that is not automated, and why · {len(rows)}</h3>"
-        )
+        out.append(f"<h3 style='margin-top:26px'>Every check that is not automated, and why · {len(rows)}</h3>")
         for m in self.modules:
             mrows = [row for row in m.rows if not row.results]
             if not mrows:
@@ -1663,7 +1633,11 @@ class Report:
         env = self.env
         out: list[str] = []
         w = out.append
-        w("<div class='wrap'>" + brand.brandbar("internal") + "<nav class='top' style='margin-top:16px'><a href='index.html'>← Summary</a>")
+        w(
+            "<div class='wrap'>"
+            + brand.brandbar("internal")
+            + "<nav class='top' style='margin-top:16px'><a href='index.html'>← Summary</a>"
+        )
         w("<a href='index.html#defects'>Open defects</a>")
         i = self.modules.index(m)
         if i > 0:
@@ -1698,8 +1672,11 @@ class Report:
             "<b>Seen</b> column opens the phone screens the test saved at its checkpoints: they "
             "are there to be looked at, not to decide anything; the assertion is what passed or failed.</p>"
         )
-        bugs = [b for b in self.open_bugs if b.module_dir == m.key or any(
-            self.module_of_chk.get(x) is m for x in self.held_by(b))]
+        bugs = [
+            b
+            for b in self.open_bugs
+            if b.module_dir == m.key or any(self.module_of_chk.get(x) is m for x in self.held_by(b))
+        ]
         if bugs:
             w("<h2 style='margin-top:26px'>Open defects</h2><ul>")
             for b in bugs:
@@ -1753,10 +1730,7 @@ class Report:
         runs = self.by_chk.get(chk, [])
         note = ""
         if verdict == "Held red":
-            note = "".join(
-                f"<div class='why'>{self.bug_ref(b)}</div>"
-                for b in self.row_bugs(row)
-            )
+            note = "".join(f"<div class='why'>{self.bug_ref(b)}</div>" for b in self.row_bugs(row))
         elif verdict in ("Failed", "Blocked"):
             detail = next((r.detail for r in runs if r.status == verdict and r.detail), "")
             note = f"<div class='why'>{t(_reason(detail)[:220])}</div>"
@@ -1829,9 +1803,8 @@ class Report:
         meta = []
         if r.chk_ids:
             meta.append(
-                "Checks: " + ", ".join(
-                    f"<a href='{self.check_href(x, r)}'>{t(x.removeprefix('CHK-'))}</a>" for x in r.chk_ids
-                )
+                "Checks: "
+                + ", ".join(f"<a href='{self.check_href(x, r)}'>{t(x.removeprefix('CHK-'))}</a>" for x in r.chk_ids)
             )
         loc = source_of(r)
         if loc:
@@ -1890,7 +1863,10 @@ class Report:
         )
         body = re.sub(r'<a href="(?!https?://|#)[^"]*">(.*?)</a>', r"\1", body, flags=re.DOTALL)
         m = next((m for m in self.modules if m.key == bug.module_dir), None)
-        nav = brand.brandbar("internal") + "<nav class='top' style='margin-top:16px'><a href='../index.html#defects'>← All open defects</a>"
+        nav = (
+            brand.brandbar("internal")
+            + "<nav class='top' style='margin-top:16px'><a href='../index.html#defects'>← All open defects</a>"
+        )
         if m:
             nav += f"<a href='../{m.page}'>{t(m.label)}: every check</a>"
         nav += "</nav>"
@@ -1937,9 +1913,7 @@ def write_site(report: Report, out_dir: Path) -> None:
                 report.document(bug.bug_id, report.bug_page(bug)), encoding="utf-8"
             )
             for src in report.bug_evidence(bug):
-                target = bugs_dir / "evidence" / bug.bug_id / src.relative_to(
-                    bug.path.parent / "evidence" / bug.bug_id
-                )
+                target = bugs_dir / "evidence" / bug.bug_id / src.relative_to(bug.path.parent / "evidence" / bug.bug_id)
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, target)
                 report.red.image(target)
@@ -1953,9 +1927,7 @@ def write_site(report: Report, out_dir: Path) -> None:
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     p.add_argument("--allure-dir", type=Path, required=True, help="allure-results of ONE run")
-    p.add_argument(
-        "--checklist", type=Path, action="append", required=True, help="repeat per module"
-    )
+    p.add_argument("--checklist", type=Path, action="append", required=True, help="repeat per module")
     p.add_argument("--run-label", default="", help="what was run (filter, suite)")
     p.add_argument("--target", default="", help="the device the run used, as the page names it")
     p.add_argument(
@@ -1967,9 +1939,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--history-note", default="", help="one note under the run history table")
     p.add_argument("--note", action="append", default=[], help="a line under 'Scope of this run'")
-    p.add_argument(
-        "--decision", action="append", default=[], help="a line under 'What needs a decision'"
-    )
+    p.add_argument("--decision", action="append", default=[], help="a line under 'What needs a decision'")
     p.add_argument(
         "--reasons",
         type=Path,
@@ -2044,11 +2014,7 @@ def main(argv: list[str] | None = None) -> int:
     bugs = load_bugs()
     runs = load_test_runs(args.allure_dir)
     kinds, reasons = load_reasons(args.reasons)
-    history = [
-        rec
-        for d in args.history_dir
-        if (rec := load_record(d, items, bugs)) is not None
-    ]
+    history = [rec for d in args.history_dir if (rec := load_record(d, items, bugs)) is not None]
     automated_by_module: dict[str, int] = {}
     report = Report(
         runs=runs,

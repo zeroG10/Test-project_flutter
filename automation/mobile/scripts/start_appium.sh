@@ -17,6 +17,6 @@ if [ $# -ge 1 ]; then
 fi
 # session_discovery (local server only): scripts/run.sh lists and closes sessions a killed run left
 # behind — such a session, when its newCommandTimeout expires, stops the UiAutomator2 server under the
-# NEXT run (Android stage, module 02 run 4: seven tests errored).
+# NEXT run (seven tests errored in one such case).
 exec appium --address "${APPIUM_HOST:-127.0.0.1}" --port "$PORT" --log-level info \
   --allow-insecure "*:session_discovery"

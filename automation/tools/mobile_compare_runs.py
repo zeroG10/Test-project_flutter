@@ -65,7 +65,10 @@ def name(run: bs.TestRun) -> str:
 
 
 def report(result: dict[str, list], baseline: Path, new: Path, n_base: int, n_new: int, partial: bool) -> str:
-    lines = [f"baseline: {bs.rel_to_repo(baseline)} — {n_base} tests", f"run:      {bs.rel_to_repo(new)} — {n_new} tests"]
+    lines = [
+        f"baseline: {bs.rel_to_repo(baseline)} — {n_base} tests",
+        f"run:      {bs.rel_to_repo(new)} — {n_new} tests",
+    ]
     lines.append("")
     if result["new_red"]:
         lines.append(f"NEW RED · {len(result['new_red'])} — triage these first (app, test or environment):")
@@ -88,7 +91,9 @@ def report(result: dict[str, list], baseline: Path, new: Path, n_base: int, n_ne
         lines.append(f"known red · {len(result['known'])} — expected until the defect is fixed:")
         lines += [f"  {name(r)}  [{b.bug_id}{'' if b.filed else ', not filed — owner'}]" for r, b in result["known"]]
     if result["added"]:
-        lines.append(f"not in the baseline · {len(result['added'])}: " + ", ".join(r.tc or r.title[:30] for r in result["added"]))
+        lines.append(
+            f"not in the baseline · {len(result['added'])}: " + ", ".join(r.tc or r.title[:30] for r in result["added"])
+        )
     if result["missing"] and not partial:
         lines.append(f"MISSING · {len(result['missing'])} — in the baseline, did not run now:")
         lines += [f"  {name(r)}" for r in result["missing"]]
@@ -109,7 +114,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("run", type=Path, help="allure results of the run to judge")
     parser.add_argument("--platform", choices=bs.PLATFORMS, help="baseline = the platform's final run")
     parser.add_argument("--baseline", type=Path, help="allure results to compare with")
-    parser.add_argument("--partial", action="store_true", help="the run is a module, not the regression: tests it did not include are not 'missing'")
+    parser.add_argument(
+        "--partial",
+        action="store_true",
+        help="the run is a module, not the regression: tests it did not include are not 'missing'",
+    )
     args = parser.parse_args(argv)
     baseline = args.baseline or (brand.slice_(args.platform).run if args.platform else None)
     if baseline is None:

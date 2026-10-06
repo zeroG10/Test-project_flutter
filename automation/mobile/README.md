@@ -123,7 +123,7 @@ point `ANDROID_APP_PATH` / `IOS_APP_PATH` at it. A missing build makes every tes
 | `ANDROID_*` | device name, OS version, app path, package, activity | UiAutomator2 caps |
 | `IOS_*` | device name, OS version, app path, bundle id | XCUITest caps |
 | `EVIDENCE_VIDEO` | `off` \| `auto` \| `all` (default `off`) | screen video per test; `off` for working runs (~5 s per test saved); `auto` — for report / demo runs and CI — keeps it for failed / Blocked tests and tests marked `e2e` |
-| `APP_USER_EMAIL`, `APP_USER_PHONE`, `APP_USER_OTP` | — | the DEV test technician (`{{tech.*}}`); empty → dependent tests `Blocked` |
+| `APP_USER_EMAIL`, `APP_USER_PHONE`, `APP_USER_OTP` | — | the test account (`{{tech.*}}`); empty → dependent tests `Blocked`; `APP_USER_NAME` (optional) — hidden in shared reports |
 | `IOS_USER_*`, `ANDROID_USER_*` (`EMAIL`, `PHONE`, `OTP`) | unset → `APP_USER_*` | a test account of the platform's own — what lets iOS and Android run at the same time ([PARALLEL-RUNS.md](PARALLEL-RUNS.md)) |
 | `IOS_APPIUM_PORT`, `ANDROID_APPIUM_PORT` | unset → `APPIUM_PORT` | an Appium server per platform, for parallel runs |
 | `ANDROID_EMULATOR_ARGS` | `-netdelay none -netspeed full -dns-server 8.8.8.8,1.1.1.1` | how `scripts/qa.sh` boots the emulator when none is up |
@@ -290,16 +290,18 @@ setup: `rm -rf ~/.npm/_npx` and re-verify (`setup/SETUP.md` §3).
 
 ## Session model and app-state fixtures
 
-**One Appium session per run** (`driver` is session-scoped): runs are serial by decision
-(weak DEV server), the session start installs the build from `.env`, and every test gets the
-app into the state its test case asks for through a fixture — never through a new session.
+**One Appium session per run** (`driver` is session-scoped; on Android a fresh session per module, and
+a dead one is revived — a long run outlives its driver): the session start installs the build from
+`.env`, and every test gets the app into the state its test case asks for through a fixture — never
+through a new session. One run per platform at a time; iOS and Android side by side only when they
+share nothing ([PARALLEL-RUNS.md](PARALLEL-RUNS.md)).
 
 | Test-case precondition | Fixture | What it does |
 |---|---|---|
 | cold start; app data reset (logged out) | `logged_out_app` | `mobile: clearApp` → launch → Welcome must show; if it does not, one reinstall, then `Blocked` |
-| signed in as `{{tech.*}}` | `ui_login` | relaunch; reuses a live session, signs in through the UI (email + DEV OTP) only when Welcome shows |
-| `{{tech.*}}` | `tech` | the DEV test technician from `APP_USER_*` |
-| `{{new_user.*}}` + API delete | `new_user` | unique `qa-auto+<stamp>@example.com`, fictional `202-555-01xx`; teardown deletes what was registered (`GET /technician` → `DELETE /user/full-delete/{id}`, verified gone), then clears app data |
+| signed in as `{{tech.*}}` | `ui_login` | relaunch; reuses a live session, signs in through the UI only when the signed-out screen shows |
+| `{{tech.*}}` | `tech` | the test account from `APP_USER_*` (or the platform's own, `IOS_USER_*` / `ANDROID_USER_*`) |
+| `{{new_user.*}}` + API delete | `new_user` | unique `qa-auto+<stamp>@example.com`, fictional `202-555-01xx`; teardown deletes what was registered through the product's API (verified gone), then clears app data |
 | named screenshots | `evidence` | `evidence.checkpoint("otp-screen")` |
 
 Why clearing data signs out on iOS: the token lives in the keychain, which a data wipe does not
@@ -313,13 +315,13 @@ any email that is not `qa-auto+…@example.com` and any record whose email is no
 
 ## Evidence
 
-Not everything is captured (owner decision 2026-09-23):
+Not everything is captured:
 
 - **On failure** (and on a Blocked setup): screenshot + page source — automatic.
 - **Checkpoints**: named screenshots only at the moments a test chooses (`evidence.checkpoint`),
   numbered `01 · welcome`, `02 · otp-screen` … — the key screens of the summary page.
-- **Video**: **off in working runs** (recording and saving cost ~5 s per test — owner decision
-  2026-09-24). Report / demo runs and CI switch it on for the run:
+- **Video**: **off in working runs** (recording and saving cost ~5 s per test). Report / demo runs
+  and CI switch it on for the run:
   `EVIDENCE_VIDEO=auto uv run pytest --platform=ios …` — every test is recorded (a failure is not
   known in advance) and the video is kept for failed or Blocked tests and tests marked `e2e`
   (`all` keeps every video). iOS records through ffmpeg (`brew install ffmpeg`) as H.264 so it
@@ -335,12 +337,12 @@ Not everything is captured (owner decision 2026-09-23):
   source commit, harness commit, Appium URL — `<results dir>/environment.properties`.
 - **Categories:** Blocked (not a product verdict) · expected element not shown in time · assertion
   failed · harness error — `<results dir>/categories.json`.
-- Every result carries an `env` label (`iOS · iPhone 17 · iOS 26.5 · build 1.1.1 (178)`) that
+- Every result carries an `env` label (`iOS · <device> · iOS <version> · build <version (build)>`) that
   `trace_results.py` prints in the run context.
 
 ```bash
-allure serve results/ios/stable-3                 # interactive
-allure generate results/ios/stable-3 -o reports/ios/allure-report --clean   # static folder
+allure serve results/ios/<run>                                               # interactive
+allure generate results/ios/<run> -o reports/ios/allure-report --clean       # static folder
 ```
 
 ## Test completion reports
@@ -349,11 +351,12 @@ allure generate results/ios/stable-3 -o reports/ios/allure-report --clean   # st
 test completion reports (ISTQB shape) — iOS, Android and both together, each internal (every check, test, step,
 screen and defect clickable; `mobile_summary.py` renders a platform, `mobile_combined_report.py` the combined one) and for the
 client (`mobile_client_report.py`). CHK verdicts come from `trace_results.py` itself, so the reports and the traceability
-matrices agree. `uv run python mobile_reports.py` writes the full local copy to `reports/mobile/<slice>/` here (gitignored:
-API bodies and videos); `--share` writes the copy people get to the repository's `reports/` — the test account
-hidden and pixelated (`mobile_redact_screens.py`), checked before it is done — and `node mobile_export_pdf.mjs` its PDFs.
-What is where and the published links: [`reports/mobile/README.md`](../../reports/README.md); options:
-[`automation/tools/README.md`](../tools/README.md).
+matrices agree. `uv run python mobile_reports.py` writes the full local copy to `reports/<slice>/` here
+(gitignored: API bodies and videos); `--share` writes the copy people get to the repository's `reports/mobile/` —
+the test accounts hidden and pixelated (`mobile_redact_screens.py`), checked before it is done — and
+`node mobile_export_pdf.mjs` its PDFs. What is where and the published links:
+[`reports/mobile/README.md`](../../reports/mobile/README.md); options: [`automation/tools/README.md`](../tools/README.md)
+(*Mobile reports*). In Claude Code: `/qa-mobile-report`.
 
 ## Prove red (GATES rule 6)
 
@@ -368,28 +371,28 @@ uv run pytest --platform=ios tests/shared/test_authentication.py --prove-red \
 
 The run must be all red; the summary lists any test that stayed green as **NOT PROVEN**.
 A test fails at its first text expectation, which is placed before any server call where
-possible, so a prove-red run costs the DEV server little.
+possible, so a prove-red run costs the test environment little.
 
-## Android (Android stage — docs/notes/android-plan.md)
+## Android specifics
 
-- Emulator `Pixel_7_API_36` (Pixel 7 · Android 16 · Google APIs arm64 · 4 GB), debug APK in
-  `builds/android/` (`BUILD_INFO.txt`). Run: `bash scripts/run.sh android <name> [pytest args]`.
-- One-time device setup a fresh AVD needs (recon A1): Chrome first run → "Use without an
-  account"; Google Maps → "Skip"; Google Messages → "Use Messages without an account"; the
-  Google "Location Accuracy" dialog → "Turn on"; `adb shell settings put secure
-  stylus_handwriting_enabled 0` (Gboard's stylus tutorial covered the screen).
-- The session sets `waitForIdleTimeout` = 100 ms (Flutter redraws never let UiAutomator see
-  "idle") and a 90-s UiAutomator2 server start.
-- Flutter hands Android only the on-screen part of a scrolled form: the survey page walks the
-  form (`pages/survey_page.py`); a whole-card text field takes text only through the IME
-  (`mobile: type`).
-- `AppControl.clear_data` = `pm clear` + the runtime permissions granted again; `set_location` keeps
-  the emulator GPS at the point (a fix per second — not reported as mocked, so check-in needs no
-  debug switch); `mock_location` makes Appium Settings the mock provider for the guard test.
-- An ANR dialog ("… isn't responding") on a failure turns the test into **Blocked** (a starved
-  emulator, not an app verdict — `conftest.py` `AnrBlocked`). Keep the Mac idle during runs.
-- Offline: `unit_tests/test_android_maps.py` (the Android column on the recon trees),
-  `unit_tests/test_android_pages.py` (the pages' Android readers on the same trees).
+Adding Android to a suite proven on iOS (or the other way round): [SECOND-PLATFORM.md](SECOND-PLATFORM.md);
+what cost time: [LESSONS.md](LESSONS.md).
+
+- An emulator booted with fixed DNS servers and the time zone the expectations assume
+  (`ANDROID_EMULATOR_ARGS`); the build in `builds/android/` with its `BUILD_INFO.txt`.
+- A fresh AVD needs its first-run screens dismissed once by hand: Chrome ("Use without an account"),
+  Google Maps, Google Messages, the "Location Accuracy" dialog; and
+  `adb shell settings put secure stylus_handwriting_enabled 0` (Gboard's stylus tutorial covers the screen).
+- The session sets `waitForIdleTimeout` = 100 ms (Flutter redraws never let UiAutomator see "idle")
+  and a 90-s UiAutomator2 server start.
+- Flutter hands Android only the on-screen part of a scrolled form: read it by walking (scroll, collect,
+  check the scroll moved); a field that rejects set-text takes text through the IME (`mobile: type`).
+- `AppControl.clear_data` = `pm clear` + the runtime permissions granted again; `set_location` keeps the
+  emulator GPS at the point (a fix per second, not reported as mocked); `mock_location` makes Appium
+  Settings the mock provider for a test of the app's mock-location guard.
+- An ANR dialog ("… isn't responding") on a failure turns the test into **Blocked** (a starved emulator,
+  not an app verdict — `conftest.py` `AnrBlocked`); `run.sh` refuses to start with one up.
+- Offline tests switch the device's network through adb (`fixtures/network.py`), restored in `finally`.
 
 ## Offline self-test
 
@@ -399,10 +402,12 @@ uv run python -m unittest discover -s unit_tests    # no device, no Appium, no n
 
 It includes **map-health** (`unit_tests/test_screen_maps.py`): every alias used in the module's
 test cases resolves in a screen map, or is listed as resolved by a page method (unnamed controls,
-per-field messages — testability defects in `docs/requirements/shared/testability-contract.md` §5).
-And the **iOS locator guard** (`unit_tests/test_ios_locator_guard.py`): during the Android stage it
-fails when any iOS locator or screen anchor differs from `unit_tests/ios_locators.snapshot.json`
-(recorded at tag `ios-final-2026-09-28`); re-record only on the owner's word (`--update`).
+per-field messages — testability defects in `docs/requirements/shared/testability-contract.md`).
+The **iOS locator guard** (`unit_tests/test_ios_locator_guard.py`): while a second platform is
+added it fails when any iOS locator or screen anchor differs from `unit_tests/ios_locators.snapshot.json`
+(recorded when iOS was proven); re-record only on the owner's word (`--update`). The Android column is
+checked on recon trees (`unit_tests/android_dumps.py`), and the parallel-run settings and the launcher
+offline (`unit_tests/test_parallel_runs.py`).
 Whether a locator finds its element is proven only on a device.
 
 ## Builds folder

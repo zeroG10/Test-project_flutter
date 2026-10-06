@@ -12,7 +12,7 @@ and whose B is filled, the adapter inserts a synthetic ``[feature, ""]`` row abo
 original row stays as it is, so it becomes the first screen of the block and B keeps its meaning.
 
     uv run python import_checklist_from_csv.py \\
-        --csv ../../docs/00-intake/checklist-concert-technologies-flutter.csv \\
+        --csv ../../docs/00-intake/<checklist-export>.csv \\
         --out-root ../../qa/mobile \\
         --module-map "Authentication=02-authentication:AUTH" ... \\
         --feature Authentication --dry-run
@@ -51,11 +51,8 @@ def main(argv: list[str] | None = None) -> int:
     rows = list(csv.reader(csv_path.open(encoding="utf-8")))
 
     # feature names come from the --module-map entries passed through to upstream
-    feature_keys = {
-        upstream.normalize_key(v.split("=", 1)[0])
-        for k, v in zip(rest, rest[1:])
-        if k == "--module-map"
-    }
+    pairs = zip(rest, rest[1:], strict=False)
+    feature_keys = {upstream.normalize_key(v.split("=", 1)[0]) for k, v in pairs if k == "--module-map"}
     rows = normalise_boundaries(rows, feature_keys)
 
     def fetch_from_csv(_sheet_id: str, _gid: int, _creds: Path):
@@ -64,8 +61,17 @@ def main(argv: list[str] | None = None) -> int:
     # upstream insists that a credentials file exists; the CSV path needs none
     with tempfile.NamedTemporaryFile(suffix=".json") as dummy:
         return upstream.main(
-            ["--sheet-id", "csv-export", "--gid", "0", "--credentials", dummy.name,
-             "--source-title", csv_path.name, *rest],
+            [
+                "--sheet-id",
+                "csv-export",
+                "--gid",
+                "0",
+                "--credentials",
+                dummy.name,
+                "--source-title",
+                csv_path.name,
+                *rest,
+            ],
             fetch=fetch_from_csv,
         )
 

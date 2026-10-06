@@ -2,7 +2,7 @@
 
 How one machine runs the iOS and the Android suites side by side, the rules that keep the two runs from
 spoiling each other, and how to set the same thing up in another project. Written to be reused: sections
-1–5 are the method, section 6 is this project's values.
+1–5 are the method, section 6 is the project's values.
 
 ## 1. One command
 
@@ -91,51 +91,19 @@ Parallel is a different environment from the one the suite was proven in. Prove 
    privacy check knows it (it reads the same `.env`).
 6. Do section 4.
 
-## 6. This project (Concert Technologies Field Technicians app)
+## 6. This project
+
+Filled per project (owner's decision; values in `automation/mobile/.env`, names only here).
 
 | | iOS | Android |
 |---|---|---|
-| Device | iPhone 17 simulator, iOS 26.5 | Pixel 7 emulator (AVD `Pixel_7_API_36`), Android 16 |
-| Test account | the second account (owner, 2026-10-05) — `IOS_USER_EMAIL` / `IOS_USER_PHONE` | the first — `APP_USER_EMAIL` / `APP_USER_PHONE` |
-| OTP | `APP_USER_OTP` (the DEV code is the same for every account) | same |
-| Appium | `IOS_APPIUM_PORT` = 4723 | `ANDROID_APPIUM_PORT` = 4724 |
-| Emulator boot | — | `ANDROID_EMULATOR_ARGS` (DNS servers, Kyiv time zone) |
+| Device | `<simulator / device, OS>` | `<emulator AVD / device, OS>` |
+| Test account | `IOS_USER_*` or the shared `APP_USER_*` | `ANDROID_USER_*` or the shared `APP_USER_*` |
+| Appium | `IOS_APPIUM_PORT` = `<port>` | `ANDROID_APPIUM_PORT` = `<port>` |
+| Emulator boot | — | `ANDROID_EMULATOR_ARGS` (DNS servers, time zone) |
 
-The second account went to iOS because iOS has to be re-run anyway after the Android stage changed the
-shared code: one verification covers both.
+**Status:** `<configured / proven by a run (section 4) — date, what ran, what differed>`.
 
-**Status (2026-10-05): configured; the mechanics work — the suite is not yet proven in parallel.** The
-second account was read on DEV (registered, active, no active job). A quick check on the owner's go: one
-read-only test (TC-PRF-005) on both platforms at the same second — each under its own account and Appium
-server, both passed; its results were deleted on purpose (a check of the tool, not a test result). Section
-4 is still to do; until then a parallel result of the suite is not evidence.
-
-A phone on a USB cable does not get in the way: `qa.sh` pins the Android run to the emulator
-(`ANDROID_SERIAL`).
-
-**First parallel module run (2026-10-05, `quick-1`: splash + profile on both, 10 min).** iOS: 12 passed,
-1 known red — clean, also under the second account and on the code changed for Android. Android: 11
-passed, 2 known red, **2 Blocked that pass alone** (TC-PRF-001, TC-PRF-007; diagnostic run `diag-1`,
-alone on Android: 2 of 2 passed). Both blocked at the sign-in before the test: the server answered
-"Incorrect code." to the correct code. The DEV code is four identical digits, so mistyped digits are
-ruled out; both failures came 4 s and 22 s after a sign-in of the iOS account, the three Android
-sign-ins that passed had none within 55 s. **Settled by a controlled check (owner's go, the app's own two calls —
-`POST /auth/sign-in/email`, `POST /auth/confirm/otp` — for the two accounts in turn, 17 sign-ins in
-7 min):** DEV answers `429 ThrottlerException: Too Many Requests` on **`/auth/confirm/otp`**, and the
-limit is **not per account**: about three confirmations in a short window from this machine and the
-next ones are refused for either account, for roughly a minute. Alone, each account signs in every
-time. The app shows that 429 as "Incorrect code." (its text for a confirmation error without a
-message of its own). So:
-
-- it is the test environment's rate limit, shared by everything behind one address — not the harness,
-  not the second account, not the Mac's load;
-- one platform alone stays under it; two at once double the sign-ins and cross it — the blocked
-  tests are sign-in preconditions, reported as Blocked, never green;
-- for the product it is a question to the backend team: is the limit per IP on production too (two
-  technicians on one Wi-Fi signing in within a minute), and should the app say "Too many requests"
-  instead of "Incorrect code." — not filed, the owner decides.
-
-**What parallel needs before a whole regression (owner's decision):** the backend relaxes the limit on
-DEV or keys it per account; or the harness paces sign-ins across the two runs (one shared gate, a
-minimum gap between confirmations — slower, but no blocked preconditions); or fewer UI sign-ins
-(sessions reused). Until then: modules that sign in often run one platform at a time.
+Known on the first product: its test environment rate-limited sign-in code confirmations per address, for every
+account at once — two platforms signing in together crossed it and their sign-in preconditions went Blocked
+(LESSONS.md, *Running*). Check the product's limits before the first parallel regression.

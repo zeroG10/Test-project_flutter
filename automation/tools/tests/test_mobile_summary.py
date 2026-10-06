@@ -175,7 +175,7 @@ def test_verdicts_match_trace_results(run_dir: Path) -> None:
     assert "<div class='kpi fail'><b>1</b><span>failed, no defect yet" in page
     assert "<div class='kpi block'><b>1</b>" in page
     assert '<span class="pill fail">Failed</span>' in page  # a failure nobody explained
-    row = "<td class='num'>5</td><td class='num'>4</td><td class='num'>2</td><td class='num'>1</td><td class='num'>1</td><td class='num'>1</td>"
+    row = "".join(f"<td class='num'>{n}</td>" for n in (5, 4, 2, 1, 1, 1))
     assert row in page
 
 
@@ -260,12 +260,8 @@ def test_a_check_without_a_reason_is_reported(run_dir: Path) -> None:
 
 
 def test_expand_ids() -> None:
-    assert bs.expand_ids("CHK-AUTH-081…-083, -090") == [
-        "CHK-AUTH-081", "CHK-AUTH-082", "CHK-AUTH-083", "CHK-AUTH-090"
-    ]
-    assert bs.expand_ids("CHK-ORDD-023, -025 and CHK-PRF-030") == [
-        "CHK-ORDD-023", "CHK-ORDD-025", "CHK-PRF-030"
-    ]
+    assert bs.expand_ids("CHK-AUTH-081…-083, -090") == ["CHK-AUTH-081", "CHK-AUTH-082", "CHK-AUTH-083", "CHK-AUTH-090"]
+    assert bs.expand_ids("CHK-ORDD-023, -025 and CHK-PRF-030") == ["CHK-ORDD-023", "CHK-ORDD-025", "CHK-PRF-030"]
 
 
 def test_history_and_stability(run_dir: Path) -> None:
@@ -316,9 +312,15 @@ def test_video_attached_in_a_fixture_teardown_is_found(run_dir: Path) -> None:
     (results / "v-1-attachment.mp4").write_bytes(b"x")
     container = {
         "children": ["t010"],
-        "afters": [{"name": "_screen_video::0", "attachments": [
-            {"name": "video · test_registration", "source": "v-1-attachment.mp4", "type": "video/mp4"}
-        ], "steps": []}],
+        "afters": [
+            {
+                "name": "_screen_video::0",
+                "attachments": [
+                    {"name": "video · test_registration", "source": "v-1-attachment.mp4", "type": "video/mp4"}
+                ],
+                "steps": [],
+            }
+        ],
     }
     (results / "c1-container.json").write_text(json.dumps(container), encoding="utf-8")
     _, _, out = _build(run_dir)
@@ -339,19 +341,18 @@ def test_empty_run_is_blocked(tmp_path: Path) -> None:
     (tmp_path / "allure-results").mkdir()
     checklist = tmp_path / "c.md"
     checklist.write_text(CHECKLIST_MD, encoding="utf-8")
-    code = bs.main(
-        ["--allure-dir", str(tmp_path / "allure-results"), "--checklist", str(checklist)]
-    )
+    code = bs.main(["--allure-dir", str(tmp_path / "allure-results"), "--checklist", str(checklist)])
     assert code == 2
 
 
 def test_pages_carry_the_brand_title_and_both_themes(run_dir: Path) -> None:
     _, page, out = _build(run_dir)
-    assert "<title>iOS App QA Report</title>" in page  # setup/project.yaml → report.slices.ios
+    title = f"{bs.brand.slice_('ios').product_short} QA Report"  # setup/project.yaml → report.mobile.slices.ios
+    assert f"<title>{title}</title>" in page
     # the three theme states: system dark, explicit dark, explicit light
     assert ':root:not([data-theme="light"])' in page
     assert ':root[data-theme="dark"]' in page
-    assert "class=\"brand-logo\"" in page and "<span class='tag'>Internal</span>" in page
+    assert 'class="brand-logo"' in page and "<span class='tag'>Internal</span>" in page
     assert _module(out).lower().startswith("<!doctype html>")
     assert not (out / "page.html").exists()  # publishing goes through mobile_reports.py --share
 
@@ -361,9 +362,7 @@ def test_test_account_is_hidden_in_text(run_dir: Path) -> None:
     env.write_text("APP_USER_EMAIL=secret.tech@example.org\nAPP_USER_PHONE=+12025550111\n")
     red = bs.Redactor(env, None)
     assert red.text("UI login as secret.tech@example.org") == "UI login as ‹test account›"
-    assert red.text("phone (202) 555-0111 or +12025550111") == (
-        "phone ‹test account› or ‹test account›"
-    )
+    assert red.text("phone (202) 555-0111 or +12025550111") == ("phone ‹test account› or ‹test account›")
 
 
 def test_redaction_box_pixelates_only_the_page_copy(tmp_path: Path) -> None:

@@ -1,7 +1,7 @@
 """Screen maps — alias → locator per platform (layer 2 in automation/README.md).
 
 A map is the ONLY place a locator lives. Test cases
-(qa/mobile/<NN-module>/<module>-test-cases.md) refer to elements by alias
+(the module's test-cases file) refer to elements by alias
 (``login.email``); page objects and generated tests resolve the alias here.
 Format, alias rules and the Flutter note: screens/README.md.
 """
@@ -54,12 +54,12 @@ ALLOWED_STRATEGIES: frozenset[str] = frozenset(
 
 
 class EditTextByHint(tuple):
-    """Android text field of a multi-field form, named only by its ``hint`` (TD-A1).
+    """Android text field of a multi-field form, named only by its ``hint``.
 
     As a locator it is ``className("android.widget.EditText").instance(n)`` — the field's
     position in the recon tree, checked offline by map-health. Flutter hands Android only the
-    on-screen fields, so once the form scrolls, ``instance(n)`` points at another field (module
-    02 run 5: TC-AUTH-014 read Email as Phone). ``helpers.waits`` therefore resolves it by
+    on-screen fields, so once the form scrolls, ``instance(n)`` points at another field (one
+    field read as another). ``helpers.waits`` therefore resolves it by
     ``hint`` among the on-screen EditTexts, on every poll.
     """
 
@@ -77,15 +77,14 @@ class EditTextByHint(tuple):
         return self
 
 
-APP_BAR_BOTTOM_ANDROID = 283  # px, Pixel 7: the app bar ends here (recon A1)
+APP_BAR_BOTTOM_ANDROID = 283  # px, Pixel 7: the app bar ends here
 
 
 class InAppBar(tuple):
     """Android: a screen's title by its label, counted only inside the app bar.
 
-    The job details list their deliverables with the very same labels as the screens they open
-    ('Survey', 'Photo report', 'Notes'), lower down; the bare label "finds" the Survey screen
-    while the details are still shown (module 06 Android run 1, TC-ORDP-005: a false "opened").
+    A list can carry items whose labels equal the titles of the screens they open, lower down;
+    the bare label "finds" the target screen while the list is still shown (a false "opened").
     ``helpers.waits`` keeps only the matches whose top lies above ``app_bar_bottom``.
     """
 

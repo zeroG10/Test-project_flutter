@@ -1,6 +1,6 @@
 """Evidence for the report: named checkpoint screenshots and per-test screen video.
 
-Policy (README "Evidence", owner decision 2026-09-23): not everything is captured.
+Policy (README "Evidence"): not everything is captured.
 * Screenshot + page source on every failure — conftest.py, automatic.
 * Named screenshots only at the key moments a test chooses (``evidence.checkpoint(...)``) —
   the happy-flow pictures the summary page shows.

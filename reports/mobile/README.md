@@ -6,8 +6,6 @@ these files. This is the **shared copy**: the test account's email, phone and na
 pixelated on the screens, and API bodies, page sources and screen videos are left out (they stay in the gitignored
 local copy, `automation/mobile/reports/`).
 
-`reports/` holds one folder per platform (`reports/web/` belongs to the web reports); this is the mobile one.
-
 Three slices, each with an internal and a client report (ISTQB / ISO/IEC/IEEE 29119-3 *test completion report*):
 
 | Slice | Run it describes | Internal (team) | Client | PDF |
@@ -40,12 +38,12 @@ cd automation/tools
 uv run python mobile_reports.py            # local full copy → automation/mobile/reports/ (gitignored)
 uv run python mobile_reports.py --share    # this copy → reports/, then the privacy check (must end with 0 · 0 · 0);
                                           # also the publish fragments → automation/mobile/reports/publish/
-node mobile_export_pdf.mjs                       # the six PDFs → reports/mobile/<slice>/pdf/
+node mobile_export_pdf.mjs                 # the six PDFs → reports/mobile/<slice>/pdf/
 ```
 
 Nothing runs against an environment: the reports read runs already made (`setup/project.yaml → report.mobile.slices`). The
-privacy check reads every screen with macOS Vision on this machine (`mobile_redact_screens.py`); the account's name is read
-from the DEV API in memory and never written.
+privacy check reads every screen with macOS Vision on this machine (`mobile_redact_screens.py`); the accounts' names are
+read through the project's hook `automation/mobile/helpers/account_names.py` (the DEV API), in memory, never written.
 
 Where things are decided: names, client, approver, links, the runs, the client's wording —
 `setup/project.yaml → report:`; the company's look (TRIARE logo, colours, fonts) — `automation/tools/brand.py`;

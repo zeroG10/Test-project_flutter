@@ -6,10 +6,12 @@ The shared copy of a report hides the test account's email, phone and name in it
 on the screens they are pixelated by boxes listed in a redactions file. Finding those boxes by eye does not scale
 (the Android run alone saved 138 screens), so this reads every screen with macOS Vision — on the machine, nothing
 leaves it — and boxes each text line that carries an account's email (or its local part), phone (its last 7 digits)
-or first / last name — for every test account in the .env: the shared one and each platform's own. `--check DIR` runs the same reading over a built copy and fails on any match.
+or first / last name — for every test account in the .env: the shared one and each platform's own. `--check DIR`
+runs the same reading over a built copy and fails on any match.
 
-The values are read from `automation/mobile/.env` and, for the name, from the DEV API (one read, in memory); none
-is printed or written anywhere.
+The values are read from `automation/mobile/.env` (`*_USER_EMAIL`, `*_USER_PHONE`, and the names as
+`*_USER_NAME`) and, if the project has one, from its hook `automation/mobile/helpers/account_names.py`
+(`account_names() -> list[str]`, e.g. read from the product's API); none is printed or written anywhere.
 
     uv run python mobile_redact_screens.py boxes --platform android --images <dir> --out <redactions.json>
     uv run python mobile_redact_screens.py check <dir> [<dir> …]
@@ -34,6 +36,7 @@ MOBILE = TOOLS.parent / "mobile"
 OCR_SOURCE = TOOLS / "ocr" / "ocr_lines.swift"
 IMAGE_SUFFIXES = (".png", ".jpg", ".jpeg")
 PAD = 10  # pixels around a matched line
+ACCOUNT_PREFIXES = ("APP_USER", "IOS_USER", "ANDROID_USER")  # the shared account and each platform's own
 
 
 def ocr_binary() -> Path:
@@ -55,25 +58,19 @@ def ocr(paths: list[Path]) -> Iterable[dict]:
 
 def account_names() -> list[str]:
     """The first and last names of every test account a run signs in with (the shared one and each platform's
-    own — PARALLEL-RUNS.md), read from the DEV API in a child process — returned, never printed."""
-    code = (
-        "import json, sys\n"
-        "from config.settings import settings\n"
-        "from helpers.field_services_api import FieldServicesApi\n"
-        "api = FieldServicesApi()\n"
-        "names = []\n"
-        "for email, _ in settings.accounts():\n"
-        "    techs = api.find_technicians_by_email(email) if email else []\n"
-        "    u = (techs[0].get('user') or {}) if techs else {}\n"
-        "    names += [u.get('firstName', ''), u.get('lastName', '')]\n"
-        "print(json.dumps(names))\n"
-        "api.close()\n"
-    )
-    python = MOBILE / ".venv" / "bin" / "python"
-    done = subprocess.run([str(python), "-c", code], cwd=MOBILE, capture_output=True, text=True, timeout=120)
-    if done.returncode != 0:
-        raise RuntimeError("Blocked: could not read the account's name from the API")
-    return [n for n in json.loads(done.stdout.strip().splitlines()[-1]) if n]
+    own — PARALLEL-RUNS.md): `APP_USER_NAME` / `IOS_USER_NAME` / `ANDROID_USER_NAME` in the .env ("First Last"),
+    and whatever the project's hook returns (`automation/mobile/helpers/account_names.py`, run in the mobile
+    harness's own environment, in a child process). Returned, never printed."""
+    env = dotenv_values(MOBILE / ".env")
+    names = [w for p in ACCOUNT_PREFIXES for w in (env.get(f"{p}_NAME") or "").split() if w]
+    if (MOBILE / "helpers" / "account_names.py").exists():
+        code = "import json\nfrom helpers.account_names import account_names\nprint(json.dumps(account_names()))\n"
+        python = MOBILE / ".venv" / "bin" / "python"
+        done = subprocess.run([str(python), "-c", code], cwd=MOBILE, capture_output=True, text=True, timeout=120)
+        if done.returncode != 0:
+            raise RuntimeError("Blocked: the project's helpers/account_names.py failed — the names are unknown")
+        names += [str(n) for n in json.loads(done.stdout.strip().splitlines()[-1]) if n]
+    return list(dict.fromkeys(names))
 
 
 class Terms:
@@ -84,7 +81,7 @@ class Terms:
         self.emails: list[str] = []
         self.locals: list[str] = []
         self.phones: list[str] = []
-        for prefix in ("APP_USER", "IOS_USER", "ANDROID_USER"):  # the shared account and each platform's own
+        for prefix in ACCOUNT_PREFIXES:  # the shared account and each platform's own
             email = (env.get(f"{prefix}_EMAIL") or "").strip().lower().replace(" ", "")
             digits = re.sub(r"\D", "", env.get(f"{prefix}_PHONE") or "")
             if email and email not in self.emails:
@@ -96,7 +93,10 @@ class Terms:
                 self.phones.append(digits[-7:])
         self.names = sorted({n for n in names if len(n) >= 3})
         if not (self.emails and self.phones and self.names):
-            raise RuntimeError("Blocked: the accounts' email, phone or name is unknown — nothing to look for")
+            raise RuntimeError(
+                "Blocked: the accounts' email, phone or name is unknown — set *_USER_EMAIL / *_USER_PHONE / "
+                "*_USER_NAME in automation/mobile/.env (or write helpers/account_names.py): nothing to look for"
+            )
 
     def in_page(self, body: str) -> bool:
         """A page's own text (markup stripped) naming the account: its email, a phone number ending in its digits,
@@ -164,10 +164,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     images = images_in(args.dirs)
     _, left = boxes(images, terms)
-    text_hits = [p for p in files_in(args.dirs, (".html",)) if terms.in_page(p.read_text(encoding="utf-8", errors="ignore"))]
+    text_hits = [
+        p for p in files_in(args.dirs, (".html",)) if terms.in_page(p.read_text(encoding="utf-8", errors="ignore"))
+    ]
     videos = files_in(args.dirs, (".mp4", ".mov", ".webm"))
-    print(f"screens read: {len(images)} · screens still showing the account's data: {len(left)} · "
-          f"pages naming it: {len(text_hits)} · videos: {len(videos)}")
+    print(
+        f"screens read: {len(images)} · screens still showing the account's data: {len(left)} · "
+        f"pages naming it: {len(text_hits)} · videos: {len(videos)}"
+    )
     for name in sorted(left)[:20]:
         print(f"  screen: {name}")
     for page in text_hits[:20]:

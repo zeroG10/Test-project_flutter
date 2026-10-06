@@ -3,12 +3,14 @@
 Two layers, kept apart on purpose:
 
 - **The company** — name, "Prepared by", colours, faces, the logo — is the same for every project made from this
-  template, so it lives here. The owner's brand (2026-09-28): #3282EB (blue), #122E52 (navy), #F6F7FA (grey). The
+  template, so it lives here: #3282EB (blue), #122E52 (navy), #F6F7FA (grey). The
   status colours (green / amber / red) are deliberately NOT brand colours: a verdict has to read the same in any
   company's palette.
-- **The project** — client, product, how prose names it, PDF file prefix, confidentiality, approver, published links,
-  scope notes — is read from `setup/project.yaml → report:`. No copy of those values lives in code, so a new project
-  changes one file (and `tests/test_brand.py` fails if a product name creeps back into the tooling).
+- **The project** — client, product, how prose names it, PDF file prefix, confidentiality, approver, time zone — is
+  read from `setup/project.yaml → report:`; what only the web reports state (published links, browser and history
+  notes, scope notes, reviews, out of scope) from `report.web:`, and the mobile reports read `report.mobile:`. No
+  copy of those values lives in code, so a new project changes one file (and `tests/test_brand.py` fails if a
+  product name creeps back into the tooling).
 
 Change a colour here and the internal report, the client report, the module pages, the defect pages and both PDFs
 change together.
@@ -44,16 +46,17 @@ def _filled(value: Any) -> bool:
 
 _DATA = _manifest()
 _REPORT: dict[str, Any] = _DATA.get("report") or {}
+_WEB: dict[str, Any] = _REPORT.get("web") or {}
 _PROJECT_NAME = (_DATA.get("project") or {}).get("name")
 
 
-def _text(key: str, default: str = "—") -> str:
-    value = _REPORT.get(key)
+def _text(key: str, default: str = "—", source: dict[str, Any] | None = None) -> str:
+    value = (_REPORT if source is None else source).get(key)
     return str(value) if _filled(value) else default
 
 
-def _list(key: str) -> list[str]:
-    value = _REPORT.get(key)
+def _list(key: str, source: dict[str, Any] | None = None) -> list[str]:
+    value = (_REPORT if source is None else source).get(key)
     return [str(x) for x in value if _filled(x)] if isinstance(value, list) else []
 
 
@@ -64,17 +67,17 @@ CLIENT = _text("client")
 FILE_PREFIX = _text("file_prefix", "".join(ch for ch in PRODUCT.title() if ch.isalnum()) or "QA")
 CONFIDENTIALITY = _text("confidentiality", "Confidential")
 APPROVED_BY = _text("approved_by")
+TIMEZONE = _text("timezone", "UTC")  # the zone the reports state local times in (IANA name)
 
-# Where each report is published; a PDF prints these so it can never be mistaken for a different version.
-INTERNAL_REPORT_URL = _text("internal_url", "")
-CLIENT_REPORT_URL = _text("client_url", "")
-
-# This project's rulings, as the reports state them.
-BROWSER_NOTE = _text("browser_note", "")
-HISTORY_NOTE = _text("history_note", "")
-SCOPE_NOTES = _list("scope_notes")
-OUT_OF_SCOPE = _list("out_of_scope")
-_reviews = _REPORT.get("reviews") or {}
+# The web reports: where each is published (a PDF prints these so it can never be mistaken for a different version)
+# and this project's rulings, as the reports state them.
+INTERNAL_REPORT_URL = _text("internal_url", "", _WEB)
+CLIENT_REPORT_URL = _text("client_url", "", _WEB)
+BROWSER_NOTE = _text("browser_note", "", _WEB)
+HISTORY_NOTE = _text("history_note", "", _WEB)
+SCOPE_NOTES = _list("scope_notes", _WEB)
+OUT_OF_SCOPE = _list("out_of_scope", _WEB)
+_reviews = _WEB.get("reviews") or {}
 REVIEWS_NOTE = str(_reviews.get("note")) if _filled(_reviews.get("note")) else ""
 REVIEW_DOCUMENTS = [str(x) for x in (_reviews.get("documents") or []) if _filled(x)]
 
@@ -82,8 +85,8 @@ BLUE = "#3282EB"
 NAVY = "#122E52"
 GREY = "#F6F7FA"
 
-# The brand font is not named yet ("seems to be on Google Fonts"): Manrope stands in — a geometric sans that sits
-# well with the logo's rounded letterforms — and swaps for the real one in this one line.
+# Manrope stands in for the brand font — a geometric sans that sits well with the logo's rounded letterforms — and
+# swaps for the real one in this one line.
 FONTS_LINK = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">'
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'

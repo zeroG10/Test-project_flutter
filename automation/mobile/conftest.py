@@ -13,9 +13,9 @@ What this file enforces (QA Doctrine, CLAUDE.md):
 * CI strict-skip: with ``CI`` (or ``QA_STRICT_SKIPS=1``) set, a run that skipped any test
   exits 1 — a skip is Blocked and must not vote green in a gate (GATES.md rule 2).
 
-Harness additions for this project (README "Session model", "Evidence", "Allure report"):
-* ONE Appium session per run (serial runs on a weak DEV server); app state per test comes
-  from fixtures/app_state.py (``logged_out_app``, ``ui_login``, ``new_user`` …).
+Harness additions (README "Session model", "Evidence", "Allure report"):
+* ONE Appium session per run (on Android one per module); app state per test comes from the
+  project's fixtures (e.g. fixtures/app_state.py: ``logged_out_app``, ``ui_login``, ``new_user`` …).
 * Allure grouping Platform › Module (from the CHK code) and a run-context ``env`` label on
   every result; environment.properties + categories.json written at the end of the run.
 * Screenshot + page source on a failure or a Blocked setup; screen video only when
@@ -104,7 +104,7 @@ def pytest_report_header(config):
 
 def skipped_chks(item: pytest.Item, platform: str) -> dict[str, str]:
     """CHK ids the owner decided NOT to check on ``platform`` for this test, with the reason:
-    ``@pytest.mark.chk_skipped_on("android", "CHK-ORDD-024", reason="owner, Q-ORDD-A4 …")``.
+    ``@pytest.mark.chk_skipped_on("android", "CHK-AUTH-024", reason="owner: <why>")``.
     On that platform the id carries no tag, so the trace reads it as not run (never Passed, never
     Failed) and the report says why; on the other platform nothing changes."""
     skipped: dict[str, str] = {}
@@ -218,7 +218,7 @@ def driver(platform):
         )
     # No implicit wait on purpose: it silently stacks on explicit waits. Use helpers/waits.py.
     with contextlib.ExitStack() as device:
-        if platform == "android":  # a pushed "New job assigned" pop-up covers the app bar
+        if platform == "android":  # a pushed notification's pop-up covers the app bar
             device.enter_context(Adb.of(drv).heads_up_off())
             Adb.of(drv).remove_test_providers()  # a crashed run may have left mock providers
         yield drv
@@ -239,7 +239,7 @@ _DEAD_SESSION = (
 
 def _new_session(drv, platform: str, why: str) -> None:
     """A fresh Appium session on the same driver object: a new UiAutomator2 server process and
-    a fast-reset app (the tests sign in by themselves, as each module did in step 4)."""
+    a fast-reset app (the tests sign in by themselves, as each module does when run alone)."""
     with allure.step(f"Appium: a new session ({why})"):
         with contextlib.suppress(Exception):
             drv.quit()
@@ -248,10 +248,9 @@ def _new_session(drv, platform: str, why: str) -> None:
 
 @pytest.fixture(scope="module", autouse=True)
 def _android_session_per_module(request, driver, platform):
-    """Android: one Appium session per test module, as the module runs of step 4. In the first
-    full run of step 6 the UiAutomator2 server died after ~40 min of one session ("socket hang
-    up") and every later test errored (final-s1: 109 errors); a fresh server per module keeps
-    a death inside one module."""
+    """Android: one Appium session per test module, as when a module runs alone. In a full run the
+    UiAutomator2 server once died after ~40 min of one session ("socket hang up") and every later
+    test errored; a fresh server per module keeps a death inside one module."""
     if platform == "android":
         if _ANDROID_MODULES_SEEN:
             _new_session(driver, platform, f"module {request.module.__name__}")
@@ -362,7 +361,7 @@ def pytest_runtest_makereport(item, call):
 
 ANR_REASON = (
     "Blocked: the emulator showed '… isn't responding' (ANR) — the emulator was starved of CPU; "
-    "not an app verdict (recon A1, Fable's analysis: docs/notes/session-handoff.md §3х). Re-run "
+    "not an app verdict. Re-run "
     "on an idle host."
 )
 

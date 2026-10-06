@@ -1,7 +1,7 @@
 """One platform's run, read once and shared by every report that describes it.
 
-The internal platform report (`mobile_summary.py`), the combined internal report (`mobile_combined_report.py`) and the three
-client reports (`mobile_client_report.py`) all read their numbers through `Platform` — built on the same
+The internal platform report (`mobile_summary.py`), the combined internal report (`mobile_combined_report.py`) and
+the three client reports (`mobile_client_report.py`) all read their numbers through `Platform` — built on the same
 `mobile_summary.Report` — so an internal and a client report of one slice cannot disagree, and the combined report is
 the two platforms' own numbers side by side.
 """
@@ -155,7 +155,7 @@ class Platform:
     @property
     def verdict(self) -> tuple[str, str]:
         """(label, css class): Failed when anything failed unexplained; otherwise "No unexpected failures" while
-        known defects hold checks red or a test could not run (owner, 2026-09-28) — never "Passed" then."""
+        known defects hold checks red or a test could not run — never "Passed" then."""
         if self.unexpected:
             return "Failed", "fail"
         if self.tc["Failed"] or self.tc["Blocked"]:

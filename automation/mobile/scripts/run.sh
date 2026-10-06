@@ -9,7 +9,7 @@
 # (harness commit, command, start / end, exit code) — the run context trace_results.py and
 # mobile_summary.py report. Refuses:
 #   - a results folder that already exists (a run is never overwritten or mixed with another);
-#   - uncommitted changes to tracked files (owner rule: commit before every run) — ALLOW_DIRTY=1
+#   - uncommitted changes to tracked files (rule: commit before every run) — ALLOW_DIRTY=1
 #     overrides for a throwaway debug run, and RUN_INFO.txt then says the tree was dirty;
 #   - a second run of the SAME platform while one is going (one device per platform);
 #   - a run of the OTHER platform while one is going, unless the two share nothing: each platform its
@@ -50,7 +50,7 @@ fi
 
 # Android: the emulator keeps the DNS server of the network it booted on (netsimd --host-dns).
 # Once the Mac moves to another network, no name resolves on the device and every test ends
-# Blocked at the UI login (module 09 Android run 4, after the Mac slept). Restart the emulator.
+# Blocked at the UI login (seen when the Mac slept and changed network). Restart the emulator.
 if [ "$PLATFORM" = "android" ]; then
   API_HOST="$(sed -n 's|^API_BASE_URL=https\{0,1\}://\([^/:]*\).*|\1|p' .env 2>/dev/null | head -1)"
   if [ -n "$API_HOST" ] && adb shell "ping -c 1 -W 5 $API_HOST" 2>&1 | grep -q "unknown host"; then
@@ -58,7 +58,7 @@ if [ "$PLATFORM" = "android" ]; then
     exit 3
   fi
   # A hung System UI ("Application Not Responding: com.android.systemui") took UiAutomator2 down
-  # 40 min into a final run and blocked every cold start after it (step 6, 2026-10-02)
+  # 40 min into a long run and blocked every cold start after it
   if adb shell dumpsys window 2>/dev/null | grep -q "mCurrentFocus=.*Application Not Responding"; then
     echo "refused: an 'Application Not Responding' window is up on the device — cold-boot the emulator (-no-snapshot-load)" >&2
     exit 3
@@ -114,7 +114,7 @@ mkdir -p "$OUT"
 # Close every Appium session a killed run left behind on THIS platform's server (we hold its lock;
 # a live run of the other platform is on its own server, or it was refused above). A leftover
 # session stops the device's UiAutomator2 server when its newCommandTimeout expires — under THIS
-# run (module 02 run 4). Needs start_appium.sh's session_discovery.
+# run. Needs start_appium.sh's session_discovery.
 APPIUM="$APPIUM_URL"
 for sid in $(curl -s -m 10 "$APPIUM/appium/sessions" | python3 -c \
     'import json,sys; print(" ".join(s["id"] for s in json.load(sys.stdin).get("value") or [] if isinstance(s, dict)))' \
@@ -123,8 +123,8 @@ for sid in $(curl -s -m 10 "$APPIUM/appium/sessions" | python3 -c \
   curl -s -m 60 -X DELETE "$APPIUM/session/$sid" >/dev/null || true
 done
 
-# No idle sleep while the run goes: on battery the Mac slept 13.8 min a minute into module 09
-# Android run 5 — the gesture in flight hung, the API connection died, one job cleanup failed.
+# No idle sleep while the run goes: on battery the Mac slept 13.8 min a minute into a run —
+# the gesture in flight hung, the API connection died, one cleanup failed.
 # (`-i` does not stop a closed lid from sleeping.)
 KEEP_AWAKE=()
 command -v caffeinate >/dev/null && KEEP_AWAKE=(caffeinate -i)

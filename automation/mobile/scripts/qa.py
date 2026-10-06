@@ -10,7 +10,7 @@ started.
            tests/shared/…::test_x  a path or node id, passed to pytest as it is
 
     scripts/qa.sh both all                 # iOS and Android regression side by side
-    scripts/qa.sh android auth             # module 02 on Android (its offline tests included)
+    scripts/qa.sh android auth             # one module on Android (its Android-only tests included)
     scripts/qa.sh ios 08,09 --name fix-1   # two modules on iOS → results/ios/<date>-fix-1/
     scripts/qa.sh both all --dry-run       # show the plan, start nothing
 

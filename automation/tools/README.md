@@ -8,9 +8,7 @@ chain described in [`automation/README.md`](../README.md):
 | `sync_checklist_to_sheets.py` | 0 → Sheet | checklist `.md` → Google Sheet | the team Sheet (**the only Sheets writer in this repo**) |
 | `import_checklist_from_sheets.py` | Sheet → 0 (one-time) | Google Sheet → per-feature checklist `.md` | markdown under `qa/web/<NN-slug>/` — **reads** Sheets, never writes them |
 | `trace_results.py` | 4 (closure) | run results → checklist IDs | one markdown report, by convention `qa/web/<NN-module>/<module>-traceability.md`, mobile per platform `qa/mobile/<NN-module>/{ios,android}/<module>-traceability.md` — never Sheets |
-| `mobile_summary.py` | 4 (report) | one mobile run → internal report site: summary, a page per module and per defect | local `automation/mobile/reports/<platform>/internal/` (gitignored) |
-| `mobile_compare_runs.py` | 4 (closure) | a run vs a baseline (default: the platform's final run), test by test: NEW RED, NEW BLOCKED, fixed?, known red with its defect, missing | stdout only; exit 1 = something to triage |
-| `mobile_reports.py` | 4 (report) | the final runs (`setup/project.yaml → report.mobile`) → all six test completion reports (iOS / Android / both × internal / client; `mobile_combined_report.py`, `mobile_client_report.py`) | local `automation/mobile/reports/<slice>/` (gitignored); `--share` → `reports/mobile/<slice>/` (the account hidden, checked by `mobile_redact_screens.py`); PDFs: `node mobile_export_pdf.mjs` — publishing is an owner call |
+| `mobile_reports.py` + `mobile_*.py` | 4 (report) | the mobile runs named in `setup/project.yaml → report.mobile` → six test completion reports (iOS / Android / both × internal / client), PDFs, the privacy check; `mobile_compare_runs.py` — a run vs the last final run | local `automation/mobile/reports/` (gitignored); `--share` → `reports/mobile/` — see *Mobile reports* below; publishing is an owner call |
 
 All of them honour the QA Doctrine in `CLAUDE.md`: no result is ever upgraded to
 Passed by a tool, a skip is Blocked, an empty run is not a passing run.
@@ -253,34 +251,54 @@ a successful import. Register the codes used by the map in
 
 ---
 
-## mobile_summary.py — mobile report site for the lead and the team
+## Mobile reports — `mobile_*.py`
 
-A small static site over **one clean run**, laid out like the admin panel's report (web, same
-product) so the two read alike:
+The test completion reports of the mobile stack (ISTQB / ISO/IEC/IEEE 29119-3 shape), built from runs already
+made — nothing runs against an environment. Three slices — `ios`, `android`, `all` (both) — each with an
+**internal** report (every check, test, step, screen and defect clickable) and a **client** report (sections 1–9,
+no ids, paths or test accounts). Names, client wording and the runs each slice describes: `setup/project.yaml →
+report.mobile:`; the company's look: `brand.py` (shared) and `mobile_brand.py` on top of it.
 
-- `index.html` — the verdict (*No unexpected failures* only when every red test is a filed
-  defect's regression check), KPIs, one phone screen per module, coverage by module, what needs
-  a decision, open defects with the checks each holds red, what could not run and why, why
-  checks are not automated (kinds from `qa/mobile/<platform>/not-automated.md`), stability over the
-  history runs, delivery pace from git, technical detail;
-- `<NN-module>.html` — every check with its verdict, the test that proved it
-  (`test_x.py:line`) and the screens that test saved; every test with its steps;
-- `bugs/<BUG-ID>.html` — each filed defect report rendered from its markdown, with its
-  evidence (a draft marked `Status: NOT FILED` is not an open defect).
-
-CHK verdicts come from `trace_results.py` itself, so the pages and the traceability matrix
-never disagree. A failed test is *held red* only when a filed bug names it as its regression
-check (`- Test case: \`TC-…\`` or `::test_name`); any other failure is *unexpected*. Read-only
-over the results; writes only `--out-dir`.
+| File | What |
+|---|---|
+| `mobile_reports.py` | all six at once. Default: the full local copy → `automation/mobile/reports/<slice>/` (gitignored: API bodies, page sources, videos). `--share`: the copy people get → `reports/mobile/<slice>/{internal,client}/` + `reports/mobile/{internal,client}.html` — screens shrunk, the test accounts hidden in the text and pixelated on the screens, then the privacy check; also the publish fragments in `automation/mobile/reports/publish/` |
+| `mobile_summary.py` | one platform's internal site over one clean run: `index.html` (verdict, KPIs, a screen per module, coverage, what needs a decision, open defects, could not run, not automated, run history, delivery pace, technical detail), a page per module (every check, the test that proved it, its steps and screens), a page per filed defect |
+| `mobile_combined_report.py` | the internal report of both platforms side by side: a page per module with each check's iOS and Android verdicts, every number a link into the platform reports; its verdict is the worse of the two |
+| `mobile_client_report.py` | the client's test completion report per slice |
+| `mobile_report_data.py`, `mobile_brand.py` | what the slices share: one platform's numbers, verdicts and records; slice names, two status colours, the header pieces |
+| `mobile_compare_runs.py` | a run against a baseline (default: the platform's final run), test by test: **NEW RED**, **NEW BLOCKED**, still red, fixed?, known red with its defect, missing; exit 1 = something to triage |
+| `mobile_redact_screens.py`, `ocr/ocr_lines.swift` | the privacy check: every screen read with macOS Vision on the machine; the test accounts' email / phone / name found and boxed (`boxes`), or reported (`check`) |
+| `mobile_export_pdf.mjs` | the six PDFs — A4, light theme, the footer "<company> · <report> · run of <date> · Page n of N", named by the date of the run; Node's own WebSocket drives a headless Chromium, no packages |
 
 ```bash
-uv run python mobile_summary.py \
-  --platform ios --allure-dir ../mobile/results/ios/stable-3 \
-  --checklist ../../qa/mobile/01-splash/splash-checklist.md ...        # one per module \
-  --history-dir ../mobile/results/ios/stable-1 ...                       # earlier full runs, oldest first \
-  --target "iOS simulator · iPhone 17 · iOS 26.5" --run-label "…" \
-  [--note "…"] [--decision "…"] [--history-note "…"] \
-  [--public --redact-boxes boxes.json --redact-text-env QA_ACCOUNT_FIRST] [--out-dir ../mobile/reports/ios/internal]
+uv run python mobile_reports.py            # local full copy
+uv run python mobile_reports.py --share    # the copy people get; must end "… 0 · … 0 · videos: 0"
+node mobile_export_pdf.mjs                 # PDFs into reports/mobile/<slice>/pdf/
+uv run python mobile_compare_runs.py --platform android ../mobile/results/android/<run> [--partial]
+```
+
+Rules the code keeps:
+
+- A verdict is read, never typed: CHK verdicts come from `trace_results.py`, so the reports and the traceability
+  matrices agree. A failed test is *held red* only when a filed defect names it as its regression check
+  (`- Test case: \`TC-…\`` or `::test_name`) — or a draft the owner decided not to file (`Status: NOT FILED —
+  owner's decision`): a known red, shown apart from the open defects. Any other failure is *unexpected*, and the
+  verdict is then "Failed".
+- Blocked is never green; a slice without a run is Blocked, never an empty report.
+- The account's personal data: email and phone from `automation/mobile/.env` (`*_USER_EMAIL`, `*_USER_PHONE` — the
+  shared account and each platform's own), names from `*_USER_NAME` there or from the project's hook
+  `automation/mobile/helpers/account_names.py` (`account_names() -> list[str]`). Unknown → the shared copy is
+  Blocked. Values are never printed or written.
+- Publishing is the owner's call; the client report is approved by the owner before it is sent.
+
+`mobile_summary.py` options, for one platform by hand:
+
+```bash
+uv run python mobile_summary.py --platform ios --allure-dir ../mobile/results/ios/<run> \
+  --checklist ../../qa/mobile/01-<module>/<module>-checklist.md ...    # one per module \
+  --history-dir ../mobile/results/ios/<earlier full run> ...            # oldest first \
+  [--target "…"] [--run-label "…"] [--note "…"] [--decision "…"] [--history-note "…"] \
+  [--public --redact-boxes boxes.json --redact-text-env NAME] [--out-dir DIR]
 ```
 
 | Option | Meaning |
@@ -288,21 +306,15 @@ uv run python mobile_summary.py \
 | `--allure-dir DIR` | allure `*-result.json` of **one clean run** (required); empty → exit 2, Blocked |
 | `--checklist MD` | repeat per module (required); a module page per `qa/mobile/<NN-module>/` folder |
 | `--history-dir DIR` | earlier full runs, oldest first — the run history table and the "same verdicts N runs in a row" line |
-| `--platform ios\|android` | whose records the page cites and the defaults below (default `ios`); results of each platform live in `automation/mobile/results/<platform>/<run>/` |
+| `--platform ios\|android` | whose records the page cites (default `ios`); results live in `automation/mobile/results/<platform>/<run>/` |
 | `--reasons MD` | why checks have no test (default `qa/mobile/<platform>/not-automated.md`); a check with no row shows "reason missing" |
-| `--target`, `--run-label` | the device and what was run, as the page names them |
 | `--note` / `--decision` / `--history-note` | lines under *Scope of this run* / *What needs a decision* / the history table |
-| `--manual-minutes-per-check N` | owner's estimate; omitted → not shown |
 | `--public` | the copy that may leave this machine: no text attachments (API bodies, page sources), no videos |
-| `--redact-env`, `--redact-text-env NAME`, `--redact-boxes JSON` | hide the test account in text (values never printed) and pixelate boxes on the screens |
+| `--redact-env`, `--redact-text-env NAME`, `--redact-boxes JSON` | hide the test accounts in text (values never printed) and pixelate boxes on the screens |
 | `--no-git` | skip the delivery-pace chart |
 | `--out-dir DIR` | default `automation/mobile/reports/<platform>/internal/` (gitignored) |
 
-The pages show screenshots of the client's app — the full copy stays local; only the `--public` build leaves this
-machine, and `mobile_reports.py --share` is the way to make it (boxes found by OCR, a check that nothing of the account
-is left, the publish fragments in `automation/mobile/reports/publish/`). Publishing is an owner call.
-`assets/` and `bugs/` are rebuilt on every run (only folders this script created are ever
-deleted).
+`assets/` and `bugs/` are rebuilt on every run (only folders this script created are ever deleted).
 
 ## trace_results.py — layer 4, traceability closure
 

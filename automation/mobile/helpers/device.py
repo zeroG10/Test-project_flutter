@@ -32,8 +32,8 @@ def platform_of(driver: WebDriver) -> str:
 
 # Android: the driver's own check after ``am force-stop`` lists the app's processes from
 # ActivityManager — and a stale record with pid 0 (``ProcessRecord{… 0:<package>/u0a219}``, seen
-# after the module 01+03 runs on 2026-09-29) never goes away, so it waits in vain ("[12799,0] ->
-# [0]", even with 10 s; run 2). So: force-stop without the driver's check, then wait until ``pidof``
+# after repeated runs) never goes away, so it waits in vain ("[12799,0] ->
+# [0]", even with 10 s). So: force-stop without the driver's check, then wait until ``pidof``
 # finds no process (it ignores pid 0). Measured: gone 0.3 s (foreground) / 0.64 s (background)
 # after force-stop, adb included; the ceiling below only matters on a stuck device.
 TERMINATE_TIMEOUT_ANDROID = 10.0

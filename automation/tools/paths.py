@@ -7,9 +7,9 @@ made while working). Per platform:
   with every check and its evidence, `index.html`;
 - `reports/<platform>/client/`   — the test completion report for the client;
 - `reports/<platform>/pdf/`      — both as PDF, named by the date of the run they describe;
-- `reports/site/<platform>/`     — the publishable build of the internal report (gitignored; `npm run qa:site`).
+- `reports/site/<platform>/`     — the publishable build of the internal report (gitignored; `npm run qa:web:site`).
 
-Renaming the folder is one edit here plus `git mv` (owner's decision of 2026-09-28: `exports/` became `reports/`).
+Renaming the folder is one edit here plus `git mv`.
 """
 
 from __future__ import annotations

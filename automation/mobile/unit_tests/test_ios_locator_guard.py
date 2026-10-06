@@ -1,8 +1,9 @@
-"""Guard for the iOS column of the screen maps in the Android stage (docs/notes/android-plan.md §3).
+"""Guard for the iOS column of the screen maps while Android is added (SECOND-PLATFORM.md).
 
-The iOS suite is proven by three identical runs (tag ``ios-final-2026-09-28``). Android locators go
-into the same maps, next to ``ios=`` — this test fails when any iOS locator or screen anchor
-changed, appeared or disappeared, so Android work cannot silently touch iOS.
+Once the iOS suite is proven (its final runs), its locators are recorded in a snapshot. Android
+locators then go into the same maps, next to ``ios=`` — this test fails when any iOS locator or
+screen anchor changed, appeared or disappeared, so the Android work cannot silently touch iOS.
+Without a snapshot (no platform closed yet) the guard has nothing to hold and says so.
 
     cd automation/mobile && uv run python -m unittest unit_tests.test_ios_locator_guard -v
 
@@ -56,22 +57,25 @@ def diff(old: dict[str, dict], new: dict[str, dict]) -> list[str]:
 
 
 class IosLocatorGuard(unittest.TestCase):
+    def setUp(self):
+        if not SNAPSHOT.is_file():
+            self.skipTest(
+                f"no snapshot at {SNAPSHOT.name}: iOS is not closed — record it with --update"
+            )
+
     def test_ios_column_is_unchanged(self):
-        self.assertTrue(SNAPSHOT.is_file(), f"no snapshot at {SNAPSHOT}")
         recorded = json.loads(SNAPSHOT.read_text(encoding="utf-8"))
         changes = diff(recorded, ios_column())
         self.assertEqual(
             changes,
             [],
-            "iOS locators changed — iOS is closed (tag ios-final-2026-09-28); revert, or re-record "
+            "iOS locators changed — iOS is closed (its snapshot); revert, or re-record "
             "with --update only on the owner's word:\n  " + "\n  ".join(changes),
         )
 
     def test_snapshot_is_not_empty(self):
         recorded = json.loads(SNAPSHOT.read_text(encoding="utf-8"))
-        self.assertGreaterEqual(
-            len(recorded), 47, "the iOS stage recorded 47 screens from 26 map files"
-        )
+        self.assertGreater(len(recorded), 0, "an empty snapshot holds nothing")
 
 
 if __name__ == "__main__":

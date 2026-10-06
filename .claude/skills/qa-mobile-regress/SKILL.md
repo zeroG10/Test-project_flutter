@@ -1,13 +1,12 @@
 ---
 name: qa-mobile-regress
-description: MOBILE (iOS / Android app, native or Flutter) — run the whole mobile regression on iOS, Android or both side by side, compare every test with the last final run and say exactly what changed. Use when the user says "регрес iOS", "регрес Android", "мобільний регрес на обох", "full regression on android", "нічний прогін апки". Web regression is /qa-run.
+description: MOBILE (iOS / Android app, native or Flutter) — run the whole mobile regression on iOS, Android or both side by side, compare every test with the last final run and say exactly what changed. Use when the user says "регрес iOS", "регрес Android", "мобільний регрес на обох", "full regression on android", "нічний прогін апки".
 ---
 
 # QA regress — the whole regression, compared with the last final run
 
 > **Scope.** The mobile stack only (`automation/mobile/`), for any app kind — native or Flutter: the platform is the
-> OS (`ios` / `android`), `APP_KIND` lives in `.env`. The web stack has its own skills (`/qa-run`, `/qa-report`);
-> platform-neutral ones (`/qa-bug`, `/qa-handoff`, where the template provides them) serve both.
+> OS (`ios` / `android`), `APP_KIND` lives in `.env`.
 
 Wrapper around [scripts/qa.sh](../../../automation/mobile/scripts/qa.sh) `… all` and
 [mobile_compare_runs.py](../../../automation/tools/mobile_compare_runs.py). The baseline is the run the final

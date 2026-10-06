@@ -10,9 +10,9 @@ the app; stop it with Ctrl-C / kill.
     PYTHONPATH=. uv run python scripts/recon/app_logs.py <out-file> [--seconds 1800] [--android]
 
 ``--android``: the URL is read from logcat (tag ``flutter``) and its port forwarded with
-``adb forward`` (offline recon 2026-10-01: the app's reasons are in developer.log, not logcat).
+``adb forward`` (the app's reasons are in developer.log, not logcat).
 
-Why: Q-ORDD-6 — attachments do not load on the simulator and the app's reason is only in its
+Why: when something does not load on the simulator, the app's reason is only in its
 own logs (developer.log / print), not in the simulator's unified log.
 """
 

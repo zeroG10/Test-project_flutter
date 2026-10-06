@@ -1,13 +1,12 @@
 ---
 name: qa-mobile-report
-description: MOBILE — make a finished mobile regression run the basis of the final reports: update the traceability, rebuild the six test completion reports (iOS / Android / both × internal / client) and the PDFs, run the privacy check — and update the published pages only when the owner says so. Use when the user says "онови мобільні звіти", "збери звіти iOS / Android з останнього прогону", "rebuild the mobile reports", "PDF мобільних звітів". Web reports are /qa-report.
+description: MOBILE — make a finished mobile regression run the basis of the final reports: update the traceability, rebuild the six test completion reports (iOS / Android / both × internal / client) and the PDFs, run the privacy check — and update the published pages only when the owner says so. Use when the user says "онови мобільні звіти", "збери звіти iOS / Android з останнього прогону", "rebuild the mobile reports", "PDF мобільних звітів".
 ---
 
 # QA report — from a regression run to the reports people get
 
 > **Scope.** The mobile stack only (`automation/mobile/`), for any app kind — native or Flutter: the platform is the
-> OS (`ios` / `android`), `APP_KIND` lives in `.env`. The web stack has its own skills (`/qa-run`, `/qa-report`);
-> platform-neutral ones (`/qa-bug`, `/qa-handoff`, where the template provides them) serve both.
+> OS (`ios` / `android`), `APP_KIND` lives in `.env`.
 
 Wrapper around [trace_results.py](../../../automation/tools/trace_results.py),
 [mobile_reports.py](../../../automation/tools/mobile_reports.py) and
@@ -38,7 +37,7 @@ rewrite `history_note` to say what the listed runs are.
 cd automation/tools && uv run python trace_results.py --platform mobile \
   $(for c in ../../qa/mobile/*/*-checklist.md; do printf -- '--checklist %s ' "$c"; done) \
   --allure-dir ../mobile/results/<platform>/<run> \
-  --target "<device · OS · DEV API>" --build "<version (build), source, debug|release>" \
+  --target "<device · OS · test environment>" --build "<version (build), source, debug|release>" \
   --run-label "<what ran, harness commit, date>" \
   --out ../../qa/mobile/<platform>/final-traceability.md
 ```
@@ -72,7 +71,7 @@ before it is sent.
   `client_url`): Artifact publish with `url`, `file_path` =
   `automation/mobile/reports/publish/{internal,client}-page.html`, `root` = the absolute path of
   `reports/`, `files` = the files that changed (≤ 255 per call; files left out are kept).
-- **Commit** on «коміть», **push** on «пуш» — never on your own.
+- **Commit** and **push** only on the owner's explicit word — never on your own.
 
 ## Rules
 

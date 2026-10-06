@@ -1,4 +1,4 @@
-"""Recon A1: which iOS locator texts are found in the Android dumps (step 2 → step 3 input).
+"""Recon: which iOS locator texts are found in the Android dumps (input for Android screen maps).
 
 For every screen map alias with an iOS locator, take the text it looks for (accessibility id, or the
 quoted value of ``name/label ==``, ``CONTAINS``, ``BEGINSWITH`` in a predicate) and search the
@@ -6,11 +6,11 @@ Android UiAutomator2 dumps: ``content-desc``, ``text`` and ``hint``. Newlines ar
 (Flutter joins lines with ``\\n`` on both platforms).
 
     cd automation/mobile
-    PYTHONPATH=. uv run python scripts/recon/compare_android.py ../../qa/shared/recon-dumps/android-2026-09-29 [--md out.md]
+    PYTHONPATH=. uv run python scripts/recon/compare_android.py <dumps-dir> [--md out.md]
 
 Status per alias: ``exact`` (same text on Android) · ``contains`` (the Android node contains it) ·
 ``missing`` (not in any dump yet: either not recon'ed yet or the text differs) · ``no-text``
-(the iOS locator is structural or parametrised — decided by hand in step 3).
+(the iOS locator is structural or parametrised — decided by hand).
 """
 
 import argparse

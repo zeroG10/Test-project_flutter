@@ -1,7 +1,7 @@
 """Pixel oracle: is anything actually drawn inside an element's bounds?
 
-For elements the accessibility tree misreports. Recon 3d: the OTP ``Incorrect code.`` text is
-in the tree and reported ``visible=true`` while nothing is drawn — so neither presence nor
+For elements the accessibility tree misreports: an error text can be in the tree and reported
+``visible=true`` while nothing is drawn — so neither presence nor
 Appium visibility can decide "the error is shown", and a test built on them passes falsely.
 The screenshot can: inside the element's box, text means pixels unlike the background.
 
@@ -44,7 +44,7 @@ def box_colour_share(
     png: bytes, box: dict, scale: float, rgb: tuple[int, int, int], tolerance: int = 45
 ) -> float:
     """Share of the pixels in ``box`` (points) painted in ``rgb`` (± ``tolerance``) — a small mark
-    the tree does not hold, e.g. the unread dot of a notification (module 11)."""
+    the tree does not hold, e.g. an unread badge."""
     image = Image.open(io.BytesIO(png)).convert("RGB")
     region = image.crop((
         round(box["x"] * scale), round(box["y"] * scale),
@@ -62,12 +62,12 @@ def box_colour_share(
 
 
 def mean_brightness(png: bytes) -> float:
-    """Mean grey level of the whole screenshot, 0–255 (module 12: the light theme ~246, the dark
+    """Mean grey level of the whole screenshot, 0–255 (e.g. a light theme ~246, a dark
     one ~39)."""
     return ImageStat.Stat(Image.open(io.BytesIO(png)).convert("L")).mean[0]
 
 
-# --- whole-screen oracles (module 01 Splash: no labelled element to ask the tree about) ---
+# --- whole-screen oracles (a screen without a labelled element to ask the tree about) ---
 
 SPLASH_DOWNSCALE = 6  # every 6th pixel is plenty for a flat brand colour and a 100-pt logo
 COLOUR_TOLERANCE = 45  # summed RGB distance still counted as "the same colour"

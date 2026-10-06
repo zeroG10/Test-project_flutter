@@ -8,8 +8,8 @@ Two copies, one command each — nothing runs against an environment, the report
   --share          reports/mobile/<slice>/{internal,client,pdf}/ + reports/mobile/{internal,client}.html — the copy
                    people get: the test account's email, phone and name hidden in the text and pixelated on the
                    screens (boxes found by mobile_redact_screens.py), no API bodies, page sources or videos, screens
-                   shrunk; checked by `mobile_redact_screens.py check` before anything else may use it. The final reports
-                   of a regression are this copy, committed.
+                   shrunk; checked by `mobile_redact_screens.py check` before anything else may use it. The final
+                   reports of a regression are this copy, committed.
 
     cd automation/tools && uv run python mobile_reports.py [--share]
 """
@@ -24,12 +24,12 @@ import sys
 from pathlib import Path
 
 import mobile_brand as brand
-import paths
-import mobile_summary as bs
 import mobile_client_report
 import mobile_combined_report
 import mobile_redact_screens
 import mobile_report_data as rd
+import mobile_summary as bs
+import paths
 
 SHARE_ROOT = paths.REPORTS_DIR / "mobile"  # reports/<platform>/ — the layout the web reports use
 
@@ -78,11 +78,20 @@ def build(root: Path, share: bool) -> int:
         end = max(p.end for p in ps)
         slc = brand.slice_(key)
         # which run each report describes: the PDFs take their names and footers from here
-        (root / key / "run.json").write_text(json.dumps({
-            "date": end.strftime("%Y-%m-%d"), "runs": {p.key: p.run_date for p in ps}, "company": brand.COMPANY,
-            "product": slc.product, "file_prefix": slc.file_prefix,
-            "verdict": rd.worst(ps)[0],
-        }, indent=1), encoding="utf-8")
+        (root / key / "run.json").write_text(
+            json.dumps(
+                {
+                    "date": end.strftime("%Y-%m-%d"),
+                    "runs": {p.key: p.run_date for p in ps},
+                    "company": brand.COMPANY,
+                    "product": slc.product,
+                    "file_prefix": slc.file_prefix,
+                    "verdict": rd.worst(ps)[0],
+                },
+                indent=1,
+            ),
+            encoding="utf-8",
+        )
     if share:
         print(f"client:   {mobile_client_report.write_entry(both, root)}")
         for name in ("internal", "client"):
@@ -97,8 +106,13 @@ def publish_fragment(page: Path, out: Path) -> Path:
     """An entry page as the Artifact host wants its main page: the host adds the document skeleton itself, so the
     page goes without doctype / html / head / body — head content first (title, fonts, style), then the body."""
     text = page.read_text(encoding="utf-8")
-    text = re.sub(r"^<!doctype html><html lang=['\"]en['\"]><head><meta charset=['\"]utf-8['\"]>"
-                  r"<meta name=['\"]viewport['\"][^>]*>", "", text, flags=re.IGNORECASE)
+    text = re.sub(
+        r"^<!doctype html><html lang=['\"]en['\"]><head><meta charset=['\"]utf-8['\"]>"
+        r"<meta name=['\"]viewport['\"][^>]*>",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
     text = re.sub(r"</body></html>\s*$", "", text.replace("</head><body>", "\n", 1))
     if re.search(r"<!doctype|<html|<head>|<body", text, re.IGNORECASE):
         raise ValueError(f"{page}: not a page this builder wrote — no fragment made")
@@ -116,8 +130,9 @@ def main(argv: list[str] | None = None) -> int:
     if code or not args.share:
         return code
     # the shared copy is only done when nothing of the account is left on it
-    return mobile_redact_screens.main(["check", *(str(root / k) for k in brand.SLICES),
-                                str(root / "internal.html"), str(root / "client.html")])
+    return mobile_redact_screens.main(
+        ["check", *(str(root / k) for k in brand.SLICES), str(root / "internal.html"), str(root / "client.html")]
+    )
 
 
 if __name__ == "__main__":

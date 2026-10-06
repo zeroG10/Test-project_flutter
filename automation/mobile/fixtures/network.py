@@ -1,4 +1,4 @@
-"""Network control for the Android offline tests (step 5, recon A2): the device's Wi-Fi + mobile
+"""Network control for the Android offline tests: the device's Wi-Fi + mobile
 data and the emulator's speed. Whatever a test does — also when it fails — the network is ON, at
 full speed and resolving names again when it ends, so the next test starts online."""
 

@@ -1,12 +1,12 @@
 """Parallel runs (PARALLEL-RUNS.md): what each platform's run uses, and when two may go side by
 side. Offline — fresh ``Settings`` objects, no .env, no device, no API."""
 
-import re
+import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
 
-from config.settings import Settings, settings
-from fixtures import jobs
+from config.settings import Settings
 from scripts import qa
 
 
@@ -65,40 +65,47 @@ class AccountPerPlatform(unittest.TestCase):
         self.assertEqual(make().can_run_in_parallel()[0], False)
 
 
-class RunStamp(unittest.TestCase):
-    def test_the_platforms_letter_keeps_two_runs_apart_at_the_same_length(self) -> None:
-        with mock.patch.object(settings, "run_tag", "I"):
-            ios = jobs._run_stamp()
-        with mock.patch.object(settings, "run_tag", "A"):
-            android = jobs._run_stamp()
-        with mock.patch.object(settings, "run_tag", "-"):
-            plain = jobs._run_stamp()
-        self.assertRegex(ios, r"^\d{4}I\d{6}$")
-        self.assertRegex(android, r"^\d{4}A\d{6}$")
-        self.assertRegex(plain, r"^\d{4}-\d{6}$")  # the id shape the final runs used
-        self.assertEqual(len(ios), len(plain))
-        # the offline dialog's reader of job ids (tests/android/test_offline_submit_deliverables.py)
-        self.assertTrue(re.fullmatch(r"QA-AUTO-[0-9A-Z-]+", f"QA-AUTO-{ios}-NEW"))
-
-
 class Launcher(unittest.TestCase):
-    def test_a_module_by_number_name_or_part(self) -> None:
-        self.assertEqual(qa.resolve_module("02"), "authentication")
-        self.assertEqual(qa.resolve_module("auth"), "authentication")
-        self.assertEqual(qa.resolve_module("order-list"), "order_list")
-        with self.assertRaises(SystemExit):
-            qa.resolve_module("order")  # order_list, order_details, order_progress
+    """scripts/qa.py on a made-up project: modules from qa/mobile/<NN>/, tests by platform."""
 
-    def test_android_gets_its_own_tests_too(self) -> None:
-        self.assertEqual(qa.targets("ios", "all"), ["tests/shared"])
-        self.assertEqual(qa.targets("android", "all"), ["tests/shared", "tests/android"])
-        self.assertEqual(qa.targets("ios", "auth"), ["tests/shared/test_authentication.py"])
-        self.assertEqual(
-            qa.targets("android", "auth"),
-            ["tests/shared/test_authentication.py", "tests/android/test_offline_authentication.py"],
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        root = Path(self.tmp.name)
+        mobile = root / "automation" / "mobile"
+        for folder in ("01-sign-in", "02-item-list", "03-item-details"):
+            (root / "qa" / "mobile" / folder).mkdir(parents=True)
+        for rel in ("tests/shared/test_sign_in.py", "tests/shared/test_item_list.py",
+                    "tests/android/test_offline_sign_in.py", "tests/ios/__init__.py"):  # fmt: skip
+            (mobile / rel).parent.mkdir(parents=True, exist_ok=True)
+            (mobile / rel).write_text("")
+        patches = (
+            mock.patch.object(qa, "MOBILE", mobile),
+            mock.patch.object(qa, "SHARED", mobile / "tests" / "shared"),
         )
-        node = "tests/shared/test_splash.py::test_x"
+        for patch in patches:
+            patch.start()
+            self.addCleanup(patch.stop)
+        self.addCleanup(self.tmp.cleanup)
+
+    def test_a_module_by_number_name_or_part(self) -> None:
+        self.assertEqual(qa.resolve_module("01"), "sign_in")
+        self.assertEqual(qa.resolve_module("sign"), "sign_in")
+        self.assertEqual(qa.resolve_module("item-list"), "item_list")
+        with self.assertRaises(SystemExit):
+            qa.resolve_module("item")  # item_list, item_details
+
+    def test_a_platform_gets_its_own_tests_too(self) -> None:
+        self.assertEqual(qa.targets("ios", "all"), ["tests/shared"])  # tests/ios holds no test file
+        self.assertEqual(qa.targets("android", "all"), ["tests/shared", "tests/android"])
+        self.assertEqual(qa.targets("ios", "sign"), ["tests/shared/test_sign_in.py"])
+        self.assertEqual(
+            qa.targets("android", "01"),
+            ["tests/shared/test_sign_in.py", "tests/android/test_offline_sign_in.py"],
+        )
+        node = "tests/shared/test_sign_in.py::test_x"
         self.assertEqual(qa.targets("ios", node), [node])
+        with self.assertRaises(SystemExit):
+            qa.targets("ios", "03")  # a module without a test file
 
 
 if __name__ == "__main__":

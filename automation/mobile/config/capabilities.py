@@ -64,12 +64,12 @@ def android_caps() -> UiAutomator2Options:
     opts.auto_grant_permissions = True
     opts.new_command_timeout = settings.new_command_timeout
     # Flutter redraws (spinners, the job timer) keep UiAutomator from ever seeing "idle": without
-    # this every action waits the default 10 s for it (recon A1). A busy emulator also needs
+    # this every action waits the default 10 s for it. A busy emulator also needs
     # longer than the default 30 s to start the UiAutomator2 server.
     opts.set_capability("appium:settings[waitForIdleTimeout]", 100)
     opts.set_capability("appium:uiautomator2ServerLaunchTimeout", 90000)
-    # The debug APK is 195 MB: its install (re-dexing) and `pm clear` take long on a busy
-    # emulator (module 02 run 1: install -r timed out after 60 s, pm clear failed after it).
+    # A large debug APK: its install (re-dexing) and `pm clear` take long on a busy emulator
+    # (a ~200 MB build timed out at 60 s, and `pm clear` failed after it).
     opts.set_capability("appium:androidInstallTimeout", 240000)
     opts.set_capability("appium:adbExecTimeout", 120000)
     return opts

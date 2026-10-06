@@ -41,7 +41,7 @@ BOTTOM_AREA = 1 / 3
 SCROLL_ATTEMPTS = 6
 VIEW_MARGIN = 50  # points kept clear at the top (status bar) and bottom (home indicator)
 # Android works in pixels (Pixel 7: 1080 x 2400): the status bar is 136 px, the app bar ends
-# at 283 px, the gesture bar takes the last ~65 px (recon A1).
+# at 283 px, the gesture bar takes the last ~65 px.
 VIEW_MARGIN_ANDROID = 150
 KEYCODE_0 = 7  # Android KeyEvent.KEYCODE_0; KEYCODE_1..9 follow
 
@@ -157,23 +157,23 @@ class BasePage:
         self, alias: str, text: str, timeout: float | None = None, per_char: bool = False
     ) -> None:
         """The ``fill`` step. ``per_char`` for masked inputs: a formatter that rewrites the
-        value on every keystroke drops characters typed in one burst (phone, recon 3d)."""
+        value on every keystroke drops characters typed in one burst (e.g. a phone number)."""
         with allure.step(f"fill {self.screen.qualified(alias)}"):
             element = waits.wait_present(self.driver, self.locator(alias), timeout)
             if not element.is_displayed():
-                # e.g. a lower field hidden by the keyboard the previous field opened (recon 3d)
+                # e.g. a lower field hidden by the keyboard the previous field opened
                 self.scroll_to(alias)
                 element = waits.wait_visible(self.driver, self.locator(alias), timeout)
             element.click()  # focus it, as a user does: keys typed into a moving view go nowhere
-            # Focusing rebuilds the Flutter widget: the old reference goes stale (prove-red run,
-            # TC-AUTH-003 setup) — find the field again before touching it.
+            # Focusing rebuilds the Flutter widget: the old reference goes stale
+            # — find the field again before touching it.
             element = waits.wait_present(self.driver, self.locator(alias), timeout)
             element.clear()
             self._send(element, text, per_char)
             element = waits.wait_present(self.driver, self.locator(alias), timeout)
             if text and not self.field_value(element):
-                # Not one character landed (the view was still settling after a scroll,
-                # recon 3d). Input plumbing, not a verdict — logged, then typed once more.
+                # Not one character landed (the view was still settling after a scroll).
+                # Input plumbing, not a verdict — logged, then typed once more.
                 with allure.step("no input landed → tap the field and type again"):
                     waits.wait_visible(self.driver, self.locator(alias), timeout).click()
                     element = waits.wait_present(self.driver, self.locator(alias), timeout)
@@ -184,10 +184,10 @@ class BasePage:
 
         ``per_char`` on Android (the masked phone input — digits only): one key press per digit,
         ``mobile: pressKey``, injected by the UiAutomator2 server like a hardware key. Not
-        ``send_keys`` — every call REPLACES the text there (ACTION_SET_TEXT, module 02 run 1) —
+        ``send_keys`` — every call REPLACES the text there (ACTION_SET_TEXT) —
         and not ``mobile: type``: it switches to Appium's invisible IME and back for every call
-        (~2.4 s here), sent as one burst the formatter dropped keys ('(20450' for 2025550450),
-        and Gboard popped up seconds later over Continue (TC-AUTH-014 re-runs)."""
+        (~2.4 s measured), sent as one burst the formatter dropped keys ('(20450' for 2025550450),
+        and Gboard popped up seconds later over the next button."""
         if per_char and self.platform == "android":
             if not text.isdigit():
                 raise ValueError(f"per-char typing on Android takes digits only, got {text!r}")
@@ -225,8 +225,8 @@ class BasePage:
             self._settle_in_view(alias, height, **params)
 
     def _settle_in_view(self, alias: str, height: int, **params: object) -> None:
-        """A partly visible element is 'visible' too, and a tap on its centre can miss (run 1:
-        the SMS Terms Accept button cut by the screen edge). Nudge it fully into view."""
+        """A partly visible element is 'visible' too, and a tap on its centre can miss (e.g.
+        a button cut by the screen edge). Nudge it fully into view."""
         margin = VIEW_MARGIN_ANDROID if self.platform == "android" else VIEW_MARGIN
         for _ in range(3):
             rect = waits.wait_visible(self.driver, self.locator(alias, **params), 2).rect
@@ -243,15 +243,15 @@ class BasePage:
     def _drag(self, from_y: int, to_y: int) -> None:
         """A vertical drag without a fling (move, hold, release), so the view stops where the
         finger stops. At the left margin: a drag that starts on an input does not scroll,
-        and a fling overshoots the target (recon 3d)."""
+        and a fling overshoots the target."""
         actions = ActionChains(self.driver)
         actions.w3c_actions = ActionBuilder(
             self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "finger"), duration=400
         )
         pointer = actions.w3c_actions.pointer_action
         x = self.DRAG_X_ANDROID if self.platform == "android" else 10
-        # Android: a 0.3-s hold still let Flutter fling now and then (the survey walk measured
-        # 1187 and 1305 px for an 840-px drag — module 08 Android run 5): hold longer there
+        # Android: a 0.3-s hold still let Flutter fling now and then (a long form measured
+        # 1187 and 1305 px for an 840-px drag): hold longer there
         hold = 0.6 if self.platform == "android" else 0.3
         pointer.move_to_location(x, from_y).pointer_down()
         pointer.move_to_location(x, to_y).pause(hold).release()
@@ -260,7 +260,7 @@ class BasePage:
     def tap_at(self, alias: str, fx: float, fy: float, **params: object) -> None:
         """Tap a point inside ``alias`` given as fractions of its bounds.
 
-        The fallback for an element without a name (decision 2026-09-23): the map names the
+        The fallback for an element without a name: the map names the
         nearest labelled anchor, the page says where inside it the control sits. Every use
         is a testability defect with a ``note=`` in the map.
         """
@@ -273,7 +273,7 @@ class BasePage:
     def tap_disabled(self, alias: str, **params: object) -> None:
         """Tap a control that is shown but disabled — to prove the tap does nothing. ``tap``
         waits for it to be clickable (shown AND enabled), which a disabled control never is
-        (Android offline, TC-DLV-007: the disabled Submit deliverables)."""
+        (e.g. a disabled submit button)."""
         rect = self.rect(alias, **params)
         with allure.step(f"tap {self._name(alias, params)} (disabled)"):
             self.tap_xy(rect["x"] + rect["width"] / 2, rect["y"] + rect["height"] / 2)
@@ -328,15 +328,15 @@ class BasePage:
 
     def label_of(self, element: WebElement) -> str:
         """What the element says: iOS ``name``; Android ``content-desc``, else ``text`` — a
-        Flutter label is in ``content-desc`` and ``.text`` is empty there (recon A1)."""
+        Flutter label is in ``content-desc`` and ``.text`` is empty there."""
         if self.platform == "android":
             return self._attr(element, "content-desc") or self._attr(element, "text")
         return element.get_attribute("name") or ""
 
     def _attr(self, element: WebElement, name: str) -> str:
         """An attribute as text. UiAutomator2 answers the STRING 'null' for an attribute a native
-        view does not have (a system dialog's TextView has no content-desc — module 04 Android,
-        TC-ORDD-005: label_of read 'null', never the text); Flutter nodes rarely lack one."""
+        view does not have (a system dialog's TextView has no content-desc, so
+        label_of would read 'null' instead of the text); Flutter nodes rarely lack one."""
         value = element.get_attribute(name)
         return "" if value is None or (self.platform == "android" and value == "null") else value
 
@@ -500,7 +500,7 @@ class BasePage:
         """Visible texts whose bounds lie inside ``alias`` — from ONE page-source read.
 
         Flutter draws a field's validation message inside the field's bounds, as a separate
-        text element without an id (recon 3c). The field's own label is excluded.
+        text element without an id. The field's own label is excluded.
         """
         box = self.rect(alias, **params)
         own = normalized(self.label_of(self.find(alias, **params)))
@@ -532,7 +532,7 @@ class BasePage:
                 int(a.get("height", 0)),
             )
         # Android twin of iOS StaticText: plain, non-interactive text. The phone field holds the
-        # country-code Button ('United States + 1\n+ 1') inside its bounds (recon A1).
+        # country-code Button ('United States + 1\n+ 1') inside its bounds.
         if a.get("displayed") == "false" or not a.get("bounds") or a.get("clickable") == "true":
             return "", None
         if a.get("class") in ("android.widget.Button", "android.widget.EditText"):

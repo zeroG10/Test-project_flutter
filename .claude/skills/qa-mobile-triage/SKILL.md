@@ -6,8 +6,7 @@ description: MOBILE — triage the red and blocked tests of a mobile run (iOS / 
 # QA triage — why a test is red, with evidence
 
 > **Scope.** The mobile stack only (`automation/mobile/`), for any app kind — native or Flutter: the platform is the
-> OS (`ios` / `android`), `APP_KIND` lives in `.env`. The web stack has its own skills (`/qa-run`, `/qa-report`);
-> platform-neutral ones (`/qa-bug`, `/qa-handoff`, where the template provides them) serve both.
+> OS (`ios` / `android`), `APP_KIND` lives in `.env`.
 
 Starts from [mobile_compare_runs.py](../../../automation/tools/mobile_compare_runs.py), ends with one decision
 per test. Doctrine (CLAUDE.md): never fake a Pass, name the oracle, fix the harness — never the
@@ -38,7 +37,7 @@ App logs hold a token: read them in the scratchpad only, never commit or quote t
 | **the environment** | device / Appium / network / server error, a timing miss under load, the other platform's run going | `Blocked` with the reason; fix the cause or note it; the test is owed |
 | **the test (harness)** | wrong locator, a wait too short, state left by another test, data collision | fix the harness — propose the change, make it on the owner's go |
 | **a wrong expectation** | the oracle says otherwise than the test asserts | a test defect: correct the test case and the test to the oracle, cite it; no bug |
-| **the app** | the app contradicts a named oracle, reproducibly | a bug **draft** per `prompts/08-file-bug.md` (three gates, severity walk, evidence) — through `/qa-bug` where the template provides it; filed only on the owner's word |
+| **the app** | the app contradicts a named oracle, reproducibly | a bug **draft** per `prompts/08-file-bug.md` (three gates, severity walk, evidence); filed only on the owner's word |
 | **no oracle** | nobody wrote what should happen | a question in `<module>-questions.md`; the check stays not-run, never Passed |
 
 Cannot tell the environment from the rest by reading? ONE diagnostic re-run of that single test,

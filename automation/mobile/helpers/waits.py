@@ -35,7 +35,7 @@ def _seconds(timeout: float | None) -> float:
 # UiAutomator2 cannot read the tree while the app's main thread is busy (a debug Flutter build's
 # cold start, a starved emulator): "Timed out … waiting for the root AccessibilityNodeInfo in the
 # active window". Inside a wait that is "not yet", like a missing element — the wait's own timeout
-# still decides (Android stage, module 02 run 1: TC-AUTH-004 errored at its first probe).
+# still decides (otherwise a test errors at its first probe).
 _TREE_NOT_READY = ("waiting for the root AccessibilityNodeInfo",)
 
 
@@ -231,8 +231,8 @@ def is_visible(driver: WebDriver, locator: Locator, timeout: float | None = None
 
 def focused(driver: WebDriver, timeout: float = 5.0):
     """The focused element, waiting while WebDriverAgent cannot name it yet — right after a tap
-    on a Flutter field it may answer "unable to find an element using '(null)'" (stable run on
-    7673885, TC-SRV-002)."""
+    on a Flutter field it may answer "unable to find an element using '(null)'" (seen on a
+    stable run)."""
 
     def probe(d):
         try:

@@ -1,5 +1,4 @@
-"""System dialogs that exist only on Android (recon A1, 2026-09-29;
-qa/shared/recon-2026-09-29-android.md).
+"""System dialogs that exist only on Android.
 
 Other apps' UI: stable resource ids of the permission controller, Google Play services and the
 system ANR dialog. The iOS counterparts are system alerts answered by ``autoAcceptAlerts``.
@@ -58,8 +57,7 @@ ANR_DIALOG = Screen(
     elements={
         "title": El(
             android=(_ID, "android:id/alertTitle"),
-            note="Android only: '[DEV] CT Mobile isn't responding' — a starved emulator (recon A1, "
-            "Fable's analysis): Blocked, never Failed",
+            note="Android only: '<app> isn't responding' (a starved emulator): Blocked, not Failed",
         ),
         "wait": El(android=(_ID, "android:id/aerr_wait"), note="Android only: Wait"),
         "close-app": El(android=(_ID, "android:id/aerr_close"), note="Android only: Close app"),

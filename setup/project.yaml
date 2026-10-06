@@ -71,6 +71,10 @@ report:
   approved_by: "QA Lead, TRIARE"                  # the client report's sign-off
   mobile:
     environment: "DEV"                              # the test environment, as the reports name it
+    subject: "field technicians' mobile app"        # the app in running prose: "regression of the <subject>"
+    scope_notes:                                    # lines added to the internal reports' "Scope of this run"
+      - "DEV only; production is never tested. The API is used to create test data, clean up and check what the app stored — API tests are out of scope."
+      - "Test data is created, marked (QA-AUTO-…) and deleted by the tests; a throwaway technician is registered and removed; the main test account's name and theme are put back."
     out_of_scope:                                   # the client report's "Out of scope" list
       - "API testing as a discipline (the API was used only to prepare test data and to verify what the app stored)"
       - "Performance and load testing"

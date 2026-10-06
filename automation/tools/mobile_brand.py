@@ -6,7 +6,8 @@ what the mobile reports need and the web ones do not:
 
 - **slices** — one report subject per platform and one for both: `report.mobile.slices.{ios,android,all}`
   (product name, PDF prefix, the run it describes, published links);
-- the mobile client report's wording — `report.mobile.{environment,out_of_scope,client_groups,client_blocked}`;
+- the mobile reports' wording — `report.mobile.{environment,subject,scope_notes,out_of_scope,client_groups,
+  client_blocked}`;
 - two status colours the mobile pages use beside the brand's (Blocked is violet, never green) and the header
   pieces every mobile page shares (brand bar, the Internal tag, the Document block).
 
@@ -44,9 +45,15 @@ def _text(source: dict[str, Any], key: str, default: str = "—") -> str:
 
 
 ENVIRONMENT = _text(_MOBILE, "environment", "the test environment")
+SUBJECT = _text(_MOBILE, "subject", "mobile app")  # the app in running prose: "regression of the <subject>"
+SCOPE_NOTES = [
+    str(x) for x in (_MOBILE.get("scope_notes") or []) if _filled(x)
+]  # the internal report's "Scope of this run"
 OUT_OF_SCOPE = [str(x) for x in (_MOBILE.get("out_of_scope") or []) if _filled(x)]
 CLIENT_GROUPS: dict[str, str] = {str(k): str(v) for k, v in (_MOBILE.get("client_groups") or {}).items() if _filled(v)}
-CLIENT_BLOCKED: dict[str, str] = {str(k): str(v) for k, v in (_MOBILE.get("client_blocked") or {}).items() if _filled(v)}
+CLIENT_BLOCKED: dict[str, str] = {
+    str(k): str(v) for k, v in (_MOBILE.get("client_blocked") or {}).items() if _filled(v)
+}
 
 SLICES = ("ios", "android", "all")  # a platform each, and both together
 

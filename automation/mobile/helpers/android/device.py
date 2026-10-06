@@ -1,18 +1,18 @@
-"""Android-only device operations over adb (Android stage; recon A1 —
-qa/shared/recon-2026-09-29-android.md).
+"""Android-only device operations over adb.
 
 Everything that changes the device is undone by its context manager, also on failure.
 
 * ``gps_feed`` — the emulator GPS reports a point once per ``adb emu geo fix``; the app asks for a
-  FRESH fix at check-in and, without one in time, shows "Enter location manually". The feed
-  repeats the fix every second while a step runs. These fixes are NOT mocked for the app (unlike
-  the iOS simulator), so check-in works without the app's debug switch (owner, Q-CHIO-A1).
+  FRESH fix for a location-gated action and, without one in time, shows "Enter location
+  manually". The feed repeats the fix every second while a step runs. These fixes are NOT
+  mocked for the app (unlike the iOS simulator), so location-gated actions work without the
+  app's debug switch.
 * ``mock_location`` — a real mocked location (Appium Settings as the mock provider): the app's
   guard shows "Location could not be trusted". The mock permission is restored afterwards.
 * ``offline`` — Wi-Fi and mobile data off, restored in ``finally``.
 * ``push_media`` — photos into the gallery (adb push + media scan), the ``simctl addmedia`` twin.
-* ``send_sms`` / ``app_links_allowed`` — a job link as an SMS in Google Messages and the user's
-  "open supported links" choice for the app (owner, Q-ORDL-A1: model the SMS where possible).
+* ``send_sms`` / ``app_links_allowed`` — a deep link delivered as an SMS in Google Messages and
+  the user's "open supported links" choice for the app (model the SMS where possible).
 """
 
 import contextlib
@@ -27,14 +27,18 @@ import allure
 
 APPIUM_SETTINGS = "io.appium.settings"
 NETWORK_BACK_TIMEOUT = 60.0  # s until a name resolves again after the network is switched on
-DEV_LINK_DOMAIN = "copsfieldservices.dev.concerttech.com"
+RESOLVE_PROBE_HOST = "dns.google"  # a name to resolve when the project has no API host
 
 
 def api_host() -> str:
-    """The API host the app talks to (``API_BASE_URL`` in .env)."""
+    """The API host the app talks to (``API_BASE_URL`` in .env): the name network checks resolve."""
     from config.settings import settings
 
-    return urllib.parse.urlparse(settings.api_base_url or "").hostname or DEV_LINK_DOMAIN
+    return (
+        urllib.parse.urlparse(settings.api_base_url or "").hostname
+        or settings.app_link_domain
+        or RESOLVE_PROBE_HOST
+    )
 
 
 class Adb:
@@ -122,9 +126,9 @@ class Adb:
     def remove_test_providers(self) -> None:
         """Drop the mock providers Appium Settings registered. Stopping its service leaves
         "gps provider [mock]" / "fused provider [mock]" behind, and while they stay the emulator's
-        real fixes never reach the app — every later check-in ends on "Enter location manually"
-        (module 05 Android run 1). The shell needs the MOCK_LOCATION app-op for the removal; it
-        gets it for these commands only."""
+        real fixes never reach the app — every later location-gated action ends on "Enter location
+        manually". The shell needs the MOCK_LOCATION app-op for the removal; it gets it for these
+        commands only."""
         with allure.step("device: remove leftover mock location providers"):
             self.shell("appops set com.android.shell android:mock_location allow", check=False)
             try:
@@ -137,7 +141,7 @@ class Adb:
                     "appops set com.android.shell android:mock_location default", check=False
                 )
 
-    # --- network (offline checks, step 5) -------------------------------------------------
+    # --- network (offline checks) -------------------------------------------------
 
     @contextlib.contextmanager
     def offline(self) -> Iterator[None]:
@@ -150,7 +154,7 @@ class Adb:
 
     def set_network(self, on: bool, *, check: bool = True) -> None:
         """Wi-Fi and mobile data on / off. On: also waits until a name resolves on the device —
-        the radios come back within seconds, DNS a little later (recon A2: ~6 s), and a request
+        the radios come back within seconds, DNS a little later (~6 s measured), and a request
         sent before that fails as offline although the switch is on."""
         state = "enable" if on else "disable"
         with allure.step(f"device: network {'ON' if on else 'OFF'} (wifi + data)"):
@@ -196,7 +200,7 @@ class Adb:
                 f"am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file://{target}"
             )
 
-    # --- SMS and links (module 03, Q-ORDL-A1) ---------------------------------------------
+    # --- SMS and links (deep links) ---------------------------------------------
 
     def send_sms(self, sender: str, text: str) -> None:
         """An incoming SMS on the emulator (the carrier's side); it lands in Google Messages."""
@@ -204,10 +208,15 @@ class Adb:
             self.run("emu", "sms", "send", sender, text)
 
     @contextlib.contextmanager
-    def app_links_allowed(self, package: str, domain: str = DEV_LINK_DOMAIN) -> Iterator[None]:
-        """The user's "open supported links" choice for ``domain``: our debug build is signed with
-        a local key, so Android's own App Link verification fails (recon A1) and the link would
-        open in Chrome. Restored in ``finally``."""
+    def app_links_allowed(self, package: str, domain: str = "") -> Iterator[None]:
+        """The user's "open supported links" choice for ``domain`` (default: ``APP_LINK_DOMAIN`` in
+        .env): a debug build is signed with a local key, so Android's own App Link verification
+        fails and the link would open in Chrome. Restored in ``finally``."""
+        from config.settings import settings
+
+        domain = domain or settings.app_link_domain
+        if not domain:
+            raise ValueError("app_links_allowed: no domain — set APP_LINK_DOMAIN in .env")
         with allure.step(f"device: links of {domain} open in the app (user selection)"):
             self.shell(
                 f"pm set-app-links-user-selection --user 0 --package {package} true {domain}"
@@ -225,9 +234,9 @@ class Adb:
     @contextlib.contextmanager
     def heads_up_off(self) -> Iterator[None]:
         """No heads-up pop-ups for the block (notifications still land in the shade); the old
-        value comes back afterwards. A job created through the API pushes "New job assigned",
-        and its pop-up lies over the app bar for seconds — a tap on the calendar toggle landed on
-        it (module 01+03 Android run 4, TC-ORDL-015). The iOS simulator shows no such pop-up."""
+        value comes back afterwards. An item created through the API pushes a notification,
+        and its pop-up lies over the app bar for seconds — a tap on an app-bar control landed on
+        it. The iOS simulator shows no such pop-up."""
         key = "heads_up_notifications_enabled"
         before = self.shell(f"settings get global {key}", check=False).strip()
         self.shell(f"settings put global {key} 0")
@@ -248,6 +257,6 @@ class Adb:
 
     def anr_on_screen(self) -> bool:
         """Whether the system "… isn't responding" dialog is up (an emulator starved of CPU —
-        recon A1, Fable's analysis: environment, Blocked, never Failed)."""
+        an environment problem: Blocked, never Failed)."""
         out = self.shell("dumpsys window windows", check=False, timeout=20)
         return "Application Not Responding" in out

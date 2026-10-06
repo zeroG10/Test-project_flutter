@@ -1,6 +1,6 @@
 """Evaluate Android locators against the recon trees (offline map-health for the Android column).
 
-The recon dumps (``qa/shared/recon-dumps/android-*/``) are UiAutomator2 page sources of the real
+The recon dumps (``recon-dumps/android-*/``) are UiAutomator2 page sources of the real
 app on the emulator. A locator of a screen map is evaluated on them the way UiAutomator2 would:
 
 * ``accessibility id`` — ``content-desc`` equals the value (newlines included);
@@ -8,10 +8,10 @@ app on the emulator. A locator of a screen map is evaluated on them the way UiAu
 * ``-android uiautomator`` — a ``new UiSelector()...`` chain of the matchers below; ``instance(n)``
   picks the n-th match in document order, as UiAutomator does.
 
-UiSelector does NOT unescape ``\\n`` in a quoted value (checked on the device, 2026-09-29): a label
+UiSelector does NOT unescape ``\\n`` in a quoted value (checked on the device): a label
 with a newline needs ``accessibility id`` or a ``…Contains`` / ``…StartsWith`` matcher.
 Nor ``\\\\``: a regex ``\\\\.`` reaches the device as two backslashes and a dot and never matches a
-literal dot (offline run 0307-r1, 2026-10-01) — write ``[.]``. Only ``\\"`` is unescaped here.
+literal dot — write ``[.]``. Only ``\\"`` is unescaped here.
 
     cd automation/mobile
     PYTHONPATH=. uv run python -m unit_tests.android_dumps [screen-id ...]   # one line per alias
@@ -25,9 +25,11 @@ from pathlib import Path
 
 from appium.webdriver.common.appiumby import AppiumBy
 
+from config.settings import settings
+
 REPO = Path(__file__).resolve().parents[3]
 DUMPS = sorted((REPO / "qa" / "shared" / "recon-dumps").glob("android-*"))
-APP_PACKAGE = "com.concerttechnologies.app.dev"
+APP_PACKAGE = settings.android_app_package  # a bare resource id belongs to the app under test
 
 _CALL = re.compile(r'\.(\w+)\((?:"((?:[^"\\]|\\.)*)"|(\d+)|(true|false))?\)')
 _STRING = {
@@ -37,7 +39,7 @@ _STRING = {
     # Java's Pattern.matches: whole value, and "." does NOT cross a newline (no DOTALL)
     "textMatches": lambda a, v: re.fullmatch(v, a.get("text", "")) is not None,
     # A node without content-desc has a NULL description on the device: no description selector
-    # matches it, not even description("") (module 01+03 Android run 3: the calendar toggle)
+    # matches it, not even description("") (e.g. an icon button without a label)
     "description": lambda a, v: a.get("content-desc") == v,
     "descriptionContains": lambda a, v: "content-desc" in a and v in a["content-desc"],
     "descriptionStartsWith": lambda a, v: "content-desc" in a and a["content-desc"].startswith(v),

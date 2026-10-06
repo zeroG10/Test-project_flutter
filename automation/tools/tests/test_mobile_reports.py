@@ -7,21 +7,21 @@ import mobile_brand as brand
 import mobile_redact_screens
 
 
-def test_every_slice_is_named_in_the_manifest() -> None:
+def test_every_slice_reads_its_names_from_the_manifest() -> None:
+    """A filled manifest names each slice; a template's placeholders leave it a draft — never a crash."""
     for key in brand.SLICES:
         slc = brand.slice_(key)
-        assert slc.product.startswith("Concert Technologies Field Technicians")
-        assert slc.file_prefix.startswith("ConcertTechnologies_FieldTechnicians_")
-        assert not brand.unset(slc), "a client report with an unset name is a draft"
-    assert brand.slice_("ios").run and brand.slice_("android").run
+        assert slc.key == key and slc.product and slc.file_prefix
+        if slc.product != "—":  # filled: a real name, a prefix without spaces
+            assert not slc.product.startswith("<") and " " not in slc.file_prefix
+        else:  # placeholders: the client report says "Draft — not for sending"
+            assert "product" in brand.unset(slc)
     assert brand.slice_("all").run is None  # the combined report reads the two platform runs
 
 
 def test_pdf_name_carries_the_run_date() -> None:
-    slc = brand.slice_("android")
-    assert slc.pdf_name("TestCompletionReport", "2026-10-02") == (
-        "ConcertTechnologies_FieldTechnicians_Android_TestCompletionReport_2026-10-02.pdf"
-    )
+    slc = brand.Slice(key="android", product="Example App", product_short="App", file_prefix="Example_Android")
+    assert slc.pdf_name("TestCompletionReport", "2026-10-02") == "Example_Android_TestCompletionReport_2026-10-02.pdf"
 
 
 def _terms() -> mobile_redact_screens.Terms:
@@ -71,15 +71,30 @@ def test_a_publish_fragment_has_no_document_skeleton(tmp_path) -> None:
 def _run(key: str, status: str, tc: str = "") -> object:
     import mobile_summary as bs
 
-    return bs.TestRun(title=f"{tc} {key}".strip(), status=status, detail="why", module="02 · Authentication",
-                      tc=tc, duration_s=1, start_ms=0, stop_ms=1, key=key, func=key)
+    return bs.TestRun(
+        title=f"{tc} {key}".strip(),
+        status=status,
+        detail="why",
+        module="02 · Authentication",
+        tc=tc,
+        duration_s=1,
+        start_ms=0,
+        stop_ms=1,
+        key=key,
+        func=key,
+    )
 
 
 def test_compare_runs_labels_what_changed() -> None:
     import mobile_compare_runs
 
-    base = {k: _run(k, s) for k, s in (("a", "Passed"), ("b", "Failed"), ("c", "Passed"), ("d", "Blocked"), ("e", "Passed"))}
-    new = {k: _run(k, s) for k, s in (("a", "Failed"), ("b", "Passed"), ("c", "Blocked"), ("d", "Blocked"), ("f", "Passed"))}
+    base = {
+        k: _run(k, s) for k, s in (("a", "Passed"), ("b", "Failed"), ("c", "Passed"), ("d", "Blocked"), ("e", "Passed"))
+    }
+    new = {
+        k: _run(k, s)
+        for k, s in (("a", "Failed"), ("b", "Passed"), ("c", "Blocked"), ("d", "Blocked"), ("f", "Passed"))
+    }
     result = mobile_compare_runs.compare(base, new, bugs=[])
     assert [r.key for r, _ in result["new_red"]] == ["a"]  # passed before, no defect names it
     assert [r.key for r, _ in result["fixed"]] == ["b"]
