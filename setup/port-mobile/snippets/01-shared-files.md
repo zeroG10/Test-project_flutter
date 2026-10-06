@@ -69,7 +69,7 @@ Under `report:` add (if there is a placeholder comment for the mobile reports, r
 
 ```yaml
   mobile:                                       # the mobile reports (automation/tools/mobile_brand.py)
-    environment: "<DEV>"                        # the test environment, as the reports name it
+    environment: "<dev|staging>"                # the test environment, as the reports name it
     subject: "<the app in running prose>"       # "regression of the <subject>"
     scope_notes: []                             # lines added to the internal reports' "Scope of this run"
     out_of_scope: []                            # the client report's "Out of scope" list

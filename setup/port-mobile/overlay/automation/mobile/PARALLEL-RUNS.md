@@ -35,14 +35,14 @@ how the harness is built.
 
 | What a run touches | Why sharing it breaks runs | How it is kept apart |
 |---|---|---|
-| **The test account** — its session, profile, theme, jobs, notifications | one run signs out or renames the profile under the other; a job seeded for one shows up in the other's list; "no active jobs" preconditions fail | **an account per platform**: `IOS_USER_*` / `ANDROID_USER_*` in `.env` (unset → the shared `APP_USER_*`) |
+| **The test account** — its session, profile, settings, the records it owns, notifications | one run signs out or renames the profile under the other; a record seeded for one shows up in the other's list; "nothing in progress" preconditions fail | **an account per platform**: `IOS_USER_*` / `ANDROID_USER_*` in `.env` (unset → the shared `APP_USER_*`) |
 | **The Appium server** | at its start a run closes every session a killed run left on *its* server — on a shared server that kills the other platform's live session | **a server per platform**: `IOS_APPIUM_PORT` / `ANDROID_APPIUM_PORT`; `scripts/start_appium.sh <platform>` |
 | **The device** | — | each platform has its own (a simulator, an emulator) |
 | **The run lock and the results** | two runs writing one folder mix their evidence | a lock per platform (`results/.run.<platform>.lock`), results per platform and run |
 | **Seeded data** — records, files | ids were stamped to the second: two runs seeding in the same second got the same id | the platform's letter in the stamp (`settings.run_tag`: `…1002I201937…` / `…A…`); every sweep and cleanup is scoped to the run's own account |
 | **Generated users** | — | emails are random and unique; phones come from one reserved block of 100 numbers and are checked against the server before use (a clash needs two registrations in the same second: accepted) |
 | **The report's privacy check** | a second account would appear unmasked in a shared report | redaction covers every account in `.env` (`automation/tools`: `Redactor`, `mobile_redact_screens.py`) |
-| Read-only things — the build, the survey template, the API admin login | nothing writes to them | shared |
+| Read-only things — the build, reference data the app only reads, the API admin login | nothing writes to them | shared |
 | **The machine and the server** | two devices and a doubled load on the test server slow everything; a test with a tight timing may go Blocked or red | not a correctness problem but a risk: see section 4 |
 
 Not possible with this setup: **two runs of the same platform** at once. That would need a second device, a
@@ -76,7 +76,7 @@ Parallel is a different environment from the one the suite was proven in. Prove 
 
 1. **Ask the owner for one test account per platform.** Each must be: registered and active on the test
    environment, the same role as the first, with its own phone / email, with no data the tests' "clean
-   state" preconditions would trip over (here: no active job), and free of other users — nobody tests
+   state" preconditions would trip over (nothing in progress under it), and free of other users — nobody tests
    by hand under it while a run goes.
 2. Put the second account in `automation/mobile/.env` as `IOS_USER_EMAIL` / `IOS_USER_PHONE`
    (`…_OTP` only if it differs), or the `ANDROID_USER_*` twins. Set `IOS_APPIUM_PORT` and

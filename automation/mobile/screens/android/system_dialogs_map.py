@@ -19,7 +19,7 @@ NOTIFICATION_PERMISSION = Screen(
     elements={
         "message": El(
             android=(_ID, f"{_PC}permission_message"),
-            note="Android only: 'Allow [DEV] CT Mobile to send you notifications?' — asked after "
+            note="Android only: 'Allow <app> to send you notifications?' — asked after "
             "the first sign-in (Android 13+ POST_NOTIFICATIONS; perm_notifications.xml)",
         ),
         "allow": El(android=(_ID, f"{_PC}permission_allow_button"), note="Android only: Allow"),
